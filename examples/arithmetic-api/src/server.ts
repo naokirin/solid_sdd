@@ -3,7 +3,7 @@ import { Calculator, PreconditionError, type Operation } from "./calculator.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
-const OPERATIONS = new Set<Operation>(["add", "sub", "mul", "div"]);
+const OPERATIONS = new Set<Operation>(["add", "sub", "mul", "div", "mod"]);
 
 async function readJson(req: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = [];

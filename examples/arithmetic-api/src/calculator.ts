@@ -1,4 +1,4 @@
-export type Operation = "add" | "sub" | "mul" | "div";
+export type Operation = "add" | "sub" | "mul" | "div" | "mod";
 
 export class PreconditionError extends Error {
   constructor(message: string) {
@@ -26,6 +26,13 @@ export const Calculator = {
     }
     return a / b;
   },
+
+  mod(a: number, b: number): number {
+    if (b === 0) {
+      throw new PreconditionError("divisor must be non-zero");
+    }
+    return a % b;
+  },
 };
 
 export function calculate(op: Operation, a: number, b: number): number {
@@ -38,6 +45,8 @@ export function calculate(op: Operation, a: number, b: number): number {
       return Calculator.mul(a, b);
     case "div":
       return Calculator.div(a, b);
+    case "mod":
+      return Calculator.mod(a, b);
     default: {
       const _exhaustive: never = op;
       return _exhaustive;

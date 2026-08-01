@@ -13,3 +13,8 @@ post ResultIsProduct: result = a * b
 context Calculator::div(a: Real, b: Real): Real
 pre DivisorIsNonZero: b <> 0
 post ResultIsQuotient: result = a / b
+
+-- JavaScript `%` remainder: sign follows dividend (a - b * truncTowardZero(a / b))
+context Calculator::mod(a: Real, b: Real): Real
+pre DivisorIsNonZero: b <> 0
+post ResultIsRemainder: result = a - b * (a / b).truncatedTowardZero()

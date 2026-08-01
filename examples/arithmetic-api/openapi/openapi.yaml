@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Arithmetic API
   version: 0.1.0
-  description: Evaluation sample for solid_sdd — four arithmetic operations over HTTP.
+  description: Evaluation sample for solid_sdd — five arithmetic operations over HTTP.
 servers:
   - url: http://localhost:3000
 paths:
@@ -24,7 +24,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculateResponse'
         '400':
-          description: Invalid request or precondition violation (e.g. division by zero)
+          description: Invalid request or precondition violation (e.g. division or modulo by zero)
           content:
             application/json:
               schema:
@@ -33,7 +33,7 @@ components:
   schemas:
     Operation:
       type: string
-      enum: [add, sub, mul, div]
+      enum: [add, sub, mul, div, mod]
     CalculateRequest:
       type: object
       additionalProperties: false
