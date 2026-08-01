@@ -4,7 +4,7 @@ description: >-
   Adversarial, read-only critique of a prior solid_sdd phase artifact (plan,
   contracts, derived tests, formal specs, or verification). When called from
   solidsdd-loop, must run as an explicit Task subagent. Emits CritiqueReport;
-  does not edit artifacts. Analogous to SpecKit analyze/clarify quality gates.
+  does not edit artifacts. Calibrated so only checkability holes fail the loop.
 license: MIT
 ---
 
@@ -16,19 +16,20 @@ license: MIT
 
 ## Purpose
 
-Emit a `CritiqueReport` that adversarially evaluates another phase’s result—especially **contract weakness** (thin preconditions, missing error shapes, density bias, weak derived tests).
+Emit a `CritiqueReport` that adversarially evaluates another phase’s result. Focus on **lost checkability** (missing `pre`, no API error path, tests that ignore existing `pre`, density vs signals). Polish stays `minor` so the loop can proceed.
 
 ## References
 
 - [critique-report.schema.json](references/critique-report.schema.json)
-- [adversarial-critique.md](references/adversarial-critique.md)
+- [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration (required)**
 - [loop-retry.md](references/loop-retry.md)
 - [judgment-axes.md](references/judgment-axes.md)
 
 ## Constraints
 
 - **Read-only**: do not modify ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
-- Do not soften findings to keep the loop moving
+- Do not inflate polish into `major` / `fail` (see severity calibration)
+- Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)
 
 ## Inputs (from parent Task prompt)
@@ -39,14 +40,14 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result—
 
 ## Steps
 
-1. Read [adversarial-critique.md](references/adversarial-critique.md) and apply the checklist for `subject`.
-2. Inspect the artifact; list every adequacy failure as a finding (prefer over-reporting thin contracts).
-3. Set `result` to `fail` if any finding is `blocker` or `major`; otherwise `pass`.
-4. On fail, choose `suggested_next_skills` that own the defect at the **source** (re-judge / re-apply / re-derive—not implement to paper over weak specs).
+1. Read [adversarial-critique.md](references/adversarial-critique.md), especially **Severity calibration**.
+2. Inspect the artifact; draft findings, then assign severity using the major vs not-major table.
+3. Set `result` to `fail` only if any finding is `blocker` or `major`; otherwise `pass` (minors allowed).
+4. On fail, choose `suggested_next_skills` that own the defect at the **source**.
 5. Shape output per [critique-report.schema.json](references/critique-report.schema.json).
 
 ## Success criteria
 
 - Findings are concrete (location + what is missing or too weak)
-- Contract-weakness checklist was applied for contract/test subjects
-- Failures are actionable for loop retry without parent rewriting artifacts
+- Severity matches calibration (standard-density samples can `pass` with minors)
+- Failures are actionable and worth consuming retry budget

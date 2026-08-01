@@ -10,7 +10,7 @@
 
 そのため **呼び出し元がオーケストレータ（`solidsdd.loop` または同等の親エージェント）のとき**、下表の「Subagent 必須」スキルは、親自身がスキル本体を実行してはならない。Cursor では Task ツール等で **明示的にサブエージェントを起動**し、スキル名と入出力だけを渡す。
 
-加えて、主要フェーズの直後は **`solidsdd.critique`（敵対的評価）を別 Task で必ず起動**する。これは SpecKit の clarify / analyze と同様、品質ゲートを独立コマンドとして分ける構成である。詳細はスキル同梱の `adversarial-critique.md`（編集ソース: `reference-src/adversarial-critique.md`）。
+加えて、主要フェーズの直後は **`solidsdd.critique`（敵対的評価）を別 Task で必ず起動**する。これは SpecKit の clarify / analyze と同様、品質ゲートを独立コマンドとして分ける構成である。ただし severity は **チェック可能性が失われたときだけ major/fail** とし、標準密度の磨き込みは minor（loop 継続）に留める。詳細はスキル同梱の `adversarial-critique.md`（編集ソース: `reference-src/adversarial-critique.md`）。
 
 手動でユーザーが単一スキルを指定した場合は、その会話エージェントが実行してよい（ユーザーが親になる）。
 

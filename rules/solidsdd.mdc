@@ -33,7 +33,7 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 ## Adversarial critique
 
 - After judge / apply-* / derive-tests / verify / apply-formal, run **`solidsdd-critique` as a Task subagent** (do not leave phase evaluation to the producer)
-- Critique must call out **thin contracts**, missing preconditions/error shapes, density bias, and weak derived tests
+- Critique fails the loop only for **checkability holes** (missing `pre` / error path, tests ignoring `pre`, density vs signals, soft verify)—polish is `minor` / pass
 - On critique fail: feedback → re-run suggested skills as Task; shared **max_auto_retries = 3** with verify; then human gate (no infinite loop)
 - Details: `solidsdd-loop/references/adversarial-critique.md`
 

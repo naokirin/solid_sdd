@@ -21,11 +21,12 @@ On **fail**:
 
 `solidsdd-critique` must emit JSON matching `critique-report.schema.json`.
 
-On **fail** (`blocker` / `major` findings):
+On **fail** (`blocker` / `major` findings only—see adversarial-critique severity calibration):
 
 - Populate `suggested_next_skills` with the **source** skills (usually judge / apply-* / derive-tests—not implement to hide thin contracts).
 - Set `loop_action` the same way as verify (`retry` / `human_gate` / `stop`).
-- Prefer categories `thin_contract`, `missing_precondition`, `weak_test`, `density_bias` when adequacy is the issue.
+- Prefer categories `thin_contract`, `missing_precondition`, `weak_test`, `density_bias` when **checkability** is the issue.
+- Do **not** fail the loop for polish-only findings (`minor`).
 
 On **pass** with only `minor` findings: continue the loop; minors may be listed in the final summary.
 

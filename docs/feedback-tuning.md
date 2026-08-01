@@ -26,6 +26,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 | F7 | max retries=3 worked conceptually; same skill twice → gate | Keep max_auto_retries=3; escalate on repeated same skill (loop-retry) |
 | F8 | Ruby `%` raised `ZeroDivisionError` when guard removed—tests expect domain error | OCL derive/implement: map `pre` failures to a **named domain error** |
 | F9 | Phase evaluation left to the producing agent; contracts can stay thin | Dedicated `solidsdd-critique` Task after judge/apply/derive/verify; contract-weakness checklist; shared max_auto_retries=3 |
+| F10 | First critique dry-run failed all examples on polish (error unions, OCL exception names, formal liveness) | Severity calibration: `major` only when checkability is lost; polish → `minor` / pass |
 
 ## Intake template (external projects)
 
@@ -44,3 +45,4 @@ When an external project contributes feedback, append a row under [Intake log](#
 |------|---------|---------|----------|
 | 2026-08-02 | solid_sdd examples (Pass 1) | See table above | Applied to rules, axes, context, loop-retry, OCL adapter notes |
 | 2026-08-02 | solid_sdd design (F9) | Adversarial critique as explicit skill | Added `solidsdd-critique`, loop integration, shared retry budget |
+| 2026-08-02 | solid_sdd examples (F10) | Critique thresholds too strict for loop progress | Softened major criteria in adversarial-critique |
