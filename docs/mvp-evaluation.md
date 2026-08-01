@@ -34,4 +34,5 @@ Working tree returned to a green contract state after repair.
 ## Remaining (deferred)
 
 - `gh skill publish` / GitHub remote distribution
-- Phase 2+ (richer judgment axes, more adapters, formal specs)
+- Phase 2 adapter eval recorded: [phase2-evaluation.md](phase2-evaluation.md)
+- Phase 3 formal design / language-native DbC

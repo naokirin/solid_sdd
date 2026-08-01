@@ -60,6 +60,7 @@
 - [x] 別言語の契約テスト生成先（Ruby / RSpec）— [../adapters/ruby-rspec/README.md](../adapters/ruby-rspec/README.md), [../examples/arithmetic-ruby](../examples/arithmetic-ruby)
 - [x] 人間ゲート条件の整備（低信頼度・破壊的変更等）— [../reference-src/human-gates.md](../reference-src/human-gates.md)
 - [x] 検証レポートの標準化とループ復帰条件 — schema + [../reference-src/loop-retry.md](../reference-src/loop-retry.md)
+- [x] GraphQL / Ruby サンプルの通し評価 — [phase2-evaluation.md](phase2-evaluation.md)
 - [ ] 言語ネイティブ DbC（任意 gem 等）— **後回し**（プロジェクト拒否を前提にオプトイン設計が必要）
 
 ## フェーズ 3: 形式仕様の導入
