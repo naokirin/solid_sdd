@@ -1,16 +1,16 @@
 ---
-name: sdd-apply-api
+name: solidsdd-apply-api
 description: >-
   Add or update OpenAPI 3.x API contracts for solid_sdd. When called from
-  sdd-loop, must run as an explicit Task subagent. Use for ApplicationPlan
+  solidsdd-loop, must run as an explicit Task subagent. Use for ApplicationPlan
   kind=api with adapter_hint=openapi, or when asked to update API specs.
 ---
 
-# sdd.apply.api
+# solidsdd.apply.api
 
 ## Execution
 
-**subagent required** when invoked from `sdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task; do not edit OpenAPI inline in the parent. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
+**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task; do not edit OpenAPI inline in the parent. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
 
 ## Purpose
 

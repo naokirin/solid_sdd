@@ -35,6 +35,6 @@ curl -s localhost:3000/calculate -H 'content-type: application/json' \
 
 ## solid_sdd での使い方
 
-1. このディレクトリを対象に `sdd-context` → `sdd-judge` などを手動実行する
-2. または `sdd-loop` で自動実行する
-3. 意図的に実装を壊して `sdd-verify` が fail することを確認する
+1. このディレクトリを対象に `solidsdd-context` → `solidsdd-judge` などを手動実行する
+2. または `solidsdd-loop` で自動実行する
+3. 意図的に実装を壊して `solidsdd-verify` が fail することを確認する

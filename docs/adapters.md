@@ -12,7 +12,7 @@
 
 言語組み込みの contract 機能には依存しない。
 
-1. **人が／`sdd.apply.dbc` が書く第一級成果物**: OCL（事前条件・事後条件・不変条件）
+1. **人が／`solidsdd.apply.dbc` が書く第一級成果物**: OCL（事前条件・事後条件・不変条件）
 2. **サブエージェントが生成する従属物**: OCL から導出したテストコード
 3. **検証**: そのテストの実行結果で契約遵守を判定する
 
@@ -20,10 +20,10 @@
 OCL (source of truth)
         │
         ▼
-  sdd.derive.tests（Subagent 必須）
+  solidsdd.derive.tests（Subagent 必須）
         │
         ▼
-  契約テストコード ──sdd.verify (Subagent)──▶ pass / fail
+  契約テストコード ──solidsdd.verify (Subagent)──▶ pass / fail
 ```
 
 オーケストレータからの呼び出し時の隔離ルールは [execution-model.md](execution-model.md) を参照。

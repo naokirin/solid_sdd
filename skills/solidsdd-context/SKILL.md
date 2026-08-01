@@ -1,15 +1,15 @@
 ---
-name: sdd-context
+name: solidsdd-context
 description: >-
   Gather repository stack, existing OpenAPI/OCL contracts, and test layout for
   solid_sdd. Use before judge/apply/loop or when asked for SDD context.
 ---
 
-# sdd.context
+# solidsdd.context
 
 ## Execution
 
-**orchestrator** — run in the parent (`sdd.loop` or the user-invoked agent). See [docs/execution-model.md](../../docs/execution-model.md).
+**orchestrator** — run in the parent (`solidsdd.loop` or the user-invoked agent). See [docs/execution-model.md](../../docs/execution-model.md).
 
 ## Purpose
 
@@ -30,4 +30,4 @@ Write a short markdown summary with:
 - stack
 - contract artifact paths
 - gaps (missing OpenAPI, OCL, or tests)
-- suggested next skill (`sdd-judge` or `sdd-loop`)
+- suggested next skill (`solidsdd-judge` or `solidsdd-loop`)

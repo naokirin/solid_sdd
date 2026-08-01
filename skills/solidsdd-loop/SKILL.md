@@ -1,36 +1,36 @@
 ---
-name: sdd-loop
+name: solidsdd-loop
 description: >-
   Orchestrate solid_sdd as the parent agent only: run context locally, and
   launch judge/apply/derive/implement/verify as explicit subagents via Task.
   Use for autonomous SDD loops.
 ---
 
-# sdd.loop
+# solidsdd.loop
 
 ## Purpose
 
-Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `sdd.loop` itself to a subagent.
+Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
 
 ## Execution policy
 
 | Step | How |
 |------|-----|
-| `sdd-context` | Parent agent (this conversation) |
-| `sdd-judge`, `sdd-apply-api`, `sdd-apply-dbc`, `sdd-derive-tests`, `sdd-implement`, `sdd-verify` | **Required subagent** via Task tool (or equivalent) |
+| `solidsdd-context` | Parent agent (this conversation) |
+| `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify` | **Required subagent** via Task tool (or equivalent) |
 
-Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `sdd-judge` to thin contracts—re-run `sdd-judge` as a subagent if the plan is wrong. Read [docs/execution-model.md](../../docs/execution-model.md).
+Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `solidsdd-judge` to thin contracts—re-run `solidsdd-judge` as a subagent if the plan is wrong. Read [docs/execution-model.md](../../docs/execution-model.md).
 
 ## Sequence
 
-1. Parent: `sdd-context`
-2. **Task subagent** `sdd-judge` → ApplicationPlan
+1. Parent: `solidsdd-context`
+2. **Task subagent** `solidsdd-judge` → ApplicationPlan
 3. For each `status=apply` target, **Task subagent**:
-   - `api` → `sdd-apply-api`
-   - `dbc` → `sdd-apply-dbc`
-4. If OCL changed → **Task subagent** `sdd-derive-tests`
-5. **Task subagent** `sdd-implement`
-6. **Task subagent** `sdd-verify`
+   - `api` → `solidsdd-apply-api`
+   - `dbc` → `solidsdd-apply-dbc`
+4. If OCL changed → **Task subagent** `solidsdd-derive-tests`
+5. **Task subagent** `solidsdd-implement`
+6. **Task subagent** `solidsdd-verify`
 7. On failure, retry the suggested skill as a **new subagent** (max 3 loops unless rules say otherwise)
 8. Leave `formal`/`defer` items visible in the final summary—do not hide them
 

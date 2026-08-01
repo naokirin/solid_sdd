@@ -24,14 +24,14 @@
 | 要素 | 内容 |
 |------|------|
 | ルール | 適用方針・成果物配置・検証必須の最小セット |
-| `sdd.context` | スタック・既存契約の把握 |
-| `sdd.judge` | API / DbC / 見送り（formal は defer 可） |
-| `sdd.apply.api` | OpenAPI 3.x |
-| `sdd.apply.dbc` | UML OCL |
-| `sdd.derive.tests` | OCL→契約テスト（サブエージェント） |
-| `sdd.implement` | 契約に沿った実装の更新 |
-| `sdd.verify` | OpenAPI 検証 + 契約テスト実行 |
-| `sdd.loop` | 上記の自動オーケストレーション |
+| `solidsdd.context` | スタック・既存契約の把握 |
+| `solidsdd.judge` | API / DbC / 見送り（formal は defer 可） |
+| `solidsdd.apply.api` | OpenAPI 3.x |
+| `solidsdd.apply.dbc` | UML OCL |
+| `solidsdd.derive.tests` | OCL→契約テスト（サブエージェント） |
+| `solidsdd.implement` | 契約に沿った実装の更新 |
+| `solidsdd.verify` | OpenAPI 検証 + 契約テスト実行 |
+| `solidsdd.loop` | 上記の自動オーケストレーション |
 
 **含まないもの（意図的）**
 
@@ -42,8 +42,8 @@
 **MVP の成功基準（仮説）**
 
 1. サンプル変更に対し、人手でスキルを順に実行して契約が残り、検証が通る／意図的に壊すと検出できる
-2. 同じ変更を `sdd.loop` だけでも同等の結果に近づく
-3. `sdd.judge` が「なぜ API / DbC / skip か」を軸に沿って説明できる
+2. 同じ変更を `solidsdd.loop` だけでも同等の結果に近づく
+3. `solidsdd.judge` が「なぜ API / DbC / skip か」を軸に沿って説明できる
 4. 形式仕様が望ましいケースでは `defer` と理由が出る（黙って無視しない）
 
 ## フェーズ 2: 適用判断とアダプタの強化
@@ -55,8 +55,8 @@
 
 ## フェーズ 3: 形式仕様の導入
 
-- `sdd.apply.formal` / `sdd.verify.formal` の追加
-- `sdd.judge` が `formal` を `apply` にしうる条件の定義
+- `solidsdd.apply.formal` / `solidsdd.verify.formal` の追加
+- `solidsdd.judge` が `formal` を `apply` にしうる条件の定義
 - 適用範囲が狭い前提での導入ガイド（分散・並行・安全クリティカル等）
 - 既存の API / DbC 経路との役割分担の再確認
 
@@ -69,7 +69,7 @@
 ## 直近の次アクション
 
 1. `examples/arithmetic-api` で手動フェーズ実行が通るか確認する
-2. `sdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
-3. `sdd.derive.tests` のサブエージェントプロンプトを固め、OCL→Vitest 生成の再現性を見る
+2. `solidsdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
+3. `solidsdd.derive.tests` のサブエージェントプロンプトを固め、OCL→Vitest 生成の再現性を見る
 4. `rules/` を Cursor ルール形式へ落とす
 5. （任意）電卓メモリ機能をシナリオ拡張として追加し、判断〜検証の再実行を試す

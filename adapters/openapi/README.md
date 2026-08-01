@@ -23,10 +23,10 @@ Projects may override paths via rules.
 
 - Document structural validity (OpenAPI 3.x)
 - Contract tests or response validation against the document
-- On failure, prefer returning to `sdd.apply.api` or `sdd.implement`
+- On failure, prefer returning to `solidsdd.apply.api` or `solidsdd.implement`
 
 ## Skill mapping
 
-- Write/update: `sdd-apply-api`
-- Consume in implementation: `sdd-implement`
-- Check: `sdd-verify`
+- Write/update: `solidsdd-apply-api`
+- Consume in implementation: `solidsdd-implement`
+- Check: `solidsdd-verify`

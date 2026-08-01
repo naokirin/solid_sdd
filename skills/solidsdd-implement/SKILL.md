@@ -1,16 +1,16 @@
 ---
-name: sdd-implement
+name: solidsdd-implement
 description: >-
   Implement or update code to satisfy OpenAPI and OCL contracts in solid_sdd.
-  When called from sdd-loop, must run as an explicit Task subagent. Use after
+  When called from solidsdd-loop, must run as an explicit Task subagent. Use after
   apply/derive skills, or when verification fails due to implementation.
 ---
 
-# sdd.implement
+# solidsdd.implement
 
 ## Execution
 
-**subagent required** when invoked from `sdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task so implementation cannot rewrite contracts in the same context. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
+**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task so implementation cannot rewrite contracts in the same context. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
 
 ## Purpose
 
@@ -32,4 +32,4 @@ Make implementation satisfy OpenAPI and OCL-derived expectations.
 ## Success criteria
 
 - Implementation matches contracts
-- Ready for `sdd-verify`
+- Ready for `solidsdd-verify`

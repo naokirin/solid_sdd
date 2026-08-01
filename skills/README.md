@@ -6,14 +6,14 @@ Cursor Agent Skill definitions for solid_sdd. Copy or link into a project's `.cu
 
 | Skill | Command-like id | Role | Execution |
 |-------|-----------------|------|-----------|
-| [sdd-loop](sdd-loop/SKILL.md) | `sdd.loop` | Orchestration | orchestrator only |
-| [sdd-context](sdd-context/SKILL.md) | `sdd.context` | Stack / contract discovery | orchestrator |
-| [sdd-judge](sdd-judge/SKILL.md) | `sdd.judge` | ApplicationPlan | **subagent required** |
-| [sdd-apply-api](sdd-apply-api/SKILL.md) | `sdd.apply.api` | OpenAPI | **subagent required** |
-| [sdd-apply-dbc](sdd-apply-dbc/SKILL.md) | `sdd.apply.dbc` | OCL | **subagent required** |
-| [sdd-derive-tests](sdd-derive-tests/SKILL.md) | `sdd.derive.tests` | OCL → contract tests | **subagent required** |
-| [sdd-implement](sdd-implement/SKILL.md) | `sdd.implement` | Implementation | **subagent required** |
-| [sdd-verify](sdd-verify/SKILL.md) | `sdd.verify` | VerificationReport | **subagent required** |
+| [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Orchestration | orchestrator only |
+| [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
+| [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
+| [solidsdd-apply-api](solidsdd-apply-api/SKILL.md) | `solidsdd.apply.api` | OpenAPI | **subagent required** |
+| [solidsdd-apply-dbc](solidsdd-apply-dbc/SKILL.md) | `solidsdd.apply.dbc` | OCL | **subagent required** |
+| [solidsdd-derive-tests](solidsdd-derive-tests/SKILL.md) | `solidsdd.derive.tests` | OCL → contract tests | **subagent required** |
+| [solidsdd-implement](solidsdd-implement/SKILL.md) | `solidsdd.implement` | Implementation | **subagent required** |
+| [solidsdd-verify](solidsdd-verify/SKILL.md) | `solidsdd.verify` | VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
-- Automatic (`sdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent.
+- Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent.

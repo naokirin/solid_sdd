@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://solid-sdd.dev/schemas/application-plan.schema.json",
   "title": "ApplicationPlan",
-  "description": "Output of sdd.judge: where and how to apply machine-checkable specs.",
+  "description": "Output of solidsdd.judge: where and how to apply machine-checkable specs.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "targets"],

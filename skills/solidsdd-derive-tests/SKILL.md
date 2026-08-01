@@ -1,16 +1,16 @@
 ---
-name: sdd-derive-tests
+name: solidsdd-derive-tests
 description: >-
   Generate contract tests from UML OCL for solid_sdd. Must run as an explicit
-  Task subagent when called from sdd-loop. Use after OCL changes, or when asked
+  Task subagent when called from solidsdd-loop. Use after OCL changes, or when asked
   to derive tests from contracts.
 ---
 
-# sdd.derive.tests
+# solidsdd.derive.tests
 
 ## Execution
 
-**subagent required** when invoked from `sdd.loop` (or any orchestrator chaining multiple phases). This is the core isolation boundary: OCL→tests must not share context with implement/verify. Parent must use Task. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
+**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining multiple phases). This is the core isolation boundary: OCL→tests must not share context with implement/verify. Parent must use Task. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
 
 ## Purpose
 

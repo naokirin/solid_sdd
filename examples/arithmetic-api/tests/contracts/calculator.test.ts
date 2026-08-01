@@ -1,6 +1,6 @@
 /**
  * Contract tests derived from contracts/Calculator.ocl
- * (hand-authored baseline for MVP evaluation; sdd.derive.tests should regenerate).
+ * (hand-authored baseline for MVP evaluation; solidsdd.derive.tests should regenerate).
  */
 import { describe, expect, it } from "vitest";
 import { Calculator, PreconditionError } from "../../src/calculator.js";

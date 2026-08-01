@@ -15,13 +15,13 @@ Generated tests are dependents: regenerate from OCL rather than hand-editing as 
 
 ## Pipeline
 
-All steps below except planning are **subagent-required** when driven by `sdd.loop` (see `docs/execution-model.md`).
+All steps below except planning are **subagent-required** when driven by `solidsdd.loop` (see `docs/execution-model.md`).
 
 ```text
-sdd.apply.dbc          →  (subagent) write/update .ocl
-sdd.derive.tests       →  (subagent) OCL → Vitest (or other) contract tests
-sdd.implement          →  (subagent) make implementation satisfy contracts
-sdd.verify             →  (subagent) run contract tests (+ OpenAPI checks)
+solidsdd.apply.dbc          →  (subagent) write/update .ocl
+solidsdd.derive.tests       →  (subagent) OCL → Vitest (or other) contract tests
+solidsdd.implement          →  (subagent) make implementation satisfy contracts
+solidsdd.verify             →  (subagent) run contract tests (+ OpenAPI checks)
 ```
 
 ## OCL conventions (MVP)
@@ -54,6 +54,6 @@ Do not invent requirements absent from OCL or OpenAPI.
 
 ## Skill mapping
 
-- Write/update OCL: `sdd-apply-dbc`
-- Derive tests: `sdd-derive-tests`
-- Check: `sdd-verify`
+- Write/update OCL: `solidsdd-apply-dbc`
+- Derive tests: `solidsdd-derive-tests`
+- Check: `solidsdd-verify`

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://solid-sdd.dev/schemas/verification-report.schema.json",
   "title": "VerificationReport",
-  "description": "Output of sdd.verify.",
+  "description": "Output of solidsdd.verify.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "result", "checks"],
@@ -26,7 +26,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Skills to re-run on failure, e.g. sdd.apply.api, sdd.implement."
+      "description": "Skills to re-run on failure, e.g. solidsdd.apply.api, solidsdd.implement."
     }
   },
   "$defs": {

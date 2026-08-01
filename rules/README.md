@@ -19,7 +19,7 @@
 
 ## Execution (orchestrator / subagent)
 
-- `sdd.loop` is parent-only
+- `solidsdd.loop` is parent-only
 - From an orchestrator, run judge / apply / derive-tests / implement / verify as **explicit subagents** (Task), never inline in the parent
-- Do not thin or rewrite `ApplicationPlan` in the parent; re-run `sdd.judge` as a subagent if needed
+- Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd.judge` as a subagent if needed
 - Details: `docs/execution-model.md`

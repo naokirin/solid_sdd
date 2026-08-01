@@ -18,7 +18,7 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 └──────────────────┬──────────────────────┘
                    │ 制約・文脈
 ┌──────────────────▼──────────────────────┐
-│   Orchestrator = sdd.loop / 親エージェント │
+│   Orchestrator = solidsdd.loop / 親エージェント │
 │   context は親。judge 以降は Subagent 必須 │
 └──────────────────┬──────────────────────┘
                    │ Task（明示的 Subagent）
@@ -48,18 +48,18 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 
 | スキル | 責務 | 実行ポリシー | 主な入出力 |
 |--------|------|--------------|------------|
-| `sdd.loop` | オーケストレーション | orchestrator のみ | ループログ・最終状態 |
-| `sdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
-| `sdd.judge` | 適用判断 | **subagent 必須** | ApplicationPlan |
-| `sdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
-| `sdd.apply.dbc` | OCL 追加・更新 | **subagent 必須** | `.ocl` 差分 |
-| `sdd.derive.tests` | OCL→契約テスト | **subagent 必須** | テスト差分 |
-| `sdd.implement` | 契約に従う実装 | **subagent 必須** | コード差分 |
-| `sdd.verify` | OpenAPI + 契約テスト検証 | **subagent 必須** | VerificationReport |
+| `solidsdd.loop` | オーケストレーション | orchestrator のみ | ループログ・最終状態 |
+| `solidsdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
+| `solidsdd.judge` | 適用判断 | **subagent 必須** | ApplicationPlan |
+| `solidsdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
+| `solidsdd.apply.dbc` | OCL 追加・更新 | **subagent 必須** | `.ocl` 差分 |
+| `solidsdd.derive.tests` | OCL→契約テスト | **subagent 必須** | テスト差分 |
+| `solidsdd.implement` | 契約に従う実装 | **subagent 必須** | コード差分 |
+| `solidsdd.verify` | OpenAPI + 契約テスト検証 | **subagent 必須** | VerificationReport |
 
-形式仕様向け（例: `sdd.apply.formal` / `sdd.verify.formal`）は [roadmap.md](roadmap.md) の後続フェーズで追加する。MVP の `sdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
+形式仕様向け（例: `solidsdd.apply.formal` / `solidsdd.verify.formal`）は [roadmap.md](roadmap.md) の後続フェーズで追加する。MVP の `solidsdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
 
-## 適用判断（`sdd.judge`）の出力モデル
+## 適用判断（`solidsdd.judge`）の出力モデル
 
 共有スキーマ: [../schemas/application-plan.schema.json](../schemas/application-plan.schema.json)
 
@@ -90,7 +90,7 @@ Module DbC      →      UML OCL → 契約テスト（サブエージェント�
 Formal (後続)   →      （未実装。judge は defer）
 ```
 
-OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`sdd.verify` はそのテスト実行で契約遵守を見る。
+OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。
 
 アダプタの責務:
 
@@ -112,7 +112,7 @@ OCL 経路のポイント: OCL がソース・オブ・トゥルース。テス�
 | モード | 振る舞い |
 |--------|----------|
 | 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切ることを推奨 |
-| 自動 | `sdd.loop`（親）が context を行い、judge・apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行 |
+| 自動 | `solidsdd.loop`（親）が context を行い、judge・apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行 |
 
 両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
 
