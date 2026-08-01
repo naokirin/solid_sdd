@@ -65,14 +65,15 @@
 
 ## フェーズ 3: 形式仕様の導入
 
-**状態: 設計スライス完了**（詳細は [phase3.md](phase3.md)）。チェッカー配線・評価サンプルは未着手。
+**状態: チェッカー + 最小サンプル完了**（[phase3.md](phase3.md), [phase3-evaluation.md](phase3-evaluation.md)）。
 
 - [x] `solidsdd.apply.formal` / `solidsdd.verify.formal` スキル骨格
 - [x] `solidsdd.judge` が `formal` を `apply` にしうる条件 — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) + [phase3.md](phase3.md)
 - [x] 適用範囲が狭い前提の導入ガイド（役割分担）— [phase3.md](phase3.md)
 - [x] 既存の API / DbC 経路との役割分担の再確認
-- [ ] 具体チェッカー統合（TLC / Apalache / Alloy 等）と最小評価サンプル
-- [ ] Phase 3 通し評価の記録
+- [x] 具体チェッカー統合（**TLC**）と最小評価サンプル — [../tools/tla](../tools/tla), [../examples/memory-formal](../examples/memory-formal)
+- [x] Phase 3 通し評価の記録（サンプル TLC）— [phase3-evaluation.md](phase3-evaluation.md)
+- [ ] ループ上の human_gate → apply-formal ドライラン
 
 ## フェーズ 4: 運用・エコシステム
 
@@ -82,5 +83,5 @@
 
 ## 直近の次アクション
 
-1. Phase 3 実装: チェッカー選定 + 最小 formal サンプル、または Phase 4（導入テンプレート）
+1. Phase 3 残り（formal ゲートのループ・ドライラン）または Phase 4（導入テンプレート）
 2. GitHub remote 設定後に `gh skill publish`（配布は後回し可）

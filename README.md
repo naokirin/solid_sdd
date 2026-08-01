@@ -45,9 +45,11 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・アダプタ） |
 | [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | Phase 2 サンプル評価 |
 | [docs/phase3.md](docs/phase3.md) | Phase 3 形式仕様の設計 |
+| [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | Phase 3 TLC サンプル評価 |
 | [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI 評価サンプル |
 | [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL 評価サンプル |
 | [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec 評価サンプル |
+| [examples/memory-formal](examples/memory-formal) | TLA+/TLC 評価サンプル |
 
 ## 実行イメージ（要約）
 

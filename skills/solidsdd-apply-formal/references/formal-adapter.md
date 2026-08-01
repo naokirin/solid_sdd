@@ -1,18 +1,32 @@
-# Formal specification adapter (Phase 3 design)
+# Formal specification adapter (Phase 3)
 
-編集用ソース。同期は formal スキル追加後に `scripts/sync-skill-references.sh` へ配線する。
+編集用ソース。同期: `skills/solidsdd-apply-formal|verify-formal/references/formal-adapter.md`。ソース変更後:
+
+```bash
+scripts/sync-skill-references.sh
+```
 
 ## Role
 
 Express **safety / liveness / concurrency** properties that API contracts and OCL→tests do not cheaply cover. Formal specs are **optional** and narrow-scope. Prefer OpenAPI/GraphQL + OCL unless [docs/phase3.md](../../docs/phase3.md) apply conditions hold.
+
+## Default checker: TLA+ / TLC
+
+| Choice | Role |
+|--------|------|
+| **TLC** (default) | Model-check `.tla` + `.cfg` via `tools/tla/tlc.sh` |
+| Apalache | Optional later (inductive invariants) |
+| Alloy | Optional alternate notation (`adapter_hint: alloy`) |
+
+Setup: [../../tools/tla/README.md](../../tools/tla/README.md) (`fetch-tla2tools.sh`, JDK 17+).
 
 ## Artifact layout (default)
 
 | Artifact | Path |
 |----------|------|
 | TLA+ modules | `formal/**/*.tla` |
-| TLA+ configs | `formal/**/*.cfg` (optional) |
-| Alloy models | `formal/**/*.als` (optional alternative) |
+| TLC configs | `formal/**/*.cfg` |
+| Alloy models | `formal/**/*.als` (optional) |
 
 ## Responsibilities
 
@@ -23,16 +37,16 @@ Express **safety / liveness / concurrency** properties that API contracts and OC
 
 ## Verification hooks
 
-- Parse / type-check the model
-- Run the project-chosen checker (TBD per repo: TLC, Apalache, Alloy, …)
-- On failure: `solidsdd-apply-formal` (spec) or clarify SoT vs implementation with the parent
+- Parse / type-check via TLC
+- Run `tools/tla/tlc.sh <Spec.tla> -config <Spec.cfg>` (or project wrapper)
+- On missing jar/JDK: `failure_class: tooling`, `loop_action: stop` or `human_gate`
+- On invariant violation: prefer `solidsdd-apply-formal` (spec) unless implementation SoT is clearer
 
 ## Skill mapping
 
-- Write/update: `solidsdd-apply-formal`
-- Check: `solidsdd-verify-formal`
-- Judge: `kind=formal`, `adapter_hint` e.g. `tla` / `alloy` / `defer-formal`
+- Write/update: `solidsdd-apply-formal` (`adapter_hint: tla`)
+- Check: `solidsdd-verify-formal` (VerificationReport check kind `formal`)
 
-## Status
+## Evaluation sample
 
-Design-only. No evaluation sample yet. Language-native DbC remains a separate deferred track.
+[../../examples/memory-formal](../../examples/memory-formal) — exclusive shared-memory adds; `./verify.sh` must report no TLC error.

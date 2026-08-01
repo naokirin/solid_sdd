@@ -60,26 +60,29 @@ Formal failures use `loop_action` / `failure_class` like Phase 2 (`tooling` → 
 
 ## Adapter sketch
 
-Default layout (project-overridable):
+Default checker: **TLA+ / TLC** ([../tools/tla/README.md](../tools/tla/README.md)).
 
 | Artifact | Path |
 |----------|------|
-| TLA+ (example) | `formal/**/*.tla` (+ `.cfg` if needed) |
-| Alloy (example) | `formal/**/*.als` |
+| TLA+ modules | `formal/**/*.tla` |
+| TLC configs | `formal/**/*.cfg` |
+| Alloy models | `formal/**/*.als` (optional later) |
 
-See [../adapters/formal/README.md](../adapters/formal/README.md). First concrete checker integration is intentionally undecided (tlc / apalache / alloy analyzer)—record choice in project rule when enabling `apply`.
+See [../adapters/formal/README.md](../adapters/formal/README.md). Evaluation sample: [../examples/memory-formal](../examples/memory-formal).
 
 ## ApplicationPlan fields (unchanged schema)
 
 Use existing `kind: formal`, `adapter_hint` (`tla` \| `alloy` \| `defer-formal`), `status`, `human_gate`, `signals: ["concurrency_safety", …]`.
 
-## Success criteria for Phase 3 implementation (later)
+## Success criteria for Phase 3 implementation
 
-1. Judge unit scenarios: concurrency → `apply` only when adapter+gate; else `defer`.
-2. One minimal formal sample (e.g. single-writer memory or lock protocol) with verify-formal green.
-3. Loop stops on `human_gate` before writing formal artifacts.
-4. OpenAPI/OCL samples still pass without a formal toolchain installed.
+1. [x] Judge rules allow `formal` `apply` under documented conditions
+2. [x] One minimal formal sample with verify-formal / TLC green ([phase3-evaluation.md](phase3-evaluation.md))
+3. [ ] Loop stops on `human_gate` before writing formal artifacts (dry-run in a project)
+4. [x] OpenAPI/OCL samples still pass without requiring TLC on every clone (jar is fetched, gitignored)
 
 ## Status
 
-**Design complete for this slice.** Skill stubs: `skills/solidsdd-apply-formal`, `skills/solidsdd-verify-formal`. Evaluation sample and checker wiring: not started.
+**Design + first checker/sample complete.** Default checker: TLC. Sample: [../examples/memory-formal](../examples/memory-formal). Notes: [phase3-evaluation.md](phase3-evaluation.md).
+
+Remaining: richer samples, optional Apalache/Alloy, loop gate dry-run in a consuming project.
