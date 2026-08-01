@@ -10,7 +10,7 @@
 
 ## 現状
 
-構想・設計ドキュメントの整備段階です。実装（ルール・スキル本体）はこれからです。
+構想・設計に加え、MVP アダプタ（OpenAPI + OCL→契約テスト）と評価用サンプル（TypeScript 四則演算 API）の骨格まで着手しています。
 
 ## ドキュメント
 
@@ -18,7 +18,10 @@
 |------|------|
 | [docs/vision.md](docs/vision.md) | 問題意識・目標・使い分けの軸 |
 | [docs/architecture.md](docs/architecture.md) | ルール・エージェント／スキル構成 |
+| [docs/adapters.md](docs/adapters.md) | MVP アダプタ決定（OpenAPI / OCL） |
+| [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent の実行ポリシー |
 | [docs/roadmap.md](docs/roadmap.md) | MVP 範囲と段階的導入 |
+| [examples/arithmetic-api](examples/arithmetic-api) | 評価用サンプル（四則演算 API） |
 
 ## 実行イメージ（要約）
 
@@ -28,10 +31,11 @@ Kiro 等と同様に、ユーザーがフェーズ単位のスキルを任意に
 
 ## スコープ方針（要約）
 
-- **MVP 中核**: API 仕様駆動、契約による設計（DbC）、適用判断、検証ループ
-- **後回し**: 形式仕様記述言語（TLA+ / Alloy / VDM 等）— 重い一方、適用範囲が狭くなりやすいため
+- **MVP 中核**: OpenAPI、OCL による DbC（サブエージェントがテスト生成）、適用判断、検証ループ
+- **評価サンプル**: TypeScript の四則演算 API（拡張時は電卓メモリ等）
+- **後回し**: 形式仕様記述言語（TLA+ / Alloy / VDM 等）
 
-詳細は [docs/roadmap.md](docs/roadmap.md) を参照してください。
+詳細は [docs/adapters.md](docs/adapters.md) と [docs/roadmap.md](docs/roadmap.md) を参照してください。
 
 ## ライセンス
 

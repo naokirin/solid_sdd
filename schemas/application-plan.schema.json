@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/application-plan.schema.json",
+  "title": "ApplicationPlan",
+  "description": "Output of sdd.judge: where and how to apply machine-checkable specs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "targets"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short human-readable summary of the plan."
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/target"
+      }
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "location",
+        "density",
+        "rationale",
+        "adapter_hint",
+        "status"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["api", "dbc", "formal", "natural_only"]
+        },
+        "location": {
+          "type": "string",
+          "description": "Boundary or module identifier (path, operationId, type name, etc.)."
+        },
+        "density": {
+          "type": "string",
+          "enum": ["thin", "standard", "strict"]
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why this kind/density/status was chosen, referencing judgment axes."
+        },
+        "adapter_hint": {
+          "type": "string",
+          "description": "Concrete adapter hint, e.g. openapi, ocl, defer-formal."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["apply", "defer", "skip"]
+        }
+      }
+    }
+  }
+}

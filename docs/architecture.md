@@ -18,15 +18,16 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 └──────────────────┬──────────────────────┘
                    │ 制約・文脈
 ┌──────────────────▼──────────────────────┐
-│         Orchestrator（任意）              │
-│     ループ: 判断 → 適用 → 実装 → 検証     │
+│   Orchestrator = sdd.loop / 親エージェント │
+│   context・judge は親。他は Subagent 必須  │
 └──────────────────┬──────────────────────┘
-                   │ 呼び出し
+                   │ Task（明示的 Subagent）
         ┌──────────┼──────────┐
         ▼          ▼          ▼
-   Skill:      Skill:      Skill: ...
-   judge       apply       verify
+   apply.*    derive.tests   implement / verify
 ```
+
+実行ポリシーの詳細は [execution-model.md](execution-model.md)。
 
 ## 設計原則
 
@@ -40,24 +41,27 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
    コアは契約の種類と検証結果のモデルを持ち、具体技術はプラグイン的に扱う。
 5. **人が介在する点を明示する**  
    デフォルトは自動。承認・例外・方針変更だけを人間ゲートにする（ゲートの有無はルールで設定可能）。
+6. **関心の隔離は Subagent で強制する**  
+   適用・テスト導出・実装・検証を同一エージェント文脈で連続実行しない（自己採点・契約の弱体化を防ぐ）。
 
 ## コアスキル（MVP 想定）
 
-名称は暫定。実装時に Cursor Skill / エージェントコマンド名へ写像する。
-
-| スキル | 責務 | 主な入出力 |
-|--------|------|------------|
-| `sdd.context` | リポジトリ・スタック・既存契約の把握 | コンテキスト要約 |
-| `sdd.judge` | 変更/機能に対する適用判断 | 適用計画（API / DbC / 見送り、粒度、理由） |
-| `sdd.apply.api` | API 契約の追加・更新 | OpenAPI 等の成果物差分 |
-| `sdd.apply.dbc` | モジュール契約の追加・更新 | 事前/事後/不変条件の記述差分 |
-| `sdd.implement` | 契約に従う実装・テストの生成/更新 | コード差分 |
-| `sdd.verify` | 契約と実装の整合チェック | 検証レポート（pass/fail・差分） |
-| `sdd.loop` | 上記をオーケストレーション | ループ実行ログ・最終状態 |
+| スキル | 責務 | 実行ポリシー | 主な入出力 |
+|--------|------|--------------|------------|
+| `sdd.loop` | オーケストレーション | orchestrator のみ | ループログ・最終状態 |
+| `sdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
+| `sdd.judge` | 適用判断 | orchestrator | ApplicationPlan |
+| `sdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
+| `sdd.apply.dbc` | OCL 追加・更新 | **subagent 必須** | `.ocl` 差分 |
+| `sdd.derive.tests` | OCL→契約テスト | **subagent 必須** | テスト差分 |
+| `sdd.implement` | 契約に従う実装 | **subagent 必須** | コード差分 |
+| `sdd.verify` | OpenAPI + 契約テスト検証 | **subagent 必須** | VerificationReport |
 
 形式仕様向け（例: `sdd.apply.formal` / `sdd.verify.formal`）は [roadmap.md](roadmap.md) の後続フェーズで追加する。MVP の `sdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
 
-## 適用判断（`sdd.judge`）の出力モデル（たたき台）
+## 適用判断（`sdd.judge`）の出力モデル
+
+共有スキーマ: [../schemas/application-plan.schema.json](../schemas/application-plan.schema.json)
 
 ```text
 ApplicationPlan:
@@ -66,7 +70,7 @@ ApplicationPlan:
     location: 境界やモジュールの識別子
     density: thin | standard | strict
     rationale: 判断理由（軸への参照）
-    adapter_hint: openapi | graphql | language-contract | ...
+    adapter_hint: openapi | ocl | ...
     status: apply | defer | skip
 ```
 
@@ -76,19 +80,23 @@ ApplicationPlan:
 
 ## アダプタ層
 
+MVP の初期アダプタは次で固定する（詳細は [adapters.md](adapters.md)）。
+
 ```text
-Contract Kind          Adapters (例)
-─────────────          ────────────────────────
-API boundary    →      OpenAPI 3.x / GraphQL SDL / ...
-Module DbC      →      言語別 contract / assert / 型注釈 / ...
-Formal (後続)   →      TLA+ / Alloy / ...
+Contract Kind          MVP Adapter
+─────────────          ─────────────────────────────
+API boundary    →      OpenAPI 3.x
+Module DbC      →      UML OCL → 契約テスト（サブエージェント生成）
+Formal (後続)   →      （未実装。judge は defer）
 ```
+
+OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`sdd.verify` はそのテスト実行で契約遵守を見る。
 
 アダプタの責務:
 
 - 成果物の配置規約（パス、命名）
 - 生成・更新のテンプレート
-- 検証の呼び出し方（スキーマ検証、契約テスト、静的チェック等）
+- 検証の呼び出し方（OpenAPI 検証、OCL 由来テストの実行等）
 - スタック未検出時のフォールバック（提案のみ / 人間ゲート）
 
 ## ルール層で持つもの（例）
@@ -103,32 +111,29 @@ Formal (後続)   →      TLA+ / Alloy / ...
 
 | モード | 振る舞い |
 |--------|----------|
-| 手動 | ユーザーが `sdd.judge` → `sdd.apply.*` → … を任意順で実行。部分適用可 |
-| 自動 | `sdd.loop` がコンテキスト取得から検証までを回す。失敗時は適用/実装に戻す |
+| 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切ることを推奨 |
+| 自動 | `sdd.loop`（親）が context/judge を行い、apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行 |
 
 両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
 
-## リポジトリ内の想定配置（将来）
-
-実装フェーズで確定する。現時点の仮説:
+## リポジトリ配置
 
 ```text
 solid_sdd/
   README.md
   docs/                 # 構想・設計
-  rules/                # 常駐ルール（プロダクト／利用側への配布物）
-  skills/               # スキル定義（プロンプト・手続き・入出力スキーマ）
-  adapters/             # スタック別アダプタ
   schemas/              # ApplicationPlan 等の共有スキーマ
+  adapters/             # OpenAPI / OCL アダプタ規約
+  skills/               # Cursor Skill 形式のスキル定義
+  rules/                # 常駐ルール（順次追加）
+  examples/             # 評価用サンプル
 ```
 
-利用側プロジェクトでは、ルールと必要なスキル／アダプタを導入し、既存の AI コーディング環境（Cursor 等）から呼び出す、という形を想定する。
+スキルは Cursor Agent Skill（`SKILL.md`）形式で定義し、利用側では `.cursor/skills/` へ配置または参照する。
 
 ## 未決事項
 
-次は設計の深掘り時に決める。
-
-- スキルの具体フォーマット（Cursor Skill / 独自 YAML / その他）
-- 検証の「どこまでを必須にするか」のデフォルト
-- マルチ言語・マルチ API スタイルのアダプタ優先順位
+- 検証の「どこまでを必須にするか」のデフォルト閾値
+- OCL 方言・ツールチェーン（構文チェックをどこまで機械化するか）
+- Rails 等へのテスト生成先アダプタの優先順位
 - 他 SDD ツール（Kiro 等）との共存・置き換えの境界

@@ -6,14 +6,16 @@
 
 形式仕様は有効だが導入が重く、適用範囲も狭くなりやすいため **意図的に後回し** する。ただし判断モデル上は `formal` を欠番にせず、`defer` として理由を残せるようにする。
 
-## フェーズ 0: 構想・設計（現在）
+## フェーズ 0: 構想・設計
 
 - [x] 問題意識と目標の明文化（[vision.md](vision.md)）
 - [x] ルール／スキル構成の方針（[architecture.md](architecture.md)）
 - [x] MVP と後続の切り分け（本ドキュメント）
-- [ ] スキル入出力スキーマの確定（`ApplicationPlan` 等）
-- [ ] 最初にサポートするアダプタの選定（API / DbC 各1系統以上）
-- [ ] 利用側への配布形態の決定（ルール＋スキルのパッケージ方法）
+- [x] 初期アダプタ選定: OpenAPI + OCL→契約テスト（[adapters.md](adapters.md)）
+- [x] 評価シナリオ選定: TypeScript 四則演算 API（[../examples/arithmetic-api](../examples/arithmetic-api)）
+- [x] スキル入出力スキーマ（`ApplicationPlan` 等）
+- [x] スキル定義スケルトン（`skills/`）
+- [ ] 利用側への配布形態の詳細（ルール同梱・インストール手順）
 
 ## フェーズ 1: MVP（つながった最小構成）
 
@@ -24,10 +26,11 @@
 | ルール | 適用方針・成果物配置・検証必須の最小セット |
 | `sdd.context` | スタック・既存契約の把握 |
 | `sdd.judge` | API / DbC / 見送り（formal は defer 可） |
-| `sdd.apply.api` | 選定した API アダプタ 1 系統 |
-| `sdd.apply.dbc` | 選定した DbC アダプタ 1 系統 |
-| `sdd.implement` | 契約に沿った実装・テスト更新 |
-| `sdd.verify` | 契約と実装の整合チェック |
+| `sdd.apply.api` | OpenAPI 3.x |
+| `sdd.apply.dbc` | UML OCL |
+| `sdd.derive.tests` | OCL→契約テスト（サブエージェント） |
+| `sdd.implement` | 契約に沿った実装の更新 |
+| `sdd.verify` | OpenAPI 検証 + 契約テスト実行 |
 | `sdd.loop` | 上記の自動オーケストレーション |
 
 **含まないもの（意図的）**
@@ -65,11 +68,8 @@
 
 ## 直近の次アクション
 
-構想ドキュメントのレビュー承認後:
-
-1. **最初のアダプタ選定**を決める（例: OpenAPI + 特定言語の DbC 表現）
-2. **`ApplicationPlan` 等のスキーマ**を `schemas/` に落とす
-3. **スキル定義のスケルトン**（入出力・手順・成功条件）を `skills/` に置く
-4. **評価用の小さなサンプルリポジトリ／シナリオ**を用意する
-
-アダプタ選定と「最初の評価シナリオ」は方針判断を伴うため、着手前に確認する。
+1. `examples/arithmetic-api` で手動フェーズ実行が通るか確認する
+2. `sdd.loop` が apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
+3. `sdd.derive.tests` のサブエージェントプロンプトを固め、OCL→Vitest 生成の再現性を見る
+4. `rules/` を Cursor ルール形式へ落とす
+5. （任意）電卓メモリ機能をシナリオ拡張として追加し、判断〜検証の再実行を試す

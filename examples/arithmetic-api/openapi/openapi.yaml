@@ -1,0 +1,61 @@
+openapi: 3.0.3
+info:
+  title: Arithmetic API
+  version: 0.1.0
+  description: Evaluation sample for solid_sdd — four arithmetic operations over HTTP.
+servers:
+  - url: http://localhost:3000
+paths:
+  /calculate:
+    post:
+      operationId: calculate
+      summary: Evaluate a binary arithmetic operation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateRequest'
+      responses:
+        '200':
+          description: Calculation succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateResponse'
+        '400':
+          description: Invalid request or precondition violation (e.g. division by zero)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Operation:
+      type: string
+      enum: [add, sub, mul, div]
+    CalculateRequest:
+      type: object
+      additionalProperties: false
+      required: [op, a, b]
+      properties:
+        op:
+          $ref: '#/components/schemas/Operation'
+        a:
+          type: number
+        b:
+          type: number
+    CalculateResponse:
+      type: object
+      additionalProperties: false
+      required: [result]
+      properties:
+        result:
+          type: number
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: string

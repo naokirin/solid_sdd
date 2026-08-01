@@ -1,0 +1,15 @@
+-- Calculator domain contracts for arithmetic-api (solid_sdd evaluation sample)
+-- Source of truth for DbC; tests under tests/contracts are derived from this.
+
+context Calculator::add(a: Real, b: Real): Real
+post ResultIsSum: result = a + b
+
+context Calculator::sub(a: Real, b: Real): Real
+post ResultIsDifference: result = a - b
+
+context Calculator::mul(a: Real, b: Real): Real
+post ResultIsProduct: result = a * b
+
+context Calculator::div(a: Real, b: Real): Real
+pre DivisorIsNonZero: b <> 0
+post ResultIsQuotient: result = a / b
