@@ -9,10 +9,11 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 | Coexistence with other SDD tools | [coexistence.md](coexistence.md) |
 | Adoption checklist (expanded) | [install.md](install.md) §導入チェックリスト |
 | Quick-start template layout | [project-template.md](project-template.md) |
+| Eval-corpus rule tuning (Pass 1) | [feedback-tuning.md](feedback-tuning.md) |
 
 ## Still open
 
-- Real-project feedback → rule/threshold tuning
+- External production-project feedback → further threshold tuning ([feedback-tuning.md](feedback-tuning.md) intake log)
 - Published `gh skill` + template repository on GitHub
 - Optional language-native DbC (opt-in design; still deferred)
 

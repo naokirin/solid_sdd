@@ -46,6 +46,7 @@ Dry-run evidence: [docs/phase3-gate-dryrun.md](../docs/phase3-gate-dryrun.md) (i
 
 ## Defaults
 
-- Evaluation samples (e.g. arithmetic-api additive changes): gate only when modifiers fire.
+- **Additive, non-breaking** API/DbC work with clear context: gate only when other modifiers fire (`breaking_change`, money, low confidence, formal apply).
+- Evaluation samples (arithmetic-*, memory-formal tooling setup): same rule—do not gate routine additive changes.
 - Production defaults may set stricter always-gate rules via project rule overrides.
 - Formal `apply` in early Phase 3: **always** gate (see docs/phase3.md).

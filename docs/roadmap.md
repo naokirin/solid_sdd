@@ -82,10 +82,11 @@
 - [x] 他 SDD ツールとの共存パターン — [coexistence.md](coexistence.md)
 - [x] 導入チェックリスト拡充 — [install.md](install.md)
 - [x] プロジェクトテンプレートレイアウト — [project-template.md](project-template.md)
+- [x] 評価コーパスに基づくルール調整（Pass 1）— [feedback-tuning.md](feedback-tuning.md)
 - [ ] テンプレートリポジトリの GitHub 公開
-- [ ] 実プロジェクトでのフィードバックに基づくルールのチューニング
+- [ ] 外部実プロジェクトからの追加フィードバック
 
 ## 直近の次アクション
 
 1. GitHub remote / `gh skill publish`（配布）
-2. 実プロジェクト導入フィードバック、または言語ネイティブ DbC のオプトイン設計
+2. 外部プロジェクト導入 → [feedback-tuning.md](feedback-tuning.md) に intake、または言語ネイティブ DbC のオプトイン設計

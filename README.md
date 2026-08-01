@@ -50,6 +50,7 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/phase4.md](docs/phase4.md) | Phase 4 運用・エコシステム |
 | [docs/coexistence.md](docs/coexistence.md) | 他 SDD ツールとの共存 |
 | [docs/project-template.md](docs/project-template.md) | 利用側レイアウト |
+| [docs/feedback-tuning.md](docs/feedback-tuning.md) | フィードバックとルール調整 |
 | [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI 評価サンプル |
 | [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL 評価サンプル |
 | [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec 評価サンプル |

@@ -54,7 +54,7 @@ Output: tests that
 
 1. exercise the domain operations (or API façade if that is the only entry)
 2. assert postconditions on valid inputs
-3. assert precondition violations are rejected (4xx / thrown error / GraphQL error per project rules)
+3. assert precondition violations are rejected via a **named domain error** (project convention, e.g. `PreconditionError`)—not only raw language errors such as `ZeroDivisionError`
 4. do not weaken the OCL meaning
 
 Do not invent requirements absent from OCL or the API contract.

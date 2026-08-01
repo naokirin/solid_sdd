@@ -33,11 +33,14 @@ Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal n
 | `money_boundary` | Payments, balances, ledger, billing → density `strict`; strong `dbc`; consider `formal` `defer` with explicit rationale |
 | `high_churn` | Rapidly changing exploratory APIs → density `thin` or `standard`, avoid over-formalizing |
 | `stable_core` | Mature, rarely changing core → density `standard` or `strict` |
+| `additive_change` | New optional fields/ops without removals or tightenings → usually **no** human gate; density often `standard` |
 | `low_confidence` | Ambiguous requirements or weak context → set `confidence: low` and `human_gate.required: true` |
 
 ## Combining rules
 
-1. Choose `kind` / `adapter_hint` from primary signals first.
+1. Choose `kind` / `adapter_hint` from primary signals first (use context summary for `openapi` vs `graphql`, Vitest vs RSpec).
 2. Raise density to the **maximum** implied by any matching modifier (thin < standard < strict).
 3. If any of `breaking_change`, `money_boundary`, or `low_confidence` applies, set plan or target `human_gate`.
-4. Do not lower density because implementation would be hard.
+4. `additive_change` alone does **not** require a gate (eval feedback Pass 1).
+5. Do not lower density because implementation would be hard.
+6. Never silently drop `concurrency_safety`—`defer` or gated `apply` only.

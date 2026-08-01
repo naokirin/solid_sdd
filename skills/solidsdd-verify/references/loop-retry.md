@@ -29,8 +29,13 @@ On **fail**:
 
 | Observe | Suggested skill | loop_action |
 |---------|-----------------|-------------|
-| Contract test fails; OCL/OpenAPI look right | `solidsdd-implement` | `retry` |
+| Contract test fails; OCL/API look right | `solidsdd-implement` | `retry` |
+| `pre` fails with wrong error type (e.g. `ZeroDivisionError` instead of domain `PreconditionError`) | `solidsdd-implement` | `retry` |
 | Tests assert behavior absent from OCL | `solidsdd-apply-dbc` then `solidsdd-derive-tests` | `retry` |
-| OpenAPI drift / invalid doc | `solidsdd-apply-api` | `retry` |
+| OpenAPI / GraphQL drift or invalid doc | `solidsdd-apply-api` | `retry` |
 | OCL changed but tests stale | `solidsdd-derive-tests` | `retry` |
+| Formal TLC missing jar/JDK | — | `stop` or `human_gate` (`tooling`) |
+| Formal invariant violated | `solidsdd-apply-formal` (or implement if model is SoT for runtime) | `retry` / `human_gate` |
 | Third consecutive same failure | — | `human_gate` |
+
+On every **fail**, `solidsdd-verify` / `solidsdd-verify-formal` **must** set `loop_action` and preferably `failure_class` (feedback Pass 1).

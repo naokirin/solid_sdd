@@ -1,5 +1,5 @@
 ---
-description: solid_sdd — OpenAPI/GraphQL/OCL contracts, skill orchestration, subagent isolation
+description: solid_sdd — OpenAPI/GraphQL/OCL/formal contracts, skill orchestration, subagent isolation
 alwaysApply: true
 ---
 
@@ -14,27 +14,40 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - GraphQL SDL (optional): `graphql/schema.graphql`
 - OCL: `contracts/**/*.ocl`
 - Derived contract tests: `tests/contracts/**/*.test.ts` or `spec/contracts/**/*_spec.rb` (dependents of OCL; not source of truth)
+- Formal (optional): `formal/**/*.tla` (+ `.cfg`)
 
 ## Adapters
 
 - API: OpenAPI 3.x (default) or GraphQL SDL — see `solidsdd-apply-api/references/`
 - DbC: UML OCL → contract tests via `solidsdd-derive-tests` (Vitest or RSpec) — see `solidsdd-apply-dbc/references/`
-- Formal specs (TLA+ / Alloy / …): optional Phase 3 path — `solidsdd-apply-formal` / `solidsdd-verify-formal`; early rollout always human-gated
+- Formal specs (TLA+ / TLC): optional — `solidsdd-apply-formal` / `solidsdd-verify-formal`; early rollout **always** human-gated
 - Language-native contract libraries: optional / deferred — never required
+
+## Judgment defaults (tuned)
+
+- Additive, non-breaking `api` / `dbc` with clear stack context → density `standard`, **no** human gate, confidence typically `medium` or `high`
+- `breaking_change`, `money_boundary`, `low_confidence`, or `formal` `apply` → `human_gate.required: true`
+- Shared mutable state / multi-client protocols → consider `formal` (`apply` only if TLC path exists; else `defer` with rationale)—never silent drop
+- OCL `pre` failures must surface as a **named domain error** (e.g. `PreconditionError`), not only language builtins (`ZeroDivisionError`, etc.)
 
 ## Verification
 
-- Do not treat work as done if API contract checks or OCL-derived contract tests fail
-- On failure, follow `loop_action` / suggested skills; do not weaken contracts to force a pass
+- Do not treat work as done if API checks, OCL-derived tests, or required formal checks fail
+- On failure: set `loop_action` and `failure_class`; follow suggested skills; **do not** weaken contracts to force a pass
+- Default **max_auto_retries = 3**; same suggested skill twice with no progress → human gate
 
-## Human gates (Phase 2+)
+## Human gates
 
-- If `ApplicationPlan` has `human_gate.required: true`, stop before apply until a person approves
-- Typical triggers: breaking API change, money boundary, low confidence, **formal apply**
+- If `ApplicationPlan` has `human_gate.required: true`, **stop before apply** until a person approves
+- After approval, resume without thinning the plan (see loop `references/human-gates.md`)
 
 ## Execution (orchestrator / subagent)
 
 - `solidsdd-loop` is parent-only
-- From an orchestrator, run `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify`, and (when gated formal apply) `solidsdd-apply-formal` / `solidsdd-verify-formal` as **explicit Task subagents** — never inline in the parent
+- From an orchestrator, run judge / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
 - Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd-judge` as a subagent if needed
 - Details: `solidsdd-loop/references/execution-model.md`
+
+## Feedback
+
+Rule thresholds evolve from project feedback — see repo `docs/feedback-tuning.md` when working in solid_sdd source.
