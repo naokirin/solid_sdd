@@ -41,14 +41,20 @@ User or solidsdd.loop (parent / orchestrator)
 
 親は `solidsdd.judge` が返した `ApplicationPlan` を受け取り、ループ分岐（どの apply を起動するか等）だけを行う。判断そのものは親で再実行・上書きしない。
 
+Phase 2 以降、親は次も扱う（詳細はスキル `references/human-gates.md` / `loop-retry.md`）。
+
+- `human_gate.required` が真なら **apply 前に停止**
+- verify fail 時の `loop_action`（`retry` / `human_gate` / `stop`）に従う（既定の自動リトライ上限 3）
+
 ## 親エージェントの義務（`solidsdd.loop`）
 
 1. Subagent 必須スキルを、親のツール実行で「スキル手順を自分でやる」形に落とさない
 2. 各 Task に渡すプロンプトへ、対象スキルの `SKILL.md` パス・成果物パス・直前成果（context 要約、ApplicationPlan 等）を含める
 3. サブエージェントの成果（差分・レポート・ApplicationPlan）だけを受け取り、次フェーズへ渡す
 4. `ApplicationPlan` を親が改変して契約を薄くしない（誤りなら `solidsdd.judge` を再度 Subagent で起動）
-5. `solidsdd.verify` が fail なら、示唆されたスキルを **再度サブエージェントとして** 起動する
-6. 最大ループ回数を超えたら人間ゲートとして停止する
+5. `human_gate.required` なら承認まで apply しない
+6. `solidsdd.verify` が fail なら、`loop_action` と示唆スキルに従い **再度サブエージェントとして** 起動する（またはゲート／停止）
+7. 最大自動リトライを超えたら人間ゲートとして停止する
 
 ## サブエージェントへの渡し方（テンプレート）
 

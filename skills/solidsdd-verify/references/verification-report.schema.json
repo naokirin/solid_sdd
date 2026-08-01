@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://solid-sdd.dev/schemas/verification-report.schema.json",
   "title": "VerificationReport",
-  "description": "Output of solidsdd.verify.",
+  "description": "Output of solidsdd.verify (Phase 2 adds loop_action / failure_class).",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "result", "checks"],
@@ -26,10 +26,27 @@
       "items": {
         "type": "string"
       },
-      "description": "Skills to re-run on failure, e.g. solidsdd.apply.api, solidsdd.implement."
+      "description": "Skills to re-run on failure, e.g. solidsdd-apply-api, solidsdd-implement."
+    },
+    "loop_action": {
+      "type": "string",
+      "enum": ["retry", "human_gate", "stop"],
+      "description": "What solidsdd-loop should do after a fail (omit on pass)."
+    },
+    "failure_class": {
+      "$ref": "#/$defs/failure_class"
     }
   },
   "$defs": {
+    "failure_class": {
+      "type": "string",
+      "enum": [
+        "implementation_bug",
+        "contract_gap",
+        "tooling",
+        "unknown"
+      ]
+    },
     "check": {
       "type": "object",
       "additionalProperties": false,
@@ -38,13 +55,16 @@
         "name": { "type": "string" },
         "kind": {
           "type": "string",
-          "enum": ["openapi", "ocl_tests", "other"]
+          "enum": ["openapi", "graphql", "ocl_tests", "other"]
         },
         "result": {
           "type": "string",
           "enum": ["pass", "fail", "skipped"]
         },
-        "detail": { "type": "string" }
+        "detail": { "type": "string" },
+        "failure_class": {
+          "$ref": "#/$defs/failure_class"
+        }
       }
     }
   }

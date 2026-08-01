@@ -1,9 +1,9 @@
 ---
 name: solidsdd-judge
 description: >-
-  Decide where to apply OpenAPI, OCL DbC, or defer formal specs for a change.
-  When called from solidsdd-loop, must run as an explicit Task subagent to avoid
-  implementation-cost bias. Use when planning SDD application or before apply.
+  Decide where to apply OpenAPI/GraphQL API contracts, OCL DbC, or defer formal
+  specs. When called from solidsdd-loop, must run as an explicit Task subagent.
+  Emits ApplicationPlan with Phase 2 signals, confidence, and human_gate fields.
 license: MIT
 ---
 
@@ -21,19 +21,22 @@ Emit an `ApplicationPlan`.
 
 - [application-plan.schema.json](references/application-plan.schema.json)
 - [judgment-axes.md](references/judgment-axes.md)
+- [human-gates.md](references/human-gates.md)
 
 ## Constraints
 
 - Produce the ApplicationPlan only (no OpenAPI / OCL / implementation / test edits)
 - Judge from risk and boundary axes, not from how hard implementation would be
 - Never silently drop formal needs—use `defer` with rationale
+- Populate `signals` on targets when known; set `human_gate` / `breaking` / `confidence` per Phase 2 rules
 
 ## Steps
 
 1. Read change intent and current context (`solidsdd-context` output if available).
 2. Apply axes in [judgment-axes.md](references/judgment-axes.md).
-3. List targets with kind, location, density, rationale, adapter_hint, status.
-4. Validate against [application-plan.schema.json](references/application-plan.schema.json).
+3. Apply gate rules in [human-gates.md](references/human-gates.md).
+4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields).
+5. Validate against [application-plan.schema.json](references/application-plan.schema.json).
 
 ## Output
 

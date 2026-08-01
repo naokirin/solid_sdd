@@ -97,6 +97,11 @@ sync_one adapters/openapi/README.md skills/solidsdd-apply-api/references/openapi
 sync_one adapters/openapi/README.md skills/solidsdd-implement/references/openapi-adapter.md
 sync_one adapters/openapi/README.md skills/solidsdd-verify/references/openapi-adapter.md
 
+# GraphQL adapter (Phase 2 skeleton)
+sync_one adapters/graphql/README.md skills/solidsdd-apply-api/references/graphql-adapter.md
+sync_one adapters/graphql/README.md skills/solidsdd-implement/references/graphql-adapter.md
+sync_one adapters/graphql/README.md skills/solidsdd-verify/references/graphql-adapter.md
+
 # OCL adapter (path rewrite for execution-model)
 sync_one adapters/ocl/README.md skills/solidsdd-apply-dbc/references/ocl-adapter.md ocl-exec-path
 sync_one adapters/ocl/README.md skills/solidsdd-derive-tests/references/ocl-adapter.md ocl-exec-path
@@ -114,6 +119,10 @@ sync_one reference-src/contract-layout.md skills/solidsdd-context/references/con
 sync_one reference-src/contract-layout.md skills/solidsdd-implement/references/contract-layout.md
 sync_one reference-src/contract-layout.md skills/solidsdd-loop/references/contract-layout.md
 sync_one reference-src/judgment-axes.md skills/solidsdd-judge/references/judgment-axes.md
+sync_one reference-src/human-gates.md skills/solidsdd-judge/references/human-gates.md
+sync_one reference-src/human-gates.md skills/solidsdd-loop/references/human-gates.md
+sync_one reference-src/loop-retry.md skills/solidsdd-verify/references/loop-retry.md
+sync_one reference-src/loop-retry.md skills/solidsdd-loop/references/loop-retry.md
 
 if [[ "$MODE" == "check" ]]; then
   if [[ "$mismatch" -ne 0 ]]; then

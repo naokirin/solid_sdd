@@ -3,7 +3,7 @@ name: solidsdd-loop
 description: >-
   Orchestrate solid_sdd as the parent agent only: run context locally, and
   launch judge/apply/derive/implement/verify as explicit subagents via Task.
-  Use for autonomous SDD loops.
+  Honors Phase 2 human_gate and verification loop_action retry policy.
 license: MIT
 ---
 
@@ -11,11 +11,13 @@ license: MIT
 
 ## Purpose
 
-Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
+Run the full loop. This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
 
 ## References
 
 - [execution-model.md](references/execution-model.md) — orchestrator / subagent rules
+- [human-gates.md](references/human-gates.md) — when to stop for a person
+- [loop-retry.md](references/loop-retry.md) — verify failure → retry / gate / stop
 - [contract-layout.md](references/contract-layout.md) — default artifact paths
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
 
@@ -26,20 +28,24 @@ Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `
 | `solidsdd-context` | Parent agent (this conversation) |
 | `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify` | **Required subagent** via Task tool (or equivalent) |
 
-Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `solidsdd-judge` to thin contracts—re-run `solidsdd-judge` as a subagent if the plan is wrong. Read [references/execution-model.md](references/execution-model.md).
+Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `solidsdd-judge` to thin contracts—re-run `solidsdd-judge` as a subagent if the plan is wrong.
 
 ## Sequence
 
 1. Parent: `solidsdd-context`
 2. **Task subagent** `solidsdd-judge` → ApplicationPlan
-3. For each `status=apply` target, **Task subagent**:
-   - `api` → `solidsdd-apply-api`
+3. If plan or any target has `human_gate.required: true` → **stop** (see [human-gates.md](references/human-gates.md)); do not apply until humans approve
+4. For each `status=apply` target, **Task subagent**:
+   - `api` → `solidsdd-apply-api` (honor `adapter_hint`: `openapi` or `graphql`)
    - `dbc` → `solidsdd-apply-dbc`
-4. If OCL changed → **Task subagent** `solidsdd-derive-tests`
-5. **Task subagent** `solidsdd-implement`
-6. **Task subagent** `solidsdd-verify`
-7. On failure, retry the suggested skill as a **new subagent** (max 3 loops unless rules say otherwise)
-8. Leave `formal`/`defer` items visible in the final summary—do not hide them
+5. If OCL changed → **Task subagent** `solidsdd-derive-tests`
+6. **Task subagent** `solidsdd-implement`
+7. **Task subagent** `solidsdd-verify`
+8. On failure, follow [loop-retry.md](references/loop-retry.md):
+   - `loop_action: retry` → re-run suggested skills as **new subagents**, then verify (max 3 verify-fail retries)
+   - `loop_action: human_gate` or `stop` → end loop with report
+   - Same suggested skill twice with no progress → escalate to human gate
+9. Leave `formal`/`defer` and unmet human gates visible in the final summary—do not hide them
 
 ## Subagent prompt requirements
 
@@ -55,5 +61,6 @@ Each Task prompt must include:
 
 - Subagent-required steps were not run inline in the parent
 - ApplicationPlan came from the judge subagent without parent thinning
-- Verification passes, or stops with a clear blocker and human-gate reason
-- Artifacts (OpenAPI, OCL, tests, code) remain consistent with the plan
+- Human gates honored before apply
+- Verification passes, or stops with clear `loop_action` / human-gate reason
+- Artifacts remain consistent with the plan

@@ -38,10 +38,11 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/install.md](docs/install.md) | **導入手順（gh skill 推奨）** |
 | [docs/vision.md](docs/vision.md) | 問題意識・目標・使い分けの軸 |
 | [docs/architecture.md](docs/architecture.md) | ルール・エージェント／スキル構成 |
-| [docs/adapters.md](docs/adapters.md) | MVP アダプタ決定（OpenAPI / OCL） |
+| [docs/adapters.md](docs/adapters.md) | アダプタ方針（OpenAPI / GraphQL / OCL） |
 | [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent の実行ポリシー |
 | [docs/roadmap.md](docs/roadmap.md) | MVP 範囲と段階的導入 |
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP 通し評価の記録 |
+| [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・ループ復帰） |
 | [examples/arithmetic-api](examples/arithmetic-api) | 評価用サンプル（演算 + 電卓メモリ） |
 
 ## 実行イメージ（要約）

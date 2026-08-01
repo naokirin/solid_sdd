@@ -1,9 +1,10 @@
 ---
 name: solidsdd-implement
 description: >-
-  Implement or update code to satisfy OpenAPI and OCL contracts in solid_sdd.
-  When called from solidsdd-loop, must run as an explicit Task subagent. Use after
-  apply/derive skills, or when verification fails due to implementation.
+  Implement or update code to satisfy API (OpenAPI/GraphQL) and OCL contracts in
+  solid_sdd. When called from solidsdd-loop, must run as an explicit Task
+  subagent. Use after apply/derive skills, or when verification fails due to
+  implementation.
 license: MIT
 ---
 
@@ -15,25 +16,26 @@ license: MIT
 
 ## Purpose
 
-Make implementation satisfy OpenAPI and OCL-derived expectations.
+Make implementation satisfy API and OCL-derived expectations.
 
 ## References
 
 - [openapi-adapter.md](references/openapi-adapter.md)
+- [graphql-adapter.md](references/graphql-adapter.md)
 - [ocl-adapter.md](references/ocl-adapter.md)
 - [contract-layout.md](references/contract-layout.md)
 
 ## Constraints
 
 - Change implementation (and non-contract app tests if needed) only
-- Do not weaken or edit OCL / OpenAPI / derived contract tests to force a pass
+- Do not weaken or edit OCL / OpenAPI / GraphQL / derived contract tests to force a pass
 - If the spec is wrong, stop and tell the parent to re-run apply skills
 
 ## Steps
 
-1. Read OpenAPI and OCL (and existing contract tests) using paths in [contract-layout.md](references/contract-layout.md).
-2. Update domain logic and HTTP wiring to meet contracts.
-3. Do not weaken OCL or OpenAPI to make tests pass—fix implementation or return to apply skills if the spec is wrong.
+1. Read API contracts and OCL (and existing contract tests) using paths in [contract-layout.md](references/contract-layout.md).
+2. Update domain logic and API wiring to meet contracts.
+3. Do not weaken contracts to make tests pass—fix implementation or return to apply skills if the spec is wrong.
 4. Keep changes scoped to the planned targets.
 
 ## Success criteria

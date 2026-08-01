@@ -1,12 +1,18 @@
-# MVP アダプタ方針
+# アダプタ方針
 
-初期アダプタの決定事項。詳細な手続きは各アダプタ README とスキルを参照。
+MVP で固定した初期アダプタと、Phase 2 で追加した骨格。詳細は各アダプタ README とスキルを参照。
 
-## API: OpenAPI 3.x
+## API: OpenAPI 3.x（既定）
 
-- **成果物**: `openapi.yaml`（またはプロジェクト規約上の同等パス）
+- **成果物**: `openapi/openapi.yaml`（またはプロジェクト規約上の同等パス）
 - **役割**: HTTP 境界のリクエスト／レスポンス・エラー形・互換性の契約
 - **検証**: スキーマ妥当性 + 実装が契約に沿うことのチェック（契約テストまたはレスポンス検証）
+
+## API: GraphQL SDL（Phase 2 骨格）
+
+- **成果物**: `graphql/schema.graphql`（任意で operations ドキュメント）
+- **役割**: GraphQL-first プロジェクト向けの境界契約（OpenAPI の代替）
+- **状態**: 規約スケルトンのみ。評価サンプルは未着手 — [../adapters/graphql/README.md](../adapters/graphql/README.md)
 
 ## DbC: UML OCL → 契約テスト（サブエージェント）
 

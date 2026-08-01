@@ -1,5 +1,5 @@
 ---
-description: solid_sdd — OpenAPI/OCL contracts, skill orchestration, subagent isolation
+description: solid_sdd — OpenAPI/GraphQL/OCL contracts, skill orchestration, subagent isolation
 alwaysApply: true
 ---
 
@@ -11,19 +11,25 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 ## Contract artifacts (defaults)
 
 - OpenAPI: `openapi/openapi.yaml`
+- GraphQL SDL (optional): `graphql/schema.graphql`
 - OCL: `contracts/**/*.ocl`
 - Derived contract tests: `tests/contracts/**/*.test.ts` (dependents of OCL; not source of truth)
 
 ## Adapters
 
-- API: OpenAPI 3.x — see `solidsdd-apply-api/references/openapi-adapter.md` (or sibling install path)
+- API: OpenAPI 3.x (default) or GraphQL SDL — see `solidsdd-apply-api/references/`
 - DbC: UML OCL → contract tests via `solidsdd-derive-tests` — see `solidsdd-apply-dbc/references/ocl-adapter.md`
 - Formal specs (TLA+ / Alloy / …): defer with rationale when relevant (MVP)
 
 ## Verification
 
-- Do not treat work as done if OpenAPI checks or OCL-derived contract tests fail
-- On failure, return to the suggested skill; do not weaken contracts to force a pass
+- Do not treat work as done if API contract checks or OCL-derived contract tests fail
+- On failure, follow `loop_action` / suggested skills; do not weaken contracts to force a pass
+
+## Human gates (Phase 2)
+
+- If `ApplicationPlan` has `human_gate.required: true`, stop before apply until a person approves
+- Typical triggers: breaking API change, money boundary, low confidence
 
 ## Execution (orchestrator / subagent)
 

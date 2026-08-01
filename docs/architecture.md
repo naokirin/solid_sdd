@@ -65,27 +65,29 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 
 ```text
 ApplicationPlan:
+  human_gate? / confidence?          … Phase 2（任意）
   targets[]:
     kind: api | dbc | formal | natural_only
     location: 境界やモジュールの識別子
     density: thin | standard | strict
     rationale: 判断理由（軸への参照）
-    adapter_hint: openapi | ocl | ...
+    adapter_hint: openapi | graphql | ocl | ...
     status: apply | defer | skip
+    signals? / breaking? / confidence? / human_gate?  … Phase 2
 ```
 
 `formal` は MVP では主に `defer`（理由付き）となる。
 
-判断に使う軸は [vision.md](vision.md) の表を初期ソースとし、ルールでプロジェクト固有の閾値を上書きできるようにする。
+判断に使う軸は [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md)（Phase 2）と [vision.md](vision.md)。ルールでプロジェクト固有の閾値を上書きできる。人間ゲートとループ復帰は [phase2.md](phase2.md)。
 
 ## アダプタ層
 
-MVP の初期アダプタは次で固定する（詳細は [adapters.md](adapters.md)）。
+MVP の初期アダプタは次で固定する（詳細は [adapters.md](adapters.md)）。Phase 2 で GraphQL 骨格を追加。
 
 ```text
-Contract Kind          MVP Adapter
+Contract Kind          Adapter
 ─────────────          ─────────────────────────────
-API boundary    →      OpenAPI 3.x
+API boundary    →      OpenAPI 3.x（既定） / GraphQL SDL（骨格）
 Module DbC      →      UML OCL → 契約テスト（サブエージェント生成）
 Formal (後続)   →      （未実装。judge は defer）
 ```
@@ -123,7 +125,7 @@ solid_sdd/
   README.md
   docs/                 # 構想・設計
   schemas/              # ApplicationPlan 等の共有スキーマ
-  adapters/             # OpenAPI / OCL アダプタ規約
+  adapters/             # OpenAPI / GraphQL / OCL アダプタ規約
   skills/               # Cursor Skill 形式のスキル定義
   rules/                # 常駐ルール（順次追加）
   examples/             # 評価用サンプル

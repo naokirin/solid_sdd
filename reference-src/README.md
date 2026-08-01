@@ -6,5 +6,7 @@ Skill `references/` のうち、repo 直下の `adapters/` / `schemas/` / `docs/
 |----------|----------------|
 | `contract-layout.md` | context / implement / loop |
 | `judgment-axes.md` | judge |
+| `human-gates.md` | judge / loop |
+| `loop-retry.md` | verify / loop |
 
 同期は `scripts/sync-skill-references.sh` を使います。`skills/*/references/` を手で編集しないでください（上書きされます）。
