@@ -1,8 +1,10 @@
 openapi: 3.0.3
 info:
   title: Arithmetic API
-  version: 0.1.0
-  description: Evaluation sample for solid_sdd — five arithmetic operations over HTTP.
+  version: 0.2.0
+  description: >-
+    Evaluation sample for solid_sdd — five arithmetic operations over HTTP,
+    plus calculator memory (MC/MR/M+/M-).
 servers:
   - url: http://localhost:3000
 paths:
@@ -29,6 +31,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /memory/clear:
+    post:
+      operationId: memoryClear
+      summary: Clear calculator memory (MC)
+      responses:
+        '200':
+          description: Memory cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryResponse'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /memory/recall:
+    post:
+      operationId: memoryRecall
+      summary: Recall calculator memory (MR)
+      responses:
+        '200':
+          description: Current memory value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryResponse'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /memory/add:
+    post:
+      operationId: memoryAdd
+      summary: Add value to calculator memory (M+)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryValueRequest'
+      responses:
+        '200':
+          description: Memory updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryResponse'
+        '400':
+          description: Invalid JSON or missing value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /memory/subtract:
+    post:
+      operationId: memorySubtract
+      summary: Subtract value from calculator memory (M-)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryValueRequest'
+      responses:
+        '200':
+          description: Memory updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryResponse'
+        '400':
+          description: Invalid JSON or missing value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     Operation:
@@ -51,6 +133,20 @@ components:
       required: [result]
       properties:
         result:
+          type: number
+    MemoryValueRequest:
+      type: object
+      additionalProperties: false
+      required: [value]
+      properties:
+        value:
+          type: number
+    MemoryResponse:
+      type: object
+      additionalProperties: false
+      required: [memory]
+      properties:
+        memory:
           type: number
     ErrorResponse:
       type: object

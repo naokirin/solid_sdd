@@ -42,7 +42,7 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent の実行ポリシー |
 | [docs/roadmap.md](docs/roadmap.md) | MVP 範囲と段階的導入 |
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP 通し評価の記録 |
-| [examples/arithmetic-api](examples/arithmetic-api) | 評価用サンプル（四則演算 API） |
+| [examples/arithmetic-api](examples/arithmetic-api) | 評価用サンプル（演算 + 電卓メモリ） |
 
 ## 実行イメージ（要約）
 

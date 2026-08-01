@@ -1,0 +1,20 @@
+-- Single calculator memory register (initial 0). Source of truth for DbC.
+-- Memory type attribute: memory: Real
+
+context Memory
+inv MemoryIsReal: memory.oclIsTypeOf(Real)
+
+context Memory::clear(): Real
+post MemoryCleared: memory = 0
+post ResultIsZero: result = 0
+
+context Memory::recall(): Real
+post ResultIsMemory: result = memory
+
+context Memory::add(value: Real): Real
+post MemoryIncreased: memory = memory@pre + value
+post ResultIsMemory: result = memory
+
+context Memory::subtract(value: Real): Real
+post MemoryDecreased: memory = memory@pre - value
+post ResultIsMemory: result = memory
