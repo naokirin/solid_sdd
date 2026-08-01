@@ -4,17 +4,22 @@ description: >-
   Add or update UML OCL Design-by-Contract specs for solid_sdd. When called from
   solidsdd-loop, must run as an explicit Task subagent. Use for ApplicationPlan
   kind=dbc with adapter_hint=ocl, or when asked for OCL.
+license: MIT
 ---
 
 # solidsdd.apply.dbc
 
 ## Execution
 
-**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task; do not edit OCL inline in the parent. Solo user invocation may run in the current agent. See [docs/execution-model.md](../../docs/execution-model.md).
+**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining multiple phases). Parent must use Task; do not edit OCL inline in the parent. Solo user invocation may run in the current agent.
 
 ## Purpose
 
 Maintain OCL as the source of truth for module contracts.
+
+## References
+
+- [ocl-adapter.md](references/ocl-adapter.md)
 
 ## Constraints
 
@@ -24,7 +29,7 @@ Maintain OCL as the source of truth for module contracts.
 
 ## Defaults
 
-Follow `adapters/ocl/README.md` (`contracts/**/*.ocl`).
+Follow [ocl-adapter.md](references/ocl-adapter.md) (`contracts/**/*.ocl`).
 
 ## Steps
 

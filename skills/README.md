@@ -1,8 +1,10 @@
 # Skills index
 
-Cursor Agent Skill definitions for solid_sdd. Copy or link into a project's `.cursor/skills/` to use.
+Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skill` 対応）。
 
-実行ポリシーの詳細: [../docs/execution-model.md](../docs/execution-model.md)
+各スキルは **自己完結** です。必要なアダプタ・スキーマ・実行モデルは `references/` に同梱しています。導入は [docs/install.md](../docs/install.md)。
+
+実行ポリシーの詳細: 各スキルの `references/`、または [../docs/execution-model.md](../docs/execution-model.md)
 
 | Skill | Command-like id | Role | Execution |
 |-------|-----------------|------|-----------|
@@ -17,3 +19,7 @@ Cursor Agent Skill definitions for solid_sdd. Copy or link into a project's `.cu
 
 - Manual: user may run one skill in the current agent.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent.
+
+## Maintainer note
+
+Repo-root `adapters/`, `schemas/`, and `docs/` are editing sources. After changing them, refresh the copies under `skills/*/references/` so `gh skill` installs stay self-contained.

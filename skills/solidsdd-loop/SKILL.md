@@ -4,6 +4,7 @@ description: >-
   Orchestrate solid_sdd as the parent agent only: run context locally, and
   launch judge/apply/derive/implement/verify as explicit subagents via Task.
   Use for autonomous SDD loops.
+license: MIT
 ---
 
 # solidsdd.loop
@@ -12,6 +13,12 @@ description: >-
 
 Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
 
+## References
+
+- [execution-model.md](references/execution-model.md) — orchestrator / subagent rules
+- [contract-layout.md](references/contract-layout.md) — default artifact paths
+- [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
+
 ## Execution policy
 
 | Step | How |
@@ -19,7 +26,7 @@ Run the full MVP loop. This skill is **orchestrator-only** — do not delegate `
 | `solidsdd-context` | Parent agent (this conversation) |
 | `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify` | **Required subagent** via Task tool (or equivalent) |
 
-Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `solidsdd-judge` to thin contracts—re-run `solidsdd-judge` as a subagent if the plan is wrong. Read [docs/execution-model.md](../../docs/execution-model.md).
+Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` from `solidsdd-judge` to thin contracts—re-run `solidsdd-judge` as a subagent if the plan is wrong. Read [references/execution-model.md](references/execution-model.md).
 
 ## Sequence
 
@@ -38,10 +45,10 @@ Never execute a subagent-required skill's procedure in the parent. Do not rewrit
 
 Each Task prompt must include:
 
-- Skill id and path to `skills/<dir>/SKILL.md`
-- Working directory
+- Skill id and path to the installed `solidsdd-*/SKILL.md`
+- Working directory (consuming project root)
 - Inputs (context summary, ApplicationPlan excerpt, changed OCL paths, etc.)
-- Constraint: only that skill's allowed edits
+- Constraint: only that skill's allowed edits; follow that skill's `references/`
 - Expected return: summary, changed files, plan/report artifacts
 
 ## Success criteria

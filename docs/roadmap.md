@@ -15,7 +15,8 @@
 - [x] 評価シナリオ選定: TypeScript 四則演算 API（[../examples/arithmetic-api](../examples/arithmetic-api)）
 - [x] スキル入出力スキーマ（`ApplicationPlan` 等）
 - [x] スキル定義スケルトン（`skills/`）
-- [ ] 利用側への配布形態の詳細（ルール同梱・インストール手順）
+- [x] 利用側への導入手順（[install.md](install.md) — `gh skill` 自己完結スキル）
+- [ ] GitHub 公開後の `gh skill publish`（release / `agent-skills` topic）
 
 ## フェーズ 1: MVP（つながった最小構成）
 
@@ -69,7 +70,7 @@
 ## 直近の次アクション
 
 1. `examples/arithmetic-api` で手動フェーズ実行が通るか確認する
-2. `solidsdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
-3. `solidsdd.derive.tests` のサブエージェントプロンプトを固め、OCL→Vitest 生成の再現性を見る
-4. `rules/` を Cursor ルール形式へ落とす
-5. （任意）電卓メモリ機能をシナリオ拡張として追加し、判断〜検証の再実行を試す
+2. `solidsdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認
+3. GitHub remote 設定後に `gh skill publish --dry-run` → `gh skill publish --tag v0.1.0`
+4. （任意）電卓メモリ機能をシナリオ拡張として追加する
+5. adapters/schemas/docs 変更時に `skills/*/references/` を同期する運用を習慣化する

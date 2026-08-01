@@ -10,12 +10,22 @@
 
 ## 現状
 
-構想・設計に加え、MVP アダプタ（OpenAPI + OCL→契約テスト）と評価用サンプル（TypeScript 四則演算 API）の骨格まで着手しています。
+構想・設計に加え、MVP アダプタ（OpenAPI + OCL→契約テスト）、評価用サンプル、**`gh skill` 向け自己完結スキル**まで整備しています。
+
+## 導入（要約）
+
+```bash
+gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project
+cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # パスは環境による
+```
+
+詳細は [docs/install.md](docs/install.md)。
 
 ## ドキュメント
 
 | 文書 | 内容 |
 |------|------|
+| [docs/install.md](docs/install.md) | **導入手順（gh skill 推奨）** |
 | [docs/vision.md](docs/vision.md) | 問題意識・目標・使い分けの軸 |
 | [docs/architecture.md](docs/architecture.md) | ルール・エージェント／スキル構成 |
 | [docs/adapters.md](docs/adapters.md) | MVP アダプタ決定（OpenAPI / OCL） |
@@ -39,4 +49,4 @@ Kiro 等と同様に、ユーザーがフェーズ単位のスキルを任意に
 
 ## ライセンス
 
-未定（リポジトリ整備時に決定）
+[MIT](LICENSE)

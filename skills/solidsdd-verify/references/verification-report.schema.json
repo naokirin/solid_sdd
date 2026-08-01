@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/verification-report.schema.json",
+  "title": "VerificationReport",
+  "description": "Output of solidsdd.verify.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "result", "checks"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["pass", "fail"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "suggested_next_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Skills to re-run on failure, e.g. solidsdd.apply.api, solidsdd.implement."
+    }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "result"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["openapi", "ocl_tests", "other"]
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail", "skipped"]
+        },
+        "detail": { "type": "string" }
+      }
+    }
+  }
+}

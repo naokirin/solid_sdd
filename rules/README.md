@@ -1,25 +1,8 @@
-# solid_sdd — minimal rules for evaluation samples
+# Rules
 
-## Contract artifacts
+| ファイル | 用途 |
+|----------|------|
+| [solidsdd.mdc](solidsdd.mdc) | リポジトリ作業用 / 手動コピー用の Project Rule |
+| 配布用コピー | `skills/solidsdd-loop/references/project-rule.mdc`（`gh skill` インストール後に利用側へコピー） |
 
-- OpenAPI: `openapi/openapi.yaml`
-- OCL: `contracts/**/*.ocl`
-- Derived contract tests: `tests/contracts/**/*.test.ts`
-
-## Defaults
-
-- API adapter: OpenAPI 3.x
-- DbC adapter: OCL → contract tests (do not treat generated tests as source of truth)
-- Formal specs: defer with rationale when relevant
-
-## Verification
-
-- Do not treat a change as done if OpenAPI or OCL-derived contract tests fail
-- On verify failure, return to the suggested skill instead of weakening contracts
-
-## Execution (orchestrator / subagent)
-
-- `solidsdd.loop` is parent-only
-- From an orchestrator, run judge / apply / derive-tests / implement / verify as **explicit subagents** (Task), never inline in the parent
-- Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd.judge` as a subagent if needed
-- Details: `docs/execution-model.md`
+導入の主経路は [docs/install.md](../docs/install.md)（`gh skill install`）です。

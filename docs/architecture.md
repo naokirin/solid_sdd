@@ -129,7 +129,7 @@ solid_sdd/
   examples/             # 評価用サンプル
 ```
 
-スキルは Cursor Agent Skill（`SKILL.md`）形式で定義し、利用側では `.cursor/skills/` へ配置または参照する。
+スキルは Cursor / Agent Skills（`SKILL.md`）形式で、**`references/` 込みの自己完結パッケージ**として定義する。利用側は `gh skill install` が主経路（[install.md](install.md)）。
 
 ## 未決事項
 

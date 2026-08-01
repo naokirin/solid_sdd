@@ -17,7 +17,7 @@ Generated tests are dependents: regenerate from OCL rather than hand-editing as 
 
 ## Pipeline
 
-All steps below except planning are **subagent-required** when driven by `solidsdd.loop` (see `docs/execution-model.md`).
+All steps below except planning are **subagent-required** when driven by `solidsdd.loop` (see solidsdd-loop `references/execution-model.md`).
 
 ```text
 solidsdd.apply.dbc          →  (subagent) write/update .ocl
