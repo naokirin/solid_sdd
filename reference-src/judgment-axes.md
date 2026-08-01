@@ -22,7 +22,7 @@ Prefer `status: apply` for `kind: formal` only when **all** hold:
 3. Scope is a single protocol or shared resource
 4. `human_gate.required: true` (early Phase 3 policy)
 
-Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal need silently. Details: repo `docs/phase3.md`.
+Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal need silently.
 
 ## Density and risk modifiers
 

@@ -19,8 +19,7 @@ Maintain formal specs for narrow concurrency / safety properties.
 
 ## References
 
-- [formal-adapter.md](references/formal-adapter.md)
-- Phase 3 design: repo `docs/phase3.md` (when working in solid_sdd source)
+- [formal-adapter.md](references/formal-adapter.md) — apply conditions, TLC setup, artifact layout
 
 ## Constraints
 

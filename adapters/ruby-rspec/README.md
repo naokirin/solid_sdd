@@ -1,13 +1,5 @@
 # Ruby / RSpec test-target adapter (Phase 2)
 
-編集用ソース。OCL は引き続きソース・オブ・トゥルース。本アダプタは **契約テストの生成先** を Vitest から RSpec に差し替えるときの規約。
-
-同期先: `skills/solidsdd-derive-tests/references/ruby-rspec-adapter.md`（および verify / apply-dbc が参照する場合）。ソース変更後:
-
-```bash
-scripts/sync-skill-references.sh
-```
-
 ## Role
 
 Map UML OCL → **RSpec** examples under `spec/contracts/`, for Ruby (and Rails-ready) stacks that keep OCL as SoT and do **not** require a language-native contracts gem.
@@ -47,6 +39,6 @@ solidsdd.verify         →  bundle exec rspec spec/contracts
 - Derive tests: `solidsdd-derive-tests` with test-target hint `rspec` / `ruby-rspec`
 - Check: `solidsdd-verify` (project test script)
 
-## Evaluation sample
+## Evaluation sample shape
 
-[../../examples/arithmetic-ruby](../../examples/arithmetic-ruby) — Calculator only (no HTTP / GraphQL).
+A typical sample is a Calculator-only Ruby domain (no HTTP / GraphQL) with OCL → `spec/contracts` and `bundle exec rspec`. Consuming projects need not ship a particular example path.

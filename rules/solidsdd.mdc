@@ -50,4 +50,4 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 ## Feedback
 
-Rule thresholds evolve from project feedback — see repo `docs/feedback-tuning.md` when working in solid_sdd source.
+Rule thresholds evolve from project feedback. Tune judgment defaults and gate rules above; keep changes documented in the consuming project.

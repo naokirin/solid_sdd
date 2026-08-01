@@ -11,7 +11,7 @@ license: MIT
 
 ## Execution
 
-**orchestrator** — run in the parent (`solidsdd.loop` or the user-invoked agent). See sibling skill `solidsdd-loop/references/execution-model.md` when available.
+**orchestrator** — run in the parent (`solidsdd.loop` or the user-invoked agent). When `solidsdd-loop` is also installed, follow its execution-model reference for orchestration rules.
 
 ## Purpose
 

@@ -32,8 +32,8 @@ Check formal specs and report pass/fail without modifying artifacts.
 ## Steps
 
 1. Locate formal artifacts (`formal/**` or plan locations).
-2. Ensure TLC is available (`tools/tla/fetch-tla2tools.sh` if using repo tooling); if missing, fail with `failure_class: tooling` and `loop_action: stop` or `human_gate`.
-3. Run TLC: `tools/tla/tlc.sh <Spec.tla> -config <Spec.cfg>` or the example's `./verify.sh`.
+2. Ensure TLC is available per [formal-adapter.md](references/formal-adapter.md); if missing, fail with `failure_class: tooling` and `loop_action: stop` or `human_gate`.
+3. Run the project TLC command (e.g. `tools/tla/tlc.sh <Spec.tla> -config <Spec.cfg>` or `./verify.sh`).
 4. Emit VerificationReport with `checks[].kind: formal`.
 5. On fail, set `suggested_next_skills`, `loop_action`, `failure_class` per [loop-retry.md](references/loop-retry.md).
 

@@ -30,7 +30,7 @@ mismatch=0
 updated=0
 
 # Build a staged copy of `src` into `$tmpdir/out` applying optional transforms.
-# Transforms: none | ocl-exec-path
+# Transforms: none (sources must already be skill-self-contained)
 stage_file() {
   local src="$1"
   local transform="${2:-none}"
@@ -39,11 +39,6 @@ stage_file() {
   case "$transform" in
     none)
       cp "$src" "$out"
-      ;;
-    ocl-exec-path)
-      # Point loop execution-model at the installed skill reference, not docs/
-      sed 's|(see `docs/execution-model.md`)|(see solidsdd-loop `references/execution-model.md`)|g' \
-        "$src" >"$out"
       ;;
     *)
       echo "unknown transform: $transform" >&2
@@ -108,11 +103,11 @@ sync_one adapters/ruby-rspec/README.md skills/solidsdd-apply-dbc/references/ruby
 sync_one adapters/ruby-rspec/README.md skills/solidsdd-verify/references/ruby-rspec-adapter.md
 sync_one adapters/ruby-rspec/README.md skills/solidsdd-implement/references/ruby-rspec-adapter.md
 
-# OCL adapter (path rewrite for execution-model)
-sync_one adapters/ocl/README.md skills/solidsdd-apply-dbc/references/ocl-adapter.md ocl-exec-path
-sync_one adapters/ocl/README.md skills/solidsdd-derive-tests/references/ocl-adapter.md ocl-exec-path
-sync_one adapters/ocl/README.md skills/solidsdd-implement/references/ocl-adapter.md ocl-exec-path
-sync_one adapters/ocl/README.md skills/solidsdd-verify/references/ocl-adapter.md ocl-exec-path
+# OCL adapter
+sync_one adapters/ocl/README.md skills/solidsdd-apply-dbc/references/ocl-adapter.md
+sync_one adapters/ocl/README.md skills/solidsdd-derive-tests/references/ocl-adapter.md
+sync_one adapters/ocl/README.md skills/solidsdd-implement/references/ocl-adapter.md
+sync_one adapters/ocl/README.md skills/solidsdd-verify/references/ocl-adapter.md
 
 # Formal adapter (Phase 3 design)
 sync_one adapters/formal/README.md skills/solidsdd-apply-formal/references/formal-adapter.md

@@ -12,7 +12,7 @@ Set `human_gate.required: true` (plan-level and/or per target) when any of:
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements |
-| `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` (see docs/phase3.md) |
+| `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` |
 
 ## Plan fields
 
@@ -42,11 +42,9 @@ When the human approves:
    - pending `formal` → `solidsdd-apply-formal` then `solidsdd-verify-formal`
 3. If approval is **partial** (e.g. allow API but not formal), re-run `solidsdd-judge` with that instruction as a subagent, or set the refused target to `defer`/`skip` only via a new judge plan—not by parent edits.
 
-Dry-run evidence: [docs/phase3-gate-dryrun.md](../docs/phase3-gate-dryrun.md) (in the solid_sdd repo).
-
 ## Defaults
 
 - **Additive, non-breaking** API/DbC work with clear context: gate only when other modifiers fire (`breaking_change`, money, low confidence, formal apply).
-- Evaluation samples (arithmetic-*, memory-formal tooling setup): same rule—do not gate routine additive changes.
+- Evaluation / sample work: same rule—do not gate routine additive changes.
 - Production defaults may set stricter always-gate rules via project rule overrides.
-- Formal `apply` in early Phase 3: **always** gate (see docs/phase3.md).
+- Formal `apply` in early Phase 3: **always** gate.

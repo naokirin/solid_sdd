@@ -50,7 +50,7 @@ Phase 2 以降、親は次も扱う（詳細はスキル `references/human-gates
 - `human_gate.required` が真なら **apply 前に停止**
 - verify fail 時の `loop_action`（`retry` / `human_gate` / `stop`）に従う（既定の自動リトライ上限 3）
 
-Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.apply.formal` / `solidsdd.verify.formal` を起動する（[phase3.md](phase3.md)）。`defer` の formal は API/DbC 経路を止めない。
+Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.apply.formal` / `solidsdd.verify.formal` を起動する。`defer` の formal は API/DbC 経路を止めない。
 
 ## 親エージェントの義務（`solidsdd.loop`）
 
@@ -67,7 +67,7 @@ Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.app
 ```text
 You are executing the solid_sdd skill: <skill-name>
 Read and follow: skills/<skill-dir>/SKILL.md
-Working directory: <project root or examples/arithmetic-api>
+Working directory: <consuming project root>
 Inputs:
   - ...
 Constraints:

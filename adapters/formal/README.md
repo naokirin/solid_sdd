@@ -1,24 +1,37 @@
 # Formal specification adapter (Phase 3)
 
-編集用ソース。同期: `skills/solidsdd-apply-formal|verify-formal/references/formal-adapter.md`。ソース変更後:
-
-```bash
-scripts/sync-skill-references.sh
-```
-
 ## Role
 
-Express **safety / liveness / concurrency** properties that API contracts and OCL→tests do not cheaply cover. Formal specs are **optional** and narrow-scope. Prefer OpenAPI/GraphQL + OCL unless [docs/phase3.md](../../docs/phase3.md) apply conditions hold.
+Express **safety / liveness / concurrency** properties that API contracts and OCL→tests do not cheaply cover. Formal specs are **optional** and narrow-scope. Prefer OpenAPI/GraphQL + OCL unless the apply conditions below hold.
+
+## When to `apply` (vs `defer`)
+
+Prefer `status: apply` for `kind: formal` only when **all** hold:
+
+1. Signal `concurrency_safety` (or equivalent: distributed consensus, multi-writer shared state, failover) is present **and** density would be `strict`, **or** product policy marks the boundary as safety-critical
+2. A formal adapter is available (`adapter_hint` e.g. `tla`, `alloy`) and the checker is documented for the project
+3. Scope is bounded (one protocol / one shared resource)—not “formalize the whole app”
+4. `human_gate.required: true` (mandatory in Phase 3 early rollout)
+
+Otherwise keep `status: defer` with `adapter_hint: defer-formal`. Never silently drop formal need.
+
+Rule of thumb: formal specs check properties that contract tests cannot cheaply falsify (interleavings, global invariants across processes). If a Vitest/RSpec example is enough, stay on DbC.
 
 ## Default checker: TLA+ / TLC
 
 | Choice | Role |
 |--------|------|
-| **TLC** (default) | Model-check `.tla` + `.cfg` via `tools/tla/tlc.sh` |
+| **TLC** (default) | Model-check `.tla` + `.cfg` |
 | Apalache | Optional later (inductive invariants) |
 | Alloy | Optional alternate notation (`adapter_hint: alloy`) |
 
-Setup: [../../tools/tla/README.md](../../tools/tla/README.md) (`fetch-tla2tools.sh`, JDK 17+).
+### TLC setup (consuming project)
+
+1. JDK 17+ (Temurin recommended)
+2. Provide a TLC runner the project documents (common pattern: `tools/tla/fetch-tla2tools.sh` then `tools/tla/tlc.sh`, or a project `./verify.sh` wrapper)
+3. Do not commit `tla2tools.jar` unless the project explicitly chooses to
+
+If jar/JDK/runner is missing: `failure_class: tooling`, `loop_action: stop` or `human_gate`.
 
 ## Artifact layout (default)
 
@@ -38,8 +51,7 @@ Setup: [../../tools/tla/README.md](../../tools/tla/README.md) (`fetch-tla2tools.
 ## Verification hooks
 
 - Parse / type-check via TLC
-- Run `tools/tla/tlc.sh <Spec.tla> -config <Spec.cfg>` (or project wrapper)
-- On missing jar/JDK: `failure_class: tooling`, `loop_action: stop` or `human_gate`
+- Run the project TLC command, e.g. `tools/tla/tlc.sh <Spec.tla> -config <Spec.cfg>` or `./verify.sh`
 - On invariant violation: prefer `solidsdd-apply-formal` (spec) unless implementation SoT is clearer
 
 ## Skill mapping
@@ -47,6 +59,6 @@ Setup: [../../tools/tla/README.md](../../tools/tla/README.md) (`fetch-tla2tools.
 - Write/update: `solidsdd-apply-formal` (`adapter_hint: tla`)
 - Check: `solidsdd-verify-formal` (VerificationReport check kind `formal`)
 
-## Evaluation sample
+## Evaluation sample shape
 
-[../../examples/memory-formal](../../examples/memory-formal) — exclusive shared-memory adds; `./verify.sh` must report no TLC error.
+A typical sample is exclusive shared-memory adds under a small `Clients` bound: TLC must report no error (e.g. “No error has been found”).
