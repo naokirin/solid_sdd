@@ -5,8 +5,9 @@ Skill `references/` のうち、repo 直下の `adapters/` / `schemas/` / `docs/
 | ファイル | 配布先（例） |
 |----------|----------------|
 | `contract-layout.md` | context / implement / loop |
-| `judgment-axes.md` | judge |
+| `judgment-axes.md` | judge / critique |
 | `human-gates.md` | judge / loop |
-| `loop-retry.md` | verify / loop |
+| `loop-retry.md` | verify / critique / loop |
+| `adversarial-critique.md` | critique / loop |
 
 同期は `scripts/sync-skill-references.sh` を使います。`skills/*/references/` を手で編集しないでください（上書きされます）。

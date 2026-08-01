@@ -119,6 +119,7 @@ sync_one reference-src/loop-retry.md skills/solidsdd-verify-formal/references/lo
 sync_one docs/execution-model.md skills/solidsdd-loop/references/execution-model.md
 sync_one schemas/application-plan.schema.json skills/solidsdd-judge/references/application-plan.schema.json
 sync_one schemas/verification-report.schema.json skills/solidsdd-verify/references/verification-report.schema.json
+sync_one schemas/critique-report.schema.json skills/solidsdd-critique/references/critique-report.schema.json
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc
 
 # Skill-local shared sources
@@ -126,10 +127,14 @@ sync_one reference-src/contract-layout.md skills/solidsdd-context/references/con
 sync_one reference-src/contract-layout.md skills/solidsdd-implement/references/contract-layout.md
 sync_one reference-src/contract-layout.md skills/solidsdd-loop/references/contract-layout.md
 sync_one reference-src/judgment-axes.md skills/solidsdd-judge/references/judgment-axes.md
+sync_one reference-src/judgment-axes.md skills/solidsdd-critique/references/judgment-axes.md
 sync_one reference-src/human-gates.md skills/solidsdd-judge/references/human-gates.md
 sync_one reference-src/human-gates.md skills/solidsdd-loop/references/human-gates.md
 sync_one reference-src/loop-retry.md skills/solidsdd-verify/references/loop-retry.md
 sync_one reference-src/loop-retry.md skills/solidsdd-loop/references/loop-retry.md
+sync_one reference-src/loop-retry.md skills/solidsdd-critique/references/loop-retry.md
+sync_one reference-src/adversarial-critique.md skills/solidsdd-critique/references/adversarial-critique.md
+sync_one reference-src/adversarial-critique.md skills/solidsdd-loop/references/adversarial-critique.md
 
 if [[ "$MODE" == "check" ]]; then
   if [[ "$mismatch" -ne 0 ]]; then

@@ -25,6 +25,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 | F6 | Parent thinning of ApplicationPlan is the main bias risk | Reaffirm in project rule; resume-after-gate must not strip formal |
 | F7 | max retries=3 worked conceptually; same skill twice → gate | Keep max_auto_retries=3; escalate on repeated same skill (loop-retry) |
 | F8 | Ruby `%` raised `ZeroDivisionError` when guard removed—tests expect domain error | OCL derive/implement: map `pre` failures to a **named domain error** |
+| F9 | Phase evaluation left to the producing agent; contracts can stay thin | Dedicated `solidsdd-critique` Task after judge/apply/derive/verify; contract-weakness checklist; shared max_auto_retries=3 |
 
 ## Intake template (external projects)
 
@@ -42,3 +43,4 @@ When an external project contributes feedback, append a row under [Intake log](#
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
 | 2026-08-02 | solid_sdd examples (Pass 1) | See table above | Applied to rules, axes, context, loop-retry, OCL adapter notes |
+| 2026-08-02 | solid_sdd design (F9) | Adversarial critique as explicit skill | Added `solidsdd-critique`, loop integration, shared retry budget |

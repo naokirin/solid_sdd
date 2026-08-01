@@ -11,6 +11,7 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Orchestration | orchestrator only |
 | [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
 | [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
+| [solidsdd-critique](solidsdd-critique/SKILL.md) | `solidsdd.critique` | CritiqueReport (adversarial phase gate) | **subagent required** |
 | [solidsdd-apply-api](solidsdd-apply-api/SKILL.md) | `solidsdd.apply.api` | OpenAPI | **subagent required** |
 | [solidsdd-apply-dbc](solidsdd-apply-dbc/SKILL.md) | `solidsdd.apply.dbc` | OCL | **subagent required** |
 | [solidsdd-derive-tests](solidsdd-derive-tests/SKILL.md) | `solidsdd.derive.tests` | OCL → contract tests | **subagent required** |
@@ -20,7 +21,7 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | [solidsdd-verify-formal](solidsdd-verify-formal/SKILL.md) | `solidsdd.verify.formal` | Formal VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
-- Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent.
+- Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
 
 ## Maintainer: keep `references/` in sync
 
@@ -34,9 +35,9 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | `adapters/ocl/README.md` | `*/ocl-adapter.md` |
 | `adapters/formal/README.md` | `*/formal-adapter.md` |
 | `docs/execution-model.md` | `solidsdd-loop/references/execution-model.md` |
-| `schemas/*.json` | judge / verify / verify-formal |
+| `schemas/*.json` | judge / verify / verify-formal / critique |
 | `rules/solidsdd.mdc` | `solidsdd-loop/references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry |
+| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique |
 
 ```bash
 # 手動

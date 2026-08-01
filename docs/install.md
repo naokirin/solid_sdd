@@ -128,10 +128,10 @@ gh skill update solidsdd-loop
 ### 必須（MVP: OpenAPI + OCL）
 
 - [ ] `gh skill install ... --all --agent cursor` が成功した（または `--from-local`）
-- [ ] `gh skill list` に `solidsdd-*` がある（loop / context / judge / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
+- [ ] `gh skill list` に `solidsdd-*` がある（loop / context / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
 - [ ] （推奨）`project-rule.mdc` を Project Rules へコピーした
 - [ ] 契約レイアウト方針を共有した（[project-template.md](project-template.md)）
-- [ ] `solidsdd-context` または `solidsdd-loop` のスモークが通る
+- [ ] `solidsdd-context` または `solidsdd-loop` のスモークが通る（loop では生産者の直後に `solidsdd-critique` が Task 起動される）
 - [ ] 契約テストがプロジェクトの `npm test` / `bundle exec rspec` 等で走る
 
 ### 任意（スタック別）

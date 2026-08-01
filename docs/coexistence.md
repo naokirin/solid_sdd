@@ -40,8 +40,9 @@ Leave TLA+/TLC to `concurrency_safety` (or policy-marked safety-critical) paths.
 ## Conflict resolution
 
 1. **Verify fails** → fix implementation or correct the contract via apply skills; never weaken contracts only to green the NL loop.
-2. **NL agent and solid_sdd disagree on density** → re-run `solidsdd-judge` as a subagent; do not thin the plan in the parent.
-3. **Human gate** → NL automation must pause the same way `solidsdd-loop` does.
+2. **Critique fails** (thin contracts, density bias, weak tests) → re-run the **source** solid_sdd skill (`judge` / `apply-*` / `derive-tests`); do not paper over with implement-only fixes.
+3. **NL agent and solid_sdd disagree on density** → re-run `solidsdd-judge` as a subagent; do not thin the plan in the parent.
+4. **Human gate** → NL automation must pause the same way `solidsdd-loop` does.
 
 ## Non-goals
 

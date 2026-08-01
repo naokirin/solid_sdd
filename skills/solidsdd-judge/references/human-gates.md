@@ -27,10 +27,11 @@ Targets may repeat a narrower `human_gate` for location-specific approval.
 
 ## Orchestrator behavior (`solidsdd-loop`)
 
-1. After `solidsdd-judge`, if any `human_gate.required` is true → **stop before apply**.
-2. Final summary must list gate reasons and waiting locations.
-3. Do not thin the plan to avoid the gate.
-4. Resume only after explicit human approval in the conversation (or updated plan from a re-run of `solidsdd-judge` under new instructions).
+1. After `solidsdd-judge`, run **Task** `solidsdd-critique` (`subject: application_plan`). Resolve critique retries before treating the plan as ready.
+2. If any `human_gate.required` is true → **stop before apply**.
+3. Final summary must list gate reasons and waiting locations.
+4. Do not thin the plan to avoid the gate.
+5. Resume only after explicit human approval in the conversation (or updated plan from a re-run of `solidsdd-judge` under new instructions).
 
 ### Resume after approval
 
@@ -38,8 +39,8 @@ When the human approves:
 
 1. Keep the approved `ApplicationPlan` (do not strip `formal` or lower density).
 2. Continue from the interrupted step:
-   - pending `api` / `dbc` → apply-* → derive-tests → implement → verify as usual
-   - pending `formal` → `solidsdd-apply-formal` then `solidsdd-verify-formal`
+   - pending `api` / `dbc` → apply-* → **critique** → derive-tests → **critique** → implement → verify → **critique** as usual
+   - pending `formal` → `solidsdd-apply-formal` → **critique** → `solidsdd-verify-formal` → **critique**
 3. If approval is **partial** (e.g. allow API but not formal), re-run `solidsdd-judge` with that instruction as a subagent, or set the refused target to `defer`/`skip` only via a new judge plan—not by parent edits.
 
 ## Defaults

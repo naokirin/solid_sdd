@@ -10,6 +10,7 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 | Adoption checklist (expanded) | [install.md](install.md) §導入チェックリスト |
 | Quick-start template layout | [project-template.md](project-template.md) |
 | Eval-corpus rule tuning (Pass 1) | [feedback-tuning.md](feedback-tuning.md) |
+| Adversarial critique skill (SpecKit-style analyze gate) | `solidsdd-critique` + [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md) |
 
 ## Still open
 

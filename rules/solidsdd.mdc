@@ -1,5 +1,5 @@
 ---
-description: solid_sdd — OpenAPI/GraphQL/OCL/formal contracts, skill orchestration, subagent isolation
+description: solid_sdd — OpenAPI/GraphQL/OCL/formal contracts, skill orchestration, subagent isolation, adversarial critique
 alwaysApply: true
 ---
 
@@ -30,11 +30,18 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - Shared mutable state / multi-client protocols → consider `formal` (`apply` only if TLC path exists; else `defer` with rationale)—never silent drop
 - OCL `pre` failures must surface as a **named domain error** (e.g. `PreconditionError`), not only language builtins (`ZeroDivisionError`, etc.)
 
+## Adversarial critique
+
+- After judge / apply-* / derive-tests / verify / apply-formal, run **`solidsdd-critique` as a Task subagent** (do not leave phase evaluation to the producer)
+- Critique must call out **thin contracts**, missing preconditions/error shapes, density bias, and weak derived tests
+- On critique fail: feedback → re-run suggested skills as Task; shared **max_auto_retries = 3** with verify; then human gate (no infinite loop)
+- Details: `solidsdd-loop/references/adversarial-critique.md`
+
 ## Verification
 
-- Do not treat work as done if API checks, OCL-derived tests, or required formal checks fail
-- On failure: set `loop_action` and `failure_class`; follow suggested skills; **do not** weaken contracts to force a pass
-- Default **max_auto_retries = 3**; same suggested skill twice with no progress → human gate
+- Do not treat work as done if API checks, OCL-derived tests, required formal checks, or required critiques fail
+- On failure: set `loop_action` and `failure_class` (verify) or findings (critique); follow suggested skills; **do not** weaken contracts to force a pass
+- Default **max_auto_retries = 3** (verify + critique + isolation re-runs share the budget); same suggested skill twice with no progress → human gate
 
 ## Human gates
 
@@ -44,8 +51,9 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 ## Execution (orchestrator / subagent)
 
 - `solidsdd-loop` is parent-only
-- From an orchestrator, run judge / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
-- Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd-judge` as a subagent if needed
+- From an orchestrator, run judge / critique / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
+- Do not thin or rewrite `ApplicationPlan` or `CritiqueReport` in the parent; re-run the owning skill as a subagent if needed
+- Isolation violation → feedback and Task re-run (consumes retry budget)
 - Details: `solidsdd-loop/references/execution-model.md`
 
 ## Feedback

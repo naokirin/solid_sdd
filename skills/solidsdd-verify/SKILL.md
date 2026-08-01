@@ -31,6 +31,7 @@ Emit a `VerificationReport`.
 - Do not modify implementation, OpenAPI/GraphQL, OCL, or tests to make checks pass
 - Report only; suggest next skills on failure
 - On fail, set `loop_action` and preferably `failure_class` per [loop-retry.md](references/loop-retry.md)
+- Do not hide soft coverage: if OCL exists but contract tests are absent/empty, fail or skip with explicit detail (so `solidsdd-critique` on `verification_report` can escalate thin passes)
 
 ## Steps
 
@@ -39,6 +40,7 @@ Emit a `VerificationReport`.
 3. Set overall `result` to `fail` if any required check fails.
 4. On failure, fill `suggested_next_skills`, `loop_action`, and `failure_class`.
 5. Shape output per [verification-report.schema.json](references/verification-report.schema.json).
+6. Return the report unchanged for the parent's follow-up `solidsdd-critique` (`subject: verification_report`).
 
 ## Success criteria
 

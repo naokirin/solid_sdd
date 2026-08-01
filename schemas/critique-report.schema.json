@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/critique-report.schema.json",
+  "title": "CritiqueReport",
+  "description": "Output of solidsdd.critique: adversarial evaluation of a prior phase artifact (analogous to SpecKit analyze).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "subject", "result", "findings"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "subject": {
+      "type": "string",
+      "enum": [
+        "application_plan",
+        "api_contracts",
+        "dbc_contracts",
+        "derived_tests",
+        "formal_specs",
+        "verification_report",
+        "isolation"
+      ],
+      "description": "Which prior-phase artifact was critiqued."
+    },
+    "result": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "fail when any finding has severity blocker or major."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "suggested_next_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Skills to re-run on fail, e.g. solidsdd-judge, solidsdd-apply-dbc."
+    },
+    "loop_action": {
+      "type": "string",
+      "enum": ["retry", "human_gate", "stop"],
+      "description": "What solidsdd-loop should do after a fail (omit on pass)."
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph adversarial verdict."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "category", "location", "detail"],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "major", "minor"]
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "thin_contract",
+            "missing_precondition",
+            "weak_test",
+            "density_bias",
+            "consistency",
+            "isolation_violation",
+            "other"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Artifact path, operationId, target location, or phase id."
+        },
+        "detail": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

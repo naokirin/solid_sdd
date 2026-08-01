@@ -83,6 +83,7 @@
 - [x] 導入チェックリスト拡充 — [install.md](install.md)
 - [x] プロジェクトテンプレートレイアウト — [project-template.md](project-template.md)
 - [x] 評価コーパスに基づくルール調整（Pass 1）— [feedback-tuning.md](feedback-tuning.md)
+- [x] 敵対的評価スキル（`solidsdd-critique`）と loop 組み込み — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
 - [ ] テンプレートリポジトリの GitHub 公開
 - [ ] 外部実プロジェクトからの追加フィードバック
 
