@@ -125,15 +125,29 @@ gh skill update solidsdd-loop
 
 ## 導入チェックリスト
 
-- [ ] `gh skill install ... --all --agent cursor` が成功した
-- [ ] `gh skill list` に 8 スキル（`solidsdd-*`）がある
+### 必須（MVP: OpenAPI + OCL）
+
+- [ ] `gh skill install ... --all --agent cursor` が成功した（または `--from-local`）
+- [ ] `gh skill list` に `solidsdd-*` がある（loop / context / judge / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
 - [ ] （推奨）`project-rule.mdc` を Project Rules へコピーした
-- [ ] `openapi/`・`contracts/`・`tests/contracts/` の方針を共有した
+- [ ] 契約レイアウト方針を共有した（[project-template.md](project-template.md)）
 - [ ] `solidsdd-context` または `solidsdd-loop` のスモークが通る
+- [ ] 契約テストがプロジェクトの `npm test` / `bundle exec rspec` 等で走る
+
+### 任意（スタック別）
+
+- [ ] GraphQL を使う場合: `graphql/schema.graphql` と `adapter_hint: graphql`
+- [ ] Ruby の場合: `spec/contracts` + ruby-rspec 生成先
+- [ ] Formal を使う場合: JDK 17+、`tla2tools` 取得手順、**human_gate** 運用をチームで合意（[phase3-gate-dryrun.md](phase3-gate-dryrun.md)）
+
+### 共存
+
+- [ ] NL SDD ツールとの役割分担を読んだ（[coexistence.md](coexistence.md)）
 
 ## 関連ドキュメント
 
-- [adapters.md](adapters.md) — OpenAPI / OCL の役割（リポジトリ説明用）
+- [adapters.md](adapters.md) — OpenAPI / GraphQL / OCL / formal の役割
 - [execution-model.md](execution-model.md) — 実行モデル（スキルにも同梱）
 - [architecture.md](architecture.md) — 全体構成
+- [phase4.md](phase4.md) — 運用・エコシステム
 - [../skills/README.md](../skills/README.md) — スキル一覧
