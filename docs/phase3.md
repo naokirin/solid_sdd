@@ -78,11 +78,13 @@ Use existing `kind: formal`, `adapter_hint` (`tla` \| `alloy` \| `defer-formal`)
 
 1. [x] Judge rules allow `formal` `apply` under documented conditions
 2. [x] One minimal formal sample with verify-formal / TLC green ([phase3-evaluation.md](phase3-evaluation.md))
-3. [ ] Loop stops on `human_gate` before writing formal artifacts (dry-run in a project)
+3. [x] Loop stops on `human_gate` before writing formal artifacts ([phase3-gate-dryrun.md](phase3-gate-dryrun.md))
 4. [x] OpenAPI/OCL samples still pass without requiring TLC on every clone (jar is fetched, gitignored)
 
 ## Status
 
 **Design + first checker/sample complete.** Default checker: TLC. Sample: [../examples/memory-formal](../examples/memory-formal). Notes: [phase3-evaluation.md](phase3-evaluation.md).
 
-Remaining: richer samples, optional Apalache/Alloy, loop gate dry-run in a consuming project.
+Remaining: optional Apalache/Alloy; consuming-project wiring without committing `tla2tools.jar`.
+
+Human-gate loop dry-run: [phase3-gate-dryrun.md](phase3-gate-dryrun.md).

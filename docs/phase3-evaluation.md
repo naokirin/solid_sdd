@@ -42,6 +42,6 @@ Exclusive shared-memory increments (`ExclusiveMemory.tla` / `.cfg`).
 
 ## Remaining
 
-- Full `solidsdd-loop` formal path with live human gate
 - Optional Apalache / Alloy adapters
 - Wire consuming projects without committing `tla2tools.jar`
+- Human-gate dry-run: **done** — [phase3-gate-dryrun.md](phase3-gate-dryrun.md)

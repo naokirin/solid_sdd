@@ -35,19 +35,20 @@ Never execute a subagent-required skill's procedure in the parent. Do not rewrit
 1. Parent: `solidsdd-context`
 2. **Task subagent** `solidsdd-judge` → ApplicationPlan
 3. If plan or any target has `human_gate.required: true` → **stop** (see [human-gates.md](references/human-gates.md)); do not apply until humans approve
-4. For each `status=apply` target, **Task subagent**:
+4. After explicit approval, **resume** from the interrupted step (do not thin the plan); see resume protocol in [human-gates.md](references/human-gates.md)
+5. For each `status=apply` target, **Task subagent**:
    - `api` → `solidsdd-apply-api` (honor `adapter_hint`: `openapi` or `graphql`)
    - `dbc` → `solidsdd-apply-dbc`
    - `formal` → only after gate approval → `solidsdd-apply-formal` (may run after or beside the API/DbC path; do not block API/DbC on formal `defer`)
-5. If OCL changed → **Task subagent** `solidsdd-derive-tests`
-6. **Task subagent** `solidsdd-implement` (API/DbC implementation)
-7. **Task subagent** `solidsdd-verify`
-8. If formal artifacts were applied → **Task subagent** `solidsdd-verify-formal`
-9. On failure, follow [loop-retry.md](references/loop-retry.md):
+6. If OCL changed → **Task subagent** `solidsdd-derive-tests`
+7. **Task subagent** `solidsdd-implement` (API/DbC implementation)
+8. **Task subagent** `solidsdd-verify`
+9. If formal artifacts were applied → **Task subagent** `solidsdd-verify-formal`
+10. On failure, follow [loop-retry.md](references/loop-retry.md):
    - `loop_action: retry` → re-run suggested skills as **new subagents**, then verify (max 3 verify-fail retries)
    - `loop_action: human_gate` or `stop` → end loop with report
    - Same suggested skill twice with no progress → escalate to human gate
-10. Leave `formal`/`defer` and unmet human gates visible in the final summary—do not hide them
+11. Leave `formal`/`defer` and unmet human gates visible in the final summary—do not hide them
 
 ## Subagent prompt requirements
 
