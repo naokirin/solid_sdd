@@ -89,10 +89,10 @@ Contract Kind          Adapter
 ─────────────          ─────────────────────────────
 API boundary    →      OpenAPI 3.x（既定） / GraphQL SDL
 Module DbC      →      UML OCL → 契約テスト（Vitest 既定 / RSpec 可）
-Formal (後続)   →      （未実装。judge は defer）
+Formal          →      TLA+ / Alloy 等（Phase 3 設計。judge は条件付き apply 可、早期はゲート必須）
 ```
 
-OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。言語ネイティブ契約は任意・後回し。
+OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。言語ネイティブ契約は任意・後回し。形式仕様の役割分担は [phase3.md](phase3.md)。
 
 アダプタの責務:
 
@@ -125,7 +125,7 @@ solid_sdd/
   README.md
   docs/                 # 構想・設計
   schemas/              # ApplicationPlan 等の共有スキーマ
-  adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec アダプタ規約
+  adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec / formal アダプタ規約
   skills/               # Cursor Skill 形式のスキル定義
   rules/                # 常駐ルール（順次追加）
   examples/             # 評価用サンプル

@@ -12,7 +12,7 @@ Set `human_gate.required: true` (plan-level and/or per target) when any of:
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements |
-| Formal apply (future) | When `formal` would be `apply` (Phase 3) — always gate in early rollout |
+| `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` (see docs/phase3.md) |
 
 ## Plan fields
 

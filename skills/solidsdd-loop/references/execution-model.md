@@ -23,7 +23,9 @@ User or solidsdd.loop (parent / orchestrator)
   ├─ Task: solidsdd.apply.dbc      ← subagent 必須
   ├─ Task: solidsdd.derive.tests   ← subagent 必須
   ├─ Task: solidsdd.implement      ← subagent 必須
-  └─ Task: solidsdd.verify         ← subagent 必須
+  ├─ Task: solidsdd.verify         ← subagent 必須
+  ├─ Task: solidsdd.apply.formal   ← subagent 必須（Phase 3・ゲート承認後）
+  └─ Task: solidsdd.verify.formal  ← subagent 必須（Phase 3）
 ```
 
 ## スキル別ポリシー
@@ -33,11 +35,13 @@ User or solidsdd.loop (parent / orchestrator)
 | `solidsdd.loop` | **orchestrator のみ** | 親。サブエージェントに委任しない |
 | `solidsdd.context` | orchestrator | 以降の計画用。軽い探索は親でよい |
 | `solidsdd.judge` | **subagent 必須** | 適用密度の判断を実装文脈から隔離し、契約を薄くする偏りを避ける |
-| `solidsdd.apply.api` | **subagent 必須** | OpenAPI だけに閉じる。実装やテストと混ぜない |
+| `solidsdd.apply.api` | **subagent 必須** | API 契約だけに閉じる。実装やテストと混ぜない |
 | `solidsdd.apply.dbc` | **subagent 必須** | OCL だけに閉じる |
 | `solidsdd.derive.tests` | **subagent 必須** | OCL→テストの核。実装改変を禁止する隔離が必要 |
 | `solidsdd.implement` | **subagent 必須** | 契約を書き換えず実装側だけ直す |
 | `solidsdd.verify` | **subagent 必須** | 実装者と同じ文脈での自己採点を避ける |
+| `solidsdd.apply.formal` | **subagent 必須** | 形式仕様だけに閉じる（Phase 3） |
+| `solidsdd.verify.formal` | **subagent 必須** | モデル検査の自己採点を避ける（Phase 3） |
 
 親は `solidsdd.judge` が返した `ApplicationPlan` を受け取り、ループ分岐（どの apply を起動するか等）だけを行う。判断そのものは親で再実行・上書きしない。
 
@@ -46,14 +50,16 @@ Phase 2 以降、親は次も扱う（詳細はスキル `references/human-gates
 - `human_gate.required` が真なら **apply 前に停止**
 - verify fail 時の `loop_action`（`retry` / `human_gate` / `stop`）に従う（既定の自動リトライ上限 3）
 
+Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.apply.formal` / `solidsdd.verify.formal` を起動する（[phase3.md](phase3.md)）。`defer` の formal は API/DbC 経路を止めない。
+
 ## 親エージェントの義務（`solidsdd.loop`）
 
 1. Subagent 必須スキルを、親のツール実行で「スキル手順を自分でやる」形に落とさない
 2. 各 Task に渡すプロンプトへ、対象スキルの `SKILL.md` パス・成果物パス・直前成果（context 要約、ApplicationPlan 等）を含める
 3. サブエージェントの成果（差分・レポート・ApplicationPlan）だけを受け取り、次フェーズへ渡す
 4. `ApplicationPlan` を親が改変して契約を薄くしない（誤りなら `solidsdd.judge` を再度 Subagent で起動）
-5. `human_gate.required` なら承認まで apply しない
-6. `solidsdd.verify` が fail なら、`loop_action` と示唆スキルに従い **再度サブエージェントとして** 起動する（またはゲート／停止）
+5. `human_gate.required` なら承認まで apply しない（formal の early rollout を含む）
+6. `solidsdd.verify` / `solidsdd.verify.formal` が fail なら、`loop_action` と示唆スキルに従い **再度サブエージェントとして** 起動する（またはゲート／停止）
 7. 最大自動リトライを超えたら人間ゲートとして停止する
 
 ## サブエージェントへの渡し方（テンプレート）

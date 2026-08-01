@@ -44,6 +44,7 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP 通し評価の記録 |
 | [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・アダプタ） |
 | [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | Phase 2 サンプル評価 |
+| [docs/phase3.md](docs/phase3.md) | Phase 3 形式仕様の設計 |
 | [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI 評価サンプル |
 | [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL 評価サンプル |
 | [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec 評価サンプル |

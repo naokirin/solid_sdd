@@ -7,6 +7,7 @@
 | OCL | `contracts/**/*.ocl` | DbC source of truth |
 | Contract tests (TS) | `tests/contracts/**/*.test.ts` | Derived from OCL (Vitest / TypeScript MVP) |
 | Contract specs (Ruby) | `spec/contracts/**/*_spec.rb` | Derived from OCL (RSpec target) |
+| Formal specs (Phase 3) | `formal/**` | Optional; TLA+ / Alloy — see formal adapter |
 
 Projects may override paths via a project rule (see `project-rule.mdc` in `solidsdd-loop` references).
 

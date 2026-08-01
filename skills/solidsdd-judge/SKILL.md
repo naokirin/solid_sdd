@@ -27,8 +27,8 @@ Emit an `ApplicationPlan`.
 
 - Produce the ApplicationPlan only (no OpenAPI / OCL / implementation / test edits)
 - Judge from risk and boundary axes, not from how hard implementation would be
-- Never silently drop formal needs—use `defer` with rationale
-- Populate `signals` on targets when known; set `human_gate` / `breaking` / `confidence` per Phase 2 rules
+- Never silently drop formal needs—use `defer` with rationale, or `apply` only under Phase 3 formal conditions in [judgment-axes.md](references/judgment-axes.md)
+- Populate `signals` on targets when known; set `human_gate` / `breaking` / `confidence` per Phase 2+ rules
 
 ## Steps
 

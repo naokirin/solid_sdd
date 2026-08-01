@@ -65,10 +65,14 @@
 
 ## フェーズ 3: 形式仕様の導入
 
-- `solidsdd.apply.formal` / `solidsdd.verify.formal` の追加
-- `solidsdd.judge` が `formal` を `apply` にしうる条件の定義
-- 適用範囲が狭い前提での導入ガイド（分散・並行・安全クリティカル等）
-- 既存の API / DbC 経路との役割分担の再確認
+**状態: 設計スライス完了**（詳細は [phase3.md](phase3.md)）。チェッカー配線・評価サンプルは未着手。
+
+- [x] `solidsdd.apply.formal` / `solidsdd.verify.formal` スキル骨格
+- [x] `solidsdd.judge` が `formal` を `apply` にしうる条件 — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) + [phase3.md](phase3.md)
+- [x] 適用範囲が狭い前提の導入ガイド（役割分担）— [phase3.md](phase3.md)
+- [x] 既存の API / DbC 経路との役割分担の再確認
+- [ ] 具体チェッカー統合（TLC / Apalache / Alloy 等）と最小評価サンプル
+- [ ] Phase 3 通し評価の記録
 
 ## フェーズ 4: 運用・エコシステム
 
@@ -78,5 +82,5 @@
 
 ## 直近の次アクション
 
-1. フェーズ3（形式仕様）の設計着手、または言語ネイティブ DbC のオプトイン設計
+1. Phase 3 実装: チェッカー選定 + 最小 formal サンプル、または Phase 4（導入テンプレート）
 2. GitHub remote 設定後に `gh skill publish`（配布は後回し可）

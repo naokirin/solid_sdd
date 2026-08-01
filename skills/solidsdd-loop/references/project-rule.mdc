@@ -19,7 +19,7 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 - API: OpenAPI 3.x (default) or GraphQL SDL — see `solidsdd-apply-api/references/`
 - DbC: UML OCL → contract tests via `solidsdd-derive-tests` (Vitest or RSpec) — see `solidsdd-apply-dbc/references/`
-- Formal specs (TLA+ / Alloy / …): defer with rationale when relevant (MVP)
+- Formal specs (TLA+ / Alloy / …): optional Phase 3 path — `solidsdd-apply-formal` / `solidsdd-verify-formal`; early rollout always human-gated
 - Language-native contract libraries: optional / deferred — never required
 
 ## Verification
@@ -27,14 +27,14 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - Do not treat work as done if API contract checks or OCL-derived contract tests fail
 - On failure, follow `loop_action` / suggested skills; do not weaken contracts to force a pass
 
-## Human gates (Phase 2)
+## Human gates (Phase 2+)
 
 - If `ApplicationPlan` has `human_gate.required: true`, stop before apply until a person approves
-- Typical triggers: breaking API change, money boundary, low confidence
+- Typical triggers: breaking API change, money boundary, low confidence, **formal apply**
 
 ## Execution (orchestrator / subagent)
 
 - `solidsdd-loop` is parent-only
-- From an orchestrator, run `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, and `solidsdd-verify` as **explicit Task subagents** — never inline in the parent
+- From an orchestrator, run `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify`, and (when gated formal apply) `solidsdd-apply-formal` / `solidsdd-verify-formal` as **explicit Task subagents** — never inline in the parent
 - Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd-judge` as a subagent if needed
 - Details: `solidsdd-loop/references/execution-model.md`

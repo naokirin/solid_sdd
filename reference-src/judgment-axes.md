@@ -10,8 +10,19 @@ Cite the **signal id** (left column) in each target's `rationale` and optional `
 |-----------|--------|
 | `http_boundary` | `api` + adapter (`openapi` / `graphql`), status `apply` |
 | `domain_contract` | `dbc` + adapter (`ocl` / future language-contract), status `apply` |
-| `concurrency_safety` | `formal`, status `defer` until Phase 3 tooling exists (or `apply` when formal adapters land) |
+| `concurrency_safety` | `formal` — `apply` only when Phase 3 conditions hold (see below); otherwise `defer` with rationale |
 | `exploratory_ux` | `natural_only` or density `thin` |
+
+## Formal `apply` vs `defer` (Phase 3)
+
+Prefer `status: apply` for `kind: formal` only when **all** hold:
+
+1. `concurrency_safety` (or product-marked safety-critical scope) is present
+2. Project has a formal adapter + documented checker (`adapter_hint`: `tla` / `alloy` / …)
+3. Scope is a single protocol or shared resource
+4. `human_gate.required: true` (early Phase 3 policy)
+
+Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal need silently. Details: repo `docs/phase3.md`.
 
 ## Density and risk modifiers
 

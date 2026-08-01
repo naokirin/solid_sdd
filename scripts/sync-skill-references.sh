@@ -114,6 +114,12 @@ sync_one adapters/ocl/README.md skills/solidsdd-derive-tests/references/ocl-adap
 sync_one adapters/ocl/README.md skills/solidsdd-implement/references/ocl-adapter.md ocl-exec-path
 sync_one adapters/ocl/README.md skills/solidsdd-verify/references/ocl-adapter.md ocl-exec-path
 
+# Formal adapter (Phase 3 design)
+sync_one adapters/formal/README.md skills/solidsdd-apply-formal/references/formal-adapter.md
+sync_one adapters/formal/README.md skills/solidsdd-verify-formal/references/formal-adapter.md
+sync_one schemas/verification-report.schema.json skills/solidsdd-verify-formal/references/verification-report.schema.json
+sync_one reference-src/loop-retry.md skills/solidsdd-verify-formal/references/loop-retry.md
+
 # Docs / schemas / rules
 sync_one docs/execution-model.md skills/solidsdd-loop/references/execution-model.md
 sync_one schemas/application-plan.schema.json skills/solidsdd-judge/references/application-plan.schema.json

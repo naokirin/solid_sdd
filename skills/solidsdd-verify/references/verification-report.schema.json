@@ -55,7 +55,7 @@
         "name": { "type": "string" },
         "kind": {
           "type": "string",
-          "enum": ["openapi", "graphql", "ocl_tests", "other"]
+          "enum": ["openapi", "graphql", "ocl_tests", "formal", "other"]
         },
         "result": {
           "type": "string",
