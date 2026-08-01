@@ -8,11 +8,12 @@ MVP で固定した初期アダプタと、Phase 2 で追加した骨格。詳�
 - **役割**: HTTP 境界のリクエスト／レスポンス・エラー形・互換性の契約
 - **検証**: スキーマ妥当性 + 実装が契約に沿うことのチェック（契約テストまたはレスポンス検証）
 
-## API: GraphQL SDL（Phase 2 骨格）
+## API: GraphQL SDL（Phase 2）
 
 - **成果物**: `graphql/schema.graphql`（任意で operations ドキュメント）
 - **役割**: GraphQL-first プロジェクト向けの境界契約（OpenAPI の代替）
-- **状態**: 規約スケルトンのみ。評価サンプルは未着手 — [../adapters/graphql/README.md](../adapters/graphql/README.md)
+- **評価サンプル**: [../examples/arithmetic-graphql](../examples/arithmetic-graphql)
+- **規約**: [../adapters/graphql/README.md](../adapters/graphql/README.md)
 
 ## DbC: UML OCL → 契約テスト（サブエージェント）
 
@@ -36,14 +37,20 @@ OCL (source of truth)
 
 OCL をソース・オブ・トゥルースに固定し、テストは再生成可能な従属物として扱う。実装言語はアダプタの「テスト生成先」として差し替える。
 
-## 評価用スタック（初期）
+### テスト生成先: Ruby / RSpec（Phase 2）
 
-- **言語／実行系**: TypeScript（Node.js）
-- **理由**: OpenAPI 周辺ツールとの相性、本リポジトリでのスキル検証のしやすさ
-- **将来候補**: Rails も同シナリオで追従可能（アダプタのテスト生成先を差し替え）
+- **成果物**: `spec/contracts/**/*_spec.rb`
+- **規約**: [../adapters/ruby-rspec/README.md](../adapters/ruby-rspec/README.md)
+- **評価サンプル**: [../examples/arithmetic-ruby](../examples/arithmetic-ruby)（Calculator のみ）
+
+言語ネイティブの contracts gem 等は **必須にしない**（後回し・オプトイン）。
+
+## 評価用スタック
+
+- **既定**: TypeScript（Node.js）+ Vitest — [../examples/arithmetic-api](../examples/arithmetic-api)（OpenAPI）、[../examples/arithmetic-graphql](../examples/arithmetic-graphql)（GraphQL）
+- **代替テスト生成先**: Ruby + RSpec — [../examples/arithmetic-ruby](../examples/arithmetic-ruby)
+- **将来候補**: フル Rails アプリ（現状は RSpec 生成先で代替経路を証明）
 
 ## 評価シナリオ
 
-[../examples/arithmetic-api](../examples/arithmetic-api) — リクエストに対して四則演算を行う API。
-
-複雑度を上げる場合の拡張案: 電卓のメモリ（M+/MR/MC 等）を同 API に追加する。
+同ドメイン（四則 + 必要ならメモリ）を API 境界の形だけ差し替えて比較する。

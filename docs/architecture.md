@@ -87,12 +87,12 @@ MVP の初期アダプタは次で固定する（詳細は [adapters.md](adapter
 ```text
 Contract Kind          Adapter
 ─────────────          ─────────────────────────────
-API boundary    →      OpenAPI 3.x（既定） / GraphQL SDL（骨格）
-Module DbC      →      UML OCL → 契約テスト（サブエージェント生成）
+API boundary    →      OpenAPI 3.x（既定） / GraphQL SDL
+Module DbC      →      UML OCL → 契約テスト（Vitest 既定 / RSpec 可）
 Formal (後続)   →      （未実装。judge は defer）
 ```
 
-OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。
+OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。言語ネイティブ契約は任意・後回し。
 
 アダプタの責務:
 
@@ -125,7 +125,7 @@ solid_sdd/
   README.md
   docs/                 # 構想・設計
   schemas/              # ApplicationPlan 等の共有スキーマ
-  adapters/             # OpenAPI / GraphQL / OCL アダプタ規約
+  adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec アダプタ規約
   skills/               # Cursor Skill 形式のスキル定義
   rules/                # 常駐ルール（順次追加）
   examples/             # 評価用サンプル
@@ -137,5 +137,5 @@ solid_sdd/
 
 - 検証の「どこまでを必須にするか」のデフォルト閾値
 - OCL 方言・ツールチェーン（構文チェックをどこまで機械化するか）
-- Rails 等へのテスト生成先アダプタの優先順位
+- 言語ネイティブ DbC のオプトイン設計（gem 拒否を前提）
 - 他 SDD ツール（Kiro 等）との共存・置き換えの境界

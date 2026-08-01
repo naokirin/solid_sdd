@@ -1,0 +1,20 @@
+-- Calculator domain contracts for arithmetic-ruby (solid_sdd evaluation sample)
+-- Source of truth for DbC; specs under spec/contracts are derived from this.
+
+context Calculator::add(a: Real, b: Real): Real
+post ResultIsSum: result = a + b
+
+context Calculator::sub(a: Real, b: Real): Real
+post ResultIsDifference: result = a - b
+
+context Calculator::mul(a: Real, b: Real): Real
+post ResultIsProduct: result = a * b
+
+context Calculator::div(a: Real, b: Real): Real
+pre DivisorIsNonZero: b <> 0
+post ResultIsQuotient: result = a / b
+
+-- Remainder: sign follows dividend (Ruby Integer#% for sample integers)
+context Calculator::mod(a: Real, b: Real): Real
+pre DivisorIsNonZero: b <> 0
+post ResultIsRemainder: result = a - b * (a / b).truncatedTowardZero()

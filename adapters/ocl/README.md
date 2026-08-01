@@ -12,10 +12,11 @@ Module-level Design by Contract expressed in UML OCL. OCL is the source of truth
 
 ## Artifact layout (default)
 
-| Artifact | Path |
-|----------|------|
-| OCL contracts | `contracts/**/*.ocl` |
-| Generated contract tests (TypeScript / Vitest) | `tests/contracts/**/*.test.ts` |
+| Artifact | Path | Notes |
+|----------|------|-------|
+| OCL contracts | `contracts/**/*.ocl` | Source of truth |
+| Generated tests (TypeScript / Vitest) | `tests/contracts/**/*.test.ts` | Default MVP target |
+| Generated specs (Ruby / RSpec) | `spec/contracts/**/*_spec.rb` | See [../ruby-rspec/README.md](../ruby-rspec/README.md) |
 
 Generated tests are dependents: regenerate from OCL rather than hand-editing as the primary workflow.
 
@@ -25,9 +26,9 @@ All steps below except planning are **subagent-required** when driven by `solids
 
 ```text
 solidsdd.apply.dbc          →  (subagent) write/update .ocl
-solidsdd.derive.tests       →  (subagent) OCL → Vitest (or other) contract tests
+solidsdd.derive.tests       →  (subagent) OCL → Vitest / RSpec / …
 solidsdd.implement          →  (subagent) make implementation satisfy contracts
-solidsdd.verify             →  (subagent) run contract tests (+ OpenAPI checks)
+solidsdd.verify             →  (subagent) run contract tests (+ API checks)
 ```
 
 ## OCL conventions (MVP)
@@ -35,7 +36,7 @@ solidsdd.verify             →  (subagent) run contract tests (+ OpenAPI checks
 - One type/module per file when practical (`Calculator.ocl`)
 - Use `context Type::operation(...): ReturnType`
 - Express `pre` / `post` / `inv` explicitly
-- Prefer pure domain operations in OCL; map HTTP concerns to OpenAPI
+- Prefer pure domain operations in OCL; map HTTP/GraphQL concerns to API adapters
 
 Example:
 
@@ -47,16 +48,18 @@ post ResultIsQuotient: result = a / b
 
 ## Subagent brief (ocl-to-tests)
 
-Input: changed/added `.ocl` files and target test stack (MVP: Vitest + TypeScript).
+Input: changed/added `.ocl` files and target test stack (`vitest` default, or `rspec` per [../ruby-rspec/README.md](../ruby-rspec/README.md)).
 
 Output: tests that
 
-1. exercise the domain operations (or HTTP façade if that is the only entry)
+1. exercise the domain operations (or API façade if that is the only entry)
 2. assert postconditions on valid inputs
-3. assert precondition violations are rejected (4xx / thrown error per project rules)
+3. assert precondition violations are rejected (4xx / thrown error / GraphQL error per project rules)
 4. do not weaken the OCL meaning
 
-Do not invent requirements absent from OCL or OpenAPI.
+Do not invent requirements absent from OCL or the API contract.
+
+Language-native contract gems/keywords are **optional and deferred**—do not require them for DbC enforcement.
 
 ## Skill mapping
 

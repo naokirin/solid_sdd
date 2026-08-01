@@ -1,6 +1,6 @@
-# GraphQL SDL adapter (Phase 2 skeleton)
+# GraphQL SDL adapter (Phase 2)
 
-編集用ソース。同期先: 今後 `solidsdd-apply-api` が `adapter_hint: graphql` のとき参照（現状 OpenAPI が既定）。ソース変更後:
+編集用ソース。同期先: `solidsdd-apply-api` が `adapter_hint: graphql` のとき参照。ソース変更後:
 
 ```bash
 scripts/sync-skill-references.sh
@@ -25,7 +25,7 @@ HTTP/API boundary contracts expressed as GraphQL Schema Definition Language (SDL
 
 ## Verification hooks
 
-- SDL parse / schema validity
+- SDL parse / schema validity (`buildSchema` / equivalent)
 - Optional contract tests against resolvers (project-specific)
 - On failure, prefer `solidsdd-apply-api` (schema) or `solidsdd-implement` (resolvers)
 
@@ -34,6 +34,6 @@ HTTP/API boundary contracts expressed as GraphQL Schema Definition Language (SDL
 - Write/update: `solidsdd-apply-api` with `adapter_hint: graphql`
 - Check: `solidsdd-verify` (check kind may be `graphql`)
 
-## Status
+## Evaluation sample
 
-Skeleton for Phase 2. MVP evaluation sample remains OpenAPI + OCL. Full GraphQL eval sample is future work.
+[../../examples/arithmetic-graphql](../../examples/arithmetic-graphql) — calculate + memory over GraphQL, with OCL → Vitest.

@@ -42,8 +42,10 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 | [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent の実行ポリシー |
 | [docs/roadmap.md](docs/roadmap.md) | MVP 範囲と段階的導入 |
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP 通し評価の記録 |
-| [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・ループ復帰） |
-| [examples/arithmetic-api](examples/arithmetic-api) | 評価用サンプル（演算 + 電卓メモリ） |
+| [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・アダプタ） |
+| [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI 評価サンプル |
+| [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL 評価サンプル |
+| [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec 評価サンプル |
 
 ## 実行イメージ（要約）
 

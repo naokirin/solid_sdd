@@ -23,6 +23,7 @@ Make implementation satisfy API and OCL-derived expectations.
 - [openapi-adapter.md](references/openapi-adapter.md)
 - [graphql-adapter.md](references/graphql-adapter.md)
 - [ocl-adapter.md](references/ocl-adapter.md)
+- [ruby-rspec-adapter.md](references/ruby-rspec-adapter.md)
 - [contract-layout.md](references/contract-layout.md)
 
 ## Constraints
@@ -34,7 +35,7 @@ Make implementation satisfy API and OCL-derived expectations.
 ## Steps
 
 1. Read API contracts and OCL (and existing contract tests) using paths in [contract-layout.md](references/contract-layout.md).
-2. Update domain logic and API wiring to meet contracts.
+2. Update domain logic and API wiring to meet contracts (TypeScript, Ruby, …).
 3. Do not weaken contracts to make tests pass—fix implementation or return to apply skills if the spec is wrong.
 4. Keep changes scoped to the planned targets.
 

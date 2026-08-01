@@ -53,13 +53,14 @@
 
 ## フェーズ 2: 適用判断とアダプタの強化
 
-**状態: 基盤スライス完了**（詳細は [phase2.md](phase2.md)）。フル評価サンプル（GraphQL / 別言語 DbC）は未着手。
+**状態: 完了**（詳細は [phase2.md](phase2.md)）。言語ネイティブ契約は意図的に後回し。
 
 - [x] 判断軸の精度向上（破壊的変更、権限・金銭境界、変更頻度、信頼度など）— [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md)
-- [x] GraphQL アダプタ骨格 — [../adapters/graphql/README.md](../adapters/graphql/README.md)
-- [ ] 別言語の contract アダプタ / GraphQL 評価サンプル
+- [x] GraphQL アダプタ + 評価サンプル — [../adapters/graphql/README.md](../adapters/graphql/README.md), [../examples/arithmetic-graphql](../examples/arithmetic-graphql)
+- [x] 別言語の契約テスト生成先（Ruby / RSpec）— [../adapters/ruby-rspec/README.md](../adapters/ruby-rspec/README.md), [../examples/arithmetic-ruby](../examples/arithmetic-ruby)
 - [x] 人間ゲート条件の整備（低信頼度・破壊的変更等）— [../reference-src/human-gates.md](../reference-src/human-gates.md)
 - [x] 検証レポートの標準化とループ復帰条件 — schema + [../reference-src/loop-retry.md](../reference-src/loop-retry.md)
+- [ ] 言語ネイティブ DbC（任意 gem 等）— **後回し**（プロジェクト拒否を前提にオプトイン設計が必要）
 
 ## フェーズ 3: 形式仕様の導入
 
@@ -76,5 +77,5 @@
 
 ## 直近の次アクション
 
-1. フェーズ2 残り: GraphQL / 別言語の評価サンプル、またはフェーズ3（形式仕様）の設計着手
+1. フェーズ3（形式仕様）の設計着手、または言語ネイティブ DbC のオプトイン設計
 2. GitHub remote 設定後に `gh skill publish`（配布は後回し可）

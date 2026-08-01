@@ -102,6 +102,12 @@ sync_one adapters/graphql/README.md skills/solidsdd-apply-api/references/graphql
 sync_one adapters/graphql/README.md skills/solidsdd-implement/references/graphql-adapter.md
 sync_one adapters/graphql/README.md skills/solidsdd-verify/references/graphql-adapter.md
 
+# Ruby / RSpec test-target adapter (Phase 2)
+sync_one adapters/ruby-rspec/README.md skills/solidsdd-derive-tests/references/ruby-rspec-adapter.md
+sync_one adapters/ruby-rspec/README.md skills/solidsdd-apply-dbc/references/ruby-rspec-adapter.md
+sync_one adapters/ruby-rspec/README.md skills/solidsdd-verify/references/ruby-rspec-adapter.md
+sync_one adapters/ruby-rspec/README.md skills/solidsdd-implement/references/ruby-rspec-adapter.md
+
 # OCL adapter (path rewrite for execution-model)
 sync_one adapters/ocl/README.md skills/solidsdd-apply-dbc/references/ocl-adapter.md ocl-exec-path
 sync_one adapters/ocl/README.md skills/solidsdd-derive-tests/references/ocl-adapter.md ocl-exec-path

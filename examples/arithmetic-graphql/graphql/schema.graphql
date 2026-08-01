@@ -1,0 +1,28 @@
+"""
+Arithmetic calculator API (GraphQL SDL) — solid_sdd evaluation sample.
+Boundary contract; domain DbC lives in contracts/*.ocl.
+"""
+
+enum Operation {
+  add
+  sub
+  mul
+  div
+  mod
+}
+
+type Query {
+  """MR: current memory register value."""
+  memory: Float!
+  """Binary arithmetic. div/mod with b=0 yields a GraphQL error."""
+  calculate(op: Operation!, a: Float!, b: Float!): Float!
+}
+
+type Mutation {
+  """MC: clear memory to 0; returns 0."""
+  memoryClear: Float!
+  """M+: add value to memory; returns new memory."""
+  memoryAdd(value: Float!): Float!
+  """M-: subtract value from memory; returns new memory."""
+  memorySubtract(value: Float!): Float!
+}

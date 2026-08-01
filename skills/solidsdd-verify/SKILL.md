@@ -24,6 +24,7 @@ Emit a `VerificationReport`.
 - [openapi-adapter.md](references/openapi-adapter.md)
 - [graphql-adapter.md](references/graphql-adapter.md)
 - [ocl-adapter.md](references/ocl-adapter.md)
+- [ruby-rspec-adapter.md](references/ruby-rspec-adapter.md)
 
 ## Constraints
 
