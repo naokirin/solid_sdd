@@ -8,7 +8,7 @@ Cursor Agent Skill definitions for solid_sdd. Copy or link into a project's `.cu
 |-------|-----------------|------|-----------|
 | [sdd-loop](sdd-loop/SKILL.md) | `sdd.loop` | Orchestration | orchestrator only |
 | [sdd-context](sdd-context/SKILL.md) | `sdd.context` | Stack / contract discovery | orchestrator |
-| [sdd-judge](sdd-judge/SKILL.md) | `sdd.judge` | ApplicationPlan | orchestrator |
+| [sdd-judge](sdd-judge/SKILL.md) | `sdd.judge` | ApplicationPlan | **subagent required** |
 | [sdd-apply-api](sdd-apply-api/SKILL.md) | `sdd.apply.api` | OpenAPI | **subagent required** |
 | [sdd-apply-dbc](sdd-apply-dbc/SKILL.md) | `sdd.apply.dbc` | OCL | **subagent required** |
 | [sdd-derive-tests](sdd-derive-tests/SKILL.md) | `sdd.derive.tests` | OCL → contract tests | **subagent required** |

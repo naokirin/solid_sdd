@@ -19,12 +19,12 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
                    │ 制約・文脈
 ┌──────────────────▼──────────────────────┐
 │   Orchestrator = sdd.loop / 親エージェント │
-│   context・judge は親。他は Subagent 必須  │
+│   context は親。judge 以降は Subagent 必須 │
 └──────────────────┬──────────────────────┘
                    │ Task（明示的 Subagent）
         ┌──────────┼──────────┐
         ▼          ▼          ▼
-   apply.*    derive.tests   implement / verify
+   judge / apply.*   derive.tests   implement / verify
 ```
 
 実行ポリシーの詳細は [execution-model.md](execution-model.md)。
@@ -42,7 +42,7 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 5. **人が介在する点を明示する**  
    デフォルトは自動。承認・例外・方針変更だけを人間ゲートにする（ゲートの有無はルールで設定可能）。
 6. **関心の隔離は Subagent で強制する**  
-   適用・テスト導出・実装・検証を同一エージェント文脈で連続実行しない（自己採点・契約の弱体化を防ぐ）。
+   適用判断・適用・テスト導出・実装・検証を同一エージェント文脈で連続実行しない（判断の偏り・自己採点・契約の弱体化を防ぐ）。
 
 ## コアスキル（MVP 想定）
 
@@ -50,7 +50,7 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 |--------|------|--------------|------------|
 | `sdd.loop` | オーケストレーション | orchestrator のみ | ループログ・最終状態 |
 | `sdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
-| `sdd.judge` | 適用判断 | orchestrator | ApplicationPlan |
+| `sdd.judge` | 適用判断 | **subagent 必須** | ApplicationPlan |
 | `sdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
 | `sdd.apply.dbc` | OCL 追加・更新 | **subagent 必須** | `.ocl` 差分 |
 | `sdd.derive.tests` | OCL→契約テスト | **subagent 必須** | テスト差分 |
@@ -112,7 +112,7 @@ OCL 経路のポイント: OCL がソース・オブ・トゥルース。テス�
 | モード | 振る舞い |
 |--------|----------|
 | 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切ることを推奨 |
-| 自動 | `sdd.loop`（親）が context/judge を行い、apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行 |
+| 自動 | `sdd.loop`（親）が context を行い、judge・apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行 |
 
 両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
 

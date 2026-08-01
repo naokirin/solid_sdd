@@ -69,7 +69,7 @@
 ## 直近の次アクション
 
 1. `examples/arithmetic-api` で手動フェーズ実行が通るか確認する
-2. `sdd.loop` が apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
+2. `sdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認（同一エージェント連続実行になっていないこと）
 3. `sdd.derive.tests` のサブエージェントプロンプトを固め、OCL→Vitest 生成の再現性を見る
 4. `rules/` を Cursor ルール形式へ落とす
 5. （任意）電卓メモリ機能をシナリオ拡張として追加し、判断〜検証の再実行を試す
