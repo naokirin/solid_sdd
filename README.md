@@ -21,6 +21,16 @@ cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solids
 
 詳細は [docs/install.md](docs/install.md)。
 
+メンテナーが `adapters/` 等を直したあと:
+
+```bash
+scripts/sync-skill-references.sh
+scripts/sync-skill-references.sh --check
+scripts/install-git-hooks.sh   # 初回のみ（pre-commit 有効化）
+```
+
+Cursor / Claude Code ではソース編集時に Hook が sync を自動実行します（`.cursor/hooks.json` / `.claude/settings.json`）。
+
 ## ドキュメント
 
 | 文書 | 内容 |

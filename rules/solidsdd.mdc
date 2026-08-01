@@ -6,8 +6,7 @@ alwaysApply: true
 # solid_sdd
 
 This project uses solid_sdd for machine-checkable Spec-Driven Development.
-Prefer skills installed via `gh skill` (typically `.agents/skills/solidsdd-*`).
-Canonical bundled copies also live under this repository's `skills/*/references/` and `skills/solidsdd-loop/references/project-rule.mdc`.
+Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`).
 
 ## Contract artifacts (defaults)
 
@@ -17,7 +16,7 @@ Canonical bundled copies also live under this repository's `skills/*/references/
 
 ## Adapters
 
-- API: OpenAPI 3.x — see installed `solidsdd-apply-api/references/openapi-adapter.md`
+- API: OpenAPI 3.x — see `solidsdd-apply-api/references/openapi-adapter.md` (or sibling install path)
 - DbC: UML OCL → contract tests via `solidsdd-derive-tests` — see `solidsdd-apply-dbc/references/ocl-adapter.md`
 - Formal specs (TLA+ / Alloy / …): defer with rationale when relevant (MVP)
 
@@ -31,4 +30,4 @@ Canonical bundled copies also live under this repository's `skills/*/references/
 - `solidsdd-loop` is parent-only
 - From an orchestrator, run `solidsdd-judge`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, and `solidsdd-verify` as **explicit Task subagents** — never inline in the parent
 - Do not thin or rewrite `ApplicationPlan` in the parent; re-run `solidsdd-judge` as a subagent if needed
-- Details: installed `solidsdd-loop/references/execution-model.md`
+- Details: `solidsdd-loop/references/execution-model.md`

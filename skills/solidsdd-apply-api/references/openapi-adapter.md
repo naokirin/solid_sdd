@@ -1,6 +1,10 @@
 # OpenAPI adapter
 
-編集用ソース。`gh skill` 配布時は `skills/solidsdd-apply-api/references/openapi-adapter.md`（および implement/verify 同梱）が利用側に入ります。ここを直したら該当 `references/` を更新してください。
+編集用ソース。`gh skill` 配布時は `skills/solidsdd-apply-api/references/openapi-adapter.md`（および implement/verify 同梱）が利用側に入ります。ここを直したら:
+
+```bash
+scripts/sync-skill-references.sh
+```
 
 ## Role
 

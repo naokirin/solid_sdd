@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Fail the commit if skills/*/references/ are out of sync with editing sources.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT"
+
+if ! "$ROOT/scripts/sync-skill-references.sh" --check; then
+  cat >&2 <<'EOF'
+
+────────────────────────────────────────────────────────────
+solid_sdd: skill references are out of date.
+
+Run:
+
+  scripts/sync-skill-references.sh
+
+Then stage the updated copies:
+
+  git add skills/*/references/
+
+And commit again.
+────────────────────────────────────────────────────────────
+EOF
+  exit 1
+fi
+
+exit 0

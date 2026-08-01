@@ -16,6 +16,8 @@
 - [x] スキル入出力スキーマ（`ApplicationPlan` 等）
 - [x] スキル定義スケルトン（`skills/`）
 - [x] 利用側への導入手順（[install.md](install.md) — `gh skill` 自己完結スキル）
+- [x] `skills/*/references/` 同期スクリプト（`scripts/sync-skill-references.sh`）
+- [x] Cursor / Claude Code Hook + git pre-commit（ずれ時はエラーと手順表示）
 - [ ] GitHub 公開後の `gh skill publish`（release / `agent-skills` topic）
 
 ## フェーズ 1: MVP（つながった最小構成）
@@ -69,8 +71,6 @@
 
 ## 直近の次アクション
 
-1. `examples/arithmetic-api` で手動フェーズ実行が通るか確認する
-2. `solidsdd.loop` が judge/apply/derive/implement/verify を **Task サブエージェント**で起動する通し確認
-3. GitHub remote 設定後に `gh skill publish --dry-run` → `gh skill publish --tag v0.1.0`
-4. （任意）電卓メモリ機能をシナリオ拡張として追加する
-5. adapters/schemas/docs 変更時に `skills/*/references/` を同期する運用を習慣化する
+1. GitHub remote 設定後に `gh skill publish --dry-run` → `gh skill publish --tag v0.1.0`（配布は後回し可）
+2. （任意）電卓メモリ機能をシナリオ拡張として追加する
+3. adapters/schemas/docs 変更時は `scripts/sync-skill-references.sh`（`--check` で検証）

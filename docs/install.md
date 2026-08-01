@@ -94,7 +94,24 @@ gh skill publish --dry-run
 
 - リポジトリ topic に `agent-skills` が付く（publish 時に案内）
 - 各 `SKILL.md` に `license: MIT` を含め済み
-- `adapters/`・`schemas/`・`docs/` はリポジトリ内の編集用ソース。**配布物の正は `skills/*/references/`**（自己完結）。ソースを直したら該当スキルの `references/` へ反映すること
+- `adapters/`・`schemas/`・`docs/`・`rules/`・`reference-src/` は編集用ソース。**配布物の正は `skills/*/references/`**
+- ソースを直したら必ず同期する:
+
+```bash
+scripts/sync-skill-references.sh
+scripts/sync-skill-references.sh --check   # ずれ検出
+```
+
+AI エージェント経由の編集では次が自動で sync します。
+
+- Cursor: `.cursor/hooks.json`（`afterFileEdit`）
+- Claude Code: `.claude/settings.json`（`PostToolUse` / `Edit|Write|MultiEdit`）
+
+コミット時は `scripts/git-hooks/pre-commit` が `--check` し、ずれていれば失敗して実行コマンドを示します。初回のみ:
+
+```bash
+scripts/install-git-hooks.sh
+```
 
 ## 更新
 

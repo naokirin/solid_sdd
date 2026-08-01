@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/sync-skill-references-on-edit.sh"
+      }
+    ]
+  }
+}

@@ -20,6 +20,28 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 - Manual: user may run one skill in the current agent.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent.
 
-## Maintainer note
+## Maintainer: keep `references/` in sync
 
-Repo-root `adapters/`, `schemas/`, and `docs/` are editing sources. After changing them, refresh the copies under `skills/*/references/` so `gh skill` installs stay self-contained.
+編集ソース → `skills/*/references/` のコピーは **手で直さず**、スクリプトで同期します。
+
+| ソース | 例 |
+|--------|-----|
+| `adapters/openapi/README.md` | `*/openapi-adapter.md` |
+| `adapters/ocl/README.md` | `*/ocl-adapter.md`（実行モデルへのパス書き換えあり） |
+| `docs/execution-model.md` | `solidsdd-loop/references/execution-model.md` |
+| `schemas/*.json` | judge / verify |
+| `rules/solidsdd.mdc` | `solidsdd-loop/references/project-rule.mdc` |
+| `reference-src/*` | contract-layout / judgment-axes |
+
+```bash
+# 手動
+scripts/sync-skill-references.sh
+scripts/sync-skill-references.sh --check
+
+# AI 編集時（自動）
+# - Cursor: .cursor/hooks.json → afterFileEdit
+# - Claude Code: .claude/settings.json → PostToolUse (Edit|Write|MultiEdit)
+
+# コミット時（ずれなら失敗し、実行すべきコマンドを表示）
+scripts/install-git-hooks.sh   # 一度だけ: core.hooksPath=scripts/git-hooks
+```
