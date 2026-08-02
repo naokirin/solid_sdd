@@ -1,11 +1,12 @@
 {
   "version": "1",
-  "summary": "Deliver a client-facing arithmetic calculator service with the four basic operations plus remainder, clear domain errors for invalid uses (especially division or remainder by zero), and a single-slot memory (clear / recall / add / subtract) that starts at zero, with HTTP/API and module surfaces that make these behaviors checkable—without auth, multi-user memory, history, or other product extras.",
+  "change_id": "initial-calculator",
+  "summary": "Deliver a client-facing arithmetic calculator service with the four basic operations plus remainder, clear domain errors for invalid uses (especially division or remainder by zero), and a single-slot memory (clear / recall / add / subtract) that starts at zero, with HTTP/API and module surfaces that make these behaviors checkable\u2014without auth, multi-user memory, history, or other product extras.",
   "goal": "Clients can perform add, subtract, multiply, divide, and remainder through a checkable service surface; invalid uses fail with a named domain error; a single memory slot supports clear, recall, add-to-memory, and subtract-from-memory starting at zero.",
   "background": "This change defines scope for the arithmetic-api evaluation sample. An existing TypeScript HTTP stack may already be present; use it only as implementation context. Scope comes from this brief, not from existing OpenAPI, OCL, or Feature files.",
   "in_scope": [
     "Binary arithmetic operations: add, subtract, multiply, divide, and remainder (mod)",
-    "Clear, named domain error for invalid uses—especially division by zero and remainder by zero—rather than opaque language/runtime errors",
+    "Clear, named domain error for invalid uses\u2014especially division by zero and remainder by zero\u2014rather than opaque language/runtime errors",
     "Single-slot calculator memory initialized to zero",
     "Memory operations: clear (set to zero), recall (return current value), add-to-memory, subtract-from-memory",
     "HTTP/API surface that exposes calculate and memory behaviors in a form clients and tests can exercise",

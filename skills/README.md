@@ -41,7 +41,7 @@ Do **not** hand-edit copies under `skills/*/references/`. Sync from edit sources
 | `docs/execution-model.md` | `solidsdd-loop` / `solidsdd-run` `references/execution-model.md` |
 | `schemas/*.json` | judge / decompose / verify / verify-formal / critique / run |
 | `rules/solidsdd.mdc` | loop / run `references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
+| `reference-src/*` | contract-layout / change-lifecycle / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
 
 ```bash
 # manual

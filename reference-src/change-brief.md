@@ -15,24 +15,29 @@ Without a brief, the loop only has chat prose or already-sliced Scenarios. Agent
 | Acceptance structure | Gherkin (property-level Scenarios) | Which properties must hold? |
 | Loop authority | OpenAPI / OCL / formal | How do we check implementation? |
 
-ChangeBrief is **not** a living product PRD and **not** a substitute for OCL/OpenAPI. It is authority for **this change’s scope** (history OK; perpetual editorial ownership is not the goal).
+ChangeBrief is **not** a living product PRD and **not** a substitute for OCL/OpenAPI. It is authority for **this change’s scope** (history OK; perpetual editorial ownership is not the goal). Additional requirements start a **new** change—see [change-lifecycle.md](change-lifecycle.md).
 
 ## Default artifact path
 
 | Artifact | Path |
 |----------|------|
-| ChangeBrief JSON | `.solidsdd/change-brief.json` |
+| Active pointer | `.solidsdd/active-change.json` |
+| ChangeBrief JSON | `.solidsdd/changes/<change_id>/change-brief.json` |
+| Change status | `.solidsdd/changes/<change_id>/status.json` |
 
-Projects may override via project rule.
+Resolve via the active pointer. Projects may override via project rule. Do not write a flat `.solidsdd/change-brief.json` (legacy only).
 
 ## Required content
 
+- `change_id` — meaningful kebab-case id; must match the directory name under `changes/`
 - `goal` — outcome for this change
 - `in_scope` / `out_of_scope` — explicit lists (out_of_scope must not be empty hand-waving; name concrete non-goals)
 - `success_criteria` — whole-change observable outcomes
 - Prefer short bullet strings over essays
 
 Optional: `background`, `assumptions`, `constraints`, `open_questions`, `confidence`, `human_gate`.
+
+When continuing an existing product line, put **only this change’s delta** in `in_scope`; use `assumptions` / `constraints` for “keep existing behavior” rather than re-listing the whole product.
 
 ## When later skills must re-read the brief
 

@@ -81,13 +81,13 @@ Shared schema: [../schemas/change-brief.schema.json](../schemas/change-brief.sch
 
 ```text
 ChangeBrief:
-  summary / goal / background?
+  change_id / summary / goal / background?
   in_scope[] / out_of_scope[]
   assumptions? / constraints? / success_criteria[]
   open_questions? / confidence? / human_gate?
 ```
 
-Scope return point for the active change. Rules: [../reference-src/change-brief.md](../reference-src/change-brief.md).
+Scope return point for the active change (path: `.solidsdd/changes/<change_id>/change-brief.json` via `active-change.json`). Rules: [../reference-src/change-brief.md](../reference-src/change-brief.md). Iterative / additional requirements: [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md).
 
 ## Work decomposition (`solidsdd.decompose`) output model
 

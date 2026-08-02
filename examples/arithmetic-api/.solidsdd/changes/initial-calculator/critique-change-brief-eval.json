@@ -7,13 +7,13 @@
     {
       "severity": "minor",
       "category": "other",
-      "location": ".solidsdd/change-brief.json#assumptions|success_criteria",
+      "location": ".solidsdd/changes/initial-calculator/change-brief.json#assumptions|success_criteria",
       "detail": "Remainder (and possibly division) sign/rounding for negative operands is not pinned. Decompose and contracts can choose Examples/oracles; not a missing in/out or slogan-only success criterion."
     },
     {
       "severity": "minor",
       "category": "other",
-      "location": ".solidsdd/change-brief.json#in_scope[1]|constraints",
+      "location": ".solidsdd/changes/initial-calculator/change-brief.json#in_scope[1]|constraints",
       "detail": "Named domain error is required and distinguishable from opaque language errors, but the exact error type/name is left to later apply-dbc/implement. Acceptable for a ChangeBrief; only becomes checkability-critical once contracts omit a failure path entirely."
     }
   ]

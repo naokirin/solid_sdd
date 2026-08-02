@@ -1,7 +1,0 @@
-{
-  "version": "1",
-  "subject": "work_plan",
-  "result": "pass",
-  "summary": "WorkPlan work-plan-from-brief-eval.json passes adversarial critique: eleven items each carry a single property-level Gherkin Scenario (Given/When/Then), map 1:1 to calculator.feature and memory.feature, have no dependency cycles, and collectively cover ChangeBrief in_scope and success_criteria (binary ops + remainder, named domain failures for div/rem by zero, single-slot memory start/clear/recall/add/subtract, checkable HTTP/API and module surfaces via acceptance_of_whole). No out_of_scope drift (auth, multi-user memory, history, etc.). Scenarios state general properties, not example-only concrete cases.",
-  "findings": []
-}

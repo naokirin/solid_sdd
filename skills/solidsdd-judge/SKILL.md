@@ -22,7 +22,7 @@ Emit an `ApplicationPlan`.
 - [application-plan.schema.json](references/application-plan.schema.json)
 - [judgment-axes.md](references/judgment-axes.md)
 - [human-gates.md](references/human-gates.md)
-- [change-brief.md](references/change-brief.md) — when `.solidsdd/change-brief.json` exists
+- [change-brief.md](references/change-brief.md) — when an active ChangeBrief exists
 
 ## Constraints
 
@@ -33,7 +33,7 @@ Emit an `ApplicationPlan`.
 
 ## Steps
 
-1. Read change intent, ChangeBrief (`.solidsdd/change-brief.json` when present), and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief over inventing scope.
+1. Read change intent, active ChangeBrief (`.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` when present), and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief over inventing scope.
 2. Apply axes in [judgment-axes.md](references/judgment-axes.md).
 3. Apply gate rules in [human-gates.md](references/human-gates.md).
 4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields).

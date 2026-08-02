@@ -10,13 +10,17 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 ## Contract artifacts (defaults)
 
-- ChangeBrief: `.solidsdd/change-brief.json` (scope premise / return point for the active change)
-- Requirements (Gherkin): `requirements/**/*.feature` (property-level acceptance; not executable test SoT)
+- Active change: `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/`
+- ChangeBrief: `.solidsdd/changes/<change_id>/change-brief.json` (scope premise / return point)
+- WorkPlan: `.solidsdd/changes/<change_id>/work-plan.json`
+- Change status: `.solidsdd/changes/<change_id>/status.json` (`active` | `done` | `abandoned`)
+- Requirements (Gherkin): `requirements/**/*.feature` (property-level acceptance; not executable test SoT; accumulates across changes)
 - OpenAPI: `openapi/openapi.yaml`
 - GraphQL SDL (optional): `graphql/schema.graphql`
 - OCL: `contracts/**/*.ocl`
 - Derived contract tests: `tests/contracts/**/*.test.ts` or `spec/contracts/**/*_spec.rb` (dependents of OCL; not source of truth)
 - Formal (optional): `formal/**/*.tla` (+ `.cfg`)
+- Additional requirements → new meaningful `change_id` + Brief (do not turn an old Brief into a living PRD); see skill `references/change-lifecycle.md`
 
 ## Adapters
 
@@ -34,8 +38,8 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 ## Work decomposition
 
-- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-brief` → ChangeBrief → `solidsdd-decompose` → WorkPlan (**one property-level Gherkin Scenario** per item) → **parallel** `solidsdd-loop` waves → integration `solidsdd-verify`
-- ChangeBrief (`.solidsdd/change-brief.json`) is the scope return point (in/out of scope); when later phases are unsure, re-read or re-run `solidsdd-brief`
+- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-brief` → ChangeBrief → `solidsdd-decompose` → WorkPlan (**one property-level Gherkin Scenario** per item) → **parallel** `solidsdd-loop` waves → integration `solidsdd-verify` → mark change `done`
+- Active ChangeBrief (via `active-change.json`) is the scope return point (in/out of scope); when later phases are unsure, re-read or re-run `solidsdd-brief`
 - Requirements use property-level Gherkin under `requirements/**/*.feature` (see skill `references/gherkin-requirements.md`); not free-form prose alone; not Cucumber SoT
 - Single known slice → `solidsdd-loop` alone is enough (prefer passing a Scenario as the acceptance focus; pass Brief excerpt when available)
 - Do not thin or rewrite `ChangeBrief` / `WorkPlan` in the parent; re-run `solidsdd-brief` / `solidsdd-decompose` if wrong

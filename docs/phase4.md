@@ -14,6 +14,7 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 | Outer run + work decomposition | `solidsdd-run` / `solidsdd-decompose` + [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md) / [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json) |
 | ChangeBrief scope phase | `solidsdd-brief` + [../reference-src/change-brief.md](../reference-src/change-brief.md) / [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json) |
 | Gherkin requirement intake | [../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md) (property-level) |
+| Iterative change layout | [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md) + `active-change` / per-`change_id` dirs |
 
 ## Still open
 
@@ -27,3 +28,4 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 1. A new team can install skills and pass the checklist without reading every architecture doc.
 2. Coexistence guidance states what solid_sdd owns vs leaves to Kiro-like NL SDD loops.
 3. Template layout matches default contract paths used by skills.
+4. Additional requirements are modeled as a new meaningful `change_id` with accumulated Features/contracts (not a living Brief PRD).

@@ -28,6 +28,8 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. F
 - [loop-retry.md](references/loop-retry.md)
 - [judgment-axes.md](references/judgment-axes.md)
 
+When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` unless the parent Task prompt gives an explicit path.
+
 ## Constraints
 
 - **Read-only**: do not modify ChangeBrief, WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation

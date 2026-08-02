@@ -34,10 +34,11 @@ User or solidsdd.run (outer parent)
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: Brief → decompose → **wave-scoped slices** → integration verify. Do not reimplement loop phases in the parent.
+- **`solidsdd.run`**: Brief → decompose → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
 - **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan; may receive ChangeBrief excerpt for scope.
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
+- **Across changes**: Additional requirements start a new meaningful `change_id` under `.solidsdd/changes/` (see [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md)). Features and contracts accumulate; Briefs do not become a living PRD.
 
 ## Role split (slice = `solidsdd.loop`)
 

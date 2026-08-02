@@ -87,6 +87,7 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 - [x] Outer run + work decomposition — `solidsdd-run` / `solidsdd-decompose` + [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md) / [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
 - [x] Gherkin as requirement intake (property-level; not Cucumber SoT) — [../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)
 - [x] ChangeBrief scope phase (`solidsdd-brief`) — [../reference-src/change-brief.md](../reference-src/change-brief.md) / [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json)
+- [x] Iterative change layout (`active-change.json` + `.solidsdd/changes/<change_id>/`) — [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md)
 - [ ] Publish template repository on GitHub
 - [ ] Additional feedback from external production projects
 

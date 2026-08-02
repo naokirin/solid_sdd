@@ -15,8 +15,9 @@ Requirements are expressed in **property-level Gherkin**. See [gherkin-requireme
 
 ## Do
 
-- Read `.solidsdd/change-brief.json` (or project override) when present; treat it as scope authority
-- If input is prose or incomplete Gherkin, **normalize** into Feature/Scenario form (update or create `.feature` under the default layout) before or while emitting the WorkPlan
+- Resolve the active ChangeBrief via `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` (or project override / legacy migration per [change-lifecycle.md](change-lifecycle.md)); treat it as scope authority
+- Write the WorkPlan to `.solidsdd/changes/<change_id>/work-plan.json` (same directory as the active Brief)
+- If input is prose or incomplete Gherkin, **normalize** into Feature/Scenario form (update or create `.feature` under the default layout) before or while emitting the WorkPlan; new Scenarios must belong to this Brief’s `in_scope`
 - Cover the whole ChangeBrief / requirement: union of item scenarios (+ `acceptance_of_whole`) must not leave silent gaps in `in_scope` / `success_criteria`
 - Do not emit items that implement `out_of_scope`
 - Prefer criteria that map to existing contract checks (API responses/errors, OCL-derived tests, TLC invariants) or clearly extendable ones

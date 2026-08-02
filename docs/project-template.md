@@ -1,13 +1,18 @@
 # Project template layout
 
-Minimal layout a consuming repo can copy. Paths match skill defaults ([contract-layout](../reference-src/contract-layout.md)).
+Minimal layout a consuming repo can copy. Paths match skill defaults ([contract-layout](../reference-src/contract-layout.md), [change-lifecycle](../reference-src/change-lifecycle.md)).
 
 ```text
 your-project/
   .solidsdd/
-    change-brief.json            # active change scope (solidsdd-brief)
+    active-change.json           # { "version": "1", "change_id": "<id>" }
+    changes/
+      <change_id>/
+        change-brief.json        # scope for this change (solidsdd-brief)
+        work-plan.json           # after solidsdd-decompose
+        status.json              # active | done | abandoned
   requirements/
-    *.feature                    # property-level Gherkin (not Cucumber SoT)
+    *.feature                    # property-level Gherkin (not Cucumber SoT); accumulates
   openapi/
     openapi.yaml                 # if HTTP/OpenAPI
   graphql/
@@ -26,6 +31,8 @@ your-project/
   .agents/skills/solidsdd-*/     # gh skill install
   .cursor/rules/solidsdd.mdc     # copy from solidsdd-loop/references/project-rule.mdc
 ```
+
+`change_id` is a meaningful kebab-case name (e.g. `initial-calculator`, `add-operation-history`). Additional requirements start a **new** change directory—do not enlarge an old Brief into a living PRD.
 
 ## Bootstrap steps
 

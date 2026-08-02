@@ -29,11 +29,21 @@ Machine-checkable outputs are for **gap reduction and mechanical verification du
 2. Before `solidsdd-run` on non-trivial work, produce a ChangeBrief (`solidsdd-brief`) then property-level Gherkin via `solidsdd-decompose`.
 3. Treat OpenAPI/OCL/TLA+ as loop authority for those boundaries; Gherkin structures acceptance and is **not** Cucumber SoT; Brief is the scope return point.
 
-### 2. Contracts first for risky changes
+### 2. Next product increment = new change
+
+When additional requirements arrive after a delivered change:
+
+1. Do **not** edit the previous Brief into a living product PRD.
+2. Start a new meaningful `change_id` (`solidsdd-brief` / `solidsdd-run`); keep prior Features and contracts as baseline via `solidsdd-context`.
+3. Put only the delta in the new Brief’s `in_scope`; preserve existing behavior via `assumptions` / `constraints`.
+
+See [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md).
+
+### 3. Contracts first for risky changes
 
 For breaking API, money, or authz surfaces: run solid_sdd **before** broad implementation so verify catches drift early.
 
-### 3. Do not double-own the same artifact
+### 4. Do not double-own the same artifact
 
 | If… | Then… |
 |-----|-------|
@@ -43,7 +53,7 @@ For breaking API, money, or authz surfaces: run solid_sdd **before** broad imple
 | Gherkin is requirement intake | Do not require Cucumber (or equivalent) to green verify |
 | NL tool regenerates OpenAPI loosely | Prefer solid_sdd `apply-api` or merge carefully; verify must win |
 
-### 4. Formal stays rare
+### 5. Formal stays rare
 
 Leave TLA+/TLC to `concurrency_safety` (or policy-marked safety-critical) paths. NL SDD tools should not be expected to author formal models.
 

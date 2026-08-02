@@ -20,7 +20,10 @@ Drive **requirement → ChangeBrief → WorkPlan → per-slice loop → integrat
 
 - [execution-model.md](references/execution-model.md) — orchestrator / subagent / critique rules
 - [change-brief.md](references/change-brief.md) — scope premise (return point)
+- [change-lifecycle.md](references/change-lifecycle.md) — active change paths / additional requirements
 - [change-brief.schema.json](references/change-brief.schema.json)
+- [active-change.schema.json](references/active-change.schema.json)
+- [change-status.schema.json](references/change-status.schema.json)
 - [work-decomposition.md](references/work-decomposition.md) — slice rules for WorkPlan
 - [gherkin-requirements.md](references/gherkin-requirements.md) — property-level Gherkin
 - [work-plan.schema.json](references/work-plan.schema.json)
@@ -42,12 +45,12 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Sequence
 
-1. Parent: `solidsdd-context`
-2. **Task subagent** `solidsdd-brief` → ChangeBrief (`.solidsdd/change-brief.json`)
+1. Parent: `solidsdd-context` (include existing Features/contracts and any `.solidsdd/active-change.json`)
+2. **Task subagent** `solidsdd-brief` → new or resumed ChangeBrief under `.solidsdd/changes/<change_id>/` (pass optional user `change_id`; migrate legacy flat Brief if needed — [change-lifecycle.md](references/change-lifecycle.md))
 3. **Task subagent** `solidsdd-critique` with `subject: change_brief`
 4. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-brief as Task, then critique again)
 5. If ChangeBrief has `human_gate.required: true` → **stop** until humans approve; then resume without thinning the brief
-6. **Task subagent** `solidsdd-decompose` → WorkPlan (must read ChangeBrief as scope authority)
+6. **Task subagent** `solidsdd-decompose` → WorkPlan at `.solidsdd/changes/<change_id>/work-plan.json` (must read active ChangeBrief as scope authority)
 7. **Task subagent** `solidsdd-critique` with `subject: work_plan`
 8. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-decompose; re-brief if scope premise is wrong)
 9. If WorkPlan or any item has `human_gate.required: true` → **stop** until humans approve; then resume without thinning the plan
@@ -63,6 +66,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
    - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole` (and Brief `success_criteria` when relevant)
    - **Task subagent** `solidsdd-critique` (`subject: verification_report`)
    - If formal artifacts were applied across slices → **Task** `solidsdd-verify-formal` then critique as in loop
+   - On successful integration: set `.solidsdd/changes/<change_id>/status.json` to `"status": "done"`
 12. On integration verify or critique failure, follow [loop-retry.md](references/loop-retry.md) with a **run-level** auto-retry budget (**max_auto_retries = 3**, separate from each slice loop’s budget): prefer re-running the owning slice’s loop or suggested skills as Task—not parent edits
 13. Leave unmet gates and blocked items visible in the final summary
 

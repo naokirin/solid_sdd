@@ -27,7 +27,7 @@ Concrete numeric examples belong in optional `Examples` tables, OCL-derived test
 |----------|------|
 | Feature files | `requirements/**/*.feature` |
 
-Projects may override via project rule. Decompose may **write or update** `.feature` files when normalizing from a ChangeBrief or incomplete Gherkin.
+Projects may override via project rule. Decompose may **write or update** `.feature` files when normalizing from a ChangeBrief or incomplete Gherkin. Feature files **accumulate across changes**; each new Scenario must map to the **active** ChangeBrief’s `in_scope` / WorkPlan items. See [change-lifecycle.md](change-lifecycle.md).
 
 ## Conventions (property-level)
 
@@ -36,8 +36,9 @@ Projects may override via project rule. Decompose may **write or update** `.feat
 3. Optional `Examples` / illustration steps may pin a representative case; they must not replace the property statement in `Then`.
 4. Name failure paths explicitly (zero divisor → named domain error).
 5. Cover ChangeBrief `in_scope` / `success_criteria`; do not pull in `out_of_scope`.
-6. Exploratory UX may stay thin: still prefer a minimal property Scenario over prose; judge may later choose `natural_only` / density `thin`.
-7. Language: English or the project’s working language is fine; keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) recognizable to agents.
+6. On later changes, **add or update** Scenarios for the new Brief only; treat destructive rewrites of existing Scenarios as breaking and surface them in Brief / critique.
+7. Exploratory UX may stay thin: still prefer a minimal property Scenario over prose; judge may later choose `natural_only` / density `thin`.
+8. Language: English or the project’s working language is fine; keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) recognizable to agents.
 
 ## Example (preferred shape)
 

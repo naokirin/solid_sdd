@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/change-status.schema.json",
+  "title": "ChangeStatus",
+  "description": "Lifecycle status for one change under .solidsdd/changes/<change_id>/status.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "status"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "done", "abandoned"],
+      "description": "active while the change is in progress; done after successful delivery; abandoned if stopped without delivery."
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional short note (e.g. why abandoned)."
+    }
+  }
+}

@@ -7,6 +7,7 @@
   "additionalProperties": false,
   "required": [
     "version",
+    "change_id",
     "summary",
     "goal",
     "in_scope",
@@ -17,6 +18,13 @@
     "version": {
       "type": "string",
       "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48,
+      "description": "Meaningful kebab-case id; must match the directory name under .solidsdd/changes/."
     },
     "summary": {
       "type": "string",
