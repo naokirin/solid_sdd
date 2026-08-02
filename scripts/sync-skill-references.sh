@@ -140,6 +140,12 @@ sync_one schemas/nfr.schema.json skills/solidsdd-critique/references/nfr.schema.
 sync_one schemas/nfr.schema.json skills/solidsdd-run/references/nfr.schema.json
 sync_one schemas/verification-report.schema.json skills/solidsdd-verify/references/verification-report.schema.json
 sync_one schemas/critique-report.schema.json skills/solidsdd-critique/references/critique-report.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-run/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-loop/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-judge/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-intake/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-brief/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-decompose/references/gate-approval.schema.json
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc
 sync_one rules/solidsdd.mdc skills/solidsdd-run/references/project-rule.mdc
 
@@ -190,6 +196,10 @@ sync_one reference-src/gherkin-requirements.md skills/solidsdd-decompose/referen
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-run/references/gherkin-requirements.md
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-critique/references/gherkin-requirements.md
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-report/references/gherkin-requirements.md
+sync_one reference-src/ears-requirements.md skills/solidsdd-brief/references/ears-requirements.md
+sync_one reference-src/ears-requirements.md skills/solidsdd-critique/references/ears-requirements.md
+sync_one reference-src/ears-requirements.md skills/solidsdd-decompose/references/ears-requirements.md
+sync_one reference-src/ears-requirements.md skills/solidsdd-run/references/ears-requirements.md
 sync_one reference-src/change-report.md skills/solidsdd-report/references/change-report.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-report/references/change-lifecycle.md
 sync_one reference-src/contract-layout.md skills/solidsdd-report/references/contract-layout.md

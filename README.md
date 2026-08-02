@@ -59,6 +59,7 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/project-template.md](docs/project-template.md) | Consuming-project layout |
 | [docs/feedback-tuning.md](docs/feedback-tuning.md) | Feedback and rule tuning |
 | [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI evaluation sample |
+| [examples/inventory-reservation](examples/inventory-reservation) | Intake/brief/critique framing (authZ + holds; no runtime) |
 | [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL evaluation sample |
 | [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec evaluation sample |
 | [examples/memory-formal](examples/memory-formal) | TLA+/TLC evaluation sample |

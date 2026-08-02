@@ -73,8 +73,19 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `formal_specs` | `solidsdd-apply-formal` | apply-formal | `solidsdd-loop` |
 | `verification_report` | `solidsdd-verify` / `solidsdd-verify-formal` | verify* | loop; also **run** after integration verify |
 | `isolation` | Parent detects inline execution of a subagent-required skill | — | loop or run |
+| `cross_change_consistency` | After `work_plan` critique when prior Features / prior changes exist | — | `solidsdd-run` (optional but recommended on follow-on changes) |
 
 Skip a subject only when that producer step did not run in this orchestrator iteration.
+
+### `cross_change_consistency` (major examples)
+
+| Check | `major` | Not major |
+|-------|---------|-----------|
+| New Brief `in_scope` contradicts an existing Scenario that remains in force without Brief/assumption saying it changes | Silent rewrite of prior acceptance | Explicit breaking note in Brief + gate |
+| Implementation / WorkPlan pulls in prior change’s `out_of_scope` (e.g. auth when previously excluded and still excluded) | Scope drift across changes | New change that deliberately opens that scope in its own Brief |
+| Active Brief `out_of_scope` conflicts with newly added Scenario tags/`covers` | Items covering `X*` or implementing excluded themes | Renames that still match intent |
+
+Prefer **Task** critique with this subject after decompose on iterative products; intake should list prior Features / prior `out_of_scope` under Context §2 or §8.
 
 ## Stance
 

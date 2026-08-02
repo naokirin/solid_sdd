@@ -49,6 +49,8 @@ When continuing an existing product line, put **only this change’s delta** in 
 
 Downstream WorkPlan items and Gherkin Scenarios reference these ids via `covers` / Scenario tags (`@R1`). Mechanical coverage is checked by `scripts/solidsdd-lint.sh` before critique. Critique judges whether coverage is *adequate*, not whether ids exist.
 
+Optional: author `text` fields using **EARS** patterns ([ears-requirements.md](ears-requirements.md))—especially unwanted / state-driven—while keeping Gherkin as acceptance.
+
 ## When later skills must re-read the brief
 
 - Prefer re-reading `change-context.md` when tech/NFR rationale is needed; Brief stays the scope checklist

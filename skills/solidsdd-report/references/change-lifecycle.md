@@ -17,6 +17,8 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
       change-brief.json
       work-plan.json                 # after solidsdd-decompose
       run-state.json                 # orchestrator phase / retries / item map
+      gate-approval.json             # latest human gate approval (when gated)
+      gate-approvals/                # optional append-only approval history
       items/<item_id>/               # ApplicationPlan, critiques, verification per slice
       report.md                      # optional human snapshot (solidsdd-report)
       report.html                    # optional HTML snapshot
@@ -32,6 +34,7 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise / return point |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change |
 | Run state | `.solidsdd/changes/<change_id>/run-state.json` | Phase, waves, retry budgets ([run-state.md](run-state.md)) |
+| Gate approval | `.solidsdd/changes/<change_id>/gate-approval.json` | Latest human approval past a gate ([human-gates.md](human-gates.md)) |
 | Per-item artifacts | `.solidsdd/changes/<change_id>/items/<item_id>/` | Plans / critiques / verify for each WorkPlan item |
 | Change report | `.solidsdd/changes/<change_id>/report.md` (+ optional `report.html`) | Human-readable view (`solidsdd-report`; not SoT) |
 | Status | `.solidsdd/changes/<change_id>/status.json` | Lifecycle state |

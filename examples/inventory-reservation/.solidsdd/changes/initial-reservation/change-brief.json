@@ -1,0 +1,93 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "Deliver a checkable inventory reservation service: authorized callers hold stock for a TTL, release or expire holds without double-booking, with named domain errors for insufficient stock and unauthorized callers—without payments, multi-warehouse routing, or a full IAM product.",
+  "goal": "Authorized principals can reserve and release inventory units against SKUs with soft holds; unauthorized or insufficient-stock attempts fail with named domain errors; holds expire after TTL.",
+  "background": "Framing example for solid_sdd hardening (intake/brief/critique/gates). No prior Features in this sample repo; treat as greenfield for this change_id.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "WHEN an authorized caller requests a reservation for a SKU and quantity THEN THE inventory service SHALL create a soft hold that reduces available stock for the hold TTL"
+    },
+    {
+      "id": "R2",
+      "text": "IF available stock is less than the requested quantity THEN THE inventory service SHALL fail with a named domain error and create no hold"
+    },
+    {
+      "id": "R3",
+      "text": "IF the caller is not authorized for the SKU THEN THE inventory service SHALL fail with a named domain error and create no hold"
+    },
+    {
+      "id": "R4",
+      "text": "WHEN an authorized caller releases an active hold THEN THE inventory service SHALL restore the held quantity to available stock"
+    },
+    {
+      "id": "R5",
+      "text": "WHILE a hold is past its TTL THE inventory service SHALL treat the hold as expired and restore availability (lazily or via explicit expire)"
+    },
+    {
+      "id": "R6",
+      "text": "THE inventory service SHALL expose reservation/release behaviors on a checkable HTTP/API surface"
+    },
+    {
+      "id": "R7",
+      "text": "THE inventory service SHALL provide module-level contracts that make hold invariants checkable"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Payment capture, checkout, or order fulfillment"
+    },
+    {
+      "id": "X2",
+      "text": "Multi-warehouse routing, transfers, or location-level ATP beyond a single stock pool per SKU"
+    },
+    {
+      "id": "X3",
+      "text": "Full IAM product (SSO, roles UI, OAuth provider); only opaque principal authorization checks"
+    },
+    {
+      "id": "X4",
+      "text": "UI clients, notifications, or analytics products"
+    },
+    {
+      "id": "X5",
+      "text": "Partial shipment / backorder policies beyond hard fail when available stock is below the requested quantity"
+    }
+  ],
+  "assumptions": [
+    "One stock pool per SKU (available + held)",
+    "Caller presents a principal id the service can authorize against a simple allow-list or policy stub",
+    "TTL is a positive duration configured per reservation request or service default"
+  ],
+  "constraints": [
+    "Do not invent payment or multi-warehouse features",
+    "Unauthorized and insufficient-stock failures must be named and distinguishable",
+    "ChangeBrief only at brief emission; Features/WorkPlan follow decompose"
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "Authorized reserve when available stock is at least the requested quantity creates a hold and reduces availability by the quantity"
+    },
+    {
+      "id": "SC2",
+      "text": "When available stock is below the requested quantity, and when the caller is unauthorized, each fails with a distinct named domain error and leaves stock unchanged"
+    },
+    {
+      "id": "SC3",
+      "text": "Release and TTL expiry restore held quantity to available stock"
+    },
+    {
+      "id": "SC4",
+      "text": "HTTP/API and module contracts make the above checkable without opaque internals alone"
+    }
+  ],
+  "open_questions": [],
+  "confidence": "medium",
+  "human_gate": {
+    "required": true,
+    "reason": "Inventory integrity and authorization boundary; confirm Brief before decompose."
+  }
+}

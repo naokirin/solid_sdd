@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/gate-approval.schema.json",
+  "title": "GateApproval",
+  "description": "Record of a human approval past a solid_sdd human gate. Free-text approver allowed. Path: .solidsdd/changes/<change_id>/gate-approvals/<stamp>-<scope>.json or gate-approval.json for the latest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "change_id",
+    "approved_at",
+    "approver",
+    "scope",
+    "decision"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "approved_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp when the human approved."
+    },
+    "approver": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free-text identity (name, handle, or role). No git-user requirement."
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "change_context",
+        "change_brief",
+        "work_plan",
+        "application_plan",
+        "formal_apply",
+        "other"
+      ],
+      "description": "Which gate was approved."
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["approve", "approve_partial", "reject"],
+      "description": "approve = continue; approve_partial = continue with noted exclusions; reject = stop / rework."
+    },
+    "partial": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Required when decision is approve_partial.",
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "What is approved (e.g. api targets, item ids)."
+        },
+        "deferred_or_refused": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "What remains gated or must be re-judged."
+        }
+      }
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional free-text rationale or conditions."
+    },
+    "artifact_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths of artifacts reviewed (Brief, ApplicationPlan, …)."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "decision": { "const": "approve_partial" } },
+        "required": ["decision"]
+      },
+      "then": { "required": ["partial"] }
+    }
+  ]
+}

@@ -13,8 +13,10 @@ Edit sources for skill-bundled docs that do **not** live under repo-root `adapte
 | `adversarial-critique.md` | critique / loop / run |
 | `work-decomposition.md` | decompose / run |
 | `gherkin-requirements.md` | decompose / run / critique |
+| `ears-requirements.md` | brief / critique / decompose / run |
 | `change-brief.md` | brief / run / decompose / critique / judge |
 | `change-report.md` | report |
+| `run-state.md` | loop / run |
 | `working-language.md` | intake / brief / decompose / critique / judge / report / run / loop |
 
 Sync with `scripts/sync-skill-references.sh`. Do not hand-edit `skills/*/references/` (they will be overwritten).

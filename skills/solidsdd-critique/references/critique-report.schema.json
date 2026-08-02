@@ -23,7 +23,8 @@
         "derived_tests",
         "formal_specs",
         "verification_report",
-        "isolation"
+        "isolation",
+        "cross_change_consistency"
       ],
       "description": "Which prior-phase artifact was critiqued."
     },

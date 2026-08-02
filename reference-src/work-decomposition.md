@@ -25,6 +25,7 @@ Requirements are expressed in **property-level Gherkin**. See [gherkin-requireme
 - Prefer criteria that map to existing contract checks (API responses/errors, OCL-derived tests, TLC invariants) or clearly extendable ones
 - Order via `depends_on` (acyclic); set initial `status` to `ready` when `depends_on` is empty, else `pending`
 - Prefer independent items (empty `depends_on`) when slices do not need each other’s artifacts — `solidsdd-run` will execute a wave of all `ready` items **in parallel**
+- Set optional **`touches`**: paths this item’s loop will primarily edit (e.g. `openapi/openapi.yaml`, `contracts/Memory.ocl`). `solidsdd-run` serializes ready items whose `touches` sets intersect; omit only when contention is impossible to know
 - Set `human_gate` / low `confidence` when the requirement is ambiguous or slicing is uncertain; if Brief has blocking `open_questions`, prefer gate / re-brief over inventing scope
 
 ## Do not

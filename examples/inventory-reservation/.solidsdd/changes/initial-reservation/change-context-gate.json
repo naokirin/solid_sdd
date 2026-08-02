@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": true,
+    "reason": "Inventory reservation involves stock integrity and actor authorization; confirm NFR thresholds and out-of-scope payments before Brief."
+  },
+  "confidence": "medium",
+  "decisions_to_confirm": [
+    "Caller identity is a opaque principal id (no full IAM product)",
+    "Reservations are soft holds with TTL; no payment capture"
+  ]
+}

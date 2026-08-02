@@ -3,11 +3,13 @@ name: solidsdd-critique
 description: >-
   Adversarial, read-only critique of a prior solid_sdd phase artifact (change
   context, change brief, work plan, application plan, contracts, derived tests,
-  formal specs, or verification). When called from solidsdd-loop or solidsdd-run,
-  must run as an explicit Task subagent. Runs deterministic solidsdd-lint first,
-  then LLM adequacy review. Emits CritiqueReport; does not edit artifacts.
-  Calibrated so only checkability holes fail the loop.
+  formal specs, verification, or cross-change consistency). When called from
+  solidsdd-loop or solidsdd-run, must run as an explicit Task subagent. Runs
+  deterministic solidsdd-lint first, then LLM adequacy review. Emits
+  CritiqueReport; does not edit artifacts. Calibrated so only checkability
+  holes fail the loop.
 license: MIT
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # solidsdd.critique
@@ -26,8 +28,9 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 - [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration + lint-first (required)**
 - [working-language.md](references/working-language.md) — finding detail language
 - [gherkin-requirements.md](references/gherkin-requirements.md) — when `subject` is `work_plan`
+- [ears-requirements.md](references/ears-requirements.md) — optional Brief wording (not lint-required)
 - [change-brief.md](references/change-brief.md) — when `subject` is `change_brief`
-- [change-context.md](references/change-context.md) — when `subject` is `change_context`
+- [change-context.md](references/change-context.md) — when `subject` is `change_context` or `cross_change_consistency`
 - [change-context-gate.schema.json](references/change-context-gate.schema.json) — when reviewing Change Context gate
 - [loop-retry.md](references/loop-retry.md)
 - [judgment-axes.md](references/judgment-axes.md)
@@ -39,7 +42,7 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 
 ## Constraints
 
-- **Read-only**: do not modify Change Context, ChangeBrief, WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
+- **Read-only**: do not modify Change Context, ChangeBrief, WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation. On hosts that honor `allowed-tools` (e.g. Claude Code), the frontmatter limits tools; **Cursor does not enforce** that key today—still follow this constraint by procedure. Use Bash only to run `scripts/solidsdd-lint.sh` (or equivalent), not to edit files.
 - Do not inflate polish into `major` / `fail` (see severity calibration)
 - Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)

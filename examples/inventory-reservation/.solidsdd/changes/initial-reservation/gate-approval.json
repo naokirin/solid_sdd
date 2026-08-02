@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "approved_at": "2026-08-03T01:00:00Z",
+  "approver": "example-reviewer",
+  "scope": "change_brief",
+  "decision": "approve",
+  "note": "Approved EARS-scoped Brief for framing sample.",
+  "artifact_paths": [
+    ".solidsdd/changes/initial-reservation/change-brief.json"
+  ]
+}

@@ -12,6 +12,7 @@ Structured scenarios reduce silent gaps (missing actors, preconditions, failure 
 |-------|--------|------|
 | Framing / rationale | Change Context (`change-context.md`) | Demand, NFRs, tech selection, judgments |
 | Change premise | ChangeBrief | Goals, in/out of scope, assumptions (return point) |
+| Optional shall-statements | EARS patterns in Brief `text` | What the system shall do ([ears-requirements.md](ears-requirements.md)) |
 | Requirements | Gherkin (`.feature`) | Property-level acceptance; input to decompose |
 | WorkPlan item | One Scenario (text in `acceptance_criterion`) | One `solidsdd-loop` slice |
 | Boundary contracts | OpenAPI / GraphQL | Machine-checkable I/O |

@@ -66,9 +66,17 @@ Use exactly these top-level headings (English). Subheadings under §4 / §5 are 
 | **5. Technology selection** | For each decision (language/runtime, API style, persistence, test stack, contract approach, …): **decision**, **alternatives considered**, **rationale**, **source** (`user` / `repo_existing` / `agent_default` + why). If inheriting the repo stack, say so explicitly—do not leave blank |
 | **6. Key judgments** | Non-obvious calls (e.g. named domain errors vs raw exceptions; single-slot memory; skip auth). Include `Working language: <tag> (from …)` per [working-language.md](working-language.md) |
 | **7. Open questions** | Unresolved items; align with Brief `open_questions` / gates when blocking |
-| **8. Links** | Paths to Brief, WorkPlan, Features, optional report (fill placeholders as artifacts appear) |
+| **8. Links** | Paths to Brief, WorkPlan, Features, `nfr.json`, optional report (fill placeholders as artifacts appear). On follow-on changes, link prior change dirs / Features that remain in force |
 
 Keep sections concise. Prefer bullets. Do not paste full OpenAPI/OCL.
+
+### Cross-change framing (follow-on changes)
+
+When the repo already has Features or prior `.solidsdd/changes/*/`:
+
+1. In §2 or §8, list **prior Scenarios / prior `out_of_scope`** that must not be silently contradicted.
+2. Put only this delta in the upcoming Brief; use assumptions/constraints for “keep existing behavior”.
+3. Expect `solidsdd-run` to run `solidsdd-critique` with `subject: cross_change_consistency` after the work_plan critique ([adversarial-critique.md](adversarial-critique.md)).
 
 ## Human gate after intake (optional, situational)
 

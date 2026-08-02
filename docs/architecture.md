@@ -23,7 +23,9 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
 │   [optional human gate before brief]     │
 │   brief + critique(change_brief)         │
 │   decompose + critique(work_plan)        │
+│   [critique(cross_change) when needed]   │
 │   → parallel solidsdd.loop waves         │
+│     (serialize on WorkPlan touches∩)     │
 │   → integration verify                   │
 └──────────────────┬──────────────────────┘
                    │
@@ -111,15 +113,19 @@ Shared schema: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.js
 
 ```text
 WorkPlan:
-  acceptance_of_whole? / human_gate? / confidence?
+  change_id? / acceptance_of_whole? / human_gate? / confidence?
   items[]:
     id / intent / acceptance_criterion   … 1 item = 1 property-level Gherkin Scenario
+    covers[]                             … Brief scope ids (required)
+    touches[]?                           … primary edit paths (wave contention)
     feature_path? / scenario_name?
     depends_on[] / status
     confidence? / human_gate?
 ```
 
-Requirements use property-level Gherkin ([../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)), guided by ChangeBrief. Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
+Requirements use property-level Gherkin ([../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)), guided by ChangeBrief. Optional EARS wording in Brief texts: [../reference-src/ears-requirements.md](../reference-src/ears-requirements.md). Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
+
+Deterministic coverage / NFR / gate checks: `scripts/solidsdd-lint.sh` (critique Step 0/1). Hardening plan: [hardening-plan.md](hardening-plan.md). Schema evolution: [schema-evolution.md](schema-evolution.md).
 
 ## Application judgment (`solidsdd.judge`) output model
 

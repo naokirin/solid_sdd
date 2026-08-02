@@ -1,0 +1,127 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "Five property-level Scenarios: authorized reserve, insufficient stock, unauthorized caller, release, TTL expiry\u2014covering Brief ids with overlapping OpenAPI touches requiring wave serialization.",
+  "acceptance_of_whole": "Scenario: Inventory reservation service covers holds, authz, and expiry\n  Given an inventory reservation service for authorized callers\n  When callers reserve, release, and allow holds to expire against SKU stock\n  Then authorized sufficient reserves create soft holds that reduce availability\n  And insufficient stock and unauthorized callers fail with named domain errors without mutating stock\n  And release and TTL expiry restore held quantity\n  And HTTP/API and module contracts make these behaviors checkable\n  And payments and multi-warehouse routing are not required",
+  "confidence": "medium",
+  "human_gate": {
+    "required": false,
+    "reason": "Brief already gated; Scenarios map 1:1 to in_scope properties."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Authorized reserve with sufficient stock creates a soft hold.",
+      "acceptance_criterion": "Scenario: Authorized reserve creates a soft hold\n  Given an authorized caller and a SKU whose available stock is at least the requested quantity\n  When the caller reserves a positive quantity\n  Then a soft hold exists for that quantity\n  And available stock decreases by that quantity",
+      "covers": [
+        "R1",
+        "R6",
+        "R7",
+        "SC1",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation.feature",
+      "scenario_name": "Authorized reserve creates a soft hold",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W2",
+      "intent": "Stock below the requested quantity fails with a named domain error and no hold.",
+      "acceptance_criterion": "Scenario: Stock below request fails with a named domain error\n  Given an authorized caller and a SKU whose available stock is below the requested quantity\n  When the caller reserves that quantity\n  Then the operation fails with a named domain error\n  And no hold is created\n  And available stock is unchanged",
+      "covers": [
+        "R2",
+        "R6",
+        "R7",
+        "SC2",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation.feature",
+      "scenario_name": "Stock below request fails with a named domain error",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W3",
+      "intent": "Unauthorized caller fails with a named authz domain error.",
+      "acceptance_criterion": "Scenario: Unauthorized caller fails with a named domain error\n  Given a caller that is not authorized for the SKU\n  And the SKU has available stock at least the requested quantity\n  When the caller reserves a positive quantity\n  Then the operation fails with a named authorization domain error\n  And no hold is created\n  And available stock is unchanged",
+      "covers": [
+        "R3",
+        "R6",
+        "R7",
+        "SC2",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation.feature",
+      "scenario_name": "Unauthorized caller fails with a named domain error",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W4",
+      "intent": "Release restores held quantity to available stock.",
+      "acceptance_criterion": "Scenario: Release restores held quantity\n  Given an authorized caller owns an active hold for a SKU quantity\n  When the caller releases that hold\n  Then the hold is no longer active\n  And available stock increases by the previously held quantity",
+      "covers": [
+        "R4",
+        "R6",
+        "R7",
+        "SC3",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation.feature",
+      "scenario_name": "Release restores held quantity",
+      "depends_on": [
+        "W1"
+      ],
+      "status": "pending",
+      "confidence": "high"
+    },
+    {
+      "id": "W5",
+      "intent": "TTL expiry restores availability for past-due holds.",
+      "acceptance_criterion": "Scenario: Expired hold restores availability\n  Given an active hold whose TTL is in the past\n  When the service expires that hold\n  Then the hold is no longer active\n  And available stock increases by the previously held quantity",
+      "covers": [
+        "R5",
+        "R6",
+        "R7",
+        "SC3",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation.feature",
+      "scenario_name": "Expired hold restores availability",
+      "depends_on": [
+        "W1"
+      ],
+      "status": "pending",
+      "confidence": "medium"
+    }
+  ]
+}

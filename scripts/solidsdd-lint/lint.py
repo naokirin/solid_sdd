@@ -425,6 +425,31 @@ def lint_change(
                 )
             )
 
+        # Advisory: ready items with intersecting touches (orchestrator should serialize)
+        ready_with_touches: list[tuple[str, set[str]]] = []
+        for it in items:
+            if not isinstance(it, dict):
+                continue
+            if it.get("status") not in (None, "ready", "pending", "running"):
+                continue
+            touches = it.get("touches")
+            if isinstance(touches, list) and touches:
+                ready_with_touches.append(
+                    (str(it.get("id", "?")), {str(t) for t in touches})
+                )
+        for i, (a_id, a_t) in enumerate(ready_with_touches):
+            for b_id, b_t in ready_with_touches[i + 1 :]:
+                overlap = sorted(a_t & b_t)
+                if overlap:
+                    findings.append(
+                        finding(
+                            "minor",
+                            "consistency",
+                            f"work-plan.json#items/{a_id},{b_id}/touches",
+                            f"overlapping touches {overlap}; solidsdd-run must serialize these items",
+                        )
+                    )
+
         if brief:
             ids = brief_ids(brief)
             covered: set[str] = set()
@@ -509,6 +534,25 @@ def lint_change(
     elif brief_path.is_file():
         # Brief without WorkPlan is OK for early critique(subject=change_brief)
         pass
+
+    approval_path = change_dir / "gate-approval.json"
+    if approval_path.is_file():
+        appr = load_json(approval_path)
+        validate_schema(appr, "gate-approval.schema.json", str(approval_path), findings)
+        if appr.get("change_id") and appr["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "gate-approval.json#change_id",
+                    f"change_id {appr['change_id']!r} != directory {change_id!r}",
+                )
+            )
+    hist_dir = change_dir / "gate-approvals"
+    if hist_dir.is_dir():
+        for path in sorted(hist_dir.glob("*.json")):
+            data = load_json(path)
+            validate_schema(data, "gate-approval.schema.json", str(path), findings)
 
     # Optional ApplicationPlan / Verification under change dir or .solidsdd/
     for pattern, schema in (

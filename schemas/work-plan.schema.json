@@ -87,6 +87,11 @@
           },
           "description": "ChangeBrief scope ids this item covers (in_scope R*, success_criteria SC*). Must not list out_of_scope X* ids."
         },
+        "touches": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary edit paths this slice contends on (e.g. openapi/openapi.yaml). solidsdd-run serializes ready items whose touches intersect."
+        },
         "feature_path": {
           "type": "string",
           "description": "Optional path to requirements/**/*.feature containing this scenario."

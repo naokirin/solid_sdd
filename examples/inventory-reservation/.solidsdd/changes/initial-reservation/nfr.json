@@ -1,0 +1,63 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Concurrent reserve attempts against the same SKU must not oversell available stock.",
+      "rationale": "Inventory integrity is the core risk.",
+      "threshold": "No two held reservations may sum above physical available+held accounting; oversell attempts fail with named domain error.",
+      "measurement": "Contract tests for concurrent or sequential race fixtures; OCL invariants on available/held.",
+      "verified_by": []
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "in_scope",
+      "requirement": "Only authorized principals may create or release holds for a SKU.",
+      "rationale": "AuthZ boundary without full IAM product.",
+      "threshold": "Unauthorized principal always receives named authz domain error; no hold mutation.",
+      "measurement": "API/contract tests with unauthorized principal fixture.",
+      "verified_by": []
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A \u2014 no latency SLO for framing sample.",
+      "rationale": "Framing-only example."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Reserve/release/expire behaviors are checkable via HTTP/API and module contracts.",
+      "rationale": "solid_sdd requires machine-checkable surfaces.",
+      "threshold": "OpenAPI documents reservation endpoints; OCL or derived tests cover hold invariants.",
+      "measurement": "Presence of openapi + contracts once applied (future implement change).",
+      "verified_by": []
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive greenfield API documented in OpenAPI when applied.",
+      "rationale": "No external clients yet.",
+      "threshold": "openapi/openapi.yaml validates structurally when present.",
+      "measurement": "solidsdd-verify OpenAPI lint (or skip with tooling reason).",
+      "verified_by": []
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Hold accounting invariants live in module DbC (OCL) with derived tests.",
+      "rationale": "Matches solid_sdd adapter policy.",
+      "threshold": "contracts for reservation/hold exist before change status done.",
+      "measurement": "Inspect contracts/ and tests/ after implement.",
+      "verified_by": []
+    }
+  ]
+}

@@ -63,26 +63,27 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 11. **Task subagent** `solidsdd-decompose` → WorkPlan at `.solidsdd/changes/<change_id>/work-plan.json` (must read active ChangeBrief as scope authority). Initialize `run-state.items` from WorkPlan (`ready`/`pending`, each with `loop_retry` max 3, `artifact_dir: items/<id>`).
 12. **Task subagent** `solidsdd-critique` with `subject: work_plan`
 13. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-decompose; re-brief / re-intake if premise is wrong)
-14. If WorkPlan or any item has `human_gate.required: true` → **stop** until humans approve; then resume without thinning the plan
-15. While items remain, run **waves** of independent loops (`phase: waves`, bump `wave_index`):
+14. When prior Features / prior `.solidsdd/changes/*/out_of_scope` exist → **Task subagent** `solidsdd-critique` with `subject: cross_change_consistency` (recommended); on fail → re-brief / re-decompose as suggested
+15. If WorkPlan or any item has `human_gate.required: true` → **stop** until humans approve (write `gate-approval.json` before resume — [human-gates.md](references/human-gates.md)); then resume without thinning the plan
+16. While items remain, run **waves** of independent loops (`phase: waves`, bump `wave_index`):
    - Promote any `pending` → `ready` when all `depends_on` are `done` (update both WorkPlan and `run-state.items`)
    - Collect **all** currently `ready` items as the wave (empty → if `pending`/`blocked` remain, stop with dependency / gate report; else proceed to integration)
    - Mark wave items `running` in `run-state`; launch **`solidsdd-loop` for every item in the wave in parallel** (same parent turn). Pass `item_id` and `items/<id>/` as the persistence root
    - Each loop uses that item’s `intent`, ChangeBrief + Change Context excerpts for scope/tech, its own Task subagents, and **`items.<id>.loop_retry`** (not chat memory)
    - After **all** loops in the wave finish: mark each `done` or `blocked` in WorkPlan + `run-state`; on human_gate/stop for an item, leave siblings’ results intact and decide whether to end the run or continue remaining waves
    - Then form the next wave from newly unblocked items
-   - **Serialize only when necessary**: if two+ ready items would clearly contend on the same primary edit paths (e.g. both rewriting the same OpenAPI SoT as the main deliverable), run those contending items sequentially within the wave; still parallelize non-contending ready items
-16. After all items `done` (or single-item plan finished its one loop):
+   - **Serialize when `touches` intersect**: if two+ ready items list overlapping paths in `touches` (set intersection non-empty), run those contending items sequentially within the wave; still parallelize non-contending ready items. If `touches` is missing, fall back to the legacy heuristic (“clearly contend on the same primary edit paths”) and prefer adding `touches` on re-decompose.
+17. After all items `done` (or single-item plan finished its one loop):
    - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole` (and Brief `success_criteria` when relevant); write `integration-verification-report.json`
    - **Task subagent** `solidsdd-critique` (`subject: verification_report`); persist critique
    - If formal artifacts were applied across slices → **Task** `solidsdd-verify-formal` then critique as in loop
    - On successful integration: set `.solidsdd/changes/<change_id>/status.json` to `"status": "done"` and `run-state.phase` to `done`
-17. On integration verify or critique failure, follow [loop-retry.md](references/loop-retry.md) with **`run_retry`** (**max_auto_retries = 3**, separate from each slice loop’s budget): prefer re-running the owning slice’s loop or suggested skills as Task—not parent edits
-18. Leave unmet gates and blocked items visible in the final summary (and in `run-state.json`)
+18. On integration verify or critique failure, follow [loop-retry.md](references/loop-retry.md) with **`run_retry`** (**max_auto_retries = 3**, separate from each slice loop’s budget): prefer re-running the owning slice’s loop or suggested skills as Task—not parent edits
+19. Leave unmet gates and blocked items visible in the final summary (and in `run-state.json`)
 
 ## Isolation checklist (required in final summary)
 
-List: `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes`.
+List: `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes`.
 
 ## Subagent / loop prompt requirements
 

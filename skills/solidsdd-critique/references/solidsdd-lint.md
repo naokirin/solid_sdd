@@ -38,19 +38,21 @@ JSON on stdout:
 
 Exit `1` when any finding is `blocker` or `major` (same rule as CritiqueReport).
 
-## Checks (M1)
+## Checks
 
 | Check | Severity |
 |-------|----------|
-| JSON Schema (Brief, WorkPlan, gate, status, run-state, optional plans/reports) | blocker |
-| `change_id` vs directory name (Brief / run-state) | blocker |
+| JSON Schema (Brief, WorkPlan, gate, status, run-state, nfr, optional gate-approval / plans/reports) | blocker |
+| `change_id` vs directory name (Brief / run-state / nfr / gate-approval) | blocker |
 | Unknown / duplicate Brief ids; `covers` → unknown id | blocker |
 | `depends_on` unknown id or cycle | blocker / major |
 | Acceptance not Given/When/Then or >1 Scenario | major |
 | Brief `in_scope` / `success_criteria` not in any `item.covers` | major |
 | `covers` includes `out_of_scope` id | major |
 | Scenario `@R*` / `@SC*` tags vs WorkPlan `covers` | major (missing) / minor (extra) |
+| Overlapping WorkPlan `touches` among active items | minor (serialize advisory) |
 | Ambiguity lexicon hits | minor |
+| In-scope NFR missing threshold/measurement; missing qualities; empty `verified_by` when status `done` | major |
 
 Lexicon: [`ambiguity-lexicon.json`](ambiguity-lexicon.json) (EN + JA).
 

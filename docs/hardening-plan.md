@@ -222,14 +222,14 @@ Shipped: `evals/critique/` (12 cases) + `scripts/solidsdd-critique-eval.py` (det
 | Item | Action | Priority |
 |------|--------|----------|
 | **CI** | GitHub Actions: `sync-skill-references.sh --check`, schema validate examples, run example tests, SKILL frontmatter sanity | P1 — **done** (`.github/workflows/ci.yml`) |
-| **Read-only tools** | Where supported (e.g. Claude Code `allowed-tools`), restrict critique (and optionally intake/brief/decompose write surfaces); document Cursor limitation | P2 |
-| **Cross-change consistency** | New critique subject and/or intake section: collide with prior Scenarios / prior `out_of_scope` | P2 |
-| **Gate approval record** | `gate-approval.json` (who/when/scope/partial); **approver is free-text** (no git-user / `--approver` requirement); resume protocol checks the record exists when resuming past a gate | P2 |
-| **`touches` on WorkPlan items** | Paths for wave contention via set ops; update `solidsdd-run` | P2 |
-| **`change_id` on WorkPlan / ApplicationPlan / VerificationReport** | Explicit membership when artifacts move | P2 |
-| **Schema evolution policy** | Document additive-only on `version: "1"`; process for `version: "2"` + migrators | P2 |
-| **Richer example** | One non-arithmetic domain (inventory reservation, approval+authz, or closing/settlement) to stress intake/brief/critique | P2 |
-| **EARS layer** | Optional: Brief `in_scope[].text` (or dedicated field) in EARS patterns; Gherkin remains acceptance. Especially unwanted-behavior / state-driven | P3 |
+| **Read-only tools** | Where supported (e.g. Claude Code `allowed-tools`), restrict critique (and optionally intake/brief/decompose write surfaces); document Cursor limitation | P2 — **done** (`solidsdd-critique` frontmatter + SKILL note) |
+| **Cross-change consistency** | New critique subject and/or intake section: collide with prior Scenarios / prior `out_of_scope` | P2 — **done** (`cross_change_consistency` + Context framing) |
+| **Gate approval record** | `gate-approval.json` (who/when/scope/partial); **approver is free-text** (no git-user / `--approver` requirement); resume protocol checks the record exists when resuming past a gate | P2 — **done** (`gate-approval.schema.json` + human-gates) |
+| **`touches` on WorkPlan items** | Paths for wave contention via set ops; update `solidsdd-run` | P2 — **done** |
+| **`change_id` on WorkPlan / ApplicationPlan / VerificationReport** | Explicit membership when artifacts move | P2 — **done** (optional fields + lint) |
+| **Schema evolution policy** | Document additive-only on `version: "1"`; process for `version: "2"` + migrators | P2 — **done** ([schema-evolution.md](schema-evolution.md)) |
+| **Richer example** | One non-arithmetic domain (inventory reservation, approval+authz, or closing/settlement) to stress intake/brief/critique | P2 — **done** (`examples/inventory-reservation`) |
+| **EARS layer** | Optional: Brief `in_scope[].text` (or dedicated field) in EARS patterns; Gherkin remains acceptance. Especially unwanted-behavior / state-driven | P3 — **entry note done** ([ears-requirements.md](../reference-src/ears-requirements.md)); pattern lint deferred |
 
 ---
 
@@ -239,6 +239,7 @@ Shipped: `evals/critique/` (12 cases) + `scripts/solidsdd-critique-eval.py` (det
 - Natural entry: id’d `in_scope` texts (Workstream A) authored as EARS sentences
 - Forces explicit unwanted-behavior and state-driven shapes that today are prose rules in `gherkin-requirements.md`
 - Do **not** block A–E on EARS
+- **M4:** optional authoring note shipped; mechanical EARS detection remains future
 
 ---
 
@@ -264,8 +265,8 @@ Shipped artifacts: `schemas/*` (`covers` / scoped items), `scripts/solidsdd-lint
 
 ### Milestone M4 — Ecosystem / edge hardness
 
-- Remaining **F** items + optional **G** (EARS)
-- Domain example beyond arithmetic
+- [x] Remaining **F** items + optional **G** entry (EARS note)
+- [x] Domain example beyond arithmetic (`examples/inventory-reservation`)
 - External feedback continues via [feedback-tuning.md](feedback-tuning.md)
 
 ## Success metrics

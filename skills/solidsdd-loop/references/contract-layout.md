@@ -9,6 +9,7 @@
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |
 | Run state | `.solidsdd/changes/<change_id>/run-state.json` | Orchestrator phase, waves, retry budgets ([run-state.md](run-state.md)) |
+| Gate approval | `.solidsdd/changes/<change_id>/gate-approval.json` | Latest human gate approval ([human-gates.md](human-gates.md)) |
 | Per-item loop artifacts | `.solidsdd/changes/<change_id>/items/<item_id>/` | ApplicationPlan, CritiqueReports, VerificationReport for that slice |
 | Change report | `.solidsdd/changes/<change_id>/report.md` (+ optional `report.html`) | Human-readable snapshot (`solidsdd-report`; not SoT) |
 | Change status | `.solidsdd/changes/<change_id>/status.json` | `active` \| `done` \| `abandoned` |
