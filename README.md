@@ -47,6 +47,7 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/architecture.md](docs/architecture.md) | Rules, agents, and skill layout |
 | [docs/adapters.md](docs/adapters.md) | Adapter policy (OpenAPI / GraphQL / OCL) |
 | [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent execution policy |
+| [docs/run-cost.md](docs/run-cost.md) | Live-run wall-clock cost and greenfield mitigations |
 | [docs/roadmap.md](docs/roadmap.md) | MVP scope and phased rollout |
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP end-to-end evaluation notes |
 | [docs/phase2.md](docs/phase2.md) | Judgment axes, gates, and adapters |

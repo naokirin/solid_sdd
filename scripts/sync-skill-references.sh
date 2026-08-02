@@ -118,6 +118,10 @@ sync_one reference-src/loop-retry.md skills/solidsdd-verify-formal/references/lo
 # Docs / schemas / rules
 sync_one docs/execution-model.md skills/solidsdd-loop/references/execution-model.md
 sync_one docs/execution-model.md skills/solidsdd-run/references/execution-model.md
+sync_one docs/run-cost.md skills/solidsdd-loop/references/run-cost.md
+sync_one docs/run-cost.md skills/solidsdd-run/references/run-cost.md
+sync_one docs/run-cost.md skills/solidsdd-decompose/references/run-cost.md
+sync_one docs/run-cost.md skills/solidsdd-critique/references/run-cost.md
 sync_one schemas/application-plan.schema.json skills/solidsdd-judge/references/application-plan.schema.json
 sync_one schemas/work-plan.schema.json skills/solidsdd-decompose/references/work-plan.schema.json
 sync_one schemas/work-plan.schema.json skills/solidsdd-run/references/work-plan.schema.json

@@ -28,6 +28,20 @@ Requirements are expressed in **property-level Gherkin**. See [gherkin-requireme
 - Set optional **`touches`**: paths this item’s loop will primarily edit (e.g. `openapi/openapi.yaml`, `contracts/Memory.ocl`). `solidsdd-run` serializes ready items whose `touches` sets intersect; omit only when contention is impossible to know
 - Set `human_gate` / low `confidence` when the requirement is ambiguous or slicing is uncertain; if Brief has blocking `open_questions`, prefer gate / re-brief over inventing scope
 
+## Greenfield / shared-contract changes (required when applicable)
+
+When the consuming project has **no** (or empty) OpenAPI / OCL / package scaffold yet, or every property Scenario will edit the **same** primary paths:
+
+1. **Do not** emit N independent `ready` items that all list the same `touches` (e.g. every item touches `openapi/openapi.yaml` + one OCL + one `src` module) with empty `depends_on`. That forces **N full serial loops** over shared files and balloons wall-clock cost without improving checkability.
+2. Prefer a **foundation → properties** shape:
+   - First item (or explicit scaffold intent): establish shared surfaces (OpenAPI skeleton, module OCL shell, package/test harness) while covering the first property Scenario when possible
+   - Later property items: `depends_on: ["<foundation-id>"]` (or a short chain), `status: pending` until the foundation is `done`
+3. Set **`touches` honestly but narrowly** when a later item only extends one artifact (e.g. OCL + tests only). Do not copy the full shared-path set onto every item “for safety” if that item will not edit those paths.
+4. Still keep **one Scenario per item** — do not merge independent properties into one item to save loops. Fix cost with `depends_on` / narrow `touches`, not by packing Scenarios.
+5. When contracts already exist (follow-on change or mid-run after foundation), later ApplicationPlans should **extend**, not re-scaffold (judge/apply stay additive).
+
+Critique / lint may flag “all ready items share intersecting touches with no depends_on edges” as a **minor** decomposition smell (solid_sdd [docs/run-cost.md](../docs/run-cost.md); skill copy: [run-cost.md](run-cost.md) when bundled).
+
 ## Do not
 
 - Emit OpenAPI / OCL / formal / implementation / test edits (Feature files for requirements are allowed)

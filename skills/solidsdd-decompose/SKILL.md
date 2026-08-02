@@ -22,6 +22,7 @@ Emit a `WorkPlan` so `solidsdd-run` can drive one `solidsdd-loop` per item. Norm
 
 - [work-plan.schema.json](references/work-plan.schema.json)
 - [work-decomposition.md](references/work-decomposition.md) — **slice rules (required)**
+- [run-cost.md](references/run-cost.md) — greenfield cost / `touches` vs `depends_on`
 - [gherkin-requirements.md](references/gherkin-requirements.md) — **requirement format (required)**
 - [working-language.md](references/working-language.md) — item / Feature prose language
 - [change-brief.md](references/change-brief.md) — scope premise when Brief exists
@@ -37,6 +38,7 @@ Emit a `WorkPlan` so `solidsdd-run` can drive one `solidsdd-loop` per item. Norm
 - Do **not** emit an ApplicationPlan or choose contract kinds/densities
 - Exactly **one** Gherkin Scenario (checkable slice) per item in `acceptance_criterion`
 - Prefer property-level Scenarios; each item must set `covers` to Brief `in_scope` / `success_criteria` ids; do not cover `out_of_scope` ids; tag Scenarios with matching `@R*` / `@SC*`
+- On greenfield / shared OpenAPI+OCL paths, follow **Greenfield / shared-contract** in [work-decomposition.md](references/work-decomposition.md) (foundation `depends_on`, narrow `touches`)
 - Do **not** treat Gherkin as Cucumber executable SoT
 - JSON keys English; item strings and Gherkin step prose in the **working language**; Gherkin keywords stay English ([working-language.md](references/working-language.md))
 

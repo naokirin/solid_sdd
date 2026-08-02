@@ -51,6 +51,7 @@ Exit `1` when any finding is `blocker` or `major` (same rule as CritiqueReport).
 | `covers` includes `out_of_scope` id | major |
 | Scenario `@R*` / `@SC*` tags vs WorkPlan `covers` | major (missing) / minor (extra) |
 | Overlapping WorkPlan `touches` among active items | minor (serialize advisory) |
+| ≥3 active items, all pairwise `touches` overlap, no `depends_on` among them | minor (greenfield / cost smell) |
 | Ambiguity lexicon hits | minor |
 | In-scope NFR missing threshold/measurement; missing qualities; empty `verified_by` when status `done` | major |
 

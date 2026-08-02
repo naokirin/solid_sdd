@@ -41,7 +41,7 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
         └──── critique (separate Task) ────┘
 ```
 
-Execution policy: [execution-model.md](execution-model.md). Adversarial critique: [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md).
+Execution policy: [execution-model.md](execution-model.md). Run cost / greenfield mitigations: [run-cost.md](run-cost.md). Adversarial critique: [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md).
 
 ## Design principles
 

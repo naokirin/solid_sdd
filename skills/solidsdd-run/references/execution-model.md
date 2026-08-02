@@ -42,6 +42,7 @@ User or solidsdd.run (outer parent)
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
 - **Across changes**: Additional requirements start a new meaningful `change_id` under `.solidsdd/changes/` (see [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md)). Features and contracts accumulate; Briefs do not become a living PRD.
+- **Cost**: Expect roughly **10+ Task steps per slice** plus outer intake/brief/decompose critiques. Greenfield WorkPlans must use foundation `depends_on` / narrow `touches` — see [run-cost.md](run-cost.md) and [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
 ## Role split (slice = `solidsdd.loop`)
 
@@ -102,6 +103,8 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 2. Critique / verify `retry` → launch the suggested skill as a **new Task**, then re-run critique for that subject (and verify if needed)
 3. Auto-retry is **at most 3** (verify fail + critique fail + isolation re-run combined). No progress on the same skill repeatedly, or budget exhausted → `human_gate`
 4. No infinite loops: do not auto-retry after the budget is exceeded
+5. **Never** put a producer and its matching `solidsdd.critique` in the **same** Task (includes integration `verify` + `critique(verification_report)`)
+6. **Never** launch one Task whose job is “execute the entire `solidsdd.loop` for item Wn” (judge through verify). The **run parent** (or the human session following `solidsdd.loop`) must orchestrate; each subagent-required skill is its own Task. “Separate write passes” inside one agent are **not** a compliant substitute — treat as isolation violation and re-run via Task, or stop at `human_gate` if the host cannot launch Tasks
 
 ## Parent obligations (`solidsdd.loop`)
 
@@ -114,17 +117,19 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 7. If `solidsdd.verify` / `solidsdd.verify.formal` / `solidsdd.critique` fails, follow `loop_action` and suggested skills and **re-launch as a subagent** (or gate / stop)
 8. Stop at a human gate when the auto-retry cap is exceeded
 9. Leave a final summary listing that each subagent-required step and critique subject was launched via Task (isolation checklist)
+10. When contracts already exist for this change, prefer ApplicationPlans that **extend** shared OpenAPI/OCL rather than re-scaffolding the package on every item
 
 ## Parent obligations (`solidsdd.run`)
 
 1. Do not inline `solidsdd.intake` / `critique(change_context)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify`
-2. Each item follows the **`solidsdd.loop` skill** (run parent must not directly run judge/apply/implement)
+2. Each item follows the **`solidsdd.loop` skill on this parent session** (run parent must not directly run judge/apply/implement, and must **not** delegate the whole loop to a single Task)
 3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
 4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices
 5. Pass Change Context and ChangeBrief paths/excerpts into decompose and into each loop prompt when scope or tech questions may arise
-6. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention)
-7. Do not skip integration `solidsdd.verify` (+ critique) after all items complete
+6. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention). If many ready items share `touches`, prefer a WorkPlan that used foundation `depends_on` ([work-decomposition.md](../reference-src/work-decomposition.md)); record serialize reason in `run-state.isolation_notes`
+7. Do not skip integration `solidsdd.verify` (+ **separate** critique Task) after all items complete
 8. Honor run-level retry budget; leave isolation checklist, wave shape, and blocked items in the final summary
+9. Read [run-cost.md](run-cost.md) before large greenfield runs; budget time for O(N × loop steps)
 
 ## Prompt template for subagents
 

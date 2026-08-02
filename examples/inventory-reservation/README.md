@@ -40,6 +40,14 @@ npm start
 ../../scripts/solidsdd-lint.sh --project-root .
 ```
 
+## How this sample was built (cost note)
+
+This tree is a **live `solidsdd-run` replay** artifact (high cost). The first WorkPlan put all five property items `ready` with identical `touches`, which forced five serial full loops over shared OpenAPI/OCL/src — correct under older “independent items” defaults, but expensive for greenfield.
+
+**Do not** copy that WorkPlan shape for new greenfield runs. Prefer foundation → properties (`depends_on`), narrow `touches`, and keep each loop step as its own Task on the run parent (see [docs/run-cost.md](../../docs/run-cost.md) and [work-decomposition.md](../../reference-src/work-decomposition.md)).
+
+Historical isolation notes in `run-state.json` record where whole-loop Tasks / combined verify+critique were used; those patterns are now **disallowed** by the execution model.
+
 ## Out of scope (this sample)
 
 Payments, multi-warehouse, full IAM, UI, notifications, backorders beyond hard-fail, durable shared DB, formal (TLA+) concurrency proofs.

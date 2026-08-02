@@ -34,6 +34,7 @@ Drive **requirement → Change Context → ChangeBrief → WorkPlan → per-slic
 - [contract-layout.md](references/contract-layout.md)
 - [run-state.md](references/run-state.md) — **persist phase / retries / item artifacts (required)**
 - [run-state.schema.json](references/run-state.schema.json)
+- [run-cost.md](references/run-cost.md) — wall-clock cost model; greenfield mitigations; do not whole-loop Task
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
 
 ## Execution policy
@@ -68,14 +69,14 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 16. While items remain, run **waves** of independent loops (`phase: waves`, bump `wave_index`):
    - Promote any `pending` → `ready` when all `depends_on` are `done` (update both WorkPlan and `run-state.items`)
    - Collect **all** currently `ready` items as the wave (empty → if `pending`/`blocked` remain, stop with dependency / gate report; else proceed to integration)
-   - Mark wave items `running` in `run-state`; launch **`solidsdd-loop` for every item in the wave in parallel** (same parent turn). Pass `item_id` and `items/<id>/` as the persistence root
+   - Mark wave items `running` in `run-state`; for each item, follow **`solidsdd-loop` in this parent session** (Task per judge/critique/apply/… — **do not** launch one Task that runs the whole loop). When several ready items have **non-intersecting** `touches`, you may drive those loops concurrently in the same parent turn. Pass `item_id` and `items/<id>/` as the persistence root
    - Each loop uses that item’s `intent`, ChangeBrief + Change Context excerpts for scope/tech, its own Task subagents, and **`items.<id>.loop_retry`** (not chat memory)
    - After **all** loops in the wave finish: mark each `done` or `blocked` in WorkPlan + `run-state`; on human_gate/stop for an item, leave siblings’ results intact and decide whether to end the run or continue remaining waves
    - Then form the next wave from newly unblocked items
-   - **Serialize when `touches` intersect**: if two+ ready items list overlapping paths in `touches` (set intersection non-empty), run those contending items sequentially within the wave; still parallelize non-contending ready items. If `touches` is missing, fall back to the legacy heuristic (“clearly contend on the same primary edit paths”) and prefer adding `touches` on re-decompose.
+   - **Serialize when `touches` intersect**: if two+ ready items list overlapping paths in `touches` (set intersection non-empty), run those contending items sequentially within the wave; still parallelize non-contending ready items. If `touches` is missing, fall back to the legacy heuristic (“clearly contend on the same primary edit paths”) and prefer adding `touches` on re-decompose. If many items share touches with empty `depends_on`, record the smell in `isolation_notes` and prefer re-decompose (foundation `depends_on`) on critique fail / next change — see [work-decomposition.md](references/work-decomposition.md)
 17. After all items `done` (or single-item plan finished its one loop):
    - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole` (and Brief `success_criteria` when relevant); write `integration-verification-report.json`
-   - **Task subagent** `solidsdd-critique` (`subject: verification_report`); persist critique
+   - **Separate Task subagent** `solidsdd-critique` (`subject: verification_report`); persist critique — never the same Task as verify
    - If formal artifacts were applied across slices → **Task** `solidsdd-verify-formal` then critique as in loop
    - On successful integration: set `.solidsdd/changes/<change_id>/status.json` to `"status": "done"` and `run-state.phase` to `done`
 18. On integration verify or critique failure, follow [loop-retry.md](references/loop-retry.md) with **`run_retry`** (**max_auto_retries = 3**, separate from each slice loop’s budget): prefer re-running the owning slice’s loop or suggested skills as Task—not parent edits

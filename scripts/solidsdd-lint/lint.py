@@ -426,12 +426,14 @@ def lint_change(
             )
 
         # Advisory: ready items with intersecting touches (orchestrator should serialize)
+        ready_items: list[dict[str, Any]] = [
+            it
+            for it in items
+            if isinstance(it, dict)
+            and it.get("status") in (None, "ready", "pending", "running")
+        ]
         ready_with_touches: list[tuple[str, set[str]]] = []
-        for it in items:
-            if not isinstance(it, dict):
-                continue
-            if it.get("status") not in (None, "ready", "pending", "running"):
-                continue
+        for it in ready_items:
             touches = it.get("touches")
             if isinstance(touches, list) and touches:
                 ready_with_touches.append(
@@ -449,6 +451,38 @@ def lint_change(
                             f"overlapping touches {overlap}; solidsdd-run must serialize these items",
                         )
                     )
+
+        # Greenfield smell: ≥3 ready items, pairwise touches overlap, no depends_on edges
+        ready_ids = {str(it.get("id")) for it in ready_items if it.get("id")}
+        has_dep_edge = False
+        for it in ready_items:
+            for dep in it.get("depends_on") or []:
+                if dep in ready_ids:
+                    has_dep_edge = True
+                    break
+            if has_dep_edge:
+                break
+        if len(ready_with_touches) >= 3 and not has_dep_edge:
+            # all pairs overlap?
+            all_overlap = True
+            for i, (_, a_t) in enumerate(ready_with_touches):
+                for _, b_t in ready_with_touches[i + 1 :]:
+                    if not (a_t & b_t):
+                        all_overlap = False
+                        break
+                if not all_overlap:
+                    break
+            if all_overlap:
+                findings.append(
+                    finding(
+                        "minor",
+                        "consistency",
+                        "work-plan.json#touches",
+                        "≥3 items share intersecting touches with no depends_on among them; "
+                        "prefer foundation→properties depends_on and narrower touches "
+                        "(see work-decomposition greenfield guidance / docs/run-cost.md)",
+                    )
+                )
 
         if brief:
             ids = brief_ids(brief)

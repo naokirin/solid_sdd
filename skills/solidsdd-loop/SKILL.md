@@ -26,6 +26,7 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 - [contract-layout.md](references/contract-layout.md) — default artifact paths
 - [run-state.md](references/run-state.md) — **persist plans / critiques / retry budget (required)**
 - [run-state.schema.json](references/run-state.schema.json)
+- [run-cost.md](references/run-cost.md) — isolation: never whole-loop Task; never produce+critique in one Task
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
 
 ## Execution policy
@@ -36,6 +37,8 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 | `solidsdd-judge`, `solidsdd-critique`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify`, `solidsdd-apply-formal`, `solidsdd-verify-formal` | **Required subagent** via Task tool (or equivalent) |
 
 Never execute a subagent-required skill's procedure in the parent. Do not rewrite an `ApplicationPlan` or thin a `CritiqueReport`—re-run the owning skill as a subagent if wrong.
+
+**Do not** ask a single Task agent to “run this entire loop.” This skill’s parent session launches **one Task per** judge / critique / apply / derive / implement / verify step. If nested Task is unavailable inside a helper agent, return control to the `solidsdd-run` parent to drive steps — do not substitute same-agent produce+critique (“separate write passes”).
 
 **Persist** under `.solidsdd/changes/<change_id>/items/<item_id>/` (caller supplies `item_id`; default `ad-hoc` only for solo loops). Update the parent `run-state.json` item entry (`loop_phase`, `loop_retry`, `status`) at each step boundary.
 

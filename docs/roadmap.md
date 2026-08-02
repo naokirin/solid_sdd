@@ -111,3 +111,4 @@ Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
 3. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)
 4. Optional: mechanical EARS pattern detection in lint (Workstream G follow-on)
+5. Honor [run-cost.md](run-cost.md) on future live replays (greenfield WorkPlan + strict Task isolation)

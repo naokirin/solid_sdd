@@ -44,6 +44,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
+| 2026-08-03 | run-cost mitigations | After inventory E2E: greenfield WorkPlan (`depends_on`/narrow `touches`), forbid whole-loop Task & verify+critique same Task, lint smell, `docs/run-cost.md` | Applied — [run-cost.md](run-cost.md) |
 | 2026-08-03 | inventory-reservation E2E | Fresh solidsdd-run sample: soft-hold + authZ + TTL; OpenAPI/OCL/Vitest green (32 tests) | Applied — `examples/inventory-reservation` |
 | 2026-08-03 | solid_sdd hardening M4 | GateApproval, WorkPlan `touches`, `cross_change_consistency`, critique `allowed-tools`, schema-evolution, EARS note, `examples/inventory-reservation` | Applied — [hardening-plan.md](hardening-plan.md) |
 | 2026-08-03 | solid_sdd hardening M3 | `nfr.json` SoT + critique eval fixtures + GitHub Actions CI | Applied — [hardening-plan.md](hardening-plan.md) |

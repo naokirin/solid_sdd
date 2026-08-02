@@ -26,6 +26,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 
 - [critique-report.schema.json](references/critique-report.schema.json)
 - [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration + lint-first (required)**
+- [run-cost.md](references/run-cost.md) — WorkPlan greenfield / `touches` smells stay minor unless checkability is lost
 - [working-language.md](references/working-language.md) — finding detail language
 - [gherkin-requirements.md](references/gherkin-requirements.md) — when `subject` is `work_plan`
 - [ears-requirements.md](references/ears-requirements.md) — optional Brief wording (not lint-required)
