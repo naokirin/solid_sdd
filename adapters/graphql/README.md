@@ -19,9 +19,16 @@ HTTP/API boundary contracts expressed as GraphQL Schema Definition Language (SDL
 
 ## Verification hooks
 
-- SDL parse / schema validity (`buildSchema` / equivalent)
+- **Structural lint (when tooling available):** `@redocly/cli` with `--extends=spec` (includes SDL parse / schema validity via Redocly’s GraphQL `struct` path)
+
+  ```bash
+  redocly lint graphql/schema.graphql --extends=spec
+  # fallback: npx --yes @redocly/cli@latest lint graphql/schema.graphql --extends=spec
+  ```
+
+  Prefer `redocly` on `PATH`; else `npx`. If neither works, `solidsdd-verify` records `kind: graphql` as `skipped` (missing tool is not a report-level fail).
 - Optional contract tests against resolvers (project-specific)
-- On failure, prefer `solidsdd-apply-api` (schema) or `solidsdd-implement` (resolvers)
+- On Redocly / schema failure, prefer `solidsdd-apply-api`; on resolver mismatch, `solidsdd-implement`
 
 ## Skill mapping
 

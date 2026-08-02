@@ -40,7 +40,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Plan thinning | Rationale cites implementation cost or “keep tests green” to lower density | Brief rationales that still cite axes |
 | Formal gap (plan) | Shared mutable multi-client protocol omitted with neither `formal` nor `defer`+reason | Formal model that checks a documented invariant set for a smoke sample |
 | Formal specs | CFG/spec checks **nothing** meaningful (no invariant/property), or claims exclusive/safety but has **zero** related invariant | Missing liveness/WF; toy `Clients=2`; TypeOK+domain invariant without a separate named mutex lemma |
-| Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Single skipped optional adapter; green run with a non-empty contract suite |
+| Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Redocly/npx unavailable → API lint `skipped` with reason; single skipped optional adapter; green run with a non-empty contract suite |
 | WorkPlan slice | Item with **uncheckable** acceptance prose; **two+** independent ACs in one item; dependency **cycle**; whole requirement not covered by items/`acceptance_of_whole` | Preferring fewer items when each AC is still checkable; brief intents that still name the check |
 
 ### Named domain errors

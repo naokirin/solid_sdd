@@ -49,6 +49,8 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 | `pre` fails with wrong error type (e.g. `ZeroDivisionError` instead of domain `PreconditionError`) | `solidsdd-implement` | `retry` |
 | Tests assert behavior absent from OCL | `solidsdd-apply-dbc` then `solidsdd-derive-tests` | `retry` |
 | OpenAPI / GraphQL drift or invalid doc | `solidsdd-apply-api` | `retry` |
+| Redocly lint fail (`--extends=spec`) on OpenAPI / GraphQL SoT | `solidsdd-apply-api` | `retry` (`contract_gap`) |
+| Redocly / npx unavailable for API lint | — | check `skipped` only (not report fail / not `tooling` stop) |
 | OCL changed but tests stale | `solidsdd-derive-tests` | `retry` |
 | Critique: plan too thin / density bias | `solidsdd-judge` | `retry` |
 | Critique: vacuous OCL / missing domain errors | `solidsdd-apply-dbc` (± `derive-tests`) | `retry` |

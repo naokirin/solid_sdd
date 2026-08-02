@@ -21,9 +21,16 @@ Projects may override paths via rules.
 
 ## Verification hooks
 
-- Document structural validity (OpenAPI 3.x)
+- **Structural lint (when tooling available):** `@redocly/cli` with `--extends=spec`
+
+  ```bash
+  redocly lint openapi/openapi.yaml --extends=spec
+  # fallback: npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec
+  ```
+
+  Prefer `redocly` on `PATH`; else `npx`. If neither works, `solidsdd-verify` records `kind: openapi` as `skipped` (missing tool is not a report-level fail).
 - Contract tests or response validation against the document
-- On failure, prefer returning to `solidsdd.apply.api` or `solidsdd.implement`
+- On Redocly / contract-doc failure, prefer `solidsdd.apply.api`; on impl mismatch, `solidsdd.implement`
 
 ## Skill mapping
 

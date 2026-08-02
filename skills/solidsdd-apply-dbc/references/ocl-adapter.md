@@ -22,7 +22,8 @@ All steps below except planning are **subagent-required** when driven by `solids
 solidsdd.apply.dbc          →  (subagent) write/update .ocl
 solidsdd.derive.tests       →  (subagent) OCL → Vitest / RSpec / …
 solidsdd.implement          →  (subagent) make implementation satisfy contracts
-solidsdd.verify             →  (subagent) run contract tests (+ API checks)
+solidsdd.verify             →  (subagent) Redocly API lint (if available) + contract tests
+                              (no dedicated OCL syntax CLI in MVP)
 ```
 
 ## OCL conventions (MVP)

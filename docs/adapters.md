@@ -6,12 +6,13 @@ MVP で固定した初期アダプタと、Phase 2 で追加した骨格。詳�
 
 - **成果物**: `openapi/openapi.yaml`（またはプロジェクト規約上の同等パス）
 - **役割**: HTTP 境界のリクエスト／レスポンス・エラー形・互換性の契約
-- **検証**: スキーマ妥当性 + 実装が契約に沿うことのチェック（契約テストまたはレスポンス検証）
+- **検証**: `@redocly/cli lint … --extends=spec`（PATH または `npx` で実行可なら）+ 実装が契約に沿うことのチェック（契約テストまたはレスポンス検証）。Redocly が使えないときは lint を `skipped`（全体 fail にはしない）
 
 ## API: GraphQL SDL（Phase 2）
 
 - **成果物**: `graphql/schema.graphql`（任意で operations ドキュメント）
 - **役割**: GraphQL-first プロジェクト向けの境界契約（OpenAPI の代替）
+- **検証**: OpenAPI と同様に `@redocly/cli lint … --extends=spec`（利用可能時）。不可なら `skipped`
 - **評価サンプル**: [../examples/arithmetic-graphql](../examples/arithmetic-graphql)
 - **規約**: [../adapters/graphql/README.md](../adapters/graphql/README.md)
 

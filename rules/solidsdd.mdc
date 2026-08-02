@@ -47,6 +47,7 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 ## Verification
 
 - Do not treat work as done if API checks, OCL-derived tests, required formal checks, or required critiques fail
+- API structural lint: `@redocly/cli lint <SoT> --extends=spec` when `redocly` is on PATH or `npx` works; if unavailable, skip that check (do not fail solely for missing Redocly)
 - On failure: set `loop_action` and `failure_class` (verify) or findings (critique); follow suggested skills; **do not** weaken contracts to force a pass
 - Default **max_auto_retries = 3** (verify + critique + isolation re-runs share the budget per orchestrator); same suggested skill twice with no progress → human gate
 - After `solidsdd-run` finishes all items, run integration `solidsdd-verify` (do not skip)

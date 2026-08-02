@@ -35,7 +35,7 @@
 | `solidsdd.apply.dbc` | UML OCL |
 | `solidsdd.derive.tests` | OCL→契約テスト（サブエージェント） |
 | `solidsdd.implement` | 契約に沿った実装の更新 |
-| `solidsdd.verify` | OpenAPI 検証 + 契約テスト実行 |
+| `solidsdd.verify` | Redocly API lint（可なら）+ 契約テスト実行 |
 | `solidsdd.loop` | 上記の自動オーケストレーション |
 
 **含まないもの（意図的）**
