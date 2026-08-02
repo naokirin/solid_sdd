@@ -2,8 +2,8 @@
 name: solidsdd-context
 description: >-
   Gather repository stack, existing OpenAPI/GraphQL/OCL/formal contracts, and
-  test layout for solid_sdd. Use before judge/apply/loop or when asked for SDD
-  context.
+  test layout for solid_sdd. Use before judge/apply/loop/run or when asked for
+  SDD context.
 license: MIT
 ---
 
@@ -11,7 +11,7 @@ license: MIT
 
 ## Execution
 
-**orchestrator** — run in the parent (`solidsdd.loop` or the user-invoked agent). When `solidsdd-loop` is also installed, follow its execution-model reference for orchestration rules.
+**orchestrator** — run in the parent (`solidsdd.run`, `solidsdd.loop`, or the user-invoked agent). When `solidsdd-run` or `solidsdd-loop` is installed, follow that skill’s execution-model reference.
 
 ## Purpose
 
@@ -42,4 +42,4 @@ Write a short markdown summary with:
 - stack
 - contract artifact paths (api / dbc / formal) and test target (vitest / rspec)
 - gaps
-- suggested next skill (`solidsdd-judge` or `solidsdd-loop`)
+- suggested next skill (`solidsdd-judge`, `solidsdd-loop` for one slice, or `solidsdd-run` for multi-criterion requirements)

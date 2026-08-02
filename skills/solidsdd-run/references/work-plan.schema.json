@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/work-plan.schema.json",
+  "title": "WorkPlan",
+  "description": "Output of solidsdd.decompose: requirement sliced into verifiable work items for solidsdd-run (distinct from ApplicationPlan).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "items"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short human-readable summary of the decomposition."
+    },
+    "acceptance_of_whole": {
+      "type": "string",
+      "description": "Overall completion condition checked by the final solidsdd-verify after all items."
+    },
+    "human_gate": {
+      "$ref": "#/$defs/human_gate"
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reason"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "intent",
+        "acceptance_criterion",
+        "depends_on",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable id within this WorkPlan (e.g. W1)."
+        },
+        "intent": {
+          "type": "string",
+          "description": "Change intent passed into one solidsdd-loop run for this slice."
+        },
+        "acceptance_criterion": {
+          "type": "string",
+          "description": "Exactly one verifiable acceptance condition for this item."
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Other item ids that must be done before this item is ready."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "ready", "done", "blocked"]
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "human_gate": {
+          "$ref": "#/$defs/human_gate"
+        }
+      }
+    }
+  }
+}

@@ -4,12 +4,14 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 
 各スキルは **自己完結** です。必要なアダプタ・スキーマ・実行モデルは当該スキルの `references/` に同梱しています（`gh skill` で個別インストールしても他パスを読みません）。導入は [docs/install.md](../docs/install.md)。
 
-実行ポリシー: `solidsdd-loop/references/execution-model.md`（リポジトリ内の設計メモは [../docs/execution-model.md](../docs/execution-model.md)）。
+実行ポリシー: `solidsdd-run/references/execution-model.md` または `solidsdd-loop/references/execution-model.md`（リポジトリ内の設計メモは [../docs/execution-model.md](../docs/execution-model.md)）。
 
 | Skill | Command-like id | Role | Execution |
 |-------|-----------------|------|-----------|
-| [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Orchestration | orchestrator only |
+| [solidsdd-run](solidsdd-run/SKILL.md) | `solidsdd.run` | Outer orchestration (WorkPlan → loops → integration verify) | orchestrator only |
+| [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Slice orchestration (one intent) | orchestrator only |
 | [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
+| [solidsdd-decompose](solidsdd-decompose/SKILL.md) | `solidsdd.decompose` | WorkPlan (one verifiable AC per item) | **subagent required** |
 | [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
 | [solidsdd-critique](solidsdd-critique/SKILL.md) | `solidsdd.critique` | CritiqueReport (adversarial phase gate) | **subagent required** |
 | [solidsdd-apply-api](solidsdd-apply-api/SKILL.md) | `solidsdd.apply.api` | OpenAPI | **subagent required** |
@@ -21,6 +23,7 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | [solidsdd-verify-formal](solidsdd-verify-formal/SKILL.md) | `solidsdd.verify.formal` | Formal VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
+- Automatic (`solidsdd-run`): parent decomposes, runs `solidsdd-loop` per item, then integration verify; never inline subagent-required skills.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
 
 ## Maintainer: keep `references/` in sync
@@ -34,10 +37,10 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | `adapters/ruby-rspec/README.md` | `*/ruby-rspec-adapter.md` |
 | `adapters/ocl/README.md` | `*/ocl-adapter.md` |
 | `adapters/formal/README.md` | `*/formal-adapter.md` |
-| `docs/execution-model.md` | `solidsdd-loop/references/execution-model.md` |
-| `schemas/*.json` | judge / verify / verify-formal / critique |
-| `rules/solidsdd.mdc` | `solidsdd-loop/references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique |
+| `docs/execution-model.md` | `solidsdd-loop` / `solidsdd-run` `references/execution-model.md` |
+| `schemas/*.json` | judge / decompose / verify / verify-formal / critique / run |
+| `rules/solidsdd.mdc` | loop / run `references/project-rule.mdc` |
+| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition |
 
 ```bash
 # 手動

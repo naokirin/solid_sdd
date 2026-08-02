@@ -14,6 +14,7 @@
     "subject": {
       "type": "string",
       "enum": [
+        "work_plan",
         "application_plan",
         "api_contracts",
         "dbc_contracts",
@@ -45,7 +46,7 @@
     "loop_action": {
       "type": "string",
       "enum": ["retry", "human_gate", "stop"],
-      "description": "What solidsdd-loop should do after a fail (omit on pass)."
+      "description": "What solidsdd-loop or solidsdd-run should do after a fail (omit on pass)."
     },
     "summary": {
       "type": "string",
@@ -70,6 +71,7 @@
             "weak_test",
             "density_bias",
             "consistency",
+            "unverifiable_acceptance",
             "isolation_violation",
             "other"
           ]

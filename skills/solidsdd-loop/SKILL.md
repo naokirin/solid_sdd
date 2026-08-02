@@ -1,10 +1,11 @@
 ---
 name: solidsdd-loop
 description: >-
-  Orchestrate solid_sdd as the parent agent only: run context locally, and
+  Orchestrate solid_sdd as the slice parent only: run context locally, and
   launch judge/critique/apply/derive/implement/verify (and Phase 3 formal
   skills) as explicit Task subagents. Honors human_gate, CritiqueReport, and
-  verification loop_action with a shared auto-retry budget.
+  verification loop_action with a shared auto-retry budget. For multi-criterion
+  requirements use solidsdd-run.
 license: MIT
 ---
 
@@ -12,7 +13,9 @@ license: MIT
 
 ## Purpose
 
-Run the full loop. This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
+Run the **slice** loop for one change intent (typically one verifiable acceptance criterion). This skill is **orchestrator-only** — do not delegate `solidsdd.loop` itself to a subagent.
+
+For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan → this loop per item → integration verify). Do not expand this skill into work decomposition.
 
 ## References
 

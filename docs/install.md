@@ -71,16 +71,21 @@ your-project/
   .cursor/rules/solidsdd.mdc   # 上記からコピー（推奨）
 ```
 
-未作成でも導入可能です。`solidsdd-context` → `solidsdd-judge`（または `solidsdd-loop`）で不足を検出・生成する想定です。
+未作成でも導入可能です。`solidsdd-context` → `solidsdd-judge`（または `solidsdd-loop` / `solidsdd-run`）で不足を検出・生成する想定です。
 
 ## 動作確認
 
 1. `gh skill list` で `solidsdd-*` が出ること
-2. Agent に「`solidsdd-context` を実行して」または「`solidsdd-loop` を回して」と依頼
+2. Agent に「`solidsdd-context` を実行して」「`solidsdd-loop` を回して」（1 slice）、または「`solidsdd-run` を回して」（複数受け入れ条件）と依頼
 3. スキルが `references/` 配下を読んでいること
 4. （任意）本リポジトリの [examples/arithmetic-api](../examples/arithmetic-api) で通し確認
 
-自動実行時は `solidsdd-loop` を指定し、親が context 以外を Task サブエージェントで起動すること（各スキルの `references/execution-model.md` または loop 同梱版）。
+自動実行時:
+
+- **1 つの検証可能な受け入れ条件**が既に分かっている → `solidsdd-loop`
+- **要件が複数条件・大きめ** → `solidsdd-run`（decompose → 各 item で loop → 統合 verify）
+
+親が context 以外の subagent 必須スキルを Task で起動すること（各スキルの `references/execution-model.md`）。
 
 ## メンテナー向け: 配布準備
 
@@ -128,10 +133,10 @@ gh skill update solidsdd-loop
 ### 必須（MVP: OpenAPI + OCL）
 
 - [ ] `gh skill install ... --all --agent cursor` が成功した（または `--from-local`）
-- [ ] `gh skill list` に `solidsdd-*` がある（loop / context / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
+- [ ] `gh skill list` に `solidsdd-*` がある（run / loop / context / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
 - [ ] （推奨）`project-rule.mdc` を Project Rules へコピーした
 - [ ] 契約レイアウト方針を共有した（[project-template.md](project-template.md)）
-- [ ] `solidsdd-context` または `solidsdd-loop` のスモークが通る（loop では生産者の直後に `solidsdd-critique` が Task 起動される）
+- [ ] `solidsdd-context`、`solidsdd-loop`、または `solidsdd-run` のスモークが通る（生産者の直後に `solidsdd-critique` が Task 起動される）
 - [ ] 契約テストがプロジェクトの `npm test` / `bundle exec rspec` 等で走る
 
 ### 任意（スタック別）

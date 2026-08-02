@@ -27,6 +27,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 | F8 | Ruby `%` raised `ZeroDivisionError` when guard removed—tests expect domain error | OCL derive/implement: map `pre` failures to a **named domain error** |
 | F9 | Phase evaluation left to the producing agent; contracts can stay thin | Dedicated `solidsdd-critique` Task after judge/apply/derive/verify; contract-weakness checklist; shared max_auto_retries=3 |
 | F10 | First critique dry-run failed all examples on polish (error unions, OCL exception names, formal liveness) | Severity calibration: `major` only when checkability is lost; polish → `minor` / pass |
+| F11 | Large requirements as one loop increase intent↔output drift | Outer `solidsdd-run` + `solidsdd-decompose` (one verifiable AC per item); `solidsdd-loop` stays slice-only; integration verify after items |
 
 ## Intake template (external projects)
 
@@ -46,3 +47,4 @@ When an external project contributes feedback, append a row under [Intake log](#
 | 2026-08-02 | solid_sdd examples (Pass 1) | See table above | Applied to rules, axes, context, loop-retry, OCL adapter notes |
 | 2026-08-02 | solid_sdd design (F9) | Adversarial critique as explicit skill | Added `solidsdd-critique`, loop integration, shared retry budget |
 | 2026-08-02 | solid_sdd examples (F10) | Critique thresholds too strict for loop progress | Softened major criteria in adversarial-critique |
+| 2026-08-02 | solid_sdd design (F11) | Requirement slicing for run orchestrator | Added WorkPlan, `solidsdd-decompose`, `solidsdd-run` |

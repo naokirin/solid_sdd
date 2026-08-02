@@ -1,10 +1,11 @@
 ---
 name: solidsdd-critique
 description: >-
-  Adversarial, read-only critique of a prior solid_sdd phase artifact (plan,
-  contracts, derived tests, formal specs, or verification). When called from
-  solidsdd-loop, must run as an explicit Task subagent. Emits CritiqueReport;
-  does not edit artifacts. Calibrated so only checkability holes fail the loop.
+  Adversarial, read-only critique of a prior solid_sdd phase artifact (work
+  plan, application plan, contracts, derived tests, formal specs, or
+  verification). When called from solidsdd-loop or solidsdd-run, must run as
+  an explicit Task subagent. Emits CritiqueReport; does not edit artifacts.
+  Calibrated so only checkability holes fail the loop.
 license: MIT
 ---
 
@@ -12,7 +13,7 @@ license: MIT
 
 ## Execution
 
-**subagent required** when invoked from `solidsdd.loop` (or any orchestrator chaining phases). Parent must use Task so the **producer of the artifact is not the evaluator**. Solo user invocation may run in the current agent.
+**subagent required** when invoked from `solidsdd.loop`, `solidsdd.run`, or any orchestrator chaining phases. Parent must use Task so the **producer of the artifact is not the evaluator**. Solo user invocation may run in the current agent.
 
 ## Purpose
 
@@ -27,7 +28,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. F
 
 ## Constraints
 
-- **Read-only**: do not modify ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
+- **Read-only**: do not modify WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
 - Do not inflate polish into `major` / `fail` (see severity calibration)
 - Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)

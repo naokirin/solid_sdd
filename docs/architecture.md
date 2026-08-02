@@ -18,7 +18,14 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 └──────────────────┬──────────────────────┘
                    │ 制約・文脈
 ┌──────────────────▼──────────────────────┐
-│   Orchestrator = solidsdd.loop / 親エージェント │
+│ Outer = solidsdd.run（要件 → WorkPlan）  │
+│   decompose + critique(work_plan)        │
+│   → solidsdd.loop per item               │
+│   → integration verify                   │
+└──────────────────┬──────────────────────┘
+                   │
+┌──────────────────▼──────────────────────┐
+│ Slice = solidsdd.loop / 親エージェント   │
 │   context は親。judge 以降は Subagent 必須 │
 │   各生産者の直後に critique（敵対的評価） │
 └──────────────────┬──────────────────────┘
@@ -52,8 +59,10 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 
 | スキル | 責務 | 実行ポリシー | 主な入出力 |
 |--------|------|--------------|------------|
-| `solidsdd.loop` | オーケストレーション | orchestrator のみ | ループログ・最終状態 |
+| `solidsdd.run` | 外側オーケストレーション（分解→slice loop→統合 verify） | orchestrator のみ | ループログ・最終状態 |
+| `solidsdd.loop` | slice オーケストレーション（1 変更意図） | orchestrator のみ | ループログ・最終状態 |
 | `solidsdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
+| `solidsdd.decompose` | 作業分解 | **subagent 必須** | WorkPlan |
 | `solidsdd.judge` | 適用判断 | **subagent 必須** | ApplicationPlan |
 | `solidsdd.critique` | フェーズ成果物の敵対的評価 | **subagent 必須** | CritiqueReport |
 | `solidsdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
@@ -62,7 +71,22 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 | `solidsdd.implement` | 契約に従う実装 | **subagent 必須** | コード差分 |
 | `solidsdd.verify` | OpenAPI + 契約テスト検証 | **subagent 必須** | VerificationReport |
 
-形式仕様向け（例: `solidsdd.apply.formal` / `solidsdd.verify.formal`）は [roadmap.md](roadmap.md) の後続フェーズで追加する。MVP の `solidsdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
+形式仕様向け（例: `solidsdd.apply.formal` / `solidsdd.verify.formal`）は Phase 3。`solidsdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
+
+## 作業分解（`solidsdd.decompose`）の出力モデル
+
+共有スキーマ: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
+
+```text
+WorkPlan:
+  acceptance_of_whole? / human_gate? / confidence?
+  items[]:
+    id / intent / acceptance_criterion   … 1 item = 検証可能な受け入れ条件 1 つ
+    depends_on[] / status
+    confidence? / human_gate?
+```
+
+`ApplicationPlan.targets`（契約の載せ先）とは別物。分解ルールは [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md)。
 
 ## 適用判断（`solidsdd.judge`）の出力モデル
 
@@ -81,9 +105,9 @@ ApplicationPlan:
     signals? / breaking? / confidence? / human_gate?  … Phase 2
 ```
 
-`formal` は MVP では主に `defer`（理由付き）となる。
+`formal` は主に `defer`（理由付き）または Phase 3 条件付き `apply`。
 
-判断に使う軸は [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md)（Phase 2）と [vision.md](vision.md)。ルールでプロジェクト固有の閾値を上書きできる。人間ゲートとループ復帰は [phase2.md](phase2.md)。
+判断に使う軸は [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) と [vision.md](vision.md)。ルールでプロジェクト固有の閾値を上書きできる。人間ゲートとループ復帰は [phase2.md](phase2.md)。
 
 ## アダプタ層
 
@@ -119,7 +143,7 @@ OCL 経路のポイント: OCL がソース・オブ・トゥルース。テス�
 | モード | 振る舞い |
 |--------|----------|
 | 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切り、生産者の直後に `critique` を推奨 |
-| 自動 | `solidsdd.loop`（親）が context を行い、judge・critique・apply・derive・implement・verify は **必ず Subagent**。失敗時も Subagent で再実行（リトライ上限あり） |
+| 自動 | `solidsdd.run`（外側）が分解と slice 順実行・統合 verify。各 slice は `solidsdd.loop` が context（省略可）・judge・critique・apply・derive・implement・verify を **必ず Subagent** で実行。失敗時も Subagent で再実行（リトライ上限あり）。単一 slice なら `solidsdd.loop` のみでも可 |
 
 両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
 
@@ -129,7 +153,7 @@ OCL 経路のポイント: OCL がソース・オブ・トゥルース。テス�
 solid_sdd/
   README.md
   docs/                 # 構想・設計
-  schemas/              # ApplicationPlan 等の共有スキーマ
+  schemas/              # ApplicationPlan / WorkPlan 等の共有スキーマ
   adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec / formal アダプタ規約
   skills/               # Cursor Skill 形式のスキル定義
   rules/                # 常駐ルール（順次追加）

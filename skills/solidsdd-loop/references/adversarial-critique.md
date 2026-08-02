@@ -6,6 +6,7 @@
 
 If the same agent (or the same unbroken context) both produces and accepts a phase result:
 
+- WorkPlans pack multiple acceptance criteria into one item or use unverifiable prose
 - ApplicationPlans drift thin to ease implementation
 - Contracts omit hard preconditions / failure paths
 - Derived tests ignore existing `pre` clauses
@@ -40,25 +41,27 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Formal gap (plan) | Shared mutable multi-client protocol omitted with neither `formal` nor `defer`+reason | Formal model that checks a documented invariant set for a smoke sample |
 | Formal specs | CFG/spec checks **nothing** meaningful (no invariant/property), or claims exclusive/safety but has **zero** related invariant | Missing liveness/WF; toy `Clients=2`; TypeOK+domain invariant without a separate named mutex lemma |
 | Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Single skipped optional adapter; green run with a non-empty contract suite |
+| WorkPlan slice | Item with **uncheckable** acceptance prose; **two+** independent ACs in one item; dependency **cycle**; whole requirement not covered by items/`acceptance_of_whole` | Preferring fewer items when each AC is still checkable; brief intents that still name the check |
 
 ### Named domain errors
 
 - **Runtime / tests / implement**: prefer named domain errors (e.g. `PreconditionError`) — see project rule and loop-retry.
 - **Critique of OCL text**: do **not** `fail` only because the `.ocl` file does not spell the exception type. Fail if the **`pre` itself is missing** while failures are in scope.
 
-## Subjects and when `solidsdd-loop` must call it
+## Subjects and when orchestrators must call it
 
-| `subject` | After | Producer skill(s) |
-|-----------|-------|-------------------|
-| `application_plan` | `solidsdd-judge` | judge |
-| `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api |
-| `dbc_contracts` | `solidsdd-apply-dbc` (if any dbc apply) | apply-dbc |
-| `derived_tests` | `solidsdd-derive-tests` | derive-tests |
-| `formal_specs` | `solidsdd-apply-formal` | apply-formal |
-| `verification_report` | `solidsdd-verify` / `solidsdd-verify-formal` | verify* |
-| `isolation` | Parent detects inline execution of a subagent-required skill | — |
+| `subject` | After | Producer skill(s) | Orchestrator |
+|-----------|-------|-------------------|--------------|
+| `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
+| `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
+| `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api | `solidsdd-loop` |
+| `dbc_contracts` | `solidsdd-apply-dbc` (if any dbc apply) | apply-dbc | `solidsdd-loop` |
+| `derived_tests` | `solidsdd-derive-tests` | derive-tests | `solidsdd-loop` |
+| `formal_specs` | `solidsdd-apply-formal` | apply-formal | `solidsdd-loop` |
+| `verification_report` | `solidsdd-verify` / `solidsdd-verify-formal` | verify* | loop; also **run** after integration verify |
+| `isolation` | Parent detects inline execution of a subagent-required skill | — | loop or run |
 
-Skip a subject only when that producer step did not run in this loop iteration.
+Skip a subject only when that producer step did not run in this orchestrator iteration.
 
 ## Stance
 
@@ -72,7 +75,7 @@ Skip a subject only when that producer step did not run in this loop iteration.
 
 - Any `blocker` or `major` → `result: fail`, set `loop_action` + `suggested_next_skills`
 - Only `minor` (or empty findings) → `result: pass` (minors may still be listed)
-- Map producers: plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts
+- Map producers: work plan → `solidsdd-decompose`; plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts
 
 ## Isolation violations
 

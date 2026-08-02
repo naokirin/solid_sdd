@@ -58,9 +58,12 @@ Cursor / Claude Code ではソース編集時に Hook が sync を自動実行�
 
 ## 実行イメージ（要約）
 
-Kiro 等と同様に、ユーザーがフェーズ単位のスキルを任意に呼び出せる一方、オーケストレータ（エージェント）が同じスキル群を使って自動実行もできます。
+Kiro 等と同様に、ユーザーがフェーズ単位のスキルを任意に呼び出せる一方、オーケストレータが同じスキル群を使って自動実行もできます。
 
-詳細は [docs/architecture.md](docs/architecture.md) を参照してください。
+- **`solidsdd-run`**: 要件を WorkPlan に分解し、item ごとに `solidsdd-loop` → 最後に統合 verify
+- **`solidsdd-loop`**: 1 slice（1 変更意図）の契約ループ
+
+詳細は [docs/architecture.md](docs/architecture.md) / [docs/execution-model.md](docs/execution-model.md) を参照してください。
 
 ## スコープ方針（要約）
 
