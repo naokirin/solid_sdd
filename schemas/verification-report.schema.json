@@ -11,6 +11,13 @@
       "type": "string",
       "const": "1"
     },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48,
+      "description": "Optional but recommended: active change_id this report belongs to."
+    },
     "result": {
       "type": "string",
       "enum": ["pass", "fail"]
@@ -62,6 +69,11 @@
           "enum": ["pass", "fail", "skipped"]
         },
         "detail": { "type": "string" },
+        "covers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "WorkPlan item ids (e.g. W1) and/or Brief scope ids this check exercises."
+        },
         "failure_class": {
           "$ref": "#/$defs/failure_class"
         }

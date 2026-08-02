@@ -176,6 +176,7 @@ sync_one reference-src/loop-retry.md skills/solidsdd-run/references/loop-retry.m
 sync_one reference-src/adversarial-critique.md skills/solidsdd-critique/references/adversarial-critique.md
 sync_one reference-src/adversarial-critique.md skills/solidsdd-loop/references/adversarial-critique.md
 sync_one reference-src/adversarial-critique.md skills/solidsdd-run/references/adversarial-critique.md
+sync_one scripts/solidsdd-lint/README.md skills/solidsdd-critique/references/solidsdd-lint.md
 sync_one reference-src/work-decomposition.md skills/solidsdd-decompose/references/work-decomposition.md
 sync_one reference-src/work-decomposition.md skills/solidsdd-run/references/work-decomposition.md
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-decompose/references/gherkin-requirements.md

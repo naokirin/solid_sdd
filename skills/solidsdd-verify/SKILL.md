@@ -68,7 +68,7 @@ OCL files have **no** dedicated structural CLI in MVP; rely on `ocl_tests` + cri
 2. For each present API SoT, run the Redocly lint procedure above; record one check per document (`kind: openapi` or `graphql`).
 3. Run OCL-derived contract tests (MVP: project test script focusing on `tests/contracts` or `spec/contracts`).
 4. Set overall `result` to `fail` if any **required** check fails (lint fail or test fail). Treat Redocly-unavailable as `skipped`, not fail.
-5. On failure, fill `suggested_next_skills`, `loop_action`, and `failure_class`.
+5. On failure, fill `suggested_next_skills`, `loop_action`, and `failure_class`. Prefer setting optional `change_id` and per-check `covers` (WorkPlan item ids) when verifying a known slice.
 6. Shape output per [verification-report.schema.json](references/verification-report.schema.json).
 7. Return the report unchanged for the parent's follow-up `solidsdd-critique` (`subject: verification_report`).
 

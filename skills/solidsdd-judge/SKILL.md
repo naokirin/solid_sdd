@@ -39,7 +39,7 @@ Emit an `ApplicationPlan`.
 1. Read change intent, active Change Context (`…/change-context.md`) and ChangeBrief (via `active-change.json`) when present, and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief; when unsure about stack/adapters, prefer Change Context §5 over inventing tech. Resolve working language from project rule or Context §6.
 2. Apply axes in [judgment-axes.md](references/judgment-axes.md).
 3. Apply gate rules in [human-gates.md](references/human-gates.md).
-4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields).
+4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields). When judging one WorkPlan slice, set optional `covers` to that item’s id(s) and optional plan-level `change_id`.
 5. Validate against [application-plan.schema.json](references/application-plan.schema.json).
 
 ## Output

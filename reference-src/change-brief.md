@@ -35,23 +35,28 @@ Resolve via the active pointer. Projects may override via project rule. Do not w
 
 - `change_id` — meaningful kebab-case id; must match the directory name under `changes/`
 - `goal` — outcome for this change
-- `in_scope` / `out_of_scope` — explicit lists (out_of_scope must not be empty hand-waving; name concrete non-goals)
-- `success_criteria` — whole-change observable outcomes
-- Prefer short bullet strings over essays
-- JSON **keys** stay English; string **values** use the project **working language** ([working-language.md](working-language.md))
+- `in_scope` / `out_of_scope` / `success_criteria` — arrays of **`{ "id", "text" }`** objects (not bare strings). Prefer ids `R1…` (in scope), `X1…` (out of scope), `SC1…` (success). Ids must be unique across the Brief. `out_of_scope` must not be empty hand-waving; name concrete non-goals
+- Prefer short `text` values over essays
+- JSON **keys** stay English; string **values** (`text`, `goal`, …) use the project **working language** ([working-language.md](working-language.md))
+
+**Breaking:** older Briefs with `string[]` scope lists are invalid. Migrate to `{ id, text }` objects (solid_sdd `docs/hardening-plan.md` Workstream A / Phase 5).
 
 Optional: `background`, `assumptions`, `constraints`, `open_questions`, `confidence`, `human_gate`.
 
 When continuing an existing product line, put **only this change’s delta** in `in_scope`; use `assumptions` / `constraints` for “keep existing behavior” rather than re-listing the whole product.
 
+## Coverage ids
+
+Downstream WorkPlan items and Gherkin Scenarios reference these ids via `covers` / Scenario tags (`@R1`). Mechanical coverage is checked by `scripts/solidsdd-lint.sh` before critique. Critique judges whether coverage is *adequate*, not whether ids exist.
+
 ## When later skills must re-read the brief
 
 - Prefer re-reading `change-context.md` when tech/NFR rationale is needed; Brief stays the scope checklist
-- `solidsdd-decompose` — Scenarios must cover `in_scope` / `success_criteria` and must not pull in `out_of_scope`
-- `solidsdd-judge` — density / skip / defer when unsure: check brief **and** Change Context §5 before inventing stack/adapters
-- `solidsdd-critique` — scope drift vs brief → fail with suggested `solidsdd-brief` or `solidsdd-decompose`; framing gaps → `solidsdd-intake`
+- `solidsdd-decompose` — each item must `covers` Brief `in_scope` / `success_criteria` ids; must not cover `out_of_scope` ids; Scenario tags must match
+- `solidsdd-judge` — density / skip / defer when unsure: check brief **and** Change Context §5 before inventing stack/adapters; set target `covers` to WorkPlan item ids when known
+- `solidsdd-critique` — run lint first; scope drift / missing id coverage → fail (often already lint-imported); framing gaps → `solidsdd-intake`
 - Ambiguous verify / gate — orchestrator may stop and point at brief `open_questions` / `human_gate` or Change Context §7
 
 ## Critique expectations
 
-`subject: change_brief` — major when in/out of scope are missing or contradictory, success criteria are unverifiable slogans only, or open questions that block slicing are unmarked (no gate / low confidence). See [adversarial-critique.md](adversarial-critique.md).
+`subject: change_brief` — major when in/out of scope are missing or contradictory, success criteria are unverifiable slogans only, or open questions that block slicing are unmarked (no gate / low confidence). Bare-string scope lists are schema/lint blockers. See [adversarial-critique.md](adversarial-critique.md).

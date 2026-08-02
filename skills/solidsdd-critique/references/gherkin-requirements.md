@@ -36,7 +36,7 @@ Projects may override via project rule. Decompose may **write or update** `.feat
 2. One **Feature** groups related behavior; each property-level **Scenario** (or independently checkable **Scenario Outline**) is one WorkPlan item when independently verifiable.
 3. Optional `Examples` / illustration steps may pin a representative case; they must not replace the property statement in `Then`.
 4. Name failure paths explicitly (zero divisor → named domain error).
-5. Cover ChangeBrief `in_scope` / `success_criteria`; do not pull in `out_of_scope`.
+5. Cover ChangeBrief `in_scope` / `success_criteria` **ids**: tag each Scenario with `@R1` / `@SC1` (etc.) matching the owning WorkPlan item’s `covers`. Do not pull in `out_of_scope` (`@X*`).
 6. On later changes, **add or update** Scenarios for the new Brief only; treat destructive rewrites of existing Scenarios as breaking and surface them in Brief / critique.
 7. Exploratory UX may stay thin: still prefer a minimal property Scenario over prose; judge may later choose `natural_only` / density `thin`.
 8. Language: Feature/Scenario titles and step prose follow the project **working language** ([working-language.md](working-language.md), usually from the project rule); keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) in English.
@@ -46,11 +46,13 @@ Projects may override via project rule. Decompose may **write or update** `.feat
 ```gherkin
 Feature: Arithmetic calculator operations
 
+  @R1 @SC1
   Scenario: Addition returns the sum of its operands
     Given a calculator service available to clients
     When the client adds two numbers
     Then the result equals the mathematical sum of those operands
 
+  @R2 @SC2
   Scenario: Division by zero fails with a named domain error
     Given a calculator service available to clients
     When the client divides by zero
@@ -62,4 +64,4 @@ Avoid making the only Scenario for addition be `When adds 2 and 3 / Then result 
 
 ## Critique expectations
 
-`solidsdd-critique` (`subject: work_plan`) treats free-form acceptance prose without Given/When/Then as a **checkability** problem (major). Prefer **minor** (or omit) for “could use a more representative example” when a property-level Scenario is already checkable. Example-only Scenarios that leave the general property unstated may be **minor** when still checkable, or **major** when they leave ChangeBrief scope uncovered. See [adversarial-critique.md](adversarial-critique.md).
+`solidsdd-critique` (`subject: work_plan`) runs **deterministic lint first** (`scripts/solidsdd-lint.sh`): missing `covers`, missing Scenario tags, non-Gherkin acceptance, and dependency cycles fail without LLM judgment. The LLM pass then judges *adequacy* of coverage. Prefer **minor** (or omit) for “could use a more representative example” when a property-level Scenario is already checkable. See [adversarial-critique.md](adversarial-critique.md).

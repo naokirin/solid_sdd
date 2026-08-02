@@ -21,11 +21,15 @@ On **fail**:
 
 `solidsdd-critique` must emit JSON matching `critique-report.schema.json`.
 
+**Step 0:** Run `scripts/solidsdd-lint.sh --project-root <consuming-project>` (critique-only; orchestrators do not call lint outside critique). Merge lint findings into the report before LLM adequacy review.
+
 On **fail** (`blocker` / `major` findings only—see adversarial-critique severity calibration):
 
-- Populate `suggested_next_skills` with the **source** skills (usually judge / apply-* / derive-tests—not implement to hide thin contracts).
+- Populate `suggested_next_skills` with the **source** skills (usually judge / apply-* / derive-tests / brief / decompose—not implement to hide thin contracts).
+- Lint-only coverage / schema / cycle failures → prefer `solidsdd-brief` or `solidsdd-decompose` (or the producer of the invalid JSON).
 - Set `loop_action` the same way as verify (`retry` / `human_gate` / `stop`).
 - Prefer categories `thin_contract`, `missing_precondition`, `weak_test`, `density_bias`, `unverifiable_acceptance`, `scope_gap` when **checkability** (or slice / scope checkability) is the issue.
+- Map lint `schema_violation` / unknown-id consistency issues to `consistency` or `scope_gap` as appropriate when folding into CritiqueReport enums.
 - Do **not** fail the loop for polish-only findings (`minor`).
 
 On **pass** with only `minor` findings: continue the loop; minors may be listed in the final summary.
@@ -46,7 +50,9 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 |---------|-----------------|-------------|
 | Critique: change_context missing headings / NFR or tech selection without rationale / missing or wrong gate JSON | `solidsdd-intake` | `retry` |
 | Critique: change_brief missing in/out scope, unverifiable success criteria, or unmarked blocking questions | `solidsdd-brief` | `retry` |
+| Critique / lint: schema invalid Brief, bare-string scope lists, duplicate ids | `solidsdd-brief` | `retry` |
 | Critique: work_plan unverifiable / multi-AC item / cycle / coverage gap / Brief scope drift | `solidsdd-decompose` (and `solidsdd-brief` / `solidsdd-intake` if premise is wrong) | `retry` |
+| Critique / lint: missing `covers`, Scenario tag mismatch, depends_on cycle | `solidsdd-decompose` | `retry` |
 | Contract test fails; OCL/API look right | `solidsdd-implement` | `retry` |
 | `pre` fails with wrong error type (e.g. `ZeroDivisionError` instead of domain `PreconditionError`) | `solidsdd-implement` | `retry` |
 | Tests assert behavior absent from OCL | `solidsdd-apply-dbc` then `solidsdd-derive-tests` | `retry` |

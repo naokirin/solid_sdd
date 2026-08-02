@@ -39,7 +39,7 @@ Emit a `ChangeBrief` so later skills share an explicit premise for what this cha
 - Do **not** choose contract kinds or densities (that is `solidsdd-judge`)
 - Do **not** slice into WorkPlan items (that is `solidsdd-decompose`)
 - Do **not** overwrite `change-context.md` (that is `solidsdd-intake`)
-- `change_id`, `in_scope`, and `out_of_scope` must be present; scope lists must be concrete
+- `change_id`, `in_scope`, and `out_of_scope` must be present; scope lists must be concrete **`{ id, text }` objects** (not bare strings); prefer `R*` / `X*` / `SC*` ids
 - Prefer structured fields over essay-length PRD prose
 - JSON keys English; string values in the **working language** ([working-language.md](references/working-language.md); prefer Context §6 / project rule)
 - Do **not** write a flat `.solidsdd/change-brief.json` (migrate legacy per [change-lifecycle.md](references/change-lifecycle.md))
@@ -52,7 +52,7 @@ Emit a `ChangeBrief` so later skills share an explicit premise for what this cha
    - Prefer `.solidsdd/active-change.json` when `change-context.md` exists for that id.
    - If the user invoked **brief alone** and no Change Context exists: run the `solidsdd-intake` procedure first (same solo session), then continue—or stop and ask the parent to run `solidsdd-intake`.
    - Do **not** invent a second `change_id` that diverges from an existing Change Context.
-4. Apply rules in [change-brief.md](references/change-brief.md) and [change-lifecycle.md](references/change-lifecycle.md). Put only this change’s delta in `in_scope`. Align `out_of_scope` / constraints with Change Context §§4–6.
+4. Apply rules in [change-brief.md](references/change-brief.md) and [change-lifecycle.md](references/change-lifecycle.md). Put only this change’s delta in `in_scope` as `{ id, text }` (prefer `R1…`). Align `out_of_scope` (`X1…`) / `success_criteria` (`SC1…`) / constraints with Change Context §§4–6. Ids must be unique across the Brief.
 5. Fill `change_id`, `goal`, `in_scope`, `out_of_scope`, `success_criteria` (plus optional background / assumptions / constraints / open_questions) in the working language.
 6. Apply gate rules in [human-gates.md](references/human-gates.md) when ambiguity or blocking open questions warrant a gate; set `confidence` accordingly. Do **not** start Brief under `solidsdd-run` while Change Context gate is still `required: true` (orchestrator stops first).
 7. Validate against [change-brief.schema.json](references/change-brief.schema.json).

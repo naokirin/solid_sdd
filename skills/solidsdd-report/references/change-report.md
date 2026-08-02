@@ -121,8 +121,9 @@ From Change Context §1–§2. Include drivers/constraints. If Context missing �
 
 ### §2 Functional requirements
 
-- From Brief: `goal`, `in_scope`, `out_of_scope`, `success_criteria` (summarize; do not drop concrete scope items).
-- From Features: Scenario names + short Given/When/Then paraphrase or verbatim Scenario blocks; link to `feature_path`.
+- From Brief: `goal`, `in_scope`, `out_of_scope`, `success_criteria` — render each scoped item as **`id` — `text`** (do not drop ids or concrete scope items).
+- From Features: Scenario names + tags (`@R1` …) + short Given/When/Then paraphrase or verbatim Scenario blocks; link to `feature_path`.
+- **Coverage matrix** (when Brief + WorkPlan exist): table or list of Brief `R*` / `SC*` ids → WorkPlan item ids that `covers` them → Scenario name / tags. Mark uncovered ids explicitly (should already fail lint).
 - If Brief and Features both missing → Not performed (`solidsdd-brief` / `solidsdd-decompose`).
 
 ### §3–§4 NFR and technology
@@ -133,8 +134,8 @@ Copy/adapt tables or bullets from Context §4–§5. Preserve requirement / rati
 
 Subsections (omit a subsection only when not applicable to the stack **and** no plan asked for it; otherwise mark Not performed):
 
-1. **WorkPlan** — item id, intent, scenario name, status, depends_on (table). Link to `work-plan.json`.
-2. **ApplicationPlan** — targets: kind, location, density, status, rationale (table). Link to plan JSON path(s).
+1. **WorkPlan** — item id, intent, `covers`, scenario name, status, depends_on (table). Link to `work-plan.json`.
+2. **ApplicationPlan** — targets: kind, location, density, status, `covers` (WorkPlan ids), rationale (table). Link to plan JSON path(s).
 3. **API contract** — natural-language summary of operations/types exposed; **Markdown: link only** to `openapi/openapi.yaml` or `graphql/schema.graphql` (no full YAML dump).
 4. **DbC (OCL)** — natural-language summary of types/invariants/preconditions covered; **one bullet (or nested bullet) per operation / invariant**—do not pack many ops into a single unbroken sentence. **Markdown: link only** to each `.ocl` file.
 5. **Formal** (optional) — summary + link to `formal/**`.

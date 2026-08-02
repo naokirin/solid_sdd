@@ -16,6 +16,12 @@ If the same agent (or the same unbroken context) both produces and accepts a pha
 
 Critique must run as an **explicit Task subagent**, separate from the producer. Finding `detail` / rationale strings use the project **working language** ([working-language.md](working-language.md)); JSON keys and enum tokens stay English.
 
+## Deterministic lint first (required)
+
+Before LLM review, run **`scripts/solidsdd-lint.sh`** against the consuming project (documented in solid_sdd `scripts/solidsdd-lint/README.md`; skill copy: [solidsdd-lint.md](solidsdd-lint.md) when installed via sync). Import lint findings into the CritiqueReport (`blocker`/`major`/`minor` as emitted). Lint owns: schema shape, `change_id` match, `depends_on` cycles, Gherkin shape, Brief id coverage via `covers` / Scenario tags, ambiguity lexicon hits.
+
+The LLM pass then judges **adequacy** (thin contracts, missing `pre`, density vs signals, whether a cover is meaningful)—not whether coverage ids exist. Do **not** skip lint when the solid_sdd checkout is available; if the script cannot run (`tooling`), record a `minor` or `major` finding with category `other` and reason, and still complete LLM review when possible.
+
 ## Severity calibration (loop must progress)
 
 Critique is adversarial, but **must not fail the loop for polish**. Default density for additive work is `standard`. Calibrate as follows:
@@ -35,7 +41,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Check | `major` examples | **Not** `major` (use `minor` or omit) |
 |-------|------------------|--------------------------------------|
 | Change Context framing | Required headings missing; §4 NFR or §5 tech selection empty/hand-wavy when demand or repo stack implies choices; decisions with neither alternatives nor rationale; missing `change-context-gate.json`; gate triggers fire (material `agent_default` tech, stack conflict, new security/money NFR, blocking §7) but `human_gate.required: false` | Wording polish; extra background prose; gate `false` when initial instruction already settled decisions |
-| ChangeBrief scope | Empty/missing `in_scope` or `out_of_scope`; contradictory in vs out; `success_criteria` only slogans with no observable outcome; blocking `open_questions` with no `human_gate` / low confidence | Brief wording polish; extra background prose |
+| ChangeBrief scope | Empty/missing `in_scope` or `out_of_scope`; contradictory in vs out; `success_criteria` only slogans with no observable outcome; blocking `open_questions` with no `human_gate` / low confidence; bare `string[]` scope lists (schema/lint) | Brief wording polish; extra background prose |
 | Vacuous constraints | `pre: true` / empty `post` when density is `standard`+ and the operation has known failure or result meaning | Type-echo invariants (`oclIsTypeOf` on an already-typed attribute); missing IEEE/NaN guards |
 | Missing precondition | Known failure mode (div/mod by zero, empty required input) with **no** `pre` / no API error path at all | OCL that has `pre` but does not name `PreconditionError` in the `.ocl` text (error **class** is an implement/adapter concern; project rule covers runtime) |
 | Happy-path-only API | HTTP/GraphQL operation with documented failures but **no** 4xx / error channel whatsoever | Undifferentiated `{ error: string }`; GraphQL errors only in prose while tests/impl already lock a code; undeclared 404/500 catch-alls |
@@ -45,7 +51,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Formal gap (plan) | Shared mutable multi-client protocol omitted with neither `formal` nor `defer`+reason | Formal model that checks a documented invariant set for a smoke sample |
 | Formal specs | CFG/spec checks **nothing** meaningful (no invariant/property), or claims exclusive/safety but has **zero** related invariant | Missing liveness/WF; toy `Clients=2`; TypeOK+domain invariant without a separate named mutex lemma |
 | Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Redocly/npx unavailable → API lint `skipped` with reason; single skipped optional adapter; green run with a non-empty contract suite |
-| WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` not covered by items/`acceptance_of_whole`; items that pull in Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; writing step prose in the working language while keeping English keywords ([working-language.md](working-language.md)) |
+| WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` ids not in any `item.covers`; Scenario tags missing those ids; items that `covers` Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; writing step prose in the working language while keeping English keywords ([working-language.md](working-language.md)). **Existence** of id coverage is primarily `scripts/solidsdd-lint.sh`; critique focuses on whether the cover is *adequate* |
 | Scope drift | WorkPlan / ApplicationPlan invents features listed in Brief `out_of_scope`, or drops Brief `in_scope` without rationale | Naming differences that still match Brief intent |
 
 ### Named domain errors

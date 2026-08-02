@@ -24,6 +24,10 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 - Optional language-native DbC (opt-in design; still deferred)
 - Optional human-readable projection skills (Markdown / HTML from contracts) — readability without changing loop authority
 
+## Follow-on: Phase 5 Hardening
+
+Mechanical assurance for requirements quality (ID traceability, pre-critique lint, run-state persistence, structured NFRs, critique eval corpus, CI) is tracked separately in [hardening-plan.md](hardening-plan.md) and [roadmap.md](roadmap.md) §Phase 5.
+
 ## Success criteria (Phase 4)
 
 1. A new team can install skills and pass the checklist without reading every architecture doc.

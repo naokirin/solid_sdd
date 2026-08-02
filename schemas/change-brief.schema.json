@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://solid-sdd.dev/schemas/change-brief.schema.json",
   "title": "ChangeBrief",
-  "description": "Output of solidsdd.brief: structured scope for one change—goals, in/out of scope, assumptions. Return point when later judgment is ambiguous. Not a living product PRD.",
+  "description": "Output of solidsdd.brief: structured scope for one change—goals, in/out of scope, assumptions. Return point when later judgment is ambiguous. Not a living product PRD. Scope lists use {id,text} objects for mechanical coverage.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -41,14 +41,14 @@
     "in_scope": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" },
-      "description": "Explicit list of what this change includes."
+      "items": { "$ref": "#/$defs/scoped_item" },
+      "description": "Explicit list of what this change includes. Prefer ids R1, R2, …"
     },
     "out_of_scope": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" },
-      "description": "Explicit list of what this change excludes (non-goals)."
+      "items": { "$ref": "#/$defs/scoped_item" },
+      "description": "Explicit list of what this change excludes (non-goals). Prefer ids X1, X2, …"
     },
     "assumptions": {
       "type": "array",
@@ -63,8 +63,8 @@
     "success_criteria": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" },
-      "description": "Whole-change success checks (later mapped by decompose / integration verify). Prefer observable outcomes, not implementation tactics."
+      "items": { "$ref": "#/$defs/scoped_item" },
+      "description": "Whole-change success checks (later mapped by decompose / integration verify). Prefer ids SC1, SC2, … Prefer observable outcomes, not implementation tactics."
     },
     "open_questions": {
       "type": "array",
@@ -79,6 +79,25 @@
     }
   },
   "$defs": {
+    "scoped_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*[0-9]+$",
+          "minLength": 2,
+          "maxLength": 16,
+          "description": "Stable id within this Brief (e.g. R1, SC1, X1)."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable scope statement in the working language."
+        }
+      }
+    },
     "confidence": {
       "type": "string",
       "enum": ["low", "medium", "high"]

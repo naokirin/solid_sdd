@@ -5,21 +5,60 @@
   "goal": "Clients can perform add, subtract, multiply, divide, and remainder through a checkable service surface; invalid uses fail with a named domain error; a single memory slot supports clear, recall, add-to-memory, and subtract-from-memory starting at zero.",
   "background": "This change defines scope for the arithmetic-api evaluation sample. An existing TypeScript HTTP stack may already be present; use it only as implementation context. Scope comes from this brief, not from existing OpenAPI, OCL, or Feature files.",
   "in_scope": [
-    "Binary arithmetic operations: add, subtract, multiply, divide, and remainder (mod)",
-    "Clear, named domain error for invalid uses\u2014especially division by zero and remainder by zero\u2014rather than opaque language/runtime errors",
-    "Single-slot calculator memory initialized to zero",
-    "Memory operations: clear (set to zero), recall (return current value), add-to-memory, subtract-from-memory",
-    "HTTP/API surface that exposes calculate and memory behaviors in a form clients and tests can exercise",
-    "Module-level contracts that make the same arithmetic and memory behaviors checkable"
+    {
+      "id": "R1",
+      "text": "Binary arithmetic operations: add, subtract, multiply, divide, and remainder (mod)"
+    },
+    {
+      "id": "R2",
+      "text": "Clear, named domain error for invalid uses\u2014especially division by zero and remainder by zero\u2014rather than opaque language/runtime errors"
+    },
+    {
+      "id": "R3",
+      "text": "Single-slot calculator memory initialized to zero"
+    },
+    {
+      "id": "R4",
+      "text": "Memory operations: clear (set to zero), recall (return current value), add-to-memory, subtract-from-memory"
+    },
+    {
+      "id": "R5",
+      "text": "HTTP/API surface that exposes calculate and memory behaviors in a form clients and tests can exercise"
+    },
+    {
+      "id": "R6",
+      "text": "Module-level contracts that make the same arithmetic and memory behaviors checkable"
+    }
   ],
   "out_of_scope": [
-    "Authentication, authorization, sessions, or API keys",
-    "Multi-user or multi-slot memory; per-client isolated memory stores",
-    "Operation history, undo/redo, or expression/transcript logging",
-    "Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder",
-    "Persistent storage, databases, or durable memory across process restarts (beyond in-process single slot)",
-    "UI / frontend clients, SDKs, or third-party integrations beyond the service surface itself",
-    "Rate limiting, quotas, observability product features, or multi-tenancy"
+    {
+      "id": "X1",
+      "text": "Authentication, authorization, sessions, or API keys"
+    },
+    {
+      "id": "X2",
+      "text": "Multi-user or multi-slot memory; per-client isolated memory stores"
+    },
+    {
+      "id": "X3",
+      "text": "Operation history, undo/redo, or expression/transcript logging"
+    },
+    {
+      "id": "X4",
+      "text": "Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder"
+    },
+    {
+      "id": "X5",
+      "text": "Persistent storage, databases, or durable memory across process restarts (beyond in-process single slot)"
+    },
+    {
+      "id": "X6",
+      "text": "UI / frontend clients, SDKs, or third-party integrations beyond the service surface itself"
+    },
+    {
+      "id": "X7",
+      "text": "Rate limiting, quotas, observability product features, or multi-tenancy"
+    }
   ],
   "assumptions": [
     "Operands and memory values are numeric (real/number) values suitable for the sample service",
@@ -33,10 +72,22 @@
     "Contract kind and density choices are deferred to later solidsdd-judge; this brief only requires that HTTP/API and module surfaces remain checkable"
   ],
   "success_criteria": [
-    "A client can request each of add, subtract, multiply, divide, and remainder and receive the correct numeric result for valid inputs",
-    "Division by zero and remainder by zero fail with a named domain error observable at the service boundary",
-    "Memory starts at zero; clear sets it to zero; recall returns the current value; add-to-memory and subtract-from-memory update the single slot as specified",
-    "HTTP/API and module contract surfaces exist such that the arithmetic and memory behaviors above can be verified without relying on opaque implementation internals alone"
+    {
+      "id": "SC1",
+      "text": "A client can request each of add, subtract, multiply, divide, and remainder and receive the correct numeric result for valid inputs"
+    },
+    {
+      "id": "SC2",
+      "text": "Division by zero and remainder by zero fail with a named domain error observable at the service boundary"
+    },
+    {
+      "id": "SC3",
+      "text": "Memory starts at zero; clear sets it to zero; recall returns the current value; add-to-memory and subtract-from-memory update the single slot as specified"
+    },
+    {
+      "id": "SC4",
+      "text": "HTTP/API and module contract surfaces exist such that the arithmetic and memory behaviors above can be verified without relying on opaque implementation internals alone"
+    }
   ],
   "open_questions": [],
   "confidence": "high",

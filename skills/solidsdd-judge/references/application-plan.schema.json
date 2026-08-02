@@ -11,6 +11,13 @@
       "type": "string",
       "const": "1"
     },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48,
+      "description": "Optional but recommended: active change_id this plan belongs to."
+    },
     "summary": {
       "type": "string",
       "description": "Short human-readable summary of the plan."
@@ -77,6 +84,11 @@
         "status": {
           "type": "string",
           "enum": ["apply", "defer", "skip"]
+        },
+        "covers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "WorkPlan item ids (e.g. W1) this target serves. Prefer when the plan is for one slice."
         },
         "signals": {
           "type": "array",

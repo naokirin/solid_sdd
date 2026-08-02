@@ -79,6 +79,15 @@ You can install without creating these yet. `solidsdd-context` → `solidsdd-jud
 2. Ask the agent to run `solidsdd-context`, `solidsdd-loop` (one slice), or `solidsdd-run` (multiple acceptance criteria)
 3. Confirm skills read under `references/`
 4. (Optional) End-to-end check with this repo’s [examples/arithmetic-api](../examples/arithmetic-api)
+5. (Optional) From a solid_sdd checkout, run deterministic coverage lint:
+   ```bash
+   /path/to/solid_sdd/scripts/solidsdd-lint.sh --project-root /path/to/your-project --pretty
+   ```
+   Requires Python 3 + `jsonschema`. Critique runs this before LLM review when the script is available.
+
+### Breaking note (ChangeBrief)
+
+`in_scope` / `out_of_scope` / `success_criteria` are **`{ "id", "text" }` objects**, not bare strings. WorkPlan items require `covers` (Brief ids); Scenarios should carry matching `@R1` / `@SC1` tags. See [hardening-plan.md](hardening-plan.md).
 
 For automatic execution:
 

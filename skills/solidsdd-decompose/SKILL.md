@@ -36,17 +36,17 @@ Emit a `WorkPlan` so `solidsdd-run` can drive one `solidsdd-loop` per item. Norm
 - No ChangeBrief overwrite, OpenAPI / OCL / formal / implementation / contract-test edits
 - Do **not** emit an ApplicationPlan or choose contract kinds/densities
 - Exactly **one** Gherkin Scenario (checkable slice) per item in `acceptance_criterion`
-- Prefer property-level Scenarios; cover Brief `in_scope` / `success_criteria`; do not pull in `out_of_scope`
+- Prefer property-level Scenarios; each item must set `covers` to Brief `in_scope` / `success_criteria` ids; do not cover `out_of_scope` ids; tag Scenarios with matching `@R*` / `@SC*`
 - Do **not** treat Gherkin as Cucumber executable SoT
 - JSON keys English; item strings and Gherkin step prose in the **working language**; Gherkin keywords stay English ([working-language.md](references/working-language.md))
 
 ## Steps
 
 1. Resolve active ChangeBrief via `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` (migrate legacy flat Brief if needed). Read change intent and context (`solidsdd-context` output if available). Resolve working language from project rule or Context §6.
-2. If input is prose or incomplete Gherkin, normalize to Feature/Scenario form per [gherkin-requirements.md](references/gherkin-requirements.md) (create/update `.feature` under default layout when useful; new Scenarios for this Brief only).
+2. If input is prose or incomplete Gherkin, normalize to Feature/Scenario form per [gherkin-requirements.md](references/gherkin-requirements.md) (create/update `.feature` under default layout when useful; new Scenarios for this Brief only, with coverage tags).
 3. Apply slice rules in [work-decomposition.md](references/work-decomposition.md).
-4. List items with id, intent, acceptance_criterion (property-level Gherkin Scenario), depends_on, status (plus optional feature_path / scenario_name / confidence / human_gate) in the working language.
-5. Set `acceptance_of_whole` for the final integration `solidsdd-verify` (align with Brief `success_criteria`).
+4. List items with id, intent, acceptance_criterion (property-level Gherkin Scenario), **`covers`** (Brief ids), depends_on, status (plus optional feature_path / scenario_name / confidence / human_gate) in the working language. Set WorkPlan `change_id`.
+5. Set `acceptance_of_whole` for the final integration `solidsdd-verify` (align with Brief `success_criteria`). Ensure union of `covers` includes every `R*` / `SC*` id.
 6. Apply gate rules in [human-gates.md](references/human-gates.md) when ambiguity warrants a gate.
 7. Validate against [work-plan.schema.json](references/work-plan.schema.json).
 8. Write JSON to `.solidsdd/changes/<change_id>/work-plan.json`.

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "description": "Phrases that often make acceptance or scope unverifiable. Matched case-insensitively as substrings in Brief text / WorkPlan acceptance / Scenario prose. Extensible per working language.",
+  "languages": {
+    "en": [
+      "appropriately",
+      "as needed",
+      "as appropriate",
+      "etc.",
+      "and so on",
+      "flexible",
+      "in principle",
+      "as much as possible",
+      "where possible",
+      "fast",
+      "quickly",
+      "high performance",
+      "user-friendly",
+      "easy to use",
+      "intuitively",
+      "reasonable",
+      "sufficient",
+      "adequate",
+      "if necessary",
+      "when necessary"
+    ],
+    "ja": [
+      "適切に",
+      "必要に応じて",
+      "等",
+      "など",
+      "柔軟に",
+      "原則",
+      "可能な限り",
+      "できるだけ",
+      "高速に",
+      "わかりやすく",
+      "使いやすく",
+      "十分に",
+      "妥当な",
+      "適宜"
+    ]
+  }
+}
