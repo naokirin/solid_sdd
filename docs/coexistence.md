@@ -8,6 +8,7 @@ solid_sdd complements—not replaces—natural-language Spec-Driven Development 
 |---------|---------------------|-----------|
 | Product narrative, UX copy, exploratory design | Primary | Thin Brief / Gherkin / `natural_only` or skip |
 | Change premise (goals, in/out of scope) | Optional / chat | **Primary**: ChangeBrief (return point) |
+| Framing (demand, NFR, tech selection) | Optional / chat | **Primary**: Change Context Markdown |
 | Requirement structure (acceptance scenarios) | Optional / prose | **Primary intake**: property-level Gherkin → WorkPlan |
 | HTTP/GraphQL boundary contracts | Optional / generated docs | **Primary** (OpenAPI / GraphQL SDL) for the active change |
 | Module pre/post (DbC) | Rare | **Primary** (OCL → contract tests) |
@@ -23,11 +24,11 @@ Machine-checkable outputs are for **gap reduction and mechanical verification du
 
 ## Recommended patterns
 
-### 1. Explore in NL, enter solid_sdd via Brief + Gherkin
+### 1. Explore in NL, enter solid_sdd via Change Context + Brief + Gherkin
 
 1. Explore with the host SDD / agent using natural language if needed.
-2. Before `solidsdd-run` on non-trivial work, produce a ChangeBrief (`solidsdd-brief`) then property-level Gherkin via `solidsdd-decompose`.
-3. Treat OpenAPI/OCL/TLA+ as loop authority for those boundaries; Gherkin structures acceptance and is **not** Cucumber SoT; Brief is the scope return point.
+2. Before `solidsdd-run` on non-trivial work, produce Change Context (`solidsdd-intake`) then ChangeBrief (`solidsdd-brief`) then property-level Gherkin via `solidsdd-decompose`.
+3. Treat OpenAPI/OCL/TLA+ as loop authority for those boundaries; Gherkin structures acceptance and is **not** Cucumber SoT; Change Context holds tech/NFR rationale; Brief is the scope return point.
 
 ### 2. Next product increment = new change
 

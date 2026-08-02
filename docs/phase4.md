@@ -13,6 +13,7 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 | Adversarial critique skill (SpecKit-style analyze gate) | `solidsdd-critique` + [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md) |
 | Outer run + work decomposition | `solidsdd-run` / `solidsdd-decompose` + [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md) / [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json) |
 | ChangeBrief scope phase | `solidsdd-brief` + [../reference-src/change-brief.md](../reference-src/change-brief.md) / [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json) |
+| Change Context framing | `solidsdd-intake` + [../reference-src/change-context.md](../reference-src/change-context.md) (+ optional gate) |
 | Gherkin requirement intake | [../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md) (property-level) |
 | Iterative change layout | [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md) + `active-change` / per-`change_id` dirs |
 

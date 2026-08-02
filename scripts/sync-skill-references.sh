@@ -127,8 +127,14 @@ sync_one schemas/change-brief.schema.json skills/solidsdd-decompose/references/c
 sync_one schemas/active-change.schema.json skills/solidsdd-brief/references/active-change.schema.json
 sync_one schemas/active-change.schema.json skills/solidsdd-run/references/active-change.schema.json
 sync_one schemas/active-change.schema.json skills/solidsdd-decompose/references/active-change.schema.json
+sync_one schemas/active-change.schema.json skills/solidsdd-intake/references/active-change.schema.json
 sync_one schemas/change-status.schema.json skills/solidsdd-brief/references/change-status.schema.json
 sync_one schemas/change-status.schema.json skills/solidsdd-run/references/change-status.schema.json
+sync_one schemas/change-status.schema.json skills/solidsdd-intake/references/change-status.schema.json
+sync_one schemas/change-context-gate.schema.json skills/solidsdd-intake/references/change-context-gate.schema.json
+sync_one schemas/change-context-gate.schema.json skills/solidsdd-run/references/change-context-gate.schema.json
+sync_one schemas/change-context-gate.schema.json skills/solidsdd-critique/references/change-context-gate.schema.json
+sync_one schemas/change-context-gate.schema.json skills/solidsdd-brief/references/change-context-gate.schema.json
 sync_one schemas/verification-report.schema.json skills/solidsdd-verify/references/verification-report.schema.json
 sync_one schemas/critique-report.schema.json skills/solidsdd-critique/references/critique-report.schema.json
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc
@@ -144,6 +150,12 @@ sync_one reference-src/change-lifecycle.md skills/solidsdd-run/references/change
 sync_one reference-src/change-lifecycle.md skills/solidsdd-decompose/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-context/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-loop/references/change-lifecycle.md
+sync_one reference-src/change-lifecycle.md skills/solidsdd-intake/references/change-lifecycle.md
+sync_one reference-src/change-context.md skills/solidsdd-intake/references/change-context.md
+sync_one reference-src/change-context.md skills/solidsdd-run/references/change-context.md
+sync_one reference-src/change-context.md skills/solidsdd-brief/references/change-context.md
+sync_one reference-src/change-context.md skills/solidsdd-critique/references/change-context.md
+sync_one reference-src/change-context.md skills/solidsdd-judge/references/change-context.md
 sync_one reference-src/judgment-axes.md skills/solidsdd-judge/references/judgment-axes.md
 sync_one reference-src/judgment-axes.md skills/solidsdd-critique/references/judgment-axes.md
 sync_one reference-src/human-gates.md skills/solidsdd-judge/references/human-gates.md
@@ -151,6 +163,7 @@ sync_one reference-src/human-gates.md skills/solidsdd-loop/references/human-gate
 sync_one reference-src/human-gates.md skills/solidsdd-decompose/references/human-gates.md
 sync_one reference-src/human-gates.md skills/solidsdd-run/references/human-gates.md
 sync_one reference-src/human-gates.md skills/solidsdd-brief/references/human-gates.md
+sync_one reference-src/human-gates.md skills/solidsdd-intake/references/human-gates.md
 sync_one reference-src/change-brief.md skills/solidsdd-brief/references/change-brief.md
 sync_one reference-src/change-brief.md skills/solidsdd-run/references/change-brief.md
 sync_one reference-src/change-brief.md skills/solidsdd-decompose/references/change-brief.md

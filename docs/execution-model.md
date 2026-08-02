@@ -21,6 +21,9 @@ When a user manually names a single skill, the conversation agent may run it (th
 User or solidsdd.run (outer parent)
   │
   ├─ solidsdd.context                 … parent OK
+  ├─ Task: solidsdd.intake            ← Change Context (MD) + gate JSON
+  ├─ Task: solidsdd.critique          ← subject: change_context
+  ├─ [stop if change-context-gate human_gate.required]
   ├─ Task: solidsdd.brief             ← ChangeBrief
   ├─ Task: solidsdd.critique          ← subject: change_brief
   ├─ Task: solidsdd.decompose         ← WorkPlan (from Brief)
@@ -34,8 +37,8 @@ User or solidsdd.run (outer parent)
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: Brief → decompose → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
-- **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan; may receive ChangeBrief excerpt for scope.
+- **`solidsdd.run`**: Intake → Brief → decompose → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
+- **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan; may receive ChangeBrief / Change Context excerpts for scope and tech.
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
 - **Across changes**: Additional requirements start a new meaningful `change_id` under `.solidsdd/changes/` (see [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md)). Features and contracts accumulate; Briefs do not become a living PRD.
@@ -71,6 +74,7 @@ User or solidsdd.loop (parent / orchestrator)
 | `solidsdd.run` | **orchestrator only** | Outer parent; do not delegate to a subagent |
 | `solidsdd.loop` | **orchestrator only** | Slice parent; do not delegate to a subagent |
 | `solidsdd.context` | orchestrator | For later planning; light exploration may stay on the parent |
+| `solidsdd.intake` | **subagent required** | Isolate demand / NFR / tech framing from scope slicing |
 | `solidsdd.brief` | **subagent required** | Isolate change scope (in/out) from slicing and implementation |
 | `solidsdd.decompose` | **subagent required** | Isolate work decomposition from contract judgment and implementation |
 | `solidsdd.judge` | **subagent required** | Isolate density judgment from implementation context; avoid thinning contracts |
@@ -83,11 +87,11 @@ User or solidsdd.loop (parent / orchestrator)
 | `solidsdd.apply.formal` | **subagent required** | Stay within formal specs (Phase 3) |
 | `solidsdd.verify.formal` | **subagent required** | Avoid self-grading of model checking (Phase 3) |
 
-The parent accepts artifacts from `solidsdd.brief` / `solidsdd.decompose` / `solidsdd.judge` and only drives loop branching. It does not re-run or overwrite the judgment itself. Critique outcomes are not softened by the parent.
+The parent accepts artifacts from `solidsdd.intake` / `solidsdd.brief` / `solidsdd.decompose` / `solidsdd.judge` and only drives loop branching. It does not re-run or overwrite the judgment itself. Critique outcomes are not softened by the parent.
 
 From Phase 2 onward, the parent also handles the following (see skill `references/human-gates.md` / `loop-retry.md`):
 
-- If `human_gate.required` is true, **stop before apply** (still effective after critique(plan) passes). Under run, a ChangeBrief gate may stop before decompose; a WorkPlan gate may stop before slice loops
+- If `human_gate.required` is true, **stop before apply** (still effective after critique(plan) passes). Under run: Change Context gate may stop before brief; ChangeBrief gate may stop before decompose; WorkPlan gate may stop before slice loops
 - Follow `loop_action` (`retry` / `human_gate` / `stop`) on verify / critique fail (default auto-retry cap 3; **shared budget per orchestrator**. run and each loop have separate budgets)
 
 Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.apply.formal` / critique(formal) / `solidsdd.verify.formal`. Deferred formal must not block the API/DbC path.
@@ -113,11 +117,11 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 
 ## Parent obligations (`solidsdd.run`)
 
-1. Do not inline `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify`
+1. Do not inline `solidsdd.intake` / `critique(change_context)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify`
 2. Each item follows the **`solidsdd.loop` skill** (run parent must not directly run judge/apply/implement)
-3. Do not thin `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
-4. Respect ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices
-5. Pass ChangeBrief path/excerpt into decompose and into each loop prompt when scope questions may arise
+3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
+4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices
+5. Pass Change Context and ChangeBrief paths/excerpts into decompose and into each loop prompt when scope or tech questions may arise
 6. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention)
 7. Do not skip integration `solidsdd.verify` (+ critique) after all items complete
 8. Honor run-level retry budget; leave isolation checklist, wave shape, and blocked items in the final summary

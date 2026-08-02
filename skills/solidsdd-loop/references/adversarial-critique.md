@@ -6,6 +6,7 @@
 
 If the same agent (or the same unbroken context) both produces and accepts a phase result:
 
+- Change Contexts omit NFR/tech rationale or required headings
 - ChangeBriefs omit in/out of scope or leave blocking questions unmarked
 - WorkPlans pack multiple acceptance criteria into one item, use unverifiable prose, or omit Gherkin Scenario structure
 - ApplicationPlans drift thin to ease implementation
@@ -33,6 +34,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 
 | Check | `major` examples | **Not** `major` (use `minor` or omit) |
 |-------|------------------|--------------------------------------|
+| Change Context framing | Required headings missing; §4 NFR or §5 tech selection empty/hand-wavy when demand or repo stack implies choices; decisions with neither alternatives nor rationale; missing `change-context-gate.json`; gate triggers fire (material `agent_default` tech, stack conflict, new security/money NFR, blocking §7) but `human_gate.required: false` | Wording polish; extra background prose; gate `false` when initial instruction already settled decisions |
 | ChangeBrief scope | Empty/missing `in_scope` or `out_of_scope`; contradictory in vs out; `success_criteria` only slogans with no observable outcome; blocking `open_questions` with no `human_gate` / low confidence | Brief wording polish; extra background prose |
 | Vacuous constraints | `pre: true` / empty `post` when density is `standard`+ and the operation has known failure or result meaning | Type-echo invariants (`oclIsTypeOf` on an already-typed attribute); missing IEEE/NaN guards |
 | Missing precondition | Known failure mode (div/mod by zero, empty required input) with **no** `pre` / no API error path at all | OCL that has `pre` but does not name `PreconditionError` in the `.ocl` text (error **class** is an implement/adapter concern; project rule covers runtime) |
@@ -55,6 +57,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 
 | `subject` | After | Producer skill(s) | Orchestrator |
 |-----------|-------|-------------------|--------------|
+| `change_context` | `solidsdd-intake` | intake | `solidsdd-run` |
 | `change_brief` | `solidsdd-brief` | brief | `solidsdd-run` |
 | `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
 | `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
@@ -79,7 +82,7 @@ Skip a subject only when that producer step did not run in this orchestrator ite
 
 - Any `blocker` or `major` → `result: fail`, set `loop_action` + `suggested_next_skills`
 - Only `minor` (or empty findings) → `result: pass` (minors may still be listed)
-- Map producers: change brief → `solidsdd-brief`; work plan → `solidsdd-decompose`; plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts; scope drift → `solidsdd-brief` and/or `solidsdd-decompose`
+- Map producers: change context → `solidsdd-intake`; change brief → `solidsdd-brief`; work plan → `solidsdd-decompose`; plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts; scope drift → `solidsdd-brief` and/or `solidsdd-decompose`; framing/NFR/tech gaps → `solidsdd-intake`
 
 ## Isolation violations
 

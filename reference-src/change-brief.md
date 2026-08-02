@@ -11,21 +11,25 @@ Without a brief, the loop only has chat prose or already-sliced Scenarios. Agent
 | Layer | Artifact | Answers |
 |-------|----------|---------|
 | Stack facts | `solidsdd-context` summary | What exists in the repo? |
+| Framing / rationale | `change-context.md` (`solidsdd-intake`) | Demand, NFRs, tech selection, judgments |
 | **Change premise** | **ChangeBrief** | What are we doing / not doing / assuming? |
 | Acceptance structure | Gherkin (property-level Scenarios) | Which properties must hold? |
 | Loop authority | OpenAPI / OCL / formal | How do we check implementation? |
 
-ChangeBrief is **not** a living product PRD and **not** a substitute for OCL/OpenAPI. It is authority for **this change’s scope** (history OK; perpetual editorial ownership is not the goal). Additional requirements start a **new** change—see [change-lifecycle.md](change-lifecycle.md).
+ChangeBrief is **not** a living product PRD and **not** a substitute for OCL/OpenAPI. It is authority for **this change’s scope** (history OK; perpetual editorial ownership is not the goal). Additional requirements start a **new** change—see [change-lifecycle.md](change-lifecycle.md). Read `change-context.md` before inventing scope that contradicts recorded tech/NFR judgments.
 
 ## Default artifact path
 
 | Artifact | Path |
 |----------|------|
 | Active pointer | `.solidsdd/active-change.json` |
+| Change Context | `.solidsdd/changes/<change_id>/change-context.md` |
 | ChangeBrief JSON | `.solidsdd/changes/<change_id>/change-brief.json` |
 | Change status | `.solidsdd/changes/<change_id>/status.json` |
 
 Resolve via the active pointer. Projects may override via project rule. Do not write a flat `.solidsdd/change-brief.json` (legacy only).
+
+`solidsdd-intake` creates `change_id` and `change-context.md`. `solidsdd-brief` writes `change-brief.json` for the **active** change (must not invent a conflicting id).
 
 ## Required content
 
@@ -41,10 +45,11 @@ When continuing an existing product line, put **only this change’s delta** in 
 
 ## When later skills must re-read the brief
 
+- Prefer re-reading `change-context.md` when tech/NFR rationale is needed; Brief stays the scope checklist
 - `solidsdd-decompose` — Scenarios must cover `in_scope` / `success_criteria` and must not pull in `out_of_scope`
-- `solidsdd-judge` — density / skip / defer when unsure: check brief before inventing scope
-- `solidsdd-critique` — scope drift vs brief → fail with suggested `solidsdd-brief` or `solidsdd-decompose`
-- Ambiguous verify / gate — orchestrator may stop and point at brief `open_questions` / `human_gate`
+- `solidsdd-judge` — density / skip / defer when unsure: check brief **and** Change Context §5 before inventing stack/adapters
+- `solidsdd-critique` — scope drift vs brief → fail with suggested `solidsdd-brief` or `solidsdd-decompose`; framing gaps → `solidsdd-intake`
+- Ambiguous verify / gate — orchestrator may stop and point at brief `open_questions` / `human_gate` or Change Context §7
 
 ## Critique expectations
 

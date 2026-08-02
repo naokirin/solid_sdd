@@ -2,10 +2,10 @@
 name: solidsdd-critique
 description: >-
   Adversarial, read-only critique of a prior solid_sdd phase artifact (change
-  brief, work plan, application plan, contracts, derived tests, formal specs, or
-  verification). When called from solidsdd-loop or solidsdd-run, must run as
-  an explicit Task subagent. Emits CritiqueReport; does not edit artifacts.
-  Calibrated so only checkability holes fail the loop.
+  context, change brief, work plan, application plan, contracts, derived tests,
+  formal specs, or verification). When called from solidsdd-loop or solidsdd-run,
+  must run as an explicit Task subagent. Emits CritiqueReport; does not edit
+  artifacts. Calibrated so only checkability holes fail the loop.
 license: MIT
 ---
 
@@ -25,6 +25,8 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. F
 - [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration (required)**
 - [gherkin-requirements.md](references/gherkin-requirements.md) — when `subject` is `work_plan`
 - [change-brief.md](references/change-brief.md) — when `subject` is `change_brief`
+- [change-context.md](references/change-context.md) — when `subject` is `change_context`
+- [change-context-gate.schema.json](references/change-context-gate.schema.json) — when reviewing Change Context gate
 - [loop-retry.md](references/loop-retry.md)
 - [judgment-axes.md](references/judgment-axes.md)
 
@@ -32,7 +34,7 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 
 ## Constraints
 
-- **Read-only**: do not modify ChangeBrief, WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
+- **Read-only**: do not modify Change Context, ChangeBrief, WorkPlan, ApplicationPlan, OpenAPI/GraphQL, OCL, tests, formal specs, or implementation
 - Do not inflate polish into `major` / `fail` (see severity calibration)
 - Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)

@@ -8,6 +8,8 @@ your-project/
     active-change.json           # { "version": "1", "change_id": "<id>" }
     changes/
       <change_id>/
+        change-context.md        # demand / NFR / tech (solidsdd-intake)
+        change-context-gate.json # optional human pause before brief
         change-brief.json        # scope for this change (solidsdd-brief)
         work-plan.json           # after solidsdd-decompose
         status.json              # active | done | abandoned

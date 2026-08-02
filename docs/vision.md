@@ -43,7 +43,7 @@ Human involvement should concentrate on exceptions, policy changes, and acceptin
 
 ### Weak requirement structure
 
-Free-form natural language as the only requirement input leaves agents to invent missing Given/When/Then structure mid-loop. Requirements need a **ChangeBrief** (goals / in / out of scope) plus **property-level Gherkin** before contract judgment—without turning those formats into perpetual product documentation or an executable test SoT.
+Free-form natural language as the only requirement input leaves agents to invent missing Given/When/Then structure mid-loop—and to hide tech/NFR judgments in chat. Requirements need a **Change Context** (demand / NFR / tech selection), a **ChangeBrief** (goals / in / out of scope), plus **property-level Gherkin** before contract judgment—without turning those formats into perpetual product documentation or an executable test SoT.
 
 ## Goals
 
@@ -62,15 +62,15 @@ More specifically:
 5. **Evaluate only when the end-state pieces connect**  
    Success is judged on a connected judgment → apply → verify path, not isolated feature demos.
 6. **Structure requirements without over-owning docs**  
-   Use a ChangeBrief for scope (in/out), property-level Gherkin for acceptance, and machine-checkable contracts as **authority for the active change**—not everlasting living documents people maintain for reading.
+   Use Change Context for demand/NFR/tech rationale, ChangeBrief for scope (in/out), property-level Gherkin for acceptance, and machine-checkable contracts as **authority for the active change**—not everlasting living documents people maintain for reading.
 
 ## What machine-checkable artifacts are for
 
-solid_sdd emits structured artifacts (ChangeBrief, Gherkin, OpenAPI, OCL, formal specs, derived tests) so agents can:
+solid_sdd emits structured artifacts (Change Context, ChangeBrief, Gherkin, OpenAPI, OCL, formal specs, derived tests) so agents can:
 
 1. **Reduce silent omissions** via constrained formats
 2. **Check implementation mechanically** against those formats
-3. **Return to an explicit premise** (ChangeBrief) when later judgment is ambiguous
+3. **Return to an explicit premise** (Change Context for tech/NFR; ChangeBrief for scope) when later judgment is ambiguous
 
 They are **not** primarily meant as long-lived human documentation. A snapshot of “how this change was judged and specified” is valuable as history; continuous editorial ownership of every past contract as product docs is not a goal. Human-readable projections (Markdown / HTML) may be added later as optional skills without changing loop authority.
 
@@ -82,6 +82,7 @@ Initial axes the system uses instead of ad-hoc human judgment.
 
 | Nature of the target | Natural fit | Status |
 |----------------------|-------------|--------|
+| Framing / rationale | Change Context (`change-context.md`) | In scope |
 | Change premise (goals, in/out of scope) | ChangeBrief | In scope |
 | Requirement intake / acceptance structure | Property-level Gherkin Features / Scenarios | In scope |
 | System boundary, I/O, compatibility | API specs (OpenAPI, etc.) | In scope |
@@ -102,10 +103,10 @@ The principle is not “formalize everything,” but **set application density f
 
 A state where the loop runs **without people deciding case by case**:
 
-1. For changes or new features, a ChangeBrief records goals and in/out of scope; requirements are structured as property-level Gherkin Scenarios; the judgment skill emits whether/at what grain API / DbC / (later) formal specs are needed
+1. For changes or new features, a Change Context records demand, NFRs, and technology selection; a ChangeBrief records goals and in/out of scope; requirements are structured as property-level Gherkin Scenarios; the judgment skill emits whether/at what grain API / DbC / (later) formal specs are needed
 2. Stack-appropriate adapters generate or update contract artifacts for the active change
 3. The verify skill detects contract–implementation drift and feeds it back into the loop
-4. When judgment is ambiguous, agents re-read or re-run the ChangeBrief instead of inventing scope from chat alone
+4. When judgment is ambiguous, agents re-read Change Context (tech/NFR) and/or ChangeBrief (scope) instead of inventing premises from chat alone
 5. Users may run skills alone or rely on automatic orchestration
 
 Evaluation detail: [roadmap.md](roadmap.md).

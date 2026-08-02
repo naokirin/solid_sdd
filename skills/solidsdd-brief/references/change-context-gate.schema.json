@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/change-context-gate.schema.json",
+  "title": "ChangeContextGate",
+  "description": "Machine-readable human gate for solidsdd.intake / Change Context. Written beside change-context.md. Not required when the initial user instruction already made framing decisions clear.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "human_gate", "confidence"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reason"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "decisions_to_confirm": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Concrete decisions the human should approve or amend when human_gate.required is true (e.g. API style, persistence)."
+    }
+  }
+}

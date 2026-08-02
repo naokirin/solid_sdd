@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "Evaluation sample intent and stack are clear from the request and repo_existing TypeScript/OpenAPI layout; §7 items are non-blocking deferrals (sign convention, exact HTTP shapes). No new security/money NFR."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

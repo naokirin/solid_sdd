@@ -33,8 +33,8 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 ## Orchestrator retry policy (`solidsdd-loop` and `solidsdd-run`)
 
 1. Default **max_auto_retries = 3** per orchestrator run — count **each** verify-fail retry **and** each critique-fail retry (shared budget within that orchestrator). Isolation-violation re-runs also consume this budget.
-2. **`solidsdd-loop`**: budget is per slice. **`solidsdd-run`**: separate budget for brief/critique(change_brief)/decompose/critique(work_plan) and integration verify/critique; each nested loop has its own budget.
-3. On `loop_action: retry` (from verify **or** critique), launch suggested skills as **new Task subagents**, then re-run the relevant critique and/or verify (for run: re-brief, re-decompose, or re-run the owning slice loop when appropriate).
+2. **`solidsdd-loop`**: budget is per slice. **`solidsdd-run`**: separate budget for intake/critique(change_context)/brief/critique(change_brief)/decompose/critique(work_plan) and integration verify/critique; each nested loop has its own budget.
+3. On `loop_action: retry` (from verify **or** critique), launch suggested skills as **new Task subagents**, then re-run the relevant critique and/or verify (for run: re-intake, re-brief, re-decompose, or re-run the owning slice loop when appropriate).
 4. On `loop_action: human_gate` or `stop`, end the orchestrator; print report + reasons.
 5. If the same skill is suggested for consecutive retries without progress, escalate to `human_gate`.
 6. Never edit contracts or thin WorkPlan/ApplicationPlan in the parent to force a green verify or critique.
@@ -44,8 +44,9 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 
 | Observe | Suggested skill | loop_action |
 |---------|-----------------|-------------|
+| Critique: change_context missing headings / NFR or tech selection without rationale / missing or wrong gate JSON | `solidsdd-intake` | `retry` |
 | Critique: change_brief missing in/out scope, unverifiable success criteria, or unmarked blocking questions | `solidsdd-brief` | `retry` |
-| Critique: work_plan unverifiable / multi-AC item / cycle / coverage gap / Brief scope drift | `solidsdd-decompose` (and `solidsdd-brief` if scope premise is wrong) | `retry` |
+| Critique: work_plan unverifiable / multi-AC item / cycle / coverage gap / Brief scope drift | `solidsdd-decompose` (and `solidsdd-brief` / `solidsdd-intake` if premise is wrong) | `retry` |
 | Contract test fails; OCL/API look right | `solidsdd-implement` | `retry` |
 | `pre` fails with wrong error type (e.g. `ZeroDivisionError` instead of domain `PreconditionError`) | `solidsdd-implement` | `retry` |
 | Tests assert behavior absent from OCL | `solidsdd-apply-dbc` then `solidsdd-derive-tests` | `retry` |

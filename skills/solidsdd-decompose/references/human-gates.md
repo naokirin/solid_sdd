@@ -4,17 +4,18 @@ A **human gate** pauses autonomous `solidsdd-loop` or `solidsdd-run` progress un
 
 ## When required
 
-Set `human_gate.required: true` (plan-level and/or per target **or** ChangeBrief / WorkPlan / item) when any of:
+Set `human_gate.required: true` (plan-level and/or per target **or** Change Context gate / ChangeBrief / WorkPlan / item) when any of:
 
 | Condition | Typical trigger |
 |-----------|-----------------|
+| **Change Context framing** | Material `agent_default` tech (language, API style, persistence, contract approach); user intent vs repo stack conflict; new security/money NFR in §4; blocking §7 questions; low framing confidence — see [change-context.md](change-context.md). **Do not** gate when the initial user instruction already settled those decisions |
 | Breaking API change | Removed fields, stricter types, status code changes, renames without compatibility |
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **brief** has blocking `open_questions`; **decompose** cannot form checkable Gherkin Scenarios |
 | `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` |
 
-## Plan fields
+## Plan / Brief / WorkPlan fields
 
 ```json
 "human_gate": {
@@ -24,6 +25,21 @@ Set `human_gate.required: true` (plan-level and/or per target **or** ChangeBrief
 ```
 
 Targets may repeat a narrower `human_gate` for location-specific approval. ChangeBrief, WorkPlan, and items use the same shape.
+
+## Change Context gate artifact
+
+Intake writes `.solidsdd/changes/<change_id>/change-context-gate.json` ([change-context-gate.schema.json](../schemas/change-context-gate.schema.json)):
+
+```json
+{
+  "version": "1",
+  "human_gate": { "required": false, "reason": "…" },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}
+```
+
+When `required: true`, list concrete `decisions_to_confirm` for the human.
 
 ## Orchestrator behavior (`solidsdd-loop`)
 
@@ -45,16 +61,19 @@ When the human approves:
 
 ## Orchestrator behavior (`solidsdd-run`)
 
-1. After `solidsdd-brief`, run **Task** `solidsdd-critique` (`subject: change_brief`).
-2. If ChangeBrief has `human_gate.required` → **stop before decompose** until approved.
-3. After `solidsdd-decompose`, run **Task** `solidsdd-critique` (`subject: work_plan`).
-4. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop).
-5. Do not thin the ChangeBrief or WorkPlan to avoid the gate.
-6. After approval, resume with the approved artifacts; continue via decompose and/or `solidsdd-loop` as appropriate.
+1. After `solidsdd-intake`, run **Task** `solidsdd-critique` (`subject: change_context`).
+2. If `change-context-gate.json` has `human_gate.required` → **stop before brief** until approved (or re-intake after amendment).
+3. After `solidsdd-brief`, run **Task** `solidsdd-critique` (`subject: change_brief`).
+4. If ChangeBrief has `human_gate.required` → **stop before decompose** until approved.
+5. After `solidsdd-decompose`, run **Task** `solidsdd-critique` (`subject: work_plan`).
+6. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop).
+7. Do not thin Change Context, ChangeBrief, or WorkPlan to avoid the gate.
+8. After approval, resume with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
 
 ## Defaults
 
+- **Change Context**: gate only when framing triggers fire; **clear initial instruction → no gate**.
 - **Additive, non-breaking** API/DbC work with clear context: gate only when other modifiers fire (`breaking_change`, money, low confidence, formal apply).
-- Evaluation / sample work: same rule—do not gate routine additive changes.
+- Evaluation / sample work: same rule—do not gate routine additive changes or clear sample stacks.
 - Production defaults may set stricter always-gate rules via project rule overrides.
 - Formal `apply` in early Phase 3: **always** gate.

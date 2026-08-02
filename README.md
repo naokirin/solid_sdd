@@ -4,6 +4,7 @@ A rules-and-skills Spec-Driven Development (SDD) foundation that runs machine-re
 
 Most SDD tools center on loops that go from natural-language specs to design, implementation, and tests. This project treats the following as first-class concerns on top of that:
 
+- **Structured change framing** (Change Context Markdown: demand, NFRs, tech selection)—before Brief
 - **Structured change premise** (ChangeBrief: goals, in/out of scope)—return point when judgment is ambiguous
 - **Structured requirement intake** (property-level Gherkin Scenarios → WorkPlan slices)—not free-form prose alone
 - **Systematizing judgment** of *where* and *which* specification techniques to apply
@@ -64,14 +65,14 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 
 As with Kiro and similar tools, users can invoke phase skills manually, while an orchestrator can also run the same skill set automatically.
 
-- **`solidsdd-run`**: ChangeBrief → property-level Gherkin WorkPlan → parallel `solidsdd-loop` waves → integration verify
+- **`solidsdd-run`**: Change Context → ChangeBrief → property-level Gherkin WorkPlan → parallel `solidsdd-loop` waves → integration verify
 - **`solidsdd-loop`**: Contract loop for one slice (one Scenario / change intent)
 
 See [docs/architecture.md](docs/architecture.md) and [docs/execution-model.md](docs/execution-model.md).
 
 ## Scope policy (summary)
 
-- **Core**: ChangeBrief, property-level Gherkin intake, OpenAPI, OCL-based DbC (subagent generates tests), application judgment, verification loop
+- **Core**: Change Context, ChangeBrief, property-level Gherkin intake, OpenAPI, OCL-based DbC (subagent generates tests), application judgment, verification loop
 - **Evaluation sample**: TypeScript arithmetic API (extendable with calculator memory, etc.)
 - **Optional / gated**: Formal specification languages (TLA+ / Alloy / VDM, etc.)
 

@@ -23,6 +23,7 @@ Emit an `ApplicationPlan`.
 - [judgment-axes.md](references/judgment-axes.md)
 - [human-gates.md](references/human-gates.md)
 - [change-brief.md](references/change-brief.md) — when an active ChangeBrief exists
+- [change-context.md](references/change-context.md) — when Change Context exists (§5 tech selection)
 
 ## Constraints
 
@@ -33,7 +34,7 @@ Emit an `ApplicationPlan`.
 
 ## Steps
 
-1. Read change intent, active ChangeBrief (`.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` when present), and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief over inventing scope.
+1. Read change intent, active Change Context (`…/change-context.md`) and ChangeBrief (via `active-change.json`) when present, and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief; when unsure about stack/adapters, prefer Change Context §5 over inventing tech.
 2. Apply axes in [judgment-axes.md](references/judgment-axes.md).
 3. Apply gate rules in [human-gates.md](references/human-gates.md).
 4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields).

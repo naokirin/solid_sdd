@@ -18,7 +18,9 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
 └──────────────────┬──────────────────────┘
                    │ constraints & context
 ┌──────────────────▼──────────────────────┐
-│ Outer = solidsdd.run (req → Brief → WP)  │
+│ Outer = solidsdd.run (req → Context → Brief → WP) │
+│   intake + critique(change_context)      │
+│   [optional human gate before brief]     │
 │   brief + critique(change_brief)         │
 │   decompose + critique(work_plan)        │
 │   → parallel solidsdd.loop waves         │
@@ -60,9 +62,10 @@ Execution policy: [execution-model.md](execution-model.md). Adversarial critique
 
 | Skill | Responsibility | Execution policy | Main I/O |
 |-------|----------------|------------------|----------|
-| `solidsdd.run` | Outer orchestration (brief → decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
+| `solidsdd.run` | Outer orchestration (intake → brief → decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
+| `solidsdd.intake` | Change framing (demand / NFR / tech) + optional gate | **subagent required** | `change-context.md`, `change-context-gate.json` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
 | `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
 | `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
@@ -74,6 +77,10 @@ Execution policy: [execution-model.md](execution-model.md). Adversarial critique
 | `solidsdd.verify` | OpenAPI + contract-test verification | **subagent required** | VerificationReport |
 
 Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phase 3. `solidsdd.judge` may explicitly defer when formal specs would help but are not yet supported.
+
+## Change context (`solidsdd.intake`) output
+
+Fixed-heading Markdown at `.solidsdd/changes/<change_id>/change-context.md` (demand, NFRs, technology selection, judgments) plus `change-context-gate.json` for an optional human pause before Brief when framing needs confirmation (not when the initial instruction already made decisions clear). Rules: [../reference-src/change-context.md](../reference-src/change-context.md).
 
 ## Change brief (`solidsdd.brief`) output model
 
@@ -160,7 +167,7 @@ Adapter responsibilities:
 | Mode | Behavior |
 |------|----------|
 | Manual | User names a skill. The conversation agent may run it. For chained skills, launch subagent-required skills via Task; recommend `critique` right after each producer |
-| Automatic | `solidsdd.run` (outer) runs brief → decompose, then **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
+| Automatic | `solidsdd.run` (outer) runs intake → brief → decompose, then **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
 
 Both modes use the **same rules, skills, and artifact layout**. Automation has no private back door.
 

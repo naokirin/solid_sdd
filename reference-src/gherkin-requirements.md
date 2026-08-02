@@ -10,6 +10,7 @@ Structured scenarios reduce silent gaps (missing actors, preconditions, failure 
 
 | Layer | Format | Role |
 |-------|--------|------|
+| Framing / rationale | Change Context (`change-context.md`) | Demand, NFRs, tech selection, judgments |
 | Change premise | ChangeBrief | Goals, in/out of scope, assumptions (return point) |
 | Requirements | Gherkin (`.feature`) | Property-level acceptance; input to decompose |
 | WorkPlan item | One Scenario (text in `acceptance_criterion`) | One `solidsdd-loop` slice |

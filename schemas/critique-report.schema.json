@@ -14,6 +14,7 @@
     "subject": {
       "type": "string",
       "enum": [
+        "change_context",
         "change_brief",
         "work_plan",
         "application_plan",
