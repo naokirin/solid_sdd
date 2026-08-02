@@ -12,24 +12,24 @@ solid_sdd skills are **self-contained**. Adapter summaries, schemas, and the exe
 
 ## Recommended: install with `gh skill`
 
-Assumes the repo is public on GitHub and `gh skill publish` has been run (or install from the default branch works):
+Public repo: [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd). Install from the default branch (or after `gh skill publish`):
 
 ```bash
 # at the consuming project root
-gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project
+gh skill install naokirin/solid_sdd --all --agent cursor --scope project
 ```
 
 Per-skill example:
 
 ```bash
-gh skill install <OWNER>/solid_sdd solidsdd-loop --agent cursor --scope project
-gh skill preview <OWNER>/solid_sdd solidsdd-loop   # preview before install
+gh skill install naokirin/solid_sdd solidsdd-loop --agent cursor --scope project
+gh skill preview naokirin/solid_sdd solidsdd-loop   # preview before install
 ```
 
 Pinning:
 
 ```bash
-gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project --pin v0.1.0
+gh skill install naokirin/solid_sdd --all --agent cursor --scope project --pin v0.1.0
 ```
 
 ### Install location
@@ -47,11 +47,11 @@ cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solids
 
 If the path differs, find `solidsdd-loop/references/project-rule.mdc` via `gh skill list` or file search and copy it.
 
-## Local verification (unpublished repo)
+## Local verification (clone)
 
 ```bash
 gh skill install --from-local /path/to/solid_sdd --all --agent cursor --scope project
-gh skill publish --dry-run /path/to/solid_sdd   # validate before distribution
+gh skill publish --dry-run /path/to/solid_sdd   # validate before tagging a release
 ```
 
 ## Contract layout for consuming projects
@@ -93,7 +93,7 @@ After changing skill bodies:
 
 ```bash
 gh skill publish --dry-run
-# with remote + auth (out of scope for this doc):
+# from https://github.com/naokirin/solid_sdd with auth:
 # gh skill publish --tag v0.1.0
 ```
 
@@ -132,7 +132,7 @@ If you customized `project-rule.mdc` locally, be careful when overwriting the co
 
 ### Required (MVP: OpenAPI + OCL)
 
-- [ ] `gh skill install ... --all --agent cursor` succeeded (or `--from-local`)
+- [ ] `gh skill install naokirin/solid_sdd --all --agent cursor` succeeded (or `--from-local`)
 - [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
 - [ ] (Recommended) Copied `project-rule.mdc` into Project Rules
 - [ ] Shared contract layout policy ([project-template.md](project-template.md))

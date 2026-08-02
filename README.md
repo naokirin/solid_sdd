@@ -15,7 +15,7 @@ Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract test
 ## Install (summary)
 
 ```bash
-gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project
+gh skill install naokirin/solid_sdd --all --agent cursor --scope project
 cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # path may vary by environment
 ```
 

@@ -18,7 +18,7 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 - [x] Consumer install guide ([install.md](install.md) — self-contained `gh skill` skills)
 - [x] `skills/*/references/` sync script (`scripts/sync-skill-references.sh`)
 - [x] Cursor / Claude Code hooks + git pre-commit (error + fix command on drift)
-- [ ] `gh skill publish` after GitHub publication (release / `agent-skills` topic)
+- [ ] `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (release / `agent-skills` topic)
 
 ## Phase 1: MVP (minimal connected system)
 
@@ -89,5 +89,5 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 
 ## Near-term next actions
 
-1. GitHub remote / `gh skill publish` (distribution)
+1. `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (distribution)
 2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
