@@ -1,0 +1,46 @@
+{
+  "version": "1",
+  "summary": "Deliver a client-facing arithmetic calculator service with the four basic operations plus remainder, clear domain errors for invalid uses (especially division or remainder by zero), and a single-slot memory (clear / recall / add / subtract) that starts at zero, with HTTP/API and module surfaces that make these behaviors checkable—without auth, multi-user memory, history, or other product extras.",
+  "goal": "Clients can perform add, subtract, multiply, divide, and remainder through a checkable service surface; invalid uses fail with a named domain error; a single memory slot supports clear, recall, add-to-memory, and subtract-from-memory starting at zero.",
+  "background": "This change defines scope for the arithmetic-api evaluation sample. An existing TypeScript HTTP stack may already be present; use it only as implementation context. Scope comes from this brief, not from existing OpenAPI, OCL, or Feature files.",
+  "in_scope": [
+    "Binary arithmetic operations: add, subtract, multiply, divide, and remainder (mod)",
+    "Clear, named domain error for invalid uses—especially division by zero and remainder by zero—rather than opaque language/runtime errors",
+    "Single-slot calculator memory initialized to zero",
+    "Memory operations: clear (set to zero), recall (return current value), add-to-memory, subtract-from-memory",
+    "HTTP/API surface that exposes calculate and memory behaviors in a form clients and tests can exercise",
+    "Module-level contracts that make the same arithmetic and memory behaviors checkable"
+  ],
+  "out_of_scope": [
+    "Authentication, authorization, sessions, or API keys",
+    "Multi-user or multi-slot memory; per-client isolated memory stores",
+    "Operation history, undo/redo, or expression/transcript logging",
+    "Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder",
+    "Persistent storage, databases, or durable memory across process restarts (beyond in-process single slot)",
+    "UI / frontend clients, SDKs, or third-party integrations beyond the service surface itself",
+    "Rate limiting, quotas, observability product features, or multi-tenancy"
+  ],
+  "assumptions": [
+    "Operands and memory values are numeric (real/number) values suitable for the sample service",
+    "Memory is one in-process slot shared by the service instance, not keyed by user or session",
+    "Existing TypeScript arithmetic-api layout (HTTP server, OpenAPI/OCL paths) may be reused as stack context without treating current contracts as the source of required scope"
+  ],
+  "constraints": [
+    "Do not invent product features beyond the stated arithmetic + single-slot memory scope",
+    "Domain failures for invalid arithmetic (notably / and remainder by zero) must be named and distinguishable from opaque language errors",
+    "ChangeBrief only at this step: no Feature files, WorkPlan, OpenAPI, OCL, tests, or implementation edits as part of brief emission",
+    "Contract kind and density choices are deferred to later solidsdd-judge; this brief only requires that HTTP/API and module surfaces remain checkable"
+  ],
+  "success_criteria": [
+    "A client can request each of add, subtract, multiply, divide, and remainder and receive the correct numeric result for valid inputs",
+    "Division by zero and remainder by zero fail with a named domain error observable at the service boundary",
+    "Memory starts at zero; clear sets it to zero; recall returns the current value; add-to-memory and subtract-from-memory update the single slot as specified",
+    "HTTP/API and module contract surfaces exist such that the arithmetic and memory behaviors above can be verified without relying on opaque implementation internals alone"
+  ],
+  "open_questions": [],
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Scope is explicit and additive for a sample calculator service; no blocking ambiguity, auth/money boundary, or conflicting requirements."
+  }
+}

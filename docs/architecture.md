@@ -18,7 +18,8 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
 └──────────────────┬──────────────────────┘
                    │ constraints & context
 ┌──────────────────▼──────────────────────┐
-│ Outer = solidsdd.run (req → WorkPlan)    │
+│ Outer = solidsdd.run (req → Brief → WP)  │
+│   brief + critique(change_brief)         │
 │   decompose + critique(work_plan)        │
 │   → parallel solidsdd.loop waves         │
 │   → integration verify                   │
@@ -59,9 +60,10 @@ Execution policy: [execution-model.md](execution-model.md). Adversarial critique
 
 | Skill | Responsibility | Execution policy | Main I/O |
 |-------|----------------|------------------|----------|
-| `solidsdd.run` | Outer orchestration (decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
+| `solidsdd.run` | Outer orchestration (brief → decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
+| `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
 | `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
 | `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
 | `solidsdd.critique` | Adversarial evaluation of phase artifacts | **subagent required** | CritiqueReport |
@@ -73,6 +75,20 @@ Execution policy: [execution-model.md](execution-model.md). Adversarial critique
 
 Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phase 3. `solidsdd.judge` may explicitly defer when formal specs would help but are not yet supported.
 
+## Change brief (`solidsdd.brief`) output model
+
+Shared schema: [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json)
+
+```text
+ChangeBrief:
+  summary / goal / background?
+  in_scope[] / out_of_scope[]
+  assumptions? / constraints? / success_criteria[]
+  open_questions? / confidence? / human_gate?
+```
+
+Scope return point for the active change. Rules: [../reference-src/change-brief.md](../reference-src/change-brief.md).
+
 ## Work decomposition (`solidsdd.decompose`) output model
 
 Shared schema: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
@@ -81,12 +97,13 @@ Shared schema: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.js
 WorkPlan:
   acceptance_of_whole? / human_gate? / confidence?
   items[]:
-    id / intent / acceptance_criterion   … 1 item = 1 verifiable acceptance criterion
+    id / intent / acceptance_criterion   … 1 item = 1 property-level Gherkin Scenario
+    feature_path? / scenario_name?
     depends_on[] / status
     confidence? / human_gate?
 ```
 
-Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
+Requirements use property-level Gherkin ([../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)), guided by ChangeBrief. Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
 ## Application judgment (`solidsdd.judge`) output model
 
@@ -143,7 +160,7 @@ Adapter responsibilities:
 | Mode | Behavior |
 |------|----------|
 | Manual | User names a skill. The conversation agent may run it. For chained skills, launch subagent-required skills via Task; recommend `critique` right after each producer |
-| Automatic | `solidsdd.run` (outer) decomposes, runs **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
+| Automatic | `solidsdd.run` (outer) runs brief → decompose, then **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
 
 Both modes use the **same rules, skills, and artifact layout**. Automation has no private back door.
 

@@ -12,12 +12,15 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 | Eval-corpus rule tuning (Pass 1) | [feedback-tuning.md](feedback-tuning.md) |
 | Adversarial critique skill (SpecKit-style analyze gate) | `solidsdd-critique` + [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md) |
 | Outer run + work decomposition | `solidsdd-run` / `solidsdd-decompose` + [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md) / [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json) |
+| ChangeBrief scope phase | `solidsdd-brief` + [../reference-src/change-brief.md](../reference-src/change-brief.md) / [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json) |
+| Gherkin requirement intake | [../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md) (property-level) |
 
 ## Still open
 
 - External production-project feedback → further threshold tuning ([feedback-tuning.md](feedback-tuning.md) intake log)
 - `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) + template repository
 - Optional language-native DbC (opt-in design; still deferred)
+- Optional human-readable projection skills (Markdown / HTML from contracts) — readability without changing loop authority
 
 ## Success criteria (Phase 4)
 

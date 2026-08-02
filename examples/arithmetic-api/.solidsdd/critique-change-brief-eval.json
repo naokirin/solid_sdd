@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief change-brief.json passes adversarial critique: non-empty concrete in_scope and out_of_scope with no contradictions, success_criteria are observable (ops return correct results, named domain errors for div/rem by zero, memory start/clear/recall/add/subtract, checkable HTTP and module surfaces), open_questions is empty with high confidence and no required human_gate. Scope is sliceable for decompose; polish gaps (negative remainder sign, exact error type name) do not remove checkability at brief density.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/change-brief.json#assumptions|success_criteria",
+      "detail": "Remainder (and possibly division) sign/rounding for negative operands is not pinned. Decompose and contracts can choose Examples/oracles; not a missing in/out or slogan-only success criterion."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/change-brief.json#in_scope[1]|constraints",
+      "detail": "Named domain error is required and distinguishable from opaque language errors, but the exact error type/name is left to later apply-dbc/implement. Acceptable for a ChangeBrief; only becomes checkability-critical once contracts omit a failure path entirely."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://solid-sdd.dev/schemas/work-plan.schema.json",
   "title": "WorkPlan",
-  "description": "Output of solidsdd.decompose: requirement sliced into verifiable work items for solidsdd-run (distinct from ApplicationPlan).",
+  "description": "Output of solidsdd.decompose: requirement sliced into verifiable work items for solidsdd-run (distinct from ApplicationPlan). Acceptance criteria are Gherkin Scenarios.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "items"],
@@ -17,7 +17,7 @@
     },
     "acceptance_of_whole": {
       "type": "string",
-      "description": "Overall completion condition checked by the final solidsdd-verify after all items."
+      "description": "Overall completion condition checked by the final solidsdd-verify after all items. Prefer a Gherkin Scenario or an explicit conjunction of scenario names."
     },
     "human_gate": {
       "$ref": "#/$defs/human_gate"
@@ -68,7 +68,15 @@
         },
         "acceptance_criterion": {
           "type": "string",
-          "description": "Exactly one verifiable acceptance condition for this item."
+          "description": "Exactly one Gherkin Scenario (or one independently checkable Scenario Outline slice) with Given/When/Then. Not free-form prose alone."
+        },
+        "feature_path": {
+          "type": "string",
+          "description": "Optional path to requirements/**/*.feature containing this scenario."
+        },
+        "scenario_name": {
+          "type": "string",
+          "description": "Optional Scenario name matching the Feature file."
         },
         "depends_on": {
           "type": "array",

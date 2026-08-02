@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/change-brief.schema.json",
+  "title": "ChangeBrief",
+  "description": "Output of solidsdd.brief: structured scope for one change—goals, in/out of scope, assumptions. Return point when later judgment is ambiguous. Not a living product PRD.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "summary",
+    "goal",
+    "in_scope",
+    "out_of_scope",
+    "success_criteria"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph overview of this change."
+    },
+    "goal": {
+      "type": "string",
+      "description": "What success looks like for this change (problem to solve / outcome)."
+    },
+    "background": {
+      "type": "string",
+      "description": "Optional short context (why now)."
+    },
+    "in_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Explicit list of what this change includes."
+    },
+    "out_of_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Explicit list of what this change excludes (non-goals)."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Assumptions the rest of the loop may rely on."
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hard constraints (compatibility, stack, policy)."
+    },
+    "success_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Whole-change success checks (later mapped by decompose / integration verify). Prefer observable outcomes, not implementation tactics."
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unresolved items; usually imply low confidence and/or human_gate."
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "human_gate": {
+      "$ref": "#/$defs/human_gate"
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reason"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

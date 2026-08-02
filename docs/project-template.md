@@ -4,12 +4,16 @@ Minimal layout a consuming repo can copy. Paths match skill defaults ([contract-
 
 ```text
 your-project/
+  .solidsdd/
+    change-brief.json            # active change scope (solidsdd-brief)
+  requirements/
+    *.feature                    # property-level Gherkin (not Cucumber SoT)
   openapi/
     openapi.yaml                 # if HTTP/OpenAPI
   graphql/
     schema.graphql               # if GraphQL (optional alternative)
   contracts/
-    *.ocl                        # DbC SoT
+    *.ocl                        # DbC loop authority
   tests/
     contracts/
       *.test.ts                  # derived (Vitest) — or:

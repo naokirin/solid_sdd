@@ -8,10 +8,11 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 
 | Skill | Command-like id | Role | Execution |
 |-------|-----------------|------|-----------|
-| [solidsdd-run](solidsdd-run/SKILL.md) | `solidsdd.run` | Outer orchestration (WorkPlan → loops → integration verify) | orchestrator only |
+| [solidsdd-run](solidsdd-run/SKILL.md) | `solidsdd.run` | Outer orchestration (Brief → WorkPlan → loops → integration verify) | orchestrator only |
 | [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Slice orchestration (one intent) | orchestrator only |
 | [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
-| [solidsdd-decompose](solidsdd-decompose/SKILL.md) | `solidsdd.decompose` | WorkPlan (one verifiable AC per item) | **subagent required** |
+| [solidsdd-brief](solidsdd-brief/SKILL.md) | `solidsdd.brief` | ChangeBrief (scope premise / return point) | **subagent required** |
+| [solidsdd-decompose](solidsdd-decompose/SKILL.md) | `solidsdd.decompose` | WorkPlan (one property-level Scenario per item) | **subagent required** |
 | [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
 | [solidsdd-critique](solidsdd-critique/SKILL.md) | `solidsdd.critique` | CritiqueReport (adversarial phase gate) | **subagent required** |
 | [solidsdd-apply-api](solidsdd-apply-api/SKILL.md) | `solidsdd.apply.api` | OpenAPI | **subagent required** |
@@ -23,7 +24,7 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 | [solidsdd-verify-formal](solidsdd-verify-formal/SKILL.md) | `solidsdd.verify.formal` | Formal VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
-- Automatic (`solidsdd-run`): parent decomposes, runs **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify; never inline subagent-required skills.
+- Automatic (`solidsdd-run`): parent runs brief → decompose, then **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify; never inline subagent-required skills.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
 
 ## Maintainer: keep `references/` in sync
@@ -40,7 +41,7 @@ Do **not** hand-edit copies under `skills/*/references/`. Sync from edit sources
 | `docs/execution-model.md` | `solidsdd-loop` / `solidsdd-run` `references/execution-model.md` |
 | `schemas/*.json` | judge / decompose / verify / verify-formal / critique / run |
 | `rules/solidsdd.mdc` | loop / run `references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition |
+| `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
 
 ```bash
 # manual

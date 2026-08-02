@@ -1,0 +1,122 @@
+{
+  "version": "1",
+  "summary": "Decompose ChangeBrief into eleven independent property-level Gherkin Scenarios covering add/sub/mul/div/remainder, zero-divisor named domain errors, and single-slot memory (start zero, clear, add, subtract), with checkable HTTP/API and module surfaces required by acceptance_of_whole.",
+  "acceptance_of_whole": "Scenario: Calculator service covers ops, zero-divisor failures, and memory\n  Given the arithmetic calculator service for clients\n  When clients exercise add, sub, mul, div, and remainder plus single-slot memory clear/recall/add/subtract\n  Then successful ops return mathematically correct numeric results for valid inputs\n  And division or remainder by zero fails with a named domain error rather than an opaque language error\n  And memory starts at zero and clear/recall/add/subtract update the single slot as specified\n  And the HTTP/API surface and module contracts make these behaviors checkable\n  And no auth, multi-user memory, or history features are required",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "ChangeBrief scope is explicit with empty open_questions; property-level Scenarios map one-to-one to in_scope items without blocking ambiguity."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Support addition so clients receive the mathematical sum of two operands via a checkable service surface.",
+      "acceptance_criterion": "Scenario: Addition returns the sum of its operands\n  Given a calculator service available to clients\n  When the client adds two numbers\n  Then the result equals the mathematical sum of those operands",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Addition returns the sum of its operands",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W2",
+      "intent": "Support subtraction so clients receive the mathematical difference of two operands via a checkable service surface.",
+      "acceptance_criterion": "Scenario: Subtraction returns the difference of its operands\n  Given a calculator service available to clients\n  When the client subtracts one number from another\n  Then the result equals the mathematical difference of those operands",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Subtraction returns the difference of its operands",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W3",
+      "intent": "Support multiplication so clients receive the mathematical product of two operands via a checkable service surface.",
+      "acceptance_criterion": "Scenario: Multiplication returns the product of its operands\n  Given a calculator service available to clients\n  When the client multiplies two numbers\n  Then the result equals the mathematical product of those operands",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Multiplication returns the product of its operands",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W4",
+      "intent": "Support division with a non-zero divisor so clients receive the mathematical quotient via a checkable service surface.",
+      "acceptance_criterion": "Scenario: Division returns the quotient of its operands\n  Given a calculator service available to clients\n  And a non-zero divisor\n  When the client divides one number by another\n  Then the result equals the mathematical quotient of those operands",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Division returns the quotient of its operands",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W5",
+      "intent": "Support remainder (modulo) with a non-zero divisor so clients receive the mathematical remainder via a checkable service surface.",
+      "acceptance_criterion": "Scenario: Remainder returns the modulo of its operands\n  Given a calculator service available to clients\n  And a non-zero divisor\n  When the client takes the remainder of one number divided by another\n  Then the result equals the mathematical remainder of those operands",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Remainder returns the modulo of its operands",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W6",
+      "intent": "Fail division by zero with a named domain error observable at the service boundary, not an opaque language or runtime error.",
+      "acceptance_criterion": "Scenario: Division by zero fails with a named domain error\n  Given a calculator service available to clients\n  When the client divides by zero\n  Then the operation fails with a named domain error\n  And the failure is not an opaque language or runtime error",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Division by zero fails with a named domain error",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W7",
+      "intent": "Fail remainder by zero with a named domain error observable at the service boundary, not an opaque language or runtime error.",
+      "acceptance_criterion": "Scenario: Remainder by zero fails with a named domain error\n  Given a calculator service available to clients\n  When the client takes the remainder with a zero divisor\n  Then the operation fails with a named domain error\n  And the failure is not an opaque language or runtime error",
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Remainder by zero fails with a named domain error",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W8",
+      "intent": "Ensure single-slot calculator memory starts at zero and recall returns that initial value.",
+      "acceptance_criterion": "Scenario: Memory starts at zero\n  Given a fresh calculator memory\n  When the client recalls memory\n  Then the recalled value is zero",
+      "feature_path": "requirements/memory.feature",
+      "scenario_name": "Memory starts at zero",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W9",
+      "intent": "Support clearing the single-slot memory so subsequent recall yields zero.",
+      "acceptance_criterion": "Scenario: Memory clear yields zero on subsequent recall\n  Given calculator memory holds a non-zero value\n  When the client clears memory\n  Then recalling memory yields zero",
+      "feature_path": "requirements/memory.feature",
+      "scenario_name": "Memory clear yields zero on subsequent recall",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W10",
+      "intent": "Support add-to-memory so the single slot increases by the given addend.",
+      "acceptance_criterion": "Scenario: Add-to-memory increases the single slot by the addend\n  Given calculator memory holds a known value\n  When the client adds a number to memory\n  Then recalling memory yields the previous value plus that number",
+      "feature_path": "requirements/memory.feature",
+      "scenario_name": "Add-to-memory increases the single slot by the addend",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    },
+    {
+      "id": "W11",
+      "intent": "Support subtract-from-memory so the single slot decreases by the given subtrahend.",
+      "acceptance_criterion": "Scenario: Subtract-from-memory decreases the single slot by the subtrahend\n  Given calculator memory holds a known value\n  When the client subtracts a number from memory\n  Then recalling memory yields the previous value minus that number",
+      "feature_path": "requirements/memory.feature",
+      "scenario_name": "Subtract-from-memory decreases the single slot by the subtrahend",
+      "depends_on": [],
+      "status": "ready",
+      "confidence": "high"
+    }
+  ]
+}

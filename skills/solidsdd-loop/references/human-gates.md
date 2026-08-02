@@ -4,14 +4,14 @@ A **human gate** pauses autonomous `solidsdd-loop` or `solidsdd-run` progress un
 
 ## When required
 
-Set `human_gate.required: true` (plan-level and/or per target **or** WorkPlan / item) when any of:
+Set `human_gate.required: true` (plan-level and/or per target **or** ChangeBrief / WorkPlan / item) when any of:
 
 | Condition | Typical trigger |
 |-----------|-----------------|
 | Breaking API change | Removed fields, stricter types, status code changes, renames without compatibility |
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
-| Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **decompose** cannot form checkable slices |
+| Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **brief** has blocking `open_questions`; **decompose** cannot form checkable Gherkin Scenarios |
 | `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` |
 
 ## Plan fields
@@ -23,7 +23,7 @@ Set `human_gate.required: true` (plan-level and/or per target **or** WorkPlan / 
 }
 ```
 
-Targets may repeat a narrower `human_gate` for location-specific approval. WorkPlan and items use the same shape.
+Targets may repeat a narrower `human_gate` for location-specific approval. ChangeBrief, WorkPlan, and items use the same shape.
 
 ## Orchestrator behavior (`solidsdd-loop`)
 
@@ -45,10 +45,12 @@ When the human approves:
 
 ## Orchestrator behavior (`solidsdd-run`)
 
-1. After `solidsdd-decompose`, run **Task** `solidsdd-critique` (`subject: work_plan`).
-2. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop).
-3. Do not thin the WorkPlan to avoid the gate.
-4. After approval, resume with the approved WorkPlan; continue pending items via `solidsdd-loop`.
+1. After `solidsdd-brief`, run **Task** `solidsdd-critique` (`subject: change_brief`).
+2. If ChangeBrief has `human_gate.required` → **stop before decompose** until approved.
+3. After `solidsdd-decompose`, run **Task** `solidsdd-critique` (`subject: work_plan`).
+4. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop).
+5. Do not thin the ChangeBrief or WorkPlan to avoid the gate.
+6. After approval, resume with the approved artifacts; continue via decompose and/or `solidsdd-loop` as appropriate.
 
 ## Defaults
 

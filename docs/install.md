@@ -82,8 +82,8 @@ You can install without creating these yet. `solidsdd-context` → `solidsdd-jud
 
 For automatic execution:
 
-- **One verifiable acceptance criterion** already known → `solidsdd-loop`
-- **Multiple / larger requirements** → `solidsdd-run` (decompose → loop per item → integration verify)
+- **One property-level Gherkin Scenario** (or equivalent single checkable slice) already known → `solidsdd-loop`
+- **Multiple / larger requirements** → `solidsdd-run` (brief → decompose to property-level Scenarios → loop per item → integration verify)
 
 The parent must launch subagent-required skills (other than context) via Task (see each skill’s `references/execution-model.md`).
 
@@ -130,13 +130,13 @@ If you customized `project-rule.mdc` locally, be careful when overwriting the co
 
 ## Adoption checklist
 
-### Required (MVP: OpenAPI + OCL)
+### Required (ChangeBrief + OpenAPI + OCL + Gherkin intake)
 
 - [ ] `gh skill install naokirin/solid_sdd --all --agent cursor` succeeded (or `--from-local`)
-- [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
+- [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / **brief** / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
 - [ ] (Recommended) Copied `project-rule.mdc` into Project Rules
-- [ ] Shared contract layout policy ([project-template.md](project-template.md))
-- [ ] Smoke of `solidsdd-context`, `solidsdd-loop`, or `solidsdd-run` passes (`solidsdd-critique` launched via Task right after producers)
+- [ ] Shared contract layout policy ([project-template.md](project-template.md)), including `.solidsdd/change-brief.json` and `requirements/**/*.feature`
+- [ ] Smoke of `solidsdd-context`, `solidsdd-loop`, or `solidsdd-run` passes (`solidsdd-critique` launched via Task right after producers; Brief then WorkPlan with property-level Gherkin Scenarios)
 - [ ] Contract tests run via the project’s `npm test` / `bundle exec rspec` / etc.
 
 ### Optional (by stack)

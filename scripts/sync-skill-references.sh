@@ -121,6 +121,9 @@ sync_one docs/execution-model.md skills/solidsdd-run/references/execution-model.
 sync_one schemas/application-plan.schema.json skills/solidsdd-judge/references/application-plan.schema.json
 sync_one schemas/work-plan.schema.json skills/solidsdd-decompose/references/work-plan.schema.json
 sync_one schemas/work-plan.schema.json skills/solidsdd-run/references/work-plan.schema.json
+sync_one schemas/change-brief.schema.json skills/solidsdd-brief/references/change-brief.schema.json
+sync_one schemas/change-brief.schema.json skills/solidsdd-run/references/change-brief.schema.json
+sync_one schemas/change-brief.schema.json skills/solidsdd-decompose/references/change-brief.schema.json
 sync_one schemas/verification-report.schema.json skills/solidsdd-verify/references/verification-report.schema.json
 sync_one schemas/critique-report.schema.json skills/solidsdd-critique/references/critique-report.schema.json
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc
@@ -137,6 +140,12 @@ sync_one reference-src/human-gates.md skills/solidsdd-judge/references/human-gat
 sync_one reference-src/human-gates.md skills/solidsdd-loop/references/human-gates.md
 sync_one reference-src/human-gates.md skills/solidsdd-decompose/references/human-gates.md
 sync_one reference-src/human-gates.md skills/solidsdd-run/references/human-gates.md
+sync_one reference-src/human-gates.md skills/solidsdd-brief/references/human-gates.md
+sync_one reference-src/change-brief.md skills/solidsdd-brief/references/change-brief.md
+sync_one reference-src/change-brief.md skills/solidsdd-run/references/change-brief.md
+sync_one reference-src/change-brief.md skills/solidsdd-decompose/references/change-brief.md
+sync_one reference-src/change-brief.md skills/solidsdd-critique/references/change-brief.md
+sync_one reference-src/change-brief.md skills/solidsdd-judge/references/change-brief.md
 sync_one reference-src/loop-retry.md skills/solidsdd-verify/references/loop-retry.md
 sync_one reference-src/loop-retry.md skills/solidsdd-loop/references/loop-retry.md
 sync_one reference-src/loop-retry.md skills/solidsdd-critique/references/loop-retry.md
@@ -146,6 +155,9 @@ sync_one reference-src/adversarial-critique.md skills/solidsdd-loop/references/a
 sync_one reference-src/adversarial-critique.md skills/solidsdd-run/references/adversarial-critique.md
 sync_one reference-src/work-decomposition.md skills/solidsdd-decompose/references/work-decomposition.md
 sync_one reference-src/work-decomposition.md skills/solidsdd-run/references/work-decomposition.md
+sync_one reference-src/gherkin-requirements.md skills/solidsdd-decompose/references/gherkin-requirements.md
+sync_one reference-src/gherkin-requirements.md skills/solidsdd-run/references/gherkin-requirements.md
+sync_one reference-src/gherkin-requirements.md skills/solidsdd-critique/references/gherkin-requirements.md
 
 if [[ "$MODE" == "check" ]]; then
   if [[ "$mismatch" -ne 0 ]]; then

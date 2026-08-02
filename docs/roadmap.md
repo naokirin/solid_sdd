@@ -84,6 +84,9 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 - [x] Project template layout — [project-template.md](project-template.md)
 - [x] Rule tuning from eval corpus (Pass 1) — [feedback-tuning.md](feedback-tuning.md)
 - [x] Adversarial critique skill (`solidsdd-critique`) wired into the loop — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
+- [x] Outer run + work decomposition — `solidsdd-run` / `solidsdd-decompose` + [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md) / [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
+- [x] Gherkin as requirement intake (property-level; not Cucumber SoT) — [../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)
+- [x] ChangeBrief scope phase (`solidsdd-brief`) — [../reference-src/change-brief.md](../reference-src/change-brief.md) / [../schemas/change-brief.schema.json](../schemas/change-brief.schema.json)
 - [ ] Publish template repository on GitHub
 - [ ] Additional feedback from external production projects
 
@@ -91,3 +94,4 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 
 1. `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (distribution)
 2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
+3. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)
