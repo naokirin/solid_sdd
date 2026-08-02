@@ -2,7 +2,7 @@
 
 solid_sdd models work as a sequence of **changes**. Each change has its own Change Context, ChangeBrief, and WorkPlan. Cross-change artifacts (Gherkin, OpenAPI, OCL, tests, formal) **accumulate** in the repo via create/update. ChangeBrief is **not** a living product PRD—start a **new** change for additional requirements instead of editing an old brief into a perpetual scope document.
 
-See also: [change-context.md](change-context.md), [change-brief.md](change-brief.md), [contract-layout.md](contract-layout.md), [gherkin-requirements.md](gherkin-requirements.md).
+See also: [change-context.md](change-context.md), [change-brief.md](change-brief.md), [contract-layout.md](contract-layout.md), [gherkin-requirements.md](gherkin-requirements.md), [working-language.md](working-language.md) (prose language for `.solidsdd` artifacts).
 
 ## Layout
 

@@ -39,7 +39,7 @@ Projects may override via project rule. Decompose may **write or update** `.feat
 5. Cover ChangeBrief `in_scope` / `success_criteria`; do not pull in `out_of_scope`.
 6. On later changes, **add or update** Scenarios for the new Brief only; treat destructive rewrites of existing Scenarios as breaking and surface them in Brief / critique.
 7. Exploratory UX may stay thin: still prefer a minimal property Scenario over prose; judge may later choose `natural_only` / density `thin`.
-8. Language: English or the project’s working language is fine; keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) recognizable to agents.
+8. Language: Feature/Scenario titles and step prose follow the project **working language** ([working-language.md](working-language.md), usually from the project rule); keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) in English.
 
 ## Example (preferred shape)
 

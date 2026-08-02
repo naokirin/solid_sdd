@@ -135,6 +135,7 @@ If you customized `project-rule.mdc` locally, be careful when overwriting the co
 - [ ] `gh skill install naokirin/solid_sdd --all --agent cursor` succeeded (or `--from-local`)
 - [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / **intake** / **brief** / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
 - [ ] (Recommended) Copied `project-rule.mdc` into Project Rules
+- [ ] Set **Working language** in the project rule (`Working language: en` or `ja`) so Change Context / Brief / report prose match the team language — see skill `references/working-language.md`
 - [ ] Shared contract layout policy ([project-template.md](project-template.md)), including `.solidsdd/active-change.json`, `.solidsdd/changes/<change_id>/change-context.md`, `change-context-gate.json`, `change-brief.json`, and `requirements/**/*.feature`
 - [ ] Smoke of `solidsdd-context`, `solidsdd-loop`, or `solidsdd-run` passes (`solidsdd-critique` launched via Task right after producers; Change Context then Brief then WorkPlan with property-level Gherkin Scenarios)
 - [ ] Contract tests run via the project’s `npm test` / `bundle exec rspec` / etc.

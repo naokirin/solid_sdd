@@ -22,6 +22,7 @@ Turn existing machine-oriented artifacts into a single human-readable report for
 ## References
 
 - [change-report.md](references/change-report.md) — **sections, presence rules, Markdown/HTML (required)**
+- [working-language.md](references/working-language.md) — language resolution
 - [change-lifecycle.md](references/change-lifecycle.md) — paths and `change_id`
 - [contract-layout.md](references/contract-layout.md) — Feature / OpenAPI / OCL / formal paths
 - [change-context.md](references/change-context.md) — framing sections to project
@@ -34,7 +35,7 @@ Turn existing machine-oriented artifacts into a single human-readable report for
 |------|----------|---------|---------|
 | `change_id` | no | active change | Target change directory |
 | `format` | no | `markdown` | `markdown`, `html`, or both |
-| `language` | no | infer from sources | e.g. `ja` / `en` |
+| `language` | no | resolve per working-language.md | e.g. `ja` / `en` (report-only override) |
 
 ## Constraints
 
@@ -43,12 +44,12 @@ Turn existing machine-oriented artifacts into a single human-readable report for
 - Do **not** fabricate missing requirements, NFRs, tech choices, or design
 - Markdown: contract bodies are **links** only (plus natural-language summary)
 - HTML: calm navy/black dark theme with **white body text**; Raw panels use generation-time highlighting (Pygments `github-dark` + muted token overrides; avoid loud yellow/chartreuse)
-- Report language matches sources unless `language` is set
+- Report language: caller `language` → project rule → Context / sources → `en` ([working-language.md](references/working-language.md)); override does not rewrite SoT
 
 ## Steps
 
 1. Resolve `change_id` per [change-report.md](references/change-report.md) (caller override → `active-change.json` → stop if unknown).
-2. Decide report language (override or infer).
+2. Decide report language per [working-language.md](references/working-language.md) / [change-report.md](references/change-report.md).
 3. Collect artifacts under `.solidsdd/changes/<change_id>/` and project contract paths ([contract-layout.md](references/contract-layout.md)):
    - `change-context.md`, `change-brief.json`, `work-plan.json`, status
    - Features tied to this change (Brief / WorkPlan / Context §8)

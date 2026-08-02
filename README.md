@@ -23,9 +23,10 @@ Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract test
 ```bash
 gh skill install naokirin/solid_sdd --all --agent cursor --scope project
 cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # path may vary by environment
+# Optional: set Working language in that rule (`Working language: ja` for Japanese .solidsdd prose)
 ```
 
-Details: [docs/install.md](docs/install.md).
+Details: [docs/install.md](docs/install.md). Working language policy: [reference-src/working-language.md](reference-src/working-language.md).
 
 After maintainers change `adapters/` and related sources:
 

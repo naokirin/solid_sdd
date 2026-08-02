@@ -2,7 +2,7 @@
 
 `solidsdd-decompose` turns a **ChangeBrief** (preferred) or raw requirement into a **WorkPlan**: ordered work items for `solidsdd-run`. Each item drives **one** `solidsdd-loop` (slice). This is **not** an `ApplicationPlan` — contract kind/density stays in `solidsdd-judge` inside each loop.
 
-Requirements are expressed in **property-level Gherkin**. See [gherkin-requirements.md](gherkin-requirements.md). Scope premise: [change-brief.md](change-brief.md).
+Requirements are expressed in **property-level Gherkin**. See [gherkin-requirements.md](gherkin-requirements.md). Scope premise: [change-brief.md](change-brief.md). Item titles, `acceptance_criterion` strings, and Feature step prose use the project **working language**; JSON keys stay English ([working-language.md](working-language.md)).
 
 ## Slice rule (required)
 

@@ -25,6 +25,15 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - Formal (optional): `formal/**/*.tla` (+ `.cfg`)
 - Additional requirements → new meaningful `change_id` via intake + Brief (do not turn an old Brief into a living PRD); see skill `references/change-lifecycle.md`
 
+## Working language
+
+- Working language: en
+  # Set to `ja` (or another BCP 47-ish tag) so Change Context body,
+  # Brief/WorkPlan/Critique JSON string values, Gherkin step prose, and
+  # reports are written in that language.
+  # Keep JSON keys, Change Context top-level headings, and Gherkin keywords in English.
+  # Japanese teams: change the line above to `Working language: ja`.
+
 ## Adapters
 
 - API: OpenAPI 3.x (default) or GraphQL SDL — see `solidsdd-apply-api/references/`

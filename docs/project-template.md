@@ -39,10 +39,14 @@ your-project/
 ## Bootstrap steps
 
 1. Install skills — [install.md](install.md)
-2. Copy project rule
-3. Add empty dirs you need (or let apply skills create files)
-4. Smoke: `solidsdd-context` then a small `solidsdd-judge` on a known change
-5. Optional formal: fetch TLC (`tools` from solid_sdd or document JDK + `tla2tools.jar` in your repo)
+2. Copy project rule into `.cursor/rules/solidsdd.mdc` (from `skills/solidsdd-loop/references/project-rule.mdc` or repo `rules/solidsdd.mdc`)
+3. Set **Working language** in that rule — one line under `## Working language`:
+   - English (default): `Working language: en`
+   - Japanese prose under `.solidsdd/`: `Working language: ja`
+   - Keep JSON keys, Change Context headings, and Gherkin keywords in English (see skill `references/working-language.md`)
+4. Add empty dirs you need (or let apply skills create files)
+5. Smoke: `solidsdd-context` then a small `solidsdd-judge` on a known change
+6. Optional formal: fetch TLC (`tools` from solid_sdd or document JDK + `tla2tools.jar` in your repo)
 
 ## What not to commit
 

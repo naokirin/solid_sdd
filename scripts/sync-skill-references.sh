@@ -188,6 +188,16 @@ sync_one reference-src/contract-layout.md skills/solidsdd-report/references/cont
 sync_one reference-src/change-context.md skills/solidsdd-report/references/change-context.md
 sync_one reference-src/change-brief.md skills/solidsdd-report/references/change-brief.md
 
+# Working language (prose policy)
+sync_one reference-src/working-language.md skills/solidsdd-intake/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-brief/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-decompose/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-critique/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-judge/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-report/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-run/references/working-language.md
+sync_one reference-src/working-language.md skills/solidsdd-loop/references/working-language.md
+
 if [[ "$MODE" == "check" ]]; then
   if [[ "$mismatch" -ne 0 ]]; then
     echo

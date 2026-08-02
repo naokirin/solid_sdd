@@ -23,6 +23,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. F
 
 - [critique-report.schema.json](references/critique-report.schema.json)
 - [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration (required)**
+- [working-language.md](references/working-language.md) — finding detail language
 - [gherkin-requirements.md](references/gherkin-requirements.md) — when `subject` is `work_plan`
 - [change-brief.md](references/change-brief.md) — when `subject` is `change_brief`
 - [change-context.md](references/change-context.md) — when `subject` is `change_context`
@@ -38,6 +39,7 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 - Do not inflate polish into `major` / `fail` (see severity calibration)
 - Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)
+- Finding `detail` strings use the **working language** ([working-language.md](references/working-language.md)); keys/enums stay English
 
 ## Inputs (from parent Task prompt)
 
@@ -47,7 +49,7 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 
 ## Steps
 
-1. Read [adversarial-critique.md](references/adversarial-critique.md), especially **Severity calibration**.
+1. Read [adversarial-critique.md](references/adversarial-critique.md), especially **Severity calibration**. Resolve working language from project rule or Change Context §6 when present.
 2. Inspect the artifact; draft findings, then assign severity using the major vs not-major table.
 3. Set `result` to `fail` only if any finding is `blocker` or `major`; otherwise `pass` (minors allowed).
 4. On fail, choose `suggested_next_skills` that own the defect at the **source**.

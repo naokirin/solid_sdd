@@ -83,6 +83,10 @@ Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phas
 
 Fixed-heading Markdown at `.solidsdd/changes/<change_id>/change-context.md` (demand, NFRs, technology selection, judgments) plus `change-context-gate.json` for an optional human pause before Brief when framing needs confirmation (not when the initial instruction already made decisions clear). Rules: [../reference-src/change-context.md](../reference-src/change-context.md).
 
+## Working language
+
+Prose under `.solidsdd/` (Context body, Brief/WorkPlan JSON string values, critique details, reports) follows the project rule line `Working language: en|ja|…`. JSON keys, Context top-level headings, and Gherkin keywords stay English. Policy: [../reference-src/working-language.md](../reference-src/working-language.md).
+
 ## Change report (`solidsdd.report`) output
 
 Manual human-readable snapshot at `.solidsdd/changes/<change_id>/report.md` (optional `report.html`). Projects demand, functional/NFR, tech selection, and design from existing artifacts; missing phases are marked not performed. Not part of `solidsdd-run`. Rules: [../reference-src/change-report.md](../reference-src/change-report.md).

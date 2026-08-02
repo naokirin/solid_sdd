@@ -38,6 +38,7 @@ Resolve via the active pointer. Projects may override via project rule. Do not w
 - `in_scope` / `out_of_scope` — explicit lists (out_of_scope must not be empty hand-waving; name concrete non-goals)
 - `success_criteria` — whole-change observable outcomes
 - Prefer short bullet strings over essays
+- JSON **keys** stay English; string **values** use the project **working language** ([working-language.md](working-language.md))
 
 Optional: `background`, `assumptions`, `constraints`, `open_questions`, `confidence`, `human_gate`.
 

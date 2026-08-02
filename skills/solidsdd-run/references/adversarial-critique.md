@@ -14,7 +14,7 @@ If the same agent (or the same unbroken context) both produces and accepts a pha
 - Derived tests ignore existing `pre` clauses
 - Green VerificationReports hide zero coverage
 
-Critique must run as an **explicit Task subagent**, separate from the producer.
+Critique must run as an **explicit Task subagent**, separate from the producer. Finding `detail` / rationale strings use the project **working language** ([working-language.md](working-language.md)); JSON keys and enum tokens stay English.
 
 ## Severity calibration (loop must progress)
 
@@ -45,7 +45,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Formal gap (plan) | Shared mutable multi-client protocol omitted with neither `formal` nor `defer`+reason | Formal model that checks a documented invariant set for a smoke sample |
 | Formal specs | CFG/spec checks **nothing** meaningful (no invariant/property), or claims exclusive/safety but has **zero** related invariant | Missing liveness/WF; toy `Clients=2`; TypeOK+domain invariant without a separate named mutex lemma |
 | Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Redocly/npx unavailable → API lint `skipped` with reason; single skipped optional adapter; green run with a non-empty contract suite |
-| WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` not covered by items/`acceptance_of_whole`; items that pull in Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; English vs project-language keyword choice |
+| WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` not covered by items/`acceptance_of_whole`; items that pull in Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; writing step prose in the working language while keeping English keywords ([working-language.md](working-language.md)) |
 | Scope drift | WorkPlan / ApplicationPlan invents features listed in Brief `out_of_scope`, or drops Brief `in_scope` without rationale | Naming differences that still match Brief intent |
 
 ### Named domain errors

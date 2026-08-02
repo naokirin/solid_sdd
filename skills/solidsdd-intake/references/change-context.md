@@ -2,7 +2,7 @@
 
 `solidsdd-intake` turns a raw change request (plus `solidsdd-context` stack facts) into a **Change Context** Markdown document. It records **why** and **how** the change is framed—demand, non-functional requirements, technology selection, and key judgments—**before** ChangeBrief / Gherkin.
 
-Natural language is expected. Headings are **fixed**; agents and humans must not invent alternate top-level section titles.
+Natural language is expected in the project’s **working language** (see [working-language.md](working-language.md)). Headings are **fixed English**; agents and humans must not invent alternate top-level section titles.
 
 ## Why
 
@@ -63,7 +63,7 @@ Use exactly these top-level headings (English). Subheadings under §4 / §5 are 
 | **3. Functional intent** | Short summary of capabilities; detail belongs in Brief / Gherkin |
 | **4. Non-functional requirements** | For each relevant quality (at least consider: reliability/error handling, security, performance, operability, compatibility, maintainability): **requirement**, **rationale**, **verification approach or deferred**. Write “N/A — rationale” when deliberately out of scope |
 | **5. Technology selection** | For each decision (language/runtime, API style, persistence, test stack, contract approach, …): **decision**, **alternatives considered**, **rationale**, **source** (`user` / `repo_existing` / `agent_default` + why). If inheriting the repo stack, say so explicitly—do not leave blank |
-| **6. Key judgments** | Non-obvious calls (e.g. named domain errors vs raw exceptions; single-slot memory; skip auth) |
+| **6. Key judgments** | Non-obvious calls (e.g. named domain errors vs raw exceptions; single-slot memory; skip auth). Include `Working language: <tag> (from …)` per [working-language.md](working-language.md) |
 | **7. Open questions** | Unresolved items; align with Brief `open_questions` / gates when blocking |
 | **8. Links** | Paths to Brief, WorkPlan, Features, optional report (fill placeholders as artifacts appear) |
 
