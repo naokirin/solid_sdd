@@ -6,58 +6,76 @@
       "id": "NFR1",
       "quality": "reliability",
       "status": "in_scope",
-      "requirement": "Concurrent reserve attempts against the same SKU must not oversell available stock.",
-      "rationale": "Inventory integrity is the core risk.",
-      "threshold": "No two held reservations may sum above physical available+held accounting; oversell attempts fail with named domain error.",
-      "measurement": "Contract tests for concurrent or sequential race fixtures; OCL invariants on available/held.",
-      "verified_by": []
+      "requirement": "Reserve fails with a named domain error when available stock is below the requested quantity, creating no hold and leaving stock unchanged. Release by an authorized caller restores held quantity. Holds past TTL expire and restore availability.",
+      "rationale": "Soft-hold correctness is the core sample property; callers and contract tests need stable failure and restore semantics.",
+      "threshold": "Insufficient-stock reserve never creates a hold and never decreases available stock; authorized release and TTL expiry each restore the held quantity to available stock.",
+      "measurement": "OCL-derived Vitest contract tests plus OpenAPI error-channel exercises for named insufficient-stock / unauthorized failures and hold lifecycle.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
     },
     {
       "id": "NFR2",
       "quality": "security",
       "status": "in_scope",
-      "requirement": "Only authorized principals may create or release holds for a SKU.",
-      "rationale": "AuthZ boundary without full IAM product.",
-      "threshold": "Unauthorized principal always receives named authz domain error; no hold mutation.",
-      "measurement": "API/contract tests with unauthorized principal fixture.",
-      "verified_by": []
+      "requirement": "Only an authorized opaque principal may create a soft-hold reservation or release a hold. Unauthorized callers fail with a named domain error; no hold is created and stock is unchanged.",
+      "rationale": "User-settled sample scope includes opaque-principal authZ for reserve/release without a full IAM product.",
+      "threshold": "Unauthorized reserve/release always fail with the named unauthorized domain error and never mutate stock or holds; authorized opaque principal can reserve (when stock allows) and release.",
+      "measurement": "Contract tests and OpenAPI authZ failure channel; OCL preconditions on reserve/release operations.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
     },
     {
       "id": "NFR3",
       "quality": "performance",
       "status": "out_of_scope",
-      "requirement": "N/A \u2014 no latency SLO for framing sample.",
-      "rationale": "Framing-only example."
+      "requirement": "N/A — no latency or throughput targets for this evaluation sample.",
+      "rationale": "Sample / solid_sdd end-to-end evaluation workload only; soft-hold TTL is a correctness concern, not an SLI."
     },
     {
       "id": "NFR4",
       "quality": "operability",
       "status": "in_scope",
-      "requirement": "Reserve/release/expire behaviors are checkable via HTTP/API and module contracts.",
-      "rationale": "solid_sdd requires machine-checkable surfaces.",
-      "threshold": "OpenAPI documents reservation endpoints; OCL or derived tests cover hold invariants.",
-      "measurement": "Presence of openapi + contracts once applied (future implement change).",
-      "verified_by": []
+      "requirement": "Behaviors are checkable via HTTP/API (OpenAPI) and module DbC (UML OCL) with Vitest contract tests; do not rely on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires machine-checkable surfaces.",
+      "threshold": "openapi/openapi.yaml documents the reservation HTTP surface; contracts/**/*.ocl and tests/contracts/** exist and pass for in-scope behaviors.",
+      "measurement": "Presence of OpenAPI + OCL + passing Vitest under tests/contracts/**.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
     },
     {
       "id": "NFR5",
       "quality": "compatibility",
       "status": "in_scope",
-      "requirement": "Additive greenfield API documented in OpenAPI when applied.",
-      "rationale": "No external clients yet.",
-      "threshold": "openapi/openapi.yaml validates structurally when present.",
-      "measurement": "solidsdd-verify OpenAPI lint (or skip with tooling reason).",
-      "verified_by": []
+      "requirement": "Additive greenfield sample API documented in OpenAPI at openapi/openapi.yaml for future clients.",
+      "rationale": "Greenfield sample with no stated external clients yet; OpenAPI path settled by user.",
+      "threshold": "openapi/openapi.yaml validates structurally (e.g. Redocly --extends=spec when tooling is available).",
+      "measurement": "solidsdd-verify OpenAPI lint check (or skipped with tooling reason).",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        ".solidsdd/changes/initial-reservation/integration-verification-report.json"
+      ]
     },
     {
       "id": "NFR6",
       "quality": "maintainability",
       "status": "in_scope",
-      "requirement": "Hold accounting invariants live in module DbC (OCL) with derived tests.",
-      "rationale": "Matches solid_sdd adapter policy.",
-      "threshold": "contracts for reservation/hold exist before change status done.",
-      "measurement": "Inspect contracts/ and tests/ after implement.",
-      "verified_by": []
+      "requirement": "UML OCL under contracts/**/*.ocl is the DbC source of truth; Vitest contract tests under tests/contracts/** are derived from OCL.",
+      "rationale": "Matches solid_sdd adapter policy and user-settled contract/test layout.",
+      "threshold": "contracts/**/*.ocl exist for reservation/stock hold behaviors and derived Vitest tests reference those behaviors.",
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes.",
+      "verified_by": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
     }
   ]
 }

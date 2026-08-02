@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for initial-reservation is checkable at brief density: non-empty {id,text} in_scope (R1–R7) and out_of_scope (X1–X8) with no in/out contradictions; success_criteria SC1–SC6 are observable (stock mutation, named domain errors, release/TTL restore, OpenAPI/OCL/Vitest presence); open_questions empty with confidence high and human_gate.required false matches settled Change Context. Aligns with Context §3–§5 and nfr.json NFR1/NFR2/NFR4–NFR6 (soft-hold, authZ, checkable surfaces; formal and durable persistence excluded). Lint’s sole hit is ambiguous ‘sufficient’ in R1—clarified by R2/SC2—so polish only. WorkPlan absent is expected pre-decompose (lint did not flag it).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "Lint: ambiguous phrase 'sufficient' in R1 scope text. R2/SC2 already define the failure path when available stock is below the requested quantity; decompose can pin Examples without losing checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#assumptions|in_scope/R5",
+      "detail": "Concrete TTL default and clock/source remain deferred to OCL/apply while R5/SC5 require expiry restore. Acceptable for Brief; WorkPlan/OCL must make TTL expiry checkable so NFR1 remains verifiable."
+    }
+  ]
+}

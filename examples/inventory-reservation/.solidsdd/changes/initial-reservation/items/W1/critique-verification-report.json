@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft: OpenAPI Redocly --extends=spec passed and ocl_tests ran a non-empty suite (5 tests covering all OCL pre/post for reserve). Overall result pass matches required checks. Formal remains deferred per plan.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W1–W5; serialize waves"
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json",
+      "detail": "HTTP server path is not exercised by contract tests (domain module only); OpenAPI↔wire mapping relies on implement alignment until later integration checks."
+    }
+  ]
+}

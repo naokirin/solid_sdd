@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "Reservation.ocl#reserve keeps W1 happy-path pre/post and elevates W2 insufficient-stock failure to checkable properties: SufficientAvailableStock remains a hard pre; posts InsufficientStockError (oclIsInvalid), NoHoldCreatedOnInsufficientStock, and AvailableStockUnchangedOnInsufficientStock state named failure with no hold and unchanged stock. Comment maps the violation to InsufficientStockError shared with OpenAPI. Not vacuous at standard density; no W1 regression.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W2–W5 on shared OCL/OpenAPI/src; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#reserve",
+      "detail": "InsufficientStockError is named in comments and a post label with result.oclIsInvalid(); no formal OCL raises clause. Acceptable at standard density (error class is adapter/runtime SoT with OpenAPI), but a raises/typed exceptional result would sharpen the contract further."
+    }
+  ]
+}

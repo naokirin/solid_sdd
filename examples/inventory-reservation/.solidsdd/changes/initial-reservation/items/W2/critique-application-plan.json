@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W2 ApplicationPlan correctly applies standard OpenAPI + OCL for insufficient-stock reserve failure (named InsufficientStockError; no hold; stock unchanged), defers formal with X8 / no concurrency_safety rationale, and explicitly preserves W1 authorized-reserve paths on shared SoT. Density is not thinned despite existing W1 InsufficientStockError hooks. Lint minors (Brief 'sufficient', WorkPlan touches overlap) do not remove checkability.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2..W5/touches",
+      "detail": "lint: overlapping touches on shared OpenAPI/OCL/src across W2–W5; serialize waves (W2 after W1 already required)"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W2/application-plan.json#targets/api,dbc",
+      "detail": "W1 already exposes InsufficientStockError hooks in OpenAPI/OCL/impl/tests; plan correctly keeps status apply at standard rather than skip, but downstream apply-api/apply-dbc must elevate no-hold / unchanged-stock as first-class W2 checkable properties—not treat existing hooks as done and no-op."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W2/application-plan.json#targets",
+      "detail": "Slice scopes insufficient-stock failure on shared POST /reservations + Reservation::reserve only; unauthorized (W3) and release/expire (W4/W5) remain later items—acceptable isolation while R6/SC6 lifecycle completeness waits on those waves."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "W4: apply standard OpenAPI + OCL elevations so authorized release restores held quantity to available stock (and completes the release success channel left as a W3 placeholder); keep W3 UnauthorizedError no-mutation posts/channels; plan derived Vitest from the elevated OCL; defer formal; do not regress W1–W3.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive elevation of existing release surface for R4/SC4; authz_boundary at standard density; no money_boundary, breaking_change, or formal apply. W3 left explicit OpenAPI/OCL hooks for authorized restore; stack and Scenario are clear."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}~1release",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary: W4 requires clients/tests to observe authorized release as a checkable success that restores held quantity to available stock. Elevate POST /reservations/{holdId}/release 204 from the W3 placeholder to first-class restore semantics without removing or thinning the 403 UnauthorizedError no-mutation channel. additive_change on shared OpenAPI; not breaking_change. TTL expiry remains W5.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W4"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive documentation of authorized restore on an existing release operation; no breaking API change."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#release",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary: R4/SC4 demand that when an authorized opaque principal releases an existing soft-hold, held quantity returns to available stock. Elevate Reservation::release W4 hooks (pre HoldExists; post AvailableStockRestored, and hold removal consistent with restore) while retaining PrincipalAuthorized and W3 unauthorized no-mutation posts. Derived Vitest under tests/contracts/** must cover the authorized restore property without regressing W1–W3. additive_change on shared OCL.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W4"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC elevation for authorized release restore; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W4"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "summary": "Change Context for initial-reservation is checkable at intake density: all eight required headings are present; nfr.json covers the six qualities with thresholds/measurement for every in_scope item and §4 projects it without contradiction; §5 records stack/API/OCL/Vitest as user-settled with alternatives and rationale; §7 deferrals are non-blocking; human_gate.required false is consistent with an explicit user ask (opaque-principal authZ, TypeScript/OpenAPI/OCL/Vitest) and no blocking open questions. Lint’s missing change-brief.json is expected pre-brief and out of scope for this subject. Remaining notes are polish only (sample-bound persistence agent_default; TTL default deferred to Brief).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json",
+      "detail": "solidsdd-lint reports major scope_gap: change-brief.json missing for active change. Expected at change_context phase (Brief is produced by solidsdd-brief next); not a framing/NFR checkability hole for this subject."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/initial-reservation/change-context.md#5|change-context-gate.json",
+      "detail": "Persistence is agent_default (process-local / in-memory) while human_gate.required is false. Decision has alternatives and rationale and durable storage is out of demand; optional human confirm would strengthen the gate story but does not remove soft-hold checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/initial-reservation/change-context.md#7",
+      "detail": "Concrete TTL default and clock/source are deferred to Brief/OCL. Acceptable for Change Context; Brief and contracts must pin a checkable TTL so NFR1 expiry restore remains verifiable."
+    }
+  ]
+}

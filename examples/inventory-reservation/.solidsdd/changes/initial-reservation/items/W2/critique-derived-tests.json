@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest suite keeps W1 pre/post coverage and elevates W2 to first-class checks: named InsufficientStockError (not PreconditionError/builtins), NoHoldCreatedOnInsufficientStock (empty and with prior hold), and AvailableStockUnchangedOnInsufficientStock. OCL failure-path posts are exercised; not happy-path-only.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W2–W5 (and with W1); solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#SufficientAvailableStock",
+      "detail": "The early SufficientAvailableStock pre case only asserts throw(InsufficientStockError); stock/hold immutability is covered by dedicated W2 post cases, so checkability remains."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#SufficientAvailableStock",
+      "detail": "No explicit success case at availableStock == quantity (boundary of SufficientAvailableStock); happy-path cases use available > quantity only."
+    }
+  ]
+}

@@ -1,16 +1,45 @@
-# inventory-reservation (framing example)
+# inventory-reservation
 
-Non-arithmetic sample that stresses **intake → brief → decompose → critique**, including:
+solid_sdd end-to-end evaluation sample: TypeScript HTTP API + OpenAPI + UML OCL + Vitest.
 
-- AuthZ / inventory boundaries (human gate + `gate-approval.json`)
-- EARS wording in ChangeBrief `in_scope` texts
-- WorkPlan `covers` / Scenario `@tags` / overlapping `touches`
-- Structured `nfr.json`
+Produced by a fresh `solidsdd-run` for change `initial-reservation` (soft-hold inventory with opaque-principal authZ and TTL). Framing / Brief / WorkPlan / per-item loop artifacts live under `.solidsdd/`.
 
-**Scope of this checkout:** framing and plan artifacts only—no runnable service. Use it to exercise lint, cross-change critique guidance, and gate resume protocol. Implementation remains future work (or a separate change).
+## Scenario
 
-## Lint
+| Behavior | HTTP (summary) | Domain error |
+|----------|----------------|--------------|
+| Authorized reserve | `POST /reservations` | — |
+| Stock below request | same | `InsufficientStockError` |
+| Unauthorized reserve/release | reserve / release | `UnauthorizedError` |
+| Authorized release | `POST /reservations/{id}/release` | — |
+| TTL expire | `POST /reservations/{id}/expire` | — |
+
+Stock and holds are **in-process** (sample bound). AuthZ is opaque principal allow/deny only—not a full IAM product.
+
+## Contract locations
+
+| Kind | Path |
+|------|------|
+| Gherkin | `requirements/reservation.feature` |
+| OpenAPI | `openapi/openapi.yaml` |
+| OCL | `contracts/Reservation.ocl` |
+| Contract tests | `tests/contracts/reservation.test.ts` |
+| Change SoT | `.solidsdd/changes/initial-reservation/` |
+
+## Setup
+
+```bash
+npm install
+npm test
+npm start
+```
+
+## Lint (from solid_sdd checkout)
 
 ```bash
 ../../scripts/solidsdd-lint.sh --project-root .
 ```
+
+## Out of scope (this sample)
+
+Payments, multi-warehouse, full IAM, UI, notifications, backorders beyond hard-fail, durable shared DB, formal (TLA+) concurrency proofs.

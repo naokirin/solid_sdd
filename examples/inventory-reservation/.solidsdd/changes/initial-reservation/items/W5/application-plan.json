@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "W5: apply standard OpenAPI + OCL elevations so holds past TTL expire and restore held quantity to available stock (elevate W5 expire hooks left as placeholders after W1–W4); prefer checkable clock or expiresAt-in-past for derived Vitest; defer formal; do not regress W1–W4.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive elevation of TTL-expiry restore for R5/SC5 on a clear Scenario with existing OCL expire hooks; no money_boundary, breaking_change, authZ model change, or formal apply. Brief open_questions empty; stack and checkability assumption (injectable clock / expiresAt in past) are settled."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}~1expire",
+      "density": "standard",
+      "rationale": "http_boundary: R5/SC5/R6 require clients and tests to exercise treating a soft-hold past TTL as expired with held quantity restored to available stock. Add (or elevate) an expire operation on the shared OpenAPI SoT—additive_change relative to W1–W4 reserve/release surfaces; not breaking_change. Document success restore semantics and any precondition/error channels without thinning existing reserve/release paths. AuthZ is not required on this service-side expire surface (Scenario: reservation service treats the hold as expired; OCL expire has no principal). Prefer a design that stays checkable without real-time waits (e.g. hold with expiresAt already in the past).",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W5"],
+      "signals": ["http_boundary", "additive_change", "stable_core"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive OpenAPI expire surface for TTL restore; no breaking change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#expire",
+      "density": "standard",
+      "rationale": "domain_contract: R5/SC5 demand that while a hold is past its TTL, the service treats it as expired and restores held quantity to available stock. Elevate Reservation::expire W5 hooks (pre HoldPastTtl; post AvailableStockRestoredOnExpiry and hold removal consistent with restore) from the commented placeholders, without regressing W1–W4 reserve/release contracts. R7/SC6 require derived Vitest under tests/contracts/** covering this property—prefer injectable clock or constructing a hold whose expiresAt is already in the past so expiry is checkable without wall-clock sleeps (Brief assumption). additive_change on shared OCL.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W5"],
+      "signals": ["domain_contract", "additive_change", "stable_core"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC elevation for TTL expiry restore; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions (no formal adapter/checker in project); defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W5"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

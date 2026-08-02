@@ -1,0 +1,92 @@
+---
+description: solid_sdd — OpenAPI/GraphQL/OCL/formal contracts, skill orchestration, subagent isolation, adversarial critique
+alwaysApply: true
+---
+
+# solid_sdd
+
+This project uses solid_sdd for machine-checkable Spec-Driven Development.
+Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`).
+
+## Contract artifacts (defaults)
+
+- Active change: `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/`
+- Change Context: `.solidsdd/changes/<change_id>/change-context.md` (demand / NFR / tech selection — `solidsdd-intake`)
+- Change Context gate: `.solidsdd/changes/<change_id>/change-context-gate.json` (optional pause before Brief)
+- ChangeBrief: `.solidsdd/changes/<change_id>/change-brief.json` (scope premise / return point)
+- WorkPlan: `.solidsdd/changes/<change_id>/work-plan.json`
+- Change report (optional human view): `.solidsdd/changes/<change_id>/report.md` (+ `report.html`) — `solidsdd-report`; not source of truth
+- Change status: `.solidsdd/changes/<change_id>/status.json` (`active` | `done` | `abandoned`)
+- Requirements (Gherkin): `requirements/**/*.feature` (property-level acceptance; not executable test SoT; accumulates across changes)
+- OpenAPI: `openapi/openapi.yaml`
+- GraphQL SDL (optional): `graphql/schema.graphql`
+- OCL: `contracts/**/*.ocl`
+- Derived contract tests: `tests/contracts/**/*.test.ts` or `spec/contracts/**/*_spec.rb` (dependents of OCL; not source of truth)
+- Formal (optional): `formal/**/*.tla` (+ `.cfg`)
+- Additional requirements → new meaningful `change_id` via intake + Brief (do not turn an old Brief into a living PRD); see skill `references/change-lifecycle.md`
+
+## Working language
+
+- Working language: en
+  # Set to `ja` (or another BCP 47-ish tag) so Change Context body,
+  # Brief/WorkPlan/Critique JSON string values, Gherkin step prose, and
+  # reports are written in that language.
+  # Keep JSON keys, Change Context top-level headings, and Gherkin keywords in English.
+  # Japanese teams: change the line above to `Working language: ja`.
+
+## Adapters
+
+- API: OpenAPI 3.x (default) or GraphQL SDL — see `solidsdd-apply-api/references/`
+- DbC: UML OCL → contract tests via `solidsdd-derive-tests` (Vitest or RSpec) — see `solidsdd-apply-dbc/references/`
+- Formal specs (TLA+ / TLC): optional — `solidsdd-apply-formal` / `solidsdd-verify-formal`; early rollout **always** human-gated
+- Language-native contract libraries: optional / deferred — never required
+
+## Judgment defaults (tuned)
+
+- Additive, non-breaking `api` / `dbc` with clear stack context → density `standard`, **no** human gate, confidence typically `medium` or `high`
+- `breaking_change`, `money_boundary`, `low_confidence`, or `formal` `apply` → `human_gate.required: true`
+- Shared mutable state / multi-client protocols → consider `formal` (`apply` only if TLC path exists; else `defer` with rationale)—never silent drop
+- OCL `pre` failures must surface as a **named domain error** (e.g. `PreconditionError`), not only language builtins (`ZeroDivisionError`, etc.)
+- Prefer Change Context §5 tech selection when choosing adapters; do not silently invent a different stack
+
+## Work decomposition
+
+- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-intake` → Change Context → [gate if required] → `solidsdd-brief` → ChangeBrief → `solidsdd-decompose` → WorkPlan (**one property-level Gherkin Scenario** per item) → **parallel** `solidsdd-loop` waves → integration `solidsdd-verify` → mark change `done`
+- Change Context records demand / NFR / tech rationale; ChangeBrief is the scope return point; when later phases are unsure, re-read or re-run `solidsdd-intake` / `solidsdd-brief`
+- Requirements use property-level Gherkin under `requirements/**/*.feature` (see skill `references/gherkin-requirements.md`); not free-form prose alone; not Cucumber SoT
+- Single known slice → `solidsdd-loop` alone is enough (prefer passing a Scenario as the acceptance focus; pass Brief / Change Context excerpts when available)
+- Do not thin or rewrite Change Context / `ChangeBrief` / `WorkPlan` in the parent; re-run `solidsdd-intake` / `solidsdd-brief` / `solidsdd-decompose` if wrong
+- Serialize loops in a wave only when items clearly contend on the same primary edit paths
+
+## Adversarial critique
+
+- After intake / brief / decompose / judge / apply-* / derive-tests / verify / apply-formal, run **`solidsdd-critique` as a Task subagent** (do not leave phase evaluation to the producer)
+- Critique fails the loop only for **checkability holes** (unverifiable work slices, missing `pre` / error path, tests ignoring `pre`, density vs signals, soft verify)—polish is `minor` / pass
+- On critique fail: feedback → re-run suggested skills as Task; shared **max_auto_retries = 3** with verify (per orchestrator); then human gate (no infinite loop)
+- Details: `solidsdd-loop/references/adversarial-critique.md` or `solidsdd-run/references/adversarial-critique.md`
+
+## Verification
+
+- Do not treat work as done if API checks, OCL-derived tests, required formal checks, or required critiques fail
+- API structural lint: `@redocly/cli lint <SoT> --extends=spec` when `redocly` is on PATH or `npx` works; if unavailable, skip that check (do not fail solely for missing Redocly)
+- On failure: set `loop_action` and `failure_class` (verify) or findings (critique); follow suggested skills; **do not** weaken contracts to force a pass
+- Default **max_auto_retries = 3** (verify + critique + isolation re-runs share the budget per orchestrator); same suggested skill twice with no progress → human gate
+- After `solidsdd-run` finishes all items, run integration `solidsdd-verify` (do not skip)
+
+## Human gates
+
+- If Change Context gate (`change-context-gate.json`) has `human_gate.required: true`, **stop before brief** until a person approves (do **not** gate when the initial instruction already settled framing)
+- If ChangeBrief / `ApplicationPlan` / `WorkPlan` has `human_gate.required: true`, **stop** (before decompose / before apply / before slice loops) until a person approves
+- After approval, resume without thinning artifacts (see loop/run `references/human-gates.md`)
+
+## Execution (orchestrator / subagent)
+
+- `solidsdd-run` and `solidsdd-loop` are parent-only
+- From an orchestrator, run intake / brief / decompose / judge / critique / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
+- Do not thin or rewrite Change Context, `ChangeBrief`, `WorkPlan`, `ApplicationPlan`, or `CritiqueReport` in the parent; re-run the owning skill as a subagent if needed
+- Isolation violation → feedback and Task re-run (consumes retry budget)
+- Details: `solidsdd-run/references/execution-model.md` or `solidsdd-loop/references/execution-model.md`
+
+## Feedback
+
+Rule thresholds evolve from project feedback. Tune judgment defaults and gate rules above; keep changes documented in the consuming project.

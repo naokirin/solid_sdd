@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest covers W3 OCL unauthorized posts for reserve and release: named UnauthorizedError (not language builtins), NoHoldCreated / HoldsUnchanged with existing holds, and AvailableStockUnchanged. W1 happy-path and W2 insufficient-stock cases retained. Release suite maps Reservation::release authZ failure without inventing authorized restore (W4). Checkability of R3/SC3 is preserved at standard density.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::reserve/pre PrincipalAuthorized",
+      "detail": "Legacy PrincipalAuthorized rejection case overlaps UnauthorizedErrorOnReserve; redundant but does not drop checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::release",
+      "detail": "Authorized release success path intentionally absent (W4); unauthorized failure and no-mutation posts are covered—adequate for this slice."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across remaining items; serialize waves"
+    }
+  ]
+}

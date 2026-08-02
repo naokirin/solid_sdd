@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "OpenAPI adequately makes W2 insufficient-stock reserve checkable at standard density: POST /reservations documents a distinguishable 400 ErrorResponse with errorType InsufficientStockError, explicit no-hold / stock-unchanged semantics in description and examples, while retaining W1 200 success and 403 UnauthorizedError. solidsdd-lint is pass (minors only); prior run-state loop_phase blocker is resolved (items.W2.loop_phase=apply). Remaining findings are polish or unrelated Brief/WorkPlan lint noise.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text (unchanged by API apply)"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W4/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W5/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3,W4/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3,W5/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/responses/InsufficientStockError",
+      "detail": "Reusable InsufficientStockError response component is defined but unused; POST /reservations documents the same channel inline under 400. Polish only—errorType enum and example already make the failure distinguishable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/post/responses/400",
+      "detail": "No-hold and unchanged-stock side effects for InsufficientStockError are stated in description/example prose rather than structured response fields; adequate at standard density with a named errorType (OCL owns mutation posts)."
+    }
+  ]
+}

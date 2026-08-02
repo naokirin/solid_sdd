@@ -1,0 +1,74 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan initial-reservation is checkable at standard density: five property-level Gherkin items (W1–W5) map 1:1 to requirements/reservation.feature Scenarios and cover all Brief in_scope R1–R7 and success_criteria SC1–SC6; no out_of_scope X* ids appear in covers or tags; each acceptance_criterion is Given/When/Then with named domain errors where required; depends_on empty (no cycles). Lint pass with only minors: Brief R1 ‘sufficient’ ambiguity (clarified by Feature “at least the requested quantity” and R2/SC2) and pairwise overlapping touches on shared OpenAPI/OCL/src paths—serialize advisory only, not a checkability hole. W3’s single Scenario for unauthorized reserve or release matches Brief R3/SC3 as one property.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "Lint: ambiguous phrase 'sufficient' in R1 scope text. Feature W1 already uses 'available stock is at least the requested quantity' and R2/SC2/W2 cover the below-quantity failure; residual polish only."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W3/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W4/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W5/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W4/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W5/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3,W4/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3,W5/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items."
+    }
+  ]
+}

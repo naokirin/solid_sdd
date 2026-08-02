@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: Inventory Reservation API
+  version: 0.1.0
+  description: >-
+    Evaluation sample for solid_sdd — soft-hold inventory reservation with
+    opaque-principal authZ. W1 documents authorized reserve; W2 elevates
+    insufficient-stock reserve failure as named InsufficientStockError with
+    no hold and unchanged stock; W3 elevates unauthorized reserve and
+    unauthorized release as named UnauthorizedError with no hold created and
+    available stock plus existing holds unchanged; W4 elevates authorized
+    release so held quantity is restored to available stock as a first-class
+    checkable success; W5 elevates service-side TTL expiry so a hold past
+    its TTL restores held quantity to available stock (no principal / AuthZ).
+servers:
+  - url: http://localhost:3000
+paths:
+  /reservations:
+    post:
+      operationId: reserve
+      summary: Soft-hold SKU quantity for a TTL (authorized opaque principal)
+      description: >-
+        Creates a soft-hold when the caller is authorized and available stock
+        is at least the requested quantity. Reduces available stock by that
+        quantity for the hold TTL. When available stock is below the requested
+        quantity, the operation fails with named domain error
+        InsufficientStockError: no soft-hold is created and available stock
+        is unchanged. When the caller is unauthorized, the operation fails
+        with named domain error UnauthorizedError: no soft-hold is created
+        and available stock and existing holds are unchanged.
+      parameters:
+        - $ref: '#/components/parameters/OpaquePrincipal'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveRequest'
+      responses:
+        '200':
+          description: Soft-hold created; available stock reduced by quantity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReserveResponse'
+        '400':
+          description: >-
+            Named domain failure InsufficientStockError when available stock
+            is below the requested quantity: no hold is created and available
+            stock is unchanged. Also used for invalid request /
+            PreconditionError (same no-mutation semantics).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                InsufficientStockError:
+                  summary: Insufficient available stock
+                  description: >-
+                    First-class W2 failure channel. Clients and tests MUST
+                    observe errorType InsufficientStockError, and MUST treat
+                    the failure as creating no soft-hold with available stock
+                    left unchanged.
+                  value:
+                    error: Insufficient available stock for requested quantity
+                    errorType: InsufficientStockError
+                PreconditionError:
+                  summary: Invalid request precondition
+                  description: >-
+                    Invalid request (e.g. non-positive quantity). No hold
+                    created; stock unchanged.
+                  value:
+                    error: quantity must be a positive integer
+                    errorType: PreconditionError
+        '403':
+          description: >-
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to reserve: no soft-hold is created; available stock
+            and existing holds are unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UnauthorizedError:
+                  summary: Caller not authorized to reserve
+                  description: >-
+                    First-class W3 failure channel for reserve. Clients and
+                    tests MUST observe errorType UnauthorizedError, and MUST
+                    treat the failure as creating no soft-hold with available
+                    stock and existing holds left unchanged.
+                  value:
+                    error: Principal is not authorized to reserve
+                    errorType: UnauthorizedError
+  /reservations/{holdId}/release:
+    post:
+      operationId: release
+      summary: Release a soft-hold and restore held quantity (authZ required)
+      description: >-
+        Releases an existing soft-hold identified by holdId when the caller
+        is an authorized opaque principal. On authorized success, the held
+        quantity is restored to available stock and the hold is removed.
+        When the caller is unauthorized, the operation fails with named
+        domain error UnauthorizedError: no hold is created by the failed
+        attempt, and available stock and existing holds are unchanged.
+      parameters:
+        - $ref: '#/components/parameters/OpaquePrincipal'
+        - name: holdId
+          in: path
+          required: true
+          description: Identifier of the soft-hold to release
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '204':
+          description: >-
+            First-class W4 success channel for authorized release. Clients
+            and tests MUST treat HTTP 204 as authorized release that restores
+            the held quantity to available stock and removes the hold.
+            Observable restore-to-available-stock is checkable against prior
+            hold quantity (available stock increases by that quantity; the
+            released holdId is no longer an active hold).
+        '403':
+          description: >-
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to release: no hold is created by the failed attempt;
+            available stock and existing holds are unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UnauthorizedError:
+                  summary: Caller not authorized to release
+                  description: >-
+                    First-class W3 failure channel for release. Clients and
+                    tests MUST observe errorType UnauthorizedError, and MUST
+                    treat the failure as leaving available stock and existing
+                    holds unchanged (no hold created by the failed attempt).
+                  value:
+                    error: Principal is not authorized to release
+                    errorType: UnauthorizedError
+        '400':
+          description: >-
+            Invalid request / PreconditionError (e.g. missing hold). No
+            mutation of stock or holds beyond documented preconditions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                PreconditionError:
+                  summary: Invalid release precondition
+                  value:
+                    error: holdId is required
+                    errorType: PreconditionError
+  /reservations/{holdId}/expire:
+    post:
+      operationId: expire
+      summary: Treat a soft-hold past TTL as expired and restore held quantity
+      description: >-
+        Service-side operation that treats an existing soft-hold as expired
+        when its TTL has elapsed (expiresAt is strictly before the service
+        clock). No opaque principal or AuthZ header is required. On success,
+        the held quantity is restored to available stock and the hold is
+        removed. Checkability: clients and tests SHOULD arrange a hold whose
+        expiresAt is already in the past (or use an injectable service clock)
+        so expiry can be exercised without wall-clock waits. When the hold is
+        missing or not yet past TTL, the operation fails with named domain
+        error PreconditionError and leaves available stock and existing holds
+        unchanged.
+      parameters:
+        - name: holdId
+          in: path
+          required: true
+          description: Identifier of the soft-hold to expire
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '204':
+          description: >-
+            First-class W5 success channel for TTL expiry. Clients and tests
+            MUST treat HTTP 204 as service-side expiry that restores the held
+            quantity to available stock and removes the hold. Observable
+            restore-to-available-stock is checkable against prior hold
+            quantity (available stock increases by that quantity; the expired
+            holdId is no longer an active hold). Prefer a hold with expiresAt
+            already in the past so the success path is checkable without
+            real-time waits.
+        '400':
+          description: >-
+            Named domain failure PreconditionError when the hold is missing
+            or its TTL has not yet elapsed (expiresAt is not strictly before
+            the service clock): available stock and existing holds are
+            unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                HoldMissing:
+                  summary: Soft-hold not found
+                  description: >-
+                    holdId does not identify an active soft-hold. No stock or
+                    hold mutation.
+                  value:
+                    error: holdId does not identify an active soft-hold
+                    errorType: PreconditionError
+                HoldNotPastTtl:
+                  summary: Soft-hold TTL has not elapsed
+                  description: >-
+                    First-class W5 precondition channel for HoldPastTtl.
+                    Clients and tests MUST observe errorType PreconditionError
+                    when the hold exists but expiresAt is not strictly before
+                    the service clock, and MUST treat the failure as leaving
+                    available stock and existing holds unchanged.
+                  value:
+                    error: hold TTL has not elapsed
+                    errorType: PreconditionError
+components:
+  parameters:
+    OpaquePrincipal:
+      name: X-Principal-Id
+      in: header
+      required: true
+      description: Opaque principal credential for sample-scale authorize/deny
+      schema:
+        type: string
+        minLength: 1
+  schemas:
+    ReserveRequest:
+      type: object
+      additionalProperties: false
+      required: [sku, quantity]
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          description: SKU identifier
+        quantity:
+          type: integer
+          minimum: 1
+          description: Quantity to soft-hold
+        ttlSeconds:
+          type: integer
+          minimum: 1
+          description: Optional hold TTL in seconds; server default applies when omitted
+    ReserveResponse:
+      type: object
+      additionalProperties: false
+      required: [holdId, sku, quantity, expiresAt, availableStock]
+      properties:
+        holdId:
+          type: string
+          description: Identifier of the created soft-hold
+        sku:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        expiresAt:
+          type: string
+          format: date-time
+          description: Absolute expiry instant for the hold TTL
+        availableStock:
+          type: integer
+          minimum: 0
+          description: Available stock after the reserve
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error, errorType]
+      properties:
+        error:
+          type: string
+          description: Human-readable failure message
+        errorType:
+          type: string
+          description: >-
+            Named domain error type distinguishable by clients and tests.
+            InsufficientStockError: available stock below requested quantity;
+            response implies no soft-hold created and available stock unchanged.
+            UnauthorizedError: caller not authorized for reserve or release;
+            no hold created by the failed attempt; available stock and existing
+            holds unchanged.
+            PreconditionError: invalid request precondition (including missing
+            hold, or expire when TTL has not elapsed); no unintended stock or
+            hold mutation.
+          enum:
+            - InsufficientStockError
+            - UnauthorizedError
+            - PreconditionError
+  responses:
+    InsufficientStockError:
+      description: >-
+        Named domain failure InsufficientStockError when available stock is
+        below the requested quantity. No soft-hold is created; available stock
+        is unchanged.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Insufficient available stock for requested quantity
+            errorType: InsufficientStockError
+    UnauthorizedError:
+      description: >-
+        Named domain failure UnauthorizedError when the caller is not
+        authorized to reserve or release. No soft-hold is created by the
+        failed attempt; available stock and existing holds are unchanged.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Principal is not authorized
+            errorType: UnauthorizedError

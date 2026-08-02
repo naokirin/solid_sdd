@@ -73,6 +73,10 @@ jobs:
         working-directory: examples/arithmetic-api
         run: npm ci && npm test
 
+      - name: inventory-reservation tests
+        working-directory: examples/inventory-reservation
+        run: npm ci && npm test
+
       - name: arithmetic-graphql tests
         working-directory: examples/arithmetic-graphql
         run: npm ci && npm test

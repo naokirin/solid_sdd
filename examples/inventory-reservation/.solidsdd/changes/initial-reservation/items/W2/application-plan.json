@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "W2: apply standard OpenAPI + OCL extensions so insufficient-stock reserve failure is a first-class checkable property (named InsufficientStockError; no hold; stock unchanged); defer formal; do not regress W1 authorized reserve.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive extension of existing greenfield SoT for R2/SC2; no money_boundary, breaking_change, or formal apply. Named InsufficientStockError vocabulary already shared; W2 elevates the failure path without thinning W1."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/post",
+      "density": "standard",
+      "rationale": "http_boundary: W2 requires clients/tests to observe insufficient-stock reserve as a named domain failure with no hold and unchanged stock. Extend the existing POST /reservations surface so InsufficientStockError is an explicit, distinguishable 400 ErrorResponse channel (examples/descriptions as needed) without removing or thinning W1 success/auth paths. additive_change on shared OpenAPI; not breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["http_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive documentation of the insufficient-stock failure channel on an existing operation; no breaking API change."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#reserve",
+      "density": "standard",
+      "rationale": "domain_contract: R2/SC2 demand that when available stock is below quantity, reserve fails with named InsufficientStockError, creates no hold, and leaves available stock unchanged. Extend Reservation::reserve so SufficientAvailableStock failure and the no-mutation side effects are first-class checkable properties for this slice (keep PrincipalAuthorized / happy-path posts from W1). additive_change on shared OCL.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC extension for insufficient-stock failure; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W2"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

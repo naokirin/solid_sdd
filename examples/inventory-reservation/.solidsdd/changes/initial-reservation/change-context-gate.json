@@ -1,12 +1,9 @@
 {
   "version": "1",
   "human_gate": {
-    "required": true,
-    "reason": "Inventory reservation involves stock integrity and actor authorization; confirm NFR thresholds and out-of-scope payments before Brief."
+    "required": false,
+    "reason": "Demand, out-of-scope list, TypeScript/Node HTTP + OpenAPI + OCL + Vitest paths, and opaque-principal authZ soft-hold behavior were settled in the user instruction; security/reliability NFRs state thresholds from that ask. §7 items are non-blocking deferrals (wire format, paths, TTL default, stock seed). In-process persistence is a sample-bound agent_default without conflicting user ask."
   },
-  "confidence": "medium",
-  "decisions_to_confirm": [
-    "Caller identity is a opaque principal id (no full IAM product)",
-    "Reservations are soft holds with TTL; no payment capture"
-  ]
+  "confidence": "high",
+  "decisions_to_confirm": []
 }

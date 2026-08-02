@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 12ms; Woohoo! Your API description is valid. UnauthorizedError elevated on POST /reservations 403; POST /reservations/{holdId}/release documents UnauthorizedError 403.",
+      "covers": ["W3", "R3", "R6", "SC3", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 19 passed (19). W3 coverage: UnauthorizedErrorOnReserve / NoHoldCreatedOnUnauthorizedReserve / AvailableStockUnchangedOnUnauthorizedReserve; release UnauthorizedErrorOnRelease / HoldsUnchangedOnUnauthorizedRelease / AvailableStockUnchangedOnUnauthorizedRelease. W1/W2 regressions also green (was 11 tests).",
+      "covers": ["W3", "R3", "R7", "SC3", "SC6"]
+    }
+  ]
+}

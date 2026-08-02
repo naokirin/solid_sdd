@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft: OpenAPI Redocly --extends=spec passed (InsufficientStockError on POST /reservations 400) and ocl_tests ran a non-empty suite (11 tests) covering W2 acceptance — named InsufficientStockError, NoHoldCreatedOnInsufficientStock, AvailableStockUnchangedOnInsufficientStock — aligned with ApplicationPlan api/dbc apply and formal defer. Report is check-only (no self-graded implementation edits). Overall result pass matches required checks.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W2–W5 (and with W1); solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W2/verification-report.json",
+      "detail": "HTTP server path is not exercised by contract tests (domain module only); OpenAPI↔wire mapping for InsufficientStockError 400 relies on implement alignment until later integration checks."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W2/verification-report.json#checks",
+      "detail": "Per-check covers split R6 (openapi) vs R7 (ocl_tests); together they cover W2 Brief ids R2/R6/R7/SC2/SC6. Not a checkability hole."
+    }
+  ]
+}

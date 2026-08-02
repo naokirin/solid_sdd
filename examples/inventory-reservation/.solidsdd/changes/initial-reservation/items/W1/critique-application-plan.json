@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan applies standard OpenAPI + OCL for authorized reserve, defers formal with rationale, and correctly leaves human_gate false for additive greenfield work. Lint minors (Brief 'sufficient', WorkPlan touches overlap) do not remove checkability. Adequacy: density matches authz_boundary/http_boundary/domain_contract; no thinning or silent formal skip.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1..W5/touches",
+      "detail": "lint: overlapping touches across W1–W5; serialize waves (already noted in run-state)"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/api",
+      "detail": "API target scopes W1 reserve only; release/expire paths deferred to later items — acceptable for slice isolation but means SC6 lifecycle completeness waits on W4/W5 OpenAPI extensions."
+    }
+  ]
+}

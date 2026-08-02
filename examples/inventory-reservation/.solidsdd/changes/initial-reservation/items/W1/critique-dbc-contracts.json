@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "Reservation.ocl defines checkable pre/post for reserve at standard density: PrincipalAuthorized, QuantityPositive, SufficientAvailableStock, HoldCreatedWithTtl, AvailableStockReduced. Not vacuous. Named error mapping for InsufficientStock/Unauthorized is documented as adapter convention. Release/expire remain commented hooks for W4/W5 — acceptable for this slice.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W1–W5; serialize waves"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release,expire",
+      "detail": "release/expire are comment hooks only; W1 checkability for reserve holds, but R4/R5 need live contexts in later items."
+    }
+  ]
+}

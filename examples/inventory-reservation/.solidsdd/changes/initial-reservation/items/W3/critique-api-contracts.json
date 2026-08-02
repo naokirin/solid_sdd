@@ -1,0 +1,38 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "OpenAPI adequately makes W3 unauthorized reserve and unauthorized release checkable at standard density: POST /reservations elevates 403 UnauthorizedError with no-hold / stock-and-holds-unchanged semantics; new POST /reservations/{holdId}/release documents the same UnauthorizedError channel as first-class; W1 200 and W2 400 InsufficientStockError paths are retained. solidsdd-lint is pass (minors only) after fixing invalid run-state/work-plan status tokens. Authorized restore remains deferred to W4 as planned.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text (unchanged by API apply)"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3..W5/touches",
+      "detail": "lint: overlapping touches on shared OpenAPI/OCL/src across W3–W5; serialize waves"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/responses/UnauthorizedError",
+      "detail": "Reusable UnauthorizedError response component is defined but unused; operations document the channel inline under 403. Polish only—errorType enum and examples already make the failure distinguishable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}~1release/post/responses/204",
+      "detail": "Release success (204) is a placeholder pending W4 authorized restore; W3 checkability rests on the 403 UnauthorizedError channel—adequate isolation at standard density."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/post/responses/403",
+      "detail": "No-hold and unchanged stock/holds side effects for UnauthorizedError are stated in description/example prose rather than structured response fields; adequate at standard density with a named errorType (OCL owns mutation posts)."
+    }
+  ]
+}

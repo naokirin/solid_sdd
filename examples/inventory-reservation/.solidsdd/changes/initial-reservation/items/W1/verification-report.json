@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated; Woohoo! Your API description is valid.",
+      "covers": ["W1", "R6", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 5 passed (PrincipalAuthorized, QuantityPositive, SufficientAvailableStock, HoldCreatedWithTtl, AvailableStockReduced)",
+      "covers": ["W1", "R1", "R7", "SC1", "SC6"]
+    }
+  ]
+}

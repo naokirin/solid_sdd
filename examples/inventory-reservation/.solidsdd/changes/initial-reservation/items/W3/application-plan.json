@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "W3: apply standard OpenAPI + OCL extensions so unauthorized reserve and unauthorized release fail with named UnauthorizedError, create no hold, and leave available stock and existing holds unchanged; introduce a minimal release surface for the authZ failure path without implementing authorized restore (W4); defer formal; do not regress W1/W2.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive extension of existing greenfield SoT for R3/SC3; authz_boundary at standard density; no money_boundary, breaking_change, or formal apply. Named UnauthorizedError vocabulary already shared; W3 elevates unauthorized reserve/release failure without thinning W1/W2."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary: W3 requires clients/tests to observe unauthorized reserve and unauthorized release as named UnauthorizedError with no hold created and stock/holds unchanged. Elevate POST /reservations 403 UnauthorizedError as a first-class W3 channel and add an additive release operation with the same UnauthorizedError no-mutation semantics. additive_change on shared OpenAPI; not breaking_change. Authorized release restore remains W4.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W3"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive documentation of unauthorized failure channels plus a new release op for authZ deny; no breaking API change."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary: R3/SC3 demand that unauthorized reserve or release fails with named UnauthorizedError, creates no hold, and leaves available stock and existing holds unchanged. Elevate Reservation::reserve PrincipalAuthorized violation posts and introduce Reservation::release with PrincipalAuthorized plus unauthorized no-mutation posts (authorized restore deferred to W4). additive_change on shared OCL.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W3"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC extension for unauthorized reserve/release failure; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W3"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

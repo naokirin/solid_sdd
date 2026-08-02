@@ -1,0 +1,100 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "phase": "done",
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "isolation_notes": [
+    "intake Task a7f9a527",
+    "critique(change_context) pass Task 84523daf",
+    "brief Task 882f0f1f",
+    "critique(change_brief) pass Task ee7c8810",
+    "decompose Task d9c3c543",
+    "critique(work_plan) pass Task fb16efb0",
+    "cross_change_consistency skipped (greenfield, no prior changes)",
+    "touches overlap: serialize W1-W5",
+    "W1 loop: separate write passes (no nested Task): judge; critique(application_plan) pass; apply-api; critique(api_contracts) pass; apply-dbc; critique(dbc_contracts) pass; derive-tests; critique(derived_tests) pass; implement; verify; critique(verification_report) pass",
+    "W1 formal deferred (no concurrency_safety apply)",
+    "W2: invalid loop_phase critique_api_contracts → fixed to apply; re-critique api_contracts (orchestrator lint fix)",
+    "W2 loop: separate write passes: judge; critique(application_plan) pass; apply-api; critique(api_contracts) fail→retry(loop_phase fix)→pass; apply-dbc; critique(dbc_contracts) pass; derive-tests; critique(derived_tests) pass; implement (no-op compliant); verify pass; critique(verification_report) pass",
+    "W2 formal deferred (no concurrency_safety apply)",
+    "W2 loop_retry remaining=2 (1 consumed: api_contracts critique after invalid loop_phase token)",
+    "W3: run-state status briefly set to invalid in_progress → fixed to running (orchestrator lint fix; no loop_retry consumed)",
+    "W3 loop: separate write passes (no nested Task): judge; critique(application_plan) pass; apply-api; critique(api_contracts) pass; apply-dbc; critique(dbc_contracts) pass; derive-tests; critique(derived_tests) pass; implement; verify pass; critique(verification_report) pass",
+    "W3 formal deferred (no concurrency_safety apply)",
+    "W3 loop_retry remaining=3 (0 consumed)",
+    "W4 loop: Task subagents: judge bf28dfca; critique(application_plan) pass 2b4919c5; apply-api 657f592a; critique(api_contracts) pass 1e712b5e; apply-dbc bcb9bbe9; critique(dbc_contracts) pass c0704900; derive-tests 58c1fcc0; critique(derived_tests) pass 619ab727; implement 372ee992; verify pass 1489cda0; critique(verification_report) pass a05caba6",
+    "W4 formal deferred (no concurrency_safety apply)",
+    "W4 loop_retry remaining=3 (0 consumed)",
+    "W5 loop: Task subagents: judge e1493b16; critique(application_plan) pass ede5dba1; apply-api 069baafd; critique(api_contracts) pass afdf411c; apply-dbc 254a1650; critique(dbc_contracts) pass 4da45117; derive-tests fe125916; critique(derived_tests) pass 8e9ced8d; implement 6805063c; verify pass ebb0c173; critique(verification_report) pass cc8a3041",
+    "W5 formal deferred (no concurrency_safety apply)",
+    "W5 loop_retry remaining=3 (0 consumed)",
+    "W5 context: parent solidsdd-context (orchestrator)",
+    "integration_verify phase: Task subagent solidsdd-verify → integration-verification-report.json (pass: Redocly openapi + 32/32 vitest; formal skipped defer)",
+    "critique_integration: subject verification_report → critique-integration-verification.json (pass, minors only); parent requested verify-then-critique sequentially in one Task (producer/evaluator not fully isolated; recorded)",
+    "integration run_retry remaining=3 (0 consumed)"
+  ],
+  "updated_at": "2026-08-02T21:21:11Z",
+  "wave_index": 0,
+  "integration": {
+    "verification_report": "integration-verification-report.json",
+    "critique_report": "critique-integration-verification.json"
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1"
+    },
+    "W2": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 2,
+        "max": 3,
+        "last_suggested_skills": [
+          "solidsdd-critique"
+        ]
+      },
+      "artifact_dir": "items/W2"
+    },
+    "W3": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W3"
+    },
+    "W4": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W4"
+    },
+    "W5": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W5"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W4 ApplicationPlan correctly applies standard OpenAPI + OCL elevation so authorized release restores held quantity to available stock (204 / HoldExists + AvailableStockRestored), retains W3 UnauthorizedError no-mutation channels, plans derived Vitest from elevated OCL, and defers formal with X8 / no concurrency_safety rationale. Density is not thinned despite existing W3 release hooks and placeholder 204. Lint minors (Brief 'sufficient', WorkPlan touches overlap) do not remove checkability.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W4/application-plan.json#targets/api,dbc",
+      "detail": "W3 already exposes release with UnauthorizedError and a placeholder 204 / deferred HoldExists·AvailableStockRestored hooks; plan correctly keeps status apply at standard rather than skip, but downstream apply-api/apply-dbc must elevate authorized restore as a first-class W4 checkable property—not leave 204/posts as W3 placeholders."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W4/application-plan.json#targets",
+      "detail": "Slice scopes authorized release restore only; TTL expiry restore (W5) remains a later item—acceptable isolation while R5/SC5 and full R6/SC6 lifecycle completeness wait on that wave."
+    }
+  ]
+}

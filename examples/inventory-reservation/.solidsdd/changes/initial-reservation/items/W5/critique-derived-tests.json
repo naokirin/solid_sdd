@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest covers W5 Reservation::expire: HoldExists / HoldPastTtl violations yield named PreconditionError with no stock/hold mutation; success path AvailableStockRestoredOnExpiry and HoldRemoved restore held quantity and remove the hold via expiresAt-in-past arrangement (no wall-clock sleeps). W1–W4 reserve/release coverage retained (~15+9 cases). Approximate suite size: 32 it() across 3 describes (expire: 8). Red until implement is acceptable; OCL properties are correctly derived at standard density.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text; does not affect derived-test checkability for W5 expire."
+    }
+  ]
+}

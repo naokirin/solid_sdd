@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 11ms; Woohoo! Your API description is valid. InsufficientStockError documented on POST /reservations 400.",
+      "covers": ["W2", "R2", "R6", "SC2", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 11 passed (11). W2 coverage: InsufficientStockError (named domain error), NoHoldCreatedOnInsufficientStock, AvailableStockUnchangedOnInsufficientStock; W1 regressions also green.",
+      "covers": ["W2", "R2", "R7", "SC2", "SC6"]
+    }
+  ]
+}

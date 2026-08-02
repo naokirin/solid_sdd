@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "Integration VerificationReport for initial-reservation is an honest pass against WorkPlan acceptance_of_whole and Brief SC1–SC6: Redocly --extends=spec validates openapi/openapi.yaml (reserve / release / expire with named InsufficientStockError, UnauthorizedError, and TTL restore channels); ocl_tests reports 32/32 Vitest passes that actually exercise authorized soft-hold, insufficient-stock and unauthorized no-mutation failures, authorized release restore, and expire-past-TTL restore—not a soft-pass over empty or lifecycle-blind coverage. Formal is correctly skipped with cross-slice ApplicationPlan formal status=defer (X8 / no concurrency_safety). Artifact-presence check affirms OpenAPI + OCL + tests/contracts. solidsdd-lint pass (minors only). No soft-verify hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text; clarified by R2/SC2 and does not affect integration verification checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts",
+      "detail": "Contract suite exercises the domain ReservationService module, not the HTTP wire path in src/server.ts; OpenAPI↔HTTP mapping remains implement-aligned rather than HTTP-integration-tested. Soft-hold behaviors remain checkable via OpenAPI + OCL-derived Vitest at standard density (SC6)."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "integration-verification-report.json#checks/ocl_tests",
+      "detail": "npm CLI was absent on PATH; verify ran vitest via Cursor-bundled node + node_modules/vitest (equivalent to package.json test script). Result is still a real green run, not invented."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "integration-verification-report.json#checks/formal",
+      "detail": "Formal TLC remains skipped via ApplicationPlan formal status=defer across W1–W5 (Brief X8)—correct and not a hidden unmet formal apply."
+    }
+  ]
+}

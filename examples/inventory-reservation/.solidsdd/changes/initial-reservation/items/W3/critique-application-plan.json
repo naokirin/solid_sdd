@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W3 ApplicationPlan correctly applies standard OpenAPI + OCL for unauthorized reserve and unauthorized release (named UnauthorizedError; no hold; stock and existing holds unchanged), introduces a minimal release surface for the authZ deny path while deferring authorized restore to W4, defers formal with X8 / no concurrency_safety rationale, and explicitly preserves W1/W2 paths on shared SoT. Density is not thinned despite existing UnauthorizedError hooks on reserve. Lint minors (Brief 'sufficient', WorkPlan touches overlap) do not remove checkability.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W3..W5/touches",
+      "detail": "lint: overlapping touches on shared OpenAPI/OCL/src across W3–W5; serialize waves (W3 after W1/W2 already required)"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W3/application-plan.json#targets/api,dbc",
+      "detail": "W1 already exposes UnauthorizedError hooks on reserve in OpenAPI/OCL/impl/tests; plan correctly keeps status apply at standard rather than skip, but downstream apply-api/apply-dbc must elevate unauthorized no-mutation (including existing holds) and unauthorized release as first-class W3 checkable properties—not treat existing reserve hooks as done and no-op."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W3/application-plan.json#targets",
+      "detail": "Slice scopes unauthorized failure on reserve + release only; authorized release restore (W4) and TTL expiry (W5) remain later items—acceptable isolation while R6/SC6 lifecycle completeness waits on those waves."
+    }
+  ]
+}

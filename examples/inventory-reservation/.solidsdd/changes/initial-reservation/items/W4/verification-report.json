@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 30ms; Woohoo! Your API description is valid. POST /reservations/{holdId}/release 204 documents authorized restore of held quantity to available stock; 403 UnauthorizedError no-mutation channel retained.",
+      "covers": ["W4", "R4", "SC4", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 24 passed (24). W4 coverage: HoldExists (pre / no-mutation); AvailableStockRestored; HoldRemoved; AvailableStockRestored + HoldRemoved with other holds intact. W1–W3 regressions also green (was 19 tests).",
+      "covers": ["W4", "R4", "R7", "SC4", "SC6"]
+    },
+    {
+      "name": "Formal (TLC) — deferred per ApplicationPlan",
+      "kind": "formal",
+      "result": "skipped",
+      "detail": "ApplicationPlan target formal/ status=defer (adapter_hint: defer-formal). concurrency_safety / distributed consistency out of demand; no Phase 3 formal apply.",
+      "covers": ["W4"]
+    }
+  ]
+}

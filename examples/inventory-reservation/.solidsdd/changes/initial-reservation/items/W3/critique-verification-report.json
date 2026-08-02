@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport for W3 is adequate: Redocly OpenAPI pass and 19/19 Vitest contract tests pass with explicit UnauthorizedError coverage for reserve and release, including no-hold / stock-and-holds-unchanged side effects. W1/W2 cases remain green. Report does not soft-pass empty ocl_tests. Formal remains deferred outside this report.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W3/verification-report.json#checks",
+      "detail": "Authorized release restore is implemented in domain for HTTP 204 coherence but not yet elevated in OCL posts (W4)—verification correctly scopes W3 to unauthorized checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across remaining W4/W5; serialize subsequent loops"
+    }
+  ]
+}

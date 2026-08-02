@@ -1,0 +1,38 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "Reservation::release elevates W4 to checkable DbC at standard density: pre HoldExists, post AvailableStockRestored, post HoldRemoved, with PrincipalAuthorized retained. W3 unauthorized no-mutation posts remain; W1/W2 reserve posts intact; W5 expire stays commented defer. HoldExists/PrincipalAuthorized failures are named via comments (PreconditionError / UnauthorizedError)—not vacuous; OCL text need not spell exception classes. No checkability hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'openapi/openapi.yaml', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release",
+      "detail": "UnauthorizedErrorOnRelease and HoldsUnchangedOnUnauthorizedRelease still duplicate holds()@pre equality; Void cannot use oclIsInvalid. Acceptable at standard density—derived tests must assert named UnauthorizedError, not only state equality."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release/AvailableStockRestored,HoldRemoved",
+      "detail": "Authorized success posts are unguarded (same pattern as reserve happy-path). Stronger OCL would imply under principal.isAuthorized() and hold@pre present; checkability remains via pre HoldExists / PrincipalAuthorized."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release/HoldExists",
+      "detail": "HoldExists violation names PreconditionError in comments only; no explicit no-mutation posts analogous to InsufficientStock. pre HoldExists itself is present—not a missing-precondition hole; optional polish for symmetry with W2/W3 failure posts."
+    }
+  ]
+}

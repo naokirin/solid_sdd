@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 15ms; Woohoo! Your API description is valid. POST /reservations/{holdId}/expire 204 documents TTL-expiry restore of held quantity to available stock (no AuthZ); 400 HoldMissing / HoldNotPastTtl precondition channels retained.",
+      "covers": ["W5", "R5", "SC5", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 32 passed (32). W5 coverage: HoldExists / HoldPastTtl (pre / no-mutation when missing or not past TTL); AvailableStockRestoredOnExpiry; HoldRemoved; AvailableStockRestoredOnExpiry + HoldRemoved with other holds intact (HoldPastTtl arranged via expiresAt already in the past). W1–W4 regressions also green (was 24 tests after W4).",
+      "covers": ["W5", "R5", "R7", "SC5", "SC6"]
+    },
+    {
+      "name": "Formal (TLC) — deferred per ApplicationPlan",
+      "kind": "formal",
+      "result": "skipped",
+      "detail": "ApplicationPlan target formal/ status=defer (adapter_hint: defer-formal). concurrency_safety / distributed consistency out of demand; no Phase 3 formal apply.",
+      "covers": ["W5"]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+-- Reservation domain contracts for inventory-reservation (solid_sdd evaluation sample)
+-- Source of truth for DbC; tests under tests/contracts are derived from this.
+-- W1: authorized reserve soft-hold (PrincipalAuthorized, QuantityPositive,
+--     SufficientAvailableStock, HoldCreatedWithTtl, AvailableStockReduced).
+-- W2: insufficient-stock reserve failure is first-class — named
+--     InsufficientStockError; no Hold created; available stock unchanged.
+-- W3: unauthorized reserve or release fails with named UnauthorizedError;
+--     no Hold created by the failed attempt; available stock and existing
+--     holds unchanged.
+-- W4: authorized release restores held quantity to available stock and
+--     removes the hold (HoldExists, AvailableStockRestored, HoldRemoved).
+-- W5: service-side expire past TTL restores held quantity and removes the
+--     hold (HoldExists, HoldPastTtl, AvailableStockRestoredOnExpiry,
+--     HoldRemoved); PreconditionError when hold missing or not past TTL.
+-- Named error vocabulary shared with OpenAPI.
+
+-- Default TTL when caller omits ttlSeconds (seconds).
+-- Sample convention: DEFAULT_TTL_SECONDS = 300
+
+context Reservation::reserve(principal: String, sku: String, quantity: Integer, ttlSeconds: Integer): Hold
+pre PrincipalAuthorized: principal.isAuthorized()
+pre QuantityPositive: quantity > 0
+pre SufficientAvailableStock: self.availableStock(sku) >= quantity
+post HoldCreatedWithTtl: result.oclIsNew() and result.sku = sku and result.quantity = quantity
+  and result.expiresAt = self.now() + ttlSeconds
+post AvailableStockReduced: self.availableStock(sku) = self.availableStock(sku)@pre - quantity
+-- W2: SufficientAvailableStock violation → named domain error InsufficientStockError
+--     (not a language builtin); no soft-hold; available stock unchanged.
+post InsufficientStockError:
+  (self.availableStock(sku)@pre < quantity) implies result.oclIsInvalid()
+post NoHoldCreatedOnInsufficientStock:
+  (self.availableStock(sku)@pre < quantity) implies self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnInsufficientStock:
+  (self.availableStock(sku)@pre < quantity) implies
+    self.availableStock(sku) = self.availableStock(sku)@pre
+-- W3: PrincipalAuthorized violation → named domain error UnauthorizedError
+--     (not a language builtin); no soft-hold; stock and holds unchanged.
+post UnauthorizedErrorOnReserve:
+  (not principal.isAuthorized()) implies result.oclIsInvalid()
+post NoHoldCreatedOnUnauthorizedReserve:
+  (not principal.isAuthorized()) implies self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnUnauthorizedReserve:
+  (not principal.isAuthorized()) implies
+    self.availableStock(sku) = self.availableStock(sku)@pre
+
+context Reservation::release(principal: String, holdId: String): Void
+pre PrincipalAuthorized: principal.isAuthorized()
+pre HoldExists: self.hold(holdId)->notEmpty()
+-- W3: PrincipalAuthorized violation → named UnauthorizedError; stock and holds unchanged.
+post UnauthorizedErrorOnRelease:
+  (not principal.isAuthorized()) implies self.holds() = self.holds()@pre
+post HoldsUnchangedOnUnauthorizedRelease:
+  (not principal.isAuthorized()) implies self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnUnauthorizedRelease:
+  (not principal.isAuthorized()) implies
+    self.hold(holdId)->notEmpty() implies
+      self.availableStock(self.hold(holdId).sku) =
+        self.availableStock(self.hold(holdId).sku)@pre
+-- W4: HoldExists violation → named domain error PreconditionError
+--     (not a language builtin); authorized success restores stock and removes hold.
+post AvailableStockRestored:
+  self.availableStock(self.hold(holdId)@pre.sku) =
+    self.availableStock(self.hold(holdId)@pre.sku)@pre + self.hold(holdId)@pre.quantity
+post HoldRemoved: self.hold(holdId)->isEmpty()
+
+-- W5: treat soft-hold past TTL as expired; restore stock and remove hold.
+-- Checkability: self.now() is the service clock (injectable in tests).
+-- Prefer a hold whose expiresAt is already strictly before self.now()
+-- so HoldPastTtl is exercisable without wall-clock waits.
+context Reservation::expire(holdId: String): Void
+pre HoldExists: self.hold(holdId)->notEmpty()
+pre HoldPastTtl: self.hold(holdId).expiresAt < self.now()
+-- HoldExists / HoldPastTtl violation → named domain error PreconditionError
+--     (not a language builtin); stock and holds unchanged.
+-- Aligns with OpenAPI expire 400: HoldMissing / HoldNotPastTtl.
+post PreconditionErrorOnExpireHoldMissing:
+  (self.hold(holdId)@pre->isEmpty()) implies self.holds() = self.holds()@pre
+post PreconditionErrorOnExpireHoldNotPastTtl:
+  (self.hold(holdId)@pre->notEmpty() and
+    not (self.hold(holdId)@pre.expiresAt < self.now())) implies
+      self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnExpireHoldNotPastTtl:
+  (self.hold(holdId)@pre->notEmpty() and
+    not (self.hold(holdId)@pre.expiresAt < self.now())) implies
+      self.availableStock(self.hold(holdId)@pre.sku) =
+        self.availableStock(self.hold(holdId)@pre.sku)@pre
+post AvailableStockRestoredOnExpiry:
+  self.availableStock(self.hold(holdId)@pre.sku) =
+    self.availableStock(self.hold(holdId)@pre.sku)@pre + self.hold(holdId)@pre.quantity
+post HoldRemoved: self.hold(holdId)->isEmpty()

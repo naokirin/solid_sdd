@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W5 ApplicationPlan correctly applies standard OpenAPI + OCL elevation so holds past TTL expire and restore held quantity to available stock (POST expire / Reservation::expire with HoldPastTtl + AvailableStockRestoredOnExpiry), prefers checkable clock or expiresAt-in-past for derived Vitest (R7/SC6), and defers formal with X8 / no concurrency_safety rationale. Density is not thinned despite commented W5 OCL hooks and a missing expire path in OpenAPI. Lint minor (Brief 'sufficient') does not remove checkability.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W5/application-plan.json#targets/api,dbc",
+      "detail": "OpenAPI has no /reservations/{holdId}/expire path yet and Reservation.ocl W5 expire hooks remain commented placeholders; plan correctly keeps status apply at standard rather than skip, but downstream apply-api/apply-dbc must elevate expire restore (and HoldPastTtl failure channel) as first-class W5 checkable properties—not leave placeholders or omit the HTTP surface."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W5/application-plan.json#targets/dbc",
+      "detail": "Plan rightly prefers injectable clock or expiresAt already in the past for Vitest; apply-dbc/derive-tests must lock that checkability assumption so R5/SC5 are not wall-clock sleeps or untestable timing races."
+    }
+  ]
+}

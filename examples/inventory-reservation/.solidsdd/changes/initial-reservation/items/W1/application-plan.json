@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "summary": "W1: apply standard OpenAPI + OCL for authorized soft-hold reserve; defer formal (no concurrency_safety demand).",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive greenfield sample; no money_boundary, breaking_change, or formal apply. AuthZ is opaque-principal allow/deny at standard density."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/post",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary: authorized reserve must be documented with success and failure error channels so clients/tests can check soft-hold creation. additive_change on greenfield SoT; prefer documenting reserve for W1 (later items extend release/expire).",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "New additive OpenAPI surface; no breaking change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#reserve",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary: module pre/post must make authorized reserve checkable (hold created with TTL; available stock decreases by quantity). Named domain errors for unauthorized / insufficient stock remain shared vocabulary even when W1 happy-path is the primary property.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC for soft-hold reserve; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency are out of demand (Change Context §5; Brief X8). Defer formal rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W1"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

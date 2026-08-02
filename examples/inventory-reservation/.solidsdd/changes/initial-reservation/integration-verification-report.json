@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "initial-reservation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec (integration)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "node /tmp/redocly-cli-install/package/bin/cli.js lint openapi/openapi.yaml --extends=spec — validated in 23ms; Woohoo! Your API description is valid. Documents POST /reservations (200 soft-hold; 400 InsufficientStockError / PreconditionError; 403 UnauthorizedError), POST /reservations/{holdId}/release (204 restore; 403 UnauthorizedError; 400 HoldMissing), and POST /reservations/{holdId}/expire (204 TTL restore; 400 HoldMissing / HoldNotPastTtl). Covers acceptance_of_whole checkable OpenAPI surface for SC1–SC6 / R6.",
+      "covers": ["W1", "W2", "W3", "W4", "W5", "R6", "SC1", "SC2", "SC3", "SC4", "SC5", "SC6"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest, integration)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "Cursor-bundled node + ./node_modules/vitest/vitest.mjs run (npm CLI absent on PATH; equivalent to package.json \"test\": \"vitest run\") → tests/contracts/reservation.test.ts: 32 passed (32). Suite exercises authorized reserve TTL hold + stock reduce (SC1); InsufficientStockError with no hold / stock unchanged (SC2); UnauthorizedError on reserve and release with no mutation (SC3); authorized release restore (SC4); expire past TTL restore via expiresAt-in-past arrange (SC5); contracts/Reservation.ocl-derived coverage for R7 / SC6. Domain module surface; OpenAPI wire alignment documented in openapi/openapi.yaml + src/server.ts.",
+      "covers": ["W1", "W2", "W3", "W4", "W5", "R1", "R2", "R3", "R4", "R5", "R7", "SC1", "SC2", "SC3", "SC4", "SC5", "SC6"]
+    },
+    {
+      "name": "Formal (TLC) — deferred across W1–W5 ApplicationPlans",
+      "kind": "formal",
+      "result": "skipped",
+      "detail": "All item ApplicationPlans set formal status=defer (adapter_hint defer-formal). Brief X8 / no concurrency_safety; no Phase 3 formal apply across the change.",
+      "covers": ["W1", "W2", "W3", "W4", "W5"]
+    },
+    {
+      "name": "acceptance_of_whole / SC1–SC6 artifact presence",
+      "kind": "other",
+      "result": "pass",
+      "detail": "openapi/openapi.yaml, contracts/Reservation.ocl, and tests/contracts/reservation.test.ts exist; WorkPlan items W1–W5 all status=done. Soft-hold lifecycle and named insufficient-stock / unauthorized failures are checkable without opaque internals alone. Out-of-scope themes (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable shared persistence, formal concurrency) are not required by this verify.",
+      "covers": ["SC1", "SC2", "SC3", "SC4", "SC5", "SC6", "R1", "R2", "R3", "R4", "R5", "R6", "R7"]
+    }
+  ]
+}

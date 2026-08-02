@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest suite exercises every OCL pre (PrincipalAuthorized → UnauthorizedError, QuantityPositive → PreconditionError, SufficientAvailableStock → InsufficientStockError) and both posts (HoldCreatedWithTtl, AvailableStockReduced), including no-hold / unchanged-stock assertions on pre failures. Not happy-path-only.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W1–W5; serialize waves"
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#HoldCreatedWithTtl",
+      "detail": "TTL assertion uses Date.now() window around 300s; clock skew tolerance is fine for sample but not a frozen clock inject."
+    }
+  ]
+}

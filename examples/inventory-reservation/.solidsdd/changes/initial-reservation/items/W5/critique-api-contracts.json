@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "OpenAPI adequately elevates W5 TTL expiry at standard density: POST /reservations/{holdId}/expire (operationId expire) is a first-class service-side surface with 204 restore-to-available-stock MUST semantics and 400 PreconditionError channels for missing hold and HoldNotPastTtl (no stock/hold mutation), without AuthZ as planned. W1–W4 reserve/release success and named-error paths are retained and not thinned. solidsdd-lint is pass (minors only).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text (unchanged by API apply)"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/responses",
+      "detail": "Reusable InsufficientStockError and UnauthorizedError response components are defined but unused; operations document channels inline. Polish only—named errorType enum and expire examples already make failures distinguishable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}~1expire/post/responses/204",
+      "detail": "TTL expiry restore is stated in 204 description prose (stock increase by prior hold quantity; holdId no longer active; prefer expiresAt already in the past) without a response body returning availableStock. Adequate at standard density—checkable MUST semantics plus planned OCL posts own the restore property; stronger HTTP observation would be polish only."
+    }
+  ]
+}

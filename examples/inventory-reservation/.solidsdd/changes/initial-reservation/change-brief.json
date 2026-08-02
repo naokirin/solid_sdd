@@ -1,93 +1,118 @@
 {
   "version": "1",
   "change_id": "initial-reservation",
-  "summary": "Deliver a checkable inventory reservation service: authorized callers hold stock for a TTL, release or expire holds without double-booking, with named domain errors for insufficient stock and unauthorized callers—without payments, multi-warehouse routing, or a full IAM product.",
-  "goal": "Authorized principals can reserve and release inventory units against SKUs with soft holds; unauthorized or insufficient-stock attempts fail with named domain errors; holds expire after TTL.",
-  "background": "Framing example for solid_sdd hardening (intake/brief/critique/gates). No prior Features in this sample repo; treat as greenfield for this change_id.",
+  "summary": "Deliver a bounded TypeScript/Node HTTP sample that soft-holds inventory: an authorized opaque principal reserves quantity against a SKU for a TTL (reducing available stock), fails with named domain errors when stock is insufficient or the caller is unauthorized (no hold; stock unchanged), restores availability on authorized release or TTL expiry, and exposes checkable OpenAPI plus UML OCL with derived Vitest—without payments, multi-warehouse routing, full IAM, UI, notifications, or backorders beyond hard-fail.",
+  "goal": "Authorized callers can soft-hold SKU quantity for a TTL and release holds; insufficient stock and unauthorized access fail with named domain errors without mutating stock; expired holds restore availability; HTTP/API and module contracts make these behaviors machine-checkable.",
+  "background": "Greenfield solid_sdd evaluation sample. Demand, opaque-principal authZ, OpenAPI/OCL/Vitest paths, and out-of-scope product extras were settled before this brief; in-process stock and holds are a sample bound.",
   "in_scope": [
     {
       "id": "R1",
-      "text": "WHEN an authorized caller requests a reservation for a SKU and quantity THEN THE inventory service SHALL create a soft hold that reduces available stock for the hold TTL"
+      "text": "WHEN an authorized opaque principal requests a soft-hold reservation of quantity against a SKU when available stock is at least the requested quantity THEN THE reservation service SHALL create a hold for a TTL and reduce available stock by that quantity"
     },
     {
       "id": "R2",
-      "text": "IF available stock is less than the requested quantity THEN THE inventory service SHALL fail with a named domain error and create no hold"
+      "text": "IF available stock is below the requested reserve quantity THEN THE reservation service SHALL fail with a named domain error, create no hold, and leave stock unchanged"
     },
     {
       "id": "R3",
-      "text": "IF the caller is not authorized for the SKU THEN THE inventory service SHALL fail with a named domain error and create no hold"
+      "text": "IF the caller is unauthorized THEN THE reservation service SHALL fail with a named domain error on reserve or release, create no hold, and leave stock unchanged"
     },
     {
       "id": "R4",
-      "text": "WHEN an authorized caller releases an active hold THEN THE inventory service SHALL restore the held quantity to available stock"
+      "text": "WHEN an authorized opaque principal releases a hold THEN THE reservation service SHALL restore the held quantity to available stock"
     },
     {
       "id": "R5",
-      "text": "WHILE a hold is past its TTL THE inventory service SHALL treat the hold as expired and restore availability (lazily or via explicit expire)"
+      "text": "WHILE a hold is past its TTL THE reservation service SHALL treat the hold as expired and restore the held quantity to available stock"
     },
     {
       "id": "R6",
-      "text": "THE inventory service SHALL expose reservation/release behaviors on a checkable HTTP/API surface"
+      "text": "HTTP/API surface documented in OpenAPI that exposes reserve, release, and soft-hold lifecycle behaviors clients and tests can exercise"
     },
     {
       "id": "R7",
-      "text": "THE inventory service SHALL provide module-level contracts that make hold invariants checkable"
+      "text": "Module-level UML OCL contracts with derived Vitest tests that make soft-hold, authZ failure, and availability-restore behaviors checkable"
     }
   ],
   "out_of_scope": [
     {
       "id": "X1",
-      "text": "Payment capture, checkout, or order fulfillment"
+      "text": "Payments, checkout, or money/ledger boundaries"
     },
     {
       "id": "X2",
-      "text": "Multi-warehouse routing, transfers, or location-level ATP beyond a single stock pool per SKU"
+      "text": "Multi-warehouse routing or cross-location inventory allocation"
     },
     {
       "id": "X3",
-      "text": "Full IAM product (SSO, roles UI, OAuth provider); only opaque principal authorization checks"
+      "text": "Full IAM product (SSO, OAuth UI, role admin) beyond opaque-principal authorize/deny for this sample"
     },
     {
       "id": "X4",
-      "text": "UI clients, notifications, or analytics products"
+      "text": "UI / frontend clients"
     },
     {
       "id": "X5",
-      "text": "Partial shipment / backorder policies beyond hard fail when available stock is below the requested quantity"
+      "text": "Notifications (email, push, webhooks) about holds or expiry"
+    },
+    {
+      "id": "X6",
+      "text": "Backorders, waitlists, or deferred fulfillment beyond hard-fail when stock is below request"
+    },
+    {
+      "id": "X7",
+      "text": "Durable shared persistence across process restarts beyond in-process stock and holds"
+    },
+    {
+      "id": "X8",
+      "text": "Formal methods (e.g. TLA+) for concurrent hold races or distributed consistency"
     }
   ],
   "assumptions": [
-    "One stock pool per SKU (available + held)",
-    "Caller presents a principal id the service can authorize against a simple allow-list or policy stub",
-    "TTL is a positive duration configured per reservation request or service default"
+    "AuthZ is opaque-principal allow/deny only; exact wire format (header/token shape) is deferred to OpenAPI apply",
+    "Exact HTTP paths, status codes, and error JSON shape are deferred to OpenAPI apply; named domain errors for insufficient stock and unauthorized remain required",
+    "Stock and holds are process-local / in-memory for this evaluation sample",
+    "TTL expiry is checkable; concrete default and clock source are deferred to OCL/apply",
+    "Initial SKU stock is established by a sample seed or implementation convention"
   ],
   "constraints": [
-    "Do not invent payment or multi-warehouse features",
-    "Unauthorized and insufficient-stock failures must be named and distinguishable",
-    "ChangeBrief only at brief emission; Features/WorkPlan follow decompose"
+    "Language/runtime: TypeScript / Node HTTP API",
+    "OpenAPI SoT path: openapi/openapi.yaml",
+    "UML OCL under contracts/**/*.ocl; derived Vitest under tests/contracts/**",
+    "Insufficient-stock and unauthorized failures must use named domain errors shared by API, OCL, and tests",
+    "Contract kind and density choices are deferred to solidsdd-judge; this brief only requires checkable HTTP/API and module surfaces",
+    "ChangeBrief only at this step: no Feature files, WorkPlan, OpenAPI, OCL, tests, or implementation edits as part of brief emission"
   ],
   "success_criteria": [
     {
       "id": "SC1",
-      "text": "Authorized reserve when available stock is at least the requested quantity creates a hold and reduces availability by the quantity"
+      "text": "An authorized opaque principal can reserve quantity against a SKU when stock allows; available stock decreases by the reserved quantity for a TTL"
     },
     {
       "id": "SC2",
-      "text": "When available stock is below the requested quantity, and when the caller is unauthorized, each fails with a distinct named domain error and leaves stock unchanged"
+      "text": "IF available stock is below the requested quantity THEN reserve fails with a named domain error, creates no hold, and leaves stock unchanged"
     },
     {
       "id": "SC3",
-      "text": "Release and TTL expiry restore held quantity to available stock"
+      "text": "IF the caller is unauthorized THEN reserve and release fail with a named domain error and never mutate stock or holds"
     },
     {
       "id": "SC4",
-      "text": "HTTP/API and module contracts make the above checkable without opaque internals alone"
+      "text": "Authorized release restores the held quantity to available stock"
+    },
+    {
+      "id": "SC5",
+      "text": "WHILE a hold is past its TTL THE service restores the held quantity to available stock"
+    },
+    {
+      "id": "SC6",
+      "text": "openapi/openapi.yaml, contracts/**/*.ocl, and passing tests/contracts/** exist such that the soft-hold behaviors above are verifiable without opaque internals alone"
     }
   ],
   "open_questions": [],
-  "confidence": "medium",
+  "confidence": "high",
   "human_gate": {
-    "required": true,
-    "reason": "Inventory integrity and authorization boundary; confirm Brief before decompose."
+    "required": false,
+    "reason": "Demand, tech stack, opaque-principal authZ soft-hold behavior, and out-of-scope list were settled in Change Context with gate required false; §7 deferrals are non-blocking (wire format, paths, TTL default, stock seed)."
   }
 }

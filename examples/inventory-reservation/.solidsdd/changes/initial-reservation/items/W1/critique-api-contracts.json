@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "OpenAPI documents POST /reservations (operationId reserve) with X-Principal-Id auth, 200 hold/TTL/availableStock response, and 400/403 ErrorResponse channels using distinguishable errorType enum (InsufficientStockError, UnauthorizedError, PreconditionError). Not happy-path-only at standard density. Release/expire paths intentionally omitted for later WorkPlan items.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text (unchanged by API apply)"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W1–W5; serialize waves"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths",
+      "detail": "Release and TTL-expiry HTTP operations are not yet documented; acceptable for W1 slice but R6 full lifecycle surface lands with W4/W5."
+    }
+  ]
+}

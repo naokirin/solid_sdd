@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "Reservation::expire elevates W5 TTL-expiry restore to checkable DbC at standard density: pre HoldExists and HoldPastTtl, post AvailableStockRestoredOnExpiry and HoldRemoved, plus no-mutation posts for HoldMissing / HoldNotPastTtl with PreconditionError named in comments. Injectable clock / expiresAt-in-past checkability is documented. W1–W4 reserve/release pre/post (authZ, stock, InsufficientStock, Unauthorized, release restore) remain intact and are not thinned. No vacuous pre:true; no missing-precondition hole for known failure modes.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#expire/AvailableStockRestoredOnExpiry,HoldRemoved",
+      "detail": "Success posts are unguarded (same pattern as release). Stronger OCL would imply under HoldExists@pre and HoldPastTtl; checkability remains via those pres and the failure no-mutation posts."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#expire/PreconditionErrorOnExpireHoldMissing",
+      "detail": "HoldMissing failure asserts holds() unchanged but does not mirror AvailableStockUnchanged (HoldNotPastTtl has that post). When the hold is absent there is no SKU to restore—adequate at standard density; optional symmetry polish only."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#expire",
+      "detail": "HoldExists / HoldPastTtl violations name PreconditionError in comments only (aligned with OpenAPI 400 HoldMissing / HoldNotPastTtl). OCL text need not spell the exception class—pre clauses are present; not a missing-precondition hole."
+    }
+  ]
+}

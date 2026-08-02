@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest covers W4 Reservation::release: HoldExists violation yields named PreconditionError with no stock/hold mutation; authorized AvailableStockRestored and HoldRemoved restore held quantity and remove the hold (including multi-hold isolation). W3 unauthorized release posts and W1–W2 reserve coverage retained. No pre is ignored; OCL checkability at standard density is preserved.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text; does not affect derived-test checkability for W4."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "lint: overlapping touches among W4/W5 on shared OCL/OpenAPI/src; solidsdd-run must serialize these items."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::release/pre PrincipalAuthorized",
+      "detail": "PrincipalAuthorized rejection overlaps UnauthorizedErrorOnRelease naming assertions; redundant but does not drop checkability."
+    }
+  ]
+}

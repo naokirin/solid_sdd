@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "OpenAPI adequately elevates W4 authorized release at standard density: POST /reservations/{holdId}/release 204 is a first-class success channel that documents restore of held quantity to available stock (and hold removal) as client/test MUST semantics; W3 403 UnauthorizedError no-mutation and 400 PreconditionError channels are preserved; W1/W2 reserve 200 and InsufficientStockError surfaces are not thinned; TTL expiry is explicitly deferred to later changes. solidsdd-lint is pass (minors only).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text (unchanged by API apply)"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W4,W5/touches",
+      "detail": "lint: overlapping touches on shared OpenAPI/OCL/src across W4–W5; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/responses",
+      "detail": "Reusable InsufficientStockError and UnauthorizedError response components are defined but unused; operations document channels inline. Polish only—named errorType enum and examples already make failures distinguishable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}~1release/post/responses/204",
+      "detail": "Authorized restore is stated in 204 description prose (stock increase by prior hold quantity; holdId no longer active) without a response body returning availableStock. Adequate at standard density—checkable MUST semantics plus OCL posts own the restore property; stronger HTTP observation would be polish only."
+    }
+  ]
+}

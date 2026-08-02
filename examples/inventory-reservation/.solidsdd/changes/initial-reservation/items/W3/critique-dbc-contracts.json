@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "Reservation.ocl elevates W3 unauthorized failure to checkable properties: reserve adds UnauthorizedErrorOnReserve (oclIsInvalid), NoHoldCreatedOnUnauthorizedReserve, and AvailableStockUnchangedOnUnauthorizedReserve; new Reservation::release has PrincipalAuthorized plus UnauthorizedErrorOnRelease / HoldsUnchangedOnUnauthorizedRelease / AvailableStockUnchangedOnUnauthorizedRelease. W1 happy-path and W2 insufficient-stock posts retained. Authorized restore deferred to W4 as planned. Not vacuous at standard density.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/initial-reservation/change-brief.json#in_scope/R1",
+      "detail": "lint: ambiguous phrase 'sufficient' in Brief scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/*/touches",
+      "detail": "lint: overlapping touches across W3–W5 on shared OCL/OpenAPI/src; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release",
+      "detail": "UnauthorizedErrorOnRelease and HoldsUnchangedOnUnauthorizedRelease overlap on holds() equality; Void result cannot use oclIsInvalid like reserve. Acceptable at standard density—derived tests must still assert named UnauthorizedError throw, not only state equality."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#release",
+      "detail": "HoldExists / AvailableStockRestored for authorized release remain W4 hooks; release context currently owns authZ failure only—intentional slice isolation."
+    }
+  ]
+}
