@@ -1,4 +1,4 @@
-# GraphQL SDL adapter (Phase 2)
+# GraphQL SDL adapter
 
 ## Role
 

@@ -42,12 +42,12 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent execution policy |
 | [docs/roadmap.md](docs/roadmap.md) | MVP scope and phased rollout |
 | [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP end-to-end evaluation notes |
-| [docs/phase2.md](docs/phase2.md) | Phase 2 (judgment axes, gates, adapters) |
-| [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | Phase 2 sample evaluation |
-| [docs/phase3.md](docs/phase3.md) | Phase 3 formal-spec design |
-| [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | Phase 3 TLC sample evaluation |
+| [docs/phase2.md](docs/phase2.md) | Judgment axes, gates, and adapters |
+| [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | GraphQL / Ruby sample evaluation |
+| [docs/phase3.md](docs/phase3.md) | Formal-spec design |
+| [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | TLC sample evaluation |
 | [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | Formal human_gate dry run |
-| [docs/phase4.md](docs/phase4.md) | Phase 4 operations and ecosystem |
+| [docs/phase4.md](docs/phase4.md) | Operations and ecosystem |
 | [docs/coexistence.md](docs/coexistence.md) | Coexistence with other SDD tools |
 | [docs/project-template.md](docs/project-template.md) | Consuming-project layout |
 | [docs/feedback-tuning.md](docs/feedback-tuning.md) | Feedback and rule tuning |

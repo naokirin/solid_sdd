@@ -1,4 +1,4 @@
-# TLC tooling (Phase 3)
+# TLC tooling
 
 Default formal checker for solid_sdd: **TLA+ / TLC** via `tla2tools.jar`.
 

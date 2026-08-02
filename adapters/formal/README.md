@@ -1,4 +1,4 @@
-# Formal specification adapter (Phase 3)
+# Formal specification adapter
 
 ## Role
 
@@ -11,7 +11,7 @@ Prefer `status: apply` for `kind: formal` only when **all** hold:
 1. Signal `concurrency_safety` (or equivalent: distributed consensus, multi-writer shared state, failover) is present **and** density would be `strict`, **or** product policy marks the boundary as safety-critical
 2. A formal adapter is available (`adapter_hint` e.g. `tla`, `alloy`) and the checker is documented for the project
 3. Scope is bounded (one protocol / one shared resource)—not “formalize the whole app”
-4. `human_gate.required: true` (mandatory in Phase 3 early rollout)
+4. `human_gate.required: true` (mandatory for early formal apply)
 
 Otherwise keep `status: defer` with `adapter_hint: defer-formal`. Never silently drop formal need.
 

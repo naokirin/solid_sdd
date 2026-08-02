@@ -1,4 +1,4 @@
-# Ruby / RSpec test-target adapter (Phase 2)
+# Ruby / RSpec test-target adapter
 
 ## Role
 

@@ -1,4 +1,4 @@
-# memory-formal (Phase 3 evaluation sample)
+# memory-formal (evaluation sample)
 
 Minimal TLA+ model of **exclusive add** to a shared memory register, checked with TLC.  
 arithmetic-api Memory (OCL) assumes a single thread; this sample targets `concurrency_safety`.
@@ -29,6 +29,6 @@ tools/tla/fetch-tla2tools.sh   # requires JDK 17+
 
 ## solid_sdd
 
-- Judge: `kind=formal`, `adapter_hint=tla`, `status=apply` + **human_gate** (early Phase 3)
+- Judge: `kind=formal`, `adapter_hint=tla`, `status=apply` + **human_gate**
 - Apply: `solidsdd-apply-formal`
 - Verify: `solidsdd-verify-formal` → equivalent to `./verify.sh` in this directory
