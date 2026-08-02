@@ -1,0 +1,10 @@
+{
+  "result": "pass",
+  "must_include": [],
+  "forbidden": [
+    {
+      "severity": "major",
+      "when_result": "pass"
+    }
+  ]
+}

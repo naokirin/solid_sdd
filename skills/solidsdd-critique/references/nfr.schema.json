@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/nfr.schema.json",
+  "title": "NfrSet",
+  "description": "Structured non-functional requirements for one change. SoT for Change Context §4 (Markdown is a projection). Path: .solidsdd/changes/<change_id>/nfr.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "change_id", "items"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "items": {
+      "type": "array",
+      "minItems": 6,
+      "items": { "$ref": "#/$defs/nfr_item" },
+      "description": "Must include at least one entry for each required quality (reliability, security, performance, operability, compatibility, maintainability)."
+    }
+  },
+  "$defs": {
+    "nfr_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "quality", "status", "requirement", "rationale"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^NFR[0-9]+$",
+          "description": "Stable id (e.g. NFR1)."
+        },
+        "quality": {
+          "type": "string",
+          "enum": [
+            "reliability",
+            "security",
+            "performance",
+            "operability",
+            "compatibility",
+            "maintainability"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["in_scope", "out_of_scope", "deferred"]
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What must hold, or N/A statement when out_of_scope/deferred."
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threshold": {
+          "type": "string",
+          "description": "Measurable threshold; required when status is in_scope."
+        },
+        "measurement": {
+          "type": "string",
+          "description": "How to measure/verify; required when status is in_scope."
+        },
+        "verified_by": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths or check names that evidence the NFR (filled as verify progresses)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "in_scope" } },
+            "required": ["status"]
+          },
+          "then": {
+            "required": ["threshold", "measurement"]
+          }
+        }
+      ]
+    }
+  }
+}

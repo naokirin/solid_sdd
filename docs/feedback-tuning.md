@@ -44,6 +44,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
+| 2026-08-03 | solid_sdd hardening M3 | `nfr.json` SoT + critique eval fixtures + GitHub Actions CI | Applied — [hardening-plan.md](hardening-plan.md) |
 | 2026-08-03 | solid_sdd hardening M2 | `run-state.json` + per-item ApplicationPlan/critique/verify persistence | Applied — [hardening-plan.md](hardening-plan.md) |
 | 2026-08-03 | solid_sdd hardening M1 | ID traceability (`{id,text}` + `covers` + Scenario tags) + critique-only `solidsdd-lint` | Applied — [hardening-plan.md](hardening-plan.md) |
 | 2026-08-02 | solid_sdd examples (Pass 1) | See table above | Applied to rules, axes, context, loop-retry, OCL adapter notes |

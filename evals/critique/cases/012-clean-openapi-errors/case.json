@@ -1,0 +1,5 @@
+{
+  "id": "012-clean-openapi-errors",
+  "checker": "static_openapi",
+  "description": "must pass OpenAPI with 4xx"
+}

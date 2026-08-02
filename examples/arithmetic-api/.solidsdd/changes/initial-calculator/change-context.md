@@ -19,14 +19,16 @@ Clients need a small arithmetic calculator service they can call over HTTP: the 
 
 ## 4. Non-functional requirements
 
-| Quality | Requirement | Rationale | Verification / deferred |
-|---------|-------------|-----------|-------------------------|
-| Reliability / error handling | Invalid arithmetic (esp. / and rem by 0) fails with a **named domain error**, not opaque language errors | Callers and contract tests need a stable signal | Contract tests + API error channel; OCL `pre` |
-| Security | N/A for this change | Auth explicitly out of scope | Deferred / out of scope |
-| Performance | No special latency/throughput targets | Sample workload | N/A |
-| Operability | Behaviors checkable via HTTP/API and module contracts without opaque internals | solid_sdd evaluate path | OpenAPI + OCL-derived tests |
-| Compatibility | Additive sample API; no stated external clients yet | Greenfield sample | OpenAPI documents surface |
-| Maintainability | Prefer UML OCL as DbC SoT; tests derived | Matches solid_sdd adapter policy | OCL + derive-tests |
+Projection of `nfr.json` (SoT). Do not edit this table without updating `nfr.json`.
+
+| Id | Quality | Status | Requirement | Rationale | Threshold / measurement |
+|----|---------|--------|-------------|-----------|-------------------------|
+| NFR1 | reliability | in_scope | Named domain error on invalid arithmetic (esp. / and rem by 0) | Stable signal for callers/tests | Domain error always; Vitest + OpenAPI + OCL `pre` |
+| NFR2 | security | out_of_scope | N/A — auth out of scope | Explicitly excluded | — |
+| NFR3 | performance | out_of_scope | N/A — no latency/throughput targets | Sample workload | — |
+| NFR4 | operability | in_scope | Checkable HTTP/API + module contracts | solid_sdd evaluate path | OpenAPI + contract tests present/passing |
+| NFR5 | compatibility | in_scope | Additive sample API documented in OpenAPI | Greenfield sample | OpenAPI structural lint when tooling available |
+| NFR6 | maintainability | in_scope | UML OCL SoT; tests derived | solid_sdd adapter policy | `contracts/**/*.ocl` + derived Vitest |
 
 ## 5. Technology selection
 
@@ -43,6 +45,7 @@ Clients need a small arithmetic calculator service they can call over HTTP: the 
 - Treat “checkable HTTP + module contracts” as a success criterion, but leave **density / adapter apply** to `solidsdd-judge` (do not over-specify OpenAPI field lists here).
 - Prefer **named domain errors** over raw `ZeroDivisionError` so API and tests share one failure vocabulary.
 - Exclude auth, multi-user memory, history, and durable storage to keep the sample bounded.
+- Working language: en (from sample / default)
 
 ## 7. Open questions and deferred decisions
 
@@ -51,6 +54,7 @@ Clients need a small arithmetic calculator service they can call over HTTP: the 
 
 ## 8. Links
 
+- NFR SoT: `.solidsdd/changes/initial-calculator/nfr.json`
 - Change Context gate: `.solidsdd/changes/initial-calculator/change-context-gate.json`
 - ChangeBrief: `.solidsdd/changes/initial-calculator/change-brief.json`
 - WorkPlan: `.solidsdd/changes/initial-calculator/work-plan.json`

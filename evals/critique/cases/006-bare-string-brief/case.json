@@ -1,0 +1,5 @@
+{
+  "id": "006-bare-string-brief",
+  "checker": "lint",
+  "description": "string[] in_scope invalid"
+}

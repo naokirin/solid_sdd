@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Reliable",
+      "rationale": "Because",
+      "threshold": "t",
+      "measurement": "m"
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Operable",
+      "rationale": "Because",
+      "threshold": "t",
+      "measurement": "m"
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Compatible",
+      "rationale": "Because",
+      "threshold": "t",
+      "measurement": "m"
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Maintainable",
+      "rationale": "Because",
+      "threshold": "t",
+      "measurement": "m"
+    }
+  ]
+}

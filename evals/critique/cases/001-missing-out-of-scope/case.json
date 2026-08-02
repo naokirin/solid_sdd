@@ -1,0 +1,5 @@
+{
+  "id": "001-missing-out-of-scope",
+  "checker": "lint",
+  "description": "Brief missing out_of_scope"
+}

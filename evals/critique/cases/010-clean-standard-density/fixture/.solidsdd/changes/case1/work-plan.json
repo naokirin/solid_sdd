@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "items": [
+    {
+      "id": "W1",
+      "intent": "do",
+      "acceptance_criterion": "Scenario: Thing works\n  Given x\n  When y\n  Then z",
+      "covers": [
+        "R1",
+        "SC1"
+      ],
+      "depends_on": [],
+      "status": "ready",
+      "feature_path": "requirements/t.feature",
+      "scenario_name": "Thing works"
+    }
+  ]
+}

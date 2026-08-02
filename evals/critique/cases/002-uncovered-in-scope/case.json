@@ -1,0 +1,5 @@
+{
+  "id": "002-uncovered-in-scope",
+  "checker": "lint",
+  "description": "WorkPlan covers omit R1"
+}

@@ -1,0 +1,5 @@
+{
+  "id": "005-happy-path-only-api",
+  "checker": "static_openapi",
+  "description": "OpenAPI without 4xx"
+}

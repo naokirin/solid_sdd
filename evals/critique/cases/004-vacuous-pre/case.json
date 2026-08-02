@@ -1,0 +1,5 @@
+{
+  "id": "004-vacuous-pre",
+  "checker": "static_ocl",
+  "description": "OCL pre: true"
+}

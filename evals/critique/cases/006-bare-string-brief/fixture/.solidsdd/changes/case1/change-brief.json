@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "summary": "s",
+  "goal": "g",
+  "in_scope": [
+    "Do the thing"
+  ],
+  "out_of_scope": [
+    "Nope"
+  ],
+  "success_criteria": [
+    "Works"
+  ]
+}

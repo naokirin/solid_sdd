@@ -1,0 +1,5 @@
+{
+  "id": "009-nfr-in-scope-no-threshold",
+  "checker": "lint",
+  "description": "in_scope NFR missing threshold"
+}

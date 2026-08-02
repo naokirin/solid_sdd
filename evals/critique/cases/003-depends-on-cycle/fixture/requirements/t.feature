@@ -1,0 +1,11 @@
+Feature: T
+  @R1 @SC1
+  Scenario: A
+    Given g
+    When w
+    Then t
+  @R2 @SC1
+  Scenario: B
+    Given g
+    When w
+    Then t

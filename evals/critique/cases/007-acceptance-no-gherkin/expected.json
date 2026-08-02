@@ -1,0 +1,9 @@
+{
+  "result": "fail",
+  "must_include": [
+    {
+      "severity": "major",
+      "category": "unverifiable_acceptance"
+    }
+  ]
+}

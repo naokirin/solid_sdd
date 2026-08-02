@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "items": [
+    {
+      "id": "W1",
+      "intent": "do",
+      "acceptance_criterion": "Make it robust somehow",
+      "covers": [
+        "R1",
+        "SC1"
+      ],
+      "depends_on": [],
+      "status": "ready"
+    }
+  ]
+}

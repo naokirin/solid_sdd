@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "summary": "s",
+  "goal": "g",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "a"
+    },
+    {
+      "id": "R2",
+      "text": "b"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Not that"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ok"
+    }
+  ]
+}

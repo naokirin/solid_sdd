@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install jsonschema
+
+      - name: Skill references in sync
+        run: scripts/sync-skill-references.sh --check
+
+      - name: Skill frontmatter
+        run: bash scripts/check-skill-frontmatter.sh
+
+      - name: solidsdd-lint (arithmetic-api)
+        run: scripts/solidsdd-lint.sh --project-root examples/arithmetic-api
+
+      - name: Critique / lint regression fixtures
+        run: python3 scripts/solidsdd-critique-eval.py
+
+      - name: Validate example change JSON against schemas
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+          root = Path("schemas")
+          mapping = {
+            "change-brief.json": "change-brief.schema.json",
+            "work-plan.json": "work-plan.schema.json",
+            "nfr.json": "nfr.schema.json",
+            "run-state.json": "run-state.schema.json",
+            "status.json": "change-status.schema.json",
+            "change-context-gate.json": "change-context-gate.schema.json",
+            "active-change.json": "active-change.schema.json",
+          }
+          for path in Path("examples").rglob("*"):
+            if path.name not in mapping:
+              continue
+            schema = json.loads((root / mapping[path.name]).read_text())
+            data = json.loads(path.read_text())
+            jsonschema.Draft202012Validator(schema).validate(data)
+            print("ok", path)
+          PY
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: arithmetic-api tests
+        working-directory: examples/arithmetic-api
+        run: npm ci && npm test
+
+      - name: arithmetic-graphql tests
+        working-directory: examples/arithmetic-graphql
+        run: npm ci && npm test
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: examples/arithmetic-ruby
+
+      - name: arithmetic-ruby specs
+        working-directory: examples/arithmetic-ruby
+        run: bundle install && bundle exec rspec

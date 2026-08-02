@@ -286,6 +286,76 @@ def lint_change(
                 )
             )
 
+    nfr_path = change_dir / "nfr.json"
+    status_obj = load_json(status_path) if status_path.is_file() else {}
+    if nfr_path.is_file():
+        nfr = load_json(nfr_path)
+        validate_schema(nfr, "nfr.schema.json", str(nfr_path), findings)
+        if nfr.get("change_id") and nfr["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "nfr.json#change_id",
+                    f"change_id {nfr['change_id']!r} != directory {change_id!r}",
+                )
+            )
+        required_qualities = {
+            "reliability",
+            "security",
+            "performance",
+            "operability",
+            "compatibility",
+            "maintainability",
+        }
+        seen_q = set()
+        for item in nfr.get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            q = item.get("quality")
+            if q:
+                seen_q.add(q)
+            if item.get("status") == "in_scope":
+                if not item.get("threshold") or not item.get("measurement"):
+                    findings.append(
+                        finding(
+                            "major",
+                            "scope_gap",
+                            f"nfr.json#{item.get('id')}",
+                            "in_scope NFR requires threshold and measurement",
+                        )
+                    )
+                if status_obj.get("status") == "done":
+                    vb = item.get("verified_by") or []
+                    if not vb:
+                        findings.append(
+                            finding(
+                                "major",
+                                "scope_gap",
+                                f"nfr.json#{item.get('id')}/verified_by",
+                                "in_scope NFR has empty verified_by while change status is done",
+                            )
+                        )
+        missing_q = sorted(required_qualities - seen_q)
+        if missing_q:
+            findings.append(
+                finding(
+                    "major",
+                    "scope_gap",
+                    "nfr.json#items",
+                    f"missing required qualities: {', '.join(missing_q)}",
+                )
+            )
+    elif brief_path.is_file() or (change_dir / "change-context.md").is_file():
+        findings.append(
+            finding(
+                "major",
+                "scope_gap",
+                str(nfr_path),
+                "nfr.json missing (SoT for Change Context §4)",
+            )
+        )
+
     work = None
     if plan_path.is_file():
         work = load_json(plan_path)

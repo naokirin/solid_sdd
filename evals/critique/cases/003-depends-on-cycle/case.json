@@ -1,0 +1,5 @@
+{
+  "id": "003-depends-on-cycle",
+  "checker": "lint",
+  "description": "depends_on cycle"
+}

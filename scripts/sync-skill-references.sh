@@ -135,6 +135,9 @@ sync_one schemas/change-context-gate.schema.json skills/solidsdd-intake/referenc
 sync_one schemas/change-context-gate.schema.json skills/solidsdd-run/references/change-context-gate.schema.json
 sync_one schemas/change-context-gate.schema.json skills/solidsdd-critique/references/change-context-gate.schema.json
 sync_one schemas/change-context-gate.schema.json skills/solidsdd-brief/references/change-context-gate.schema.json
+sync_one schemas/nfr.schema.json skills/solidsdd-intake/references/nfr.schema.json
+sync_one schemas/nfr.schema.json skills/solidsdd-critique/references/nfr.schema.json
+sync_one schemas/nfr.schema.json skills/solidsdd-run/references/nfr.schema.json
 sync_one schemas/verification-report.schema.json skills/solidsdd-verify/references/verification-report.schema.json
 sync_one schemas/critique-report.schema.json skills/solidsdd-critique/references/critique-report.schema.json
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc

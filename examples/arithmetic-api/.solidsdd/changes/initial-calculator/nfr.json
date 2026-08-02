@@ -1,0 +1,72 @@
+{
+  "version": "1",
+  "change_id": "initial-calculator",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Invalid arithmetic (especially division or remainder by zero) fails with a named domain error, not an opaque language/runtime error.",
+      "rationale": "Callers and contract tests need a stable failure signal.",
+      "threshold": "Division/remainder by zero always raises the named domain error type used by the service (never ZeroDivisionError/raw runtime as the only signal).",
+      "measurement": "OCL-derived Vitest contract tests + OpenAPI error channel exercises.",
+      "verified_by": [
+        "tests/contracts/calculator.test.ts",
+        "contracts/Calculator.ocl",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A — authentication and authorization are out of scope for this change.",
+      "rationale": "Auth explicitly excluded from sample scope."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no special latency or throughput targets.",
+      "rationale": "Sample / evaluation workload only."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Behaviors are checkable via HTTP/API and module contracts without relying on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires machine-checkable surfaces.",
+      "threshold": "OpenAPI documents calculate/memory surfaces and OCL-derived tests exist for in-scope ops.",
+      "measurement": "Presence of openapi/openapi.yaml plus passing tests/contracts/*.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "tests/contracts/calculator.test.ts",
+        "tests/contracts/memory.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive sample API; document the HTTP surface in OpenAPI for future clients.",
+      "rationale": "Greenfield sample with no stated external clients yet.",
+      "threshold": "openapi/openapi.yaml validates structurally (Redocly --extends=spec when tooling available).",
+      "measurement": "solidsdd-verify OpenAPI lint check (or skipped with tooling reason).",
+      "verified_by": ["openapi/openapi.yaml"]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL is the DbC source of truth; contract tests are derived from OCL.",
+      "rationale": "Matches solid_sdd adapter policy.",
+      "threshold": "contracts/**/*.ocl exist for calculator/memory and derived Vitest tests reference those behaviors.",
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes.",
+      "verified_by": [
+        "contracts/Calculator.ocl",
+        "contracts/Memory.ocl",
+        "tests/contracts/"
+      ]
+    }
+  ]
+}

@@ -73,7 +73,7 @@ Rules:
 |----------------|--------------|
 | Demand and problem | `change-context.md` with §1 (and §2 when present) |
 | Functional requirements | `change-brief.json` and/or Feature paths tied to this change |
-| Non-functional requirements | `change-context.md` §4 with content (not empty placeholder) |
+| Non-functional requirements | `nfr.json` and/or `change-context.md` §4 with content |
 | Technology selection | `change-context.md` §5 with content |
 | Design — WorkPlan | `work-plan.json` |
 | Design — ApplicationPlan | One or more ApplicationPlan JSON files for this change (see discovery below) |
@@ -131,7 +131,8 @@ From Change Context §1–§2. Include drivers/constraints. If Context missing �
 
 ### §3–§4 NFR and technology
 
-Copy/adapt tables or bullets from Context §4–§5. Preserve requirement / rationale / verification and decision / alternatives / rationale / source. Missing Context → Not performed.
+- Prefer `nfr.json` as SoT for §3 Non-functional requirements (render id / quality / status / requirement / threshold). Fall back to Context §4 only if `nfr.json` is missing (mark that SoT is absent).
+- Technology: copy/adapt tables from Context §5. Missing Context → Not performed.
 
 ### §5 Design
 

@@ -32,10 +32,11 @@ Change Context is **not** a living product PRD and **not** a substitute for Brie
 | Artifact | Path |
 |----------|------|
 | Change Context | `.solidsdd/changes/<change_id>/change-context.md` |
+| NFR SoT | `.solidsdd/changes/<change_id>/nfr.json` — structured NFRs; §4 is a **projection** ([nfr.schema.json](../schemas/nfr.schema.json)) |
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` |
 | Active pointer / status | same lifecycle as Brief — [change-lifecycle.md](change-lifecycle.md) |
 
-`solidsdd-intake` **owns** creating `change_id`, the change directory, `status.json` (`active`), `active-change.json`, and `change-context-gate.json`. `solidsdd-brief` then writes `change-brief.json` into that directory (must not invent a conflicting id).
+`solidsdd-intake` **owns** creating `change_id`, the change directory, `status.json` (`active`), `active-change.json`, `nfr.json`, and `change-context-gate.json`. `solidsdd-brief` then writes `change-brief.json` into that directory (must not invent a conflicting id).
 
 ## Required document shape
 
@@ -61,7 +62,7 @@ Use exactly these top-level headings (English). Subheadings under §4 / §5 are 
 | **1. Demand and problem** | Who/what hurts; desired outcome in prose (not Scenario lists) |
 | **2. Drivers and constraints** | External constraints (compliance, timeline, “must reuse stack X”); explicit “none” if empty |
 | **3. Functional intent** | Short summary of capabilities; detail belongs in Brief / Gherkin |
-| **4. Non-functional requirements** | For each relevant quality (at least consider: reliability/error handling, security, performance, operability, compatibility, maintainability): **requirement**, **rationale**, **verification approach or deferred**. Write “N/A — rationale” when deliberately out of scope |
+| **4. Non-functional requirements** | **Projection of `nfr.json` (SoT).** Include all six qualities (`reliability`, `security`, `performance`, `operability`, `compatibility`, `maintainability`). For `in_scope` items, `threshold` + `measurement` are required in JSON; render them in the Markdown table. `out_of_scope` / `deferred` need requirement + rationale (N/A OK). Do not invent §4 rows that are absent from `nfr.json` |
 | **5. Technology selection** | For each decision (language/runtime, API style, persistence, test stack, contract approach, …): **decision**, **alternatives considered**, **rationale**, **source** (`user` / `repo_existing` / `agent_default` + why). If inheriting the repo stack, say so explicitly—do not leave blank |
 | **6. Key judgments** | Non-obvious calls (e.g. named domain errors vs raw exceptions; single-slot memory; skip auth). Include `Working language: <tag> (from …)` per [working-language.md](working-language.md) |
 | **7. Open questions** | Unresolved items; align with Brief `open_questions` / gates when blocking |
@@ -102,9 +103,9 @@ Fill `decisions_to_confirm` only when `required: true` (concrete questions for t
 
 - `solidsdd-brief` — scope must not contradict §3–§6; `out_of_scope` should reflect deliberate exclusions from context; honor Change Context gate before starting when under `solidsdd-run`
 - `solidsdd-judge` — density / adapter hints should respect §5 technology selection unless Brief/gates override
-- `solidsdd-critique` — missing §4/§5 content, or tech/NFR with no rationale → `scope_gap` / fail when checkability of premise is lost; blocking §7 without gate → major
-- Ambiguity in loop — re-read §5–§7 before inventing stack or NFR policy
+- `solidsdd-critique` — missing §4/§5 content, or tech/NFR with no rationale → `scope_gap` / fail when checkability of premise is lost; blocking §7 without gate → major. Missing/invalid `nfr.json` or in_scope NFR without threshold is primarily **lint** (`scripts/solidsdd-lint.sh`)
+- Ambiguity in loop — re-read §5–§7 and `nfr.json` before inventing stack or NFR policy
 
 ## Critique expectations
 
-`subject: change_context` — major when required headings are missing; when §4 or §5 are empty/hand-wavy despite a stack or quality-sensitive demand; when decisions lack both alternatives and rationale; when gate triggers above fire but `change-context-gate.json` has `required: false`. Polish-only wording → minor. See [adversarial-critique.md](adversarial-critique.md) and [human-gates.md](human-gates.md).
+`subject: change_context` — major when required headings are missing; when §4 or §5 are empty/hand-wavy despite a stack or quality-sensitive demand; when decisions lack both alternatives and rationale; when gate triggers above fire but `change-context-gate.json` has `required: false`; when Context §4 contradicts `nfr.json`. Polish-only wording → minor. See [adversarial-critique.md](adversarial-critique.md) and [human-gates.md](human-gates.md).

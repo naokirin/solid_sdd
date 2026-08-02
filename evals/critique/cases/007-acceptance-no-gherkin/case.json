@@ -1,0 +1,5 @@
+{
+  "id": "007-acceptance-no-gherkin",
+  "checker": "lint",
+  "description": "free-form acceptance"
+}

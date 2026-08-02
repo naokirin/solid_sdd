@@ -178,8 +178,10 @@ Ids (`NFR1`, …) should join the `covers` story where WorkPlan/verify claims NF
 
 ### Acceptance
 
-- [ ] Missing quality row / empty in-scope NFR without threshold → lint fail
-- [ ] Example arithmetic-api still valid with explicit `status: out_of_scope` + rationale for Performance/Security
+- [x] Missing quality row / empty in-scope NFR without threshold → lint fail
+- [x] Example arithmetic-api still valid with explicit `status: out_of_scope` + rationale for Performance/Security
+
+Shipped: `schemas/nfr.schema.json`, intake writes `nfr.json`, lint + arithmetic-api sample (2026-08-03).
 
 ---
 
@@ -208,8 +210,10 @@ Wire into CI once Workstream G exists (even if first version is manual checklist
 
 ### Acceptance
 
-- [ ] Editing severity table without updating corpus fails CI or documented eval script
-- [ ] Clean standard-density fixtures pass under current calibration
+- [x] Editing severity table without updating corpus fails CI or documented eval script
+- [x] Clean standard-density fixtures pass under current calibration
+
+Shipped: `evals/critique/` (12 cases) + `scripts/solidsdd-critique-eval.py` (deterministic checkers; LLM variance deferred).
 
 ---
 
@@ -217,7 +221,7 @@ Wire into CI once Workstream G exists (even if first version is manual checklist
 
 | Item | Action | Priority |
 |------|--------|----------|
-| **CI** | GitHub Actions: `sync-skill-references.sh --check`, schema validate examples, run example tests, SKILL frontmatter sanity | P1 |
+| **CI** | GitHub Actions: `sync-skill-references.sh --check`, schema validate examples, run example tests, SKILL frontmatter sanity | P1 — **done** (`.github/workflows/ci.yml`) |
 | **Read-only tools** | Where supported (e.g. Claude Code `allowed-tools`), restrict critique (and optionally intake/brief/decompose write surfaces); document Cursor limitation | P2 |
 | **Cross-change consistency** | New critique subject and/or intake section: collide with prior Scenarios / prior `out_of_scope` | P2 |
 | **Gate approval record** | `gate-approval.json` (who/when/scope/partial); **approver is free-text** (no git-user / `--approver` requirement); resume protocol checks the record exists when resuming past a gate | P2 |
@@ -255,8 +259,8 @@ Shipped artifacts: `schemas/*` (`covers` / scoped items), `scripts/solidsdd-lint
 
 ### Milestone M3 — NFR + critique quality bar
 
-- Workstreams **D** + **E**
-- First GitHub Actions workflow (**F**/CI subset)
+- [x] Workstreams **D** + **E**
+- [x] First GitHub Actions workflow (**F**/CI subset)
 
 ### Milestone M4 — Ecosystem / edge hardness
 

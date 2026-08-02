@@ -12,6 +12,7 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
   changes/
     <change_id>/
       change-context.md              # demand, NFR, tech selection (solidsdd-intake)
+      nfr.json                       # NFR SoT (Context §4 projection)
       change-context-gate.json       # optional human gate after intake
       change-brief.json
       work-plan.json                 # after solidsdd-decompose
@@ -26,6 +27,7 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
 |----------|------|------|
 | Active pointer | `.solidsdd/active-change.json` | Which change is in progress |
 | Change Context | `.solidsdd/changes/<change_id>/change-context.md` | Demand / NFR / tech selection / judgments |
+| NFR SoT | `.solidsdd/changes/<change_id>/nfr.json` | Structured NFRs (Context §4 projection) |
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Whether to pause before Brief |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise / return point |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change |

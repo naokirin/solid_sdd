@@ -95,7 +95,7 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 
 ## Phase 5: Hardening (planned)
 
-**Status: plan drafted; Milestones M1–M2 shipped** ([hardening-plan.md](hardening-plan.md)). Raise mechanical assurance so requirements hardness does not bottom out in LLM judgment alone.
+**Status: plan drafted; Milestones M1–M3 shipped** ([hardening-plan.md](hardening-plan.md)). Raise mechanical assurance so requirements hardness does not bottom out in LLM judgment alone.
 
 Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 
@@ -107,7 +107,7 @@ Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 
 ## Near-term next actions
 
-1. Execute [hardening-plan.md](hardening-plan.md) Milestone **M3** (structured NFRs + critique eval corpus + CI subset)
+1. Execute [hardening-plan.md](hardening-plan.md) Milestone **M4** (remaining supporting hardening / richer example / optional EARS)
 2. `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (distribution)
 3. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
 4. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)

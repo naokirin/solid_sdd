@@ -1,0 +1,36 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "items": [
+    {
+      "id": "W1",
+      "intent": "a",
+      "acceptance_criterion": "Scenario: A\n  Given g\n  When w\n  Then t",
+      "covers": [
+        "R1",
+        "SC1"
+      ],
+      "depends_on": [
+        "W2"
+      ],
+      "status": "pending",
+      "feature_path": "requirements/t.feature",
+      "scenario_name": "A"
+    },
+    {
+      "id": "W2",
+      "intent": "b",
+      "acceptance_criterion": "Scenario: B\n  Given g\n  When w\n  Then t",
+      "covers": [
+        "R2",
+        "SC1"
+      ],
+      "depends_on": [
+        "W1"
+      ],
+      "status": "pending",
+      "feature_path": "requirements/t.feature",
+      "scenario_name": "B"
+    }
+  ]
+}

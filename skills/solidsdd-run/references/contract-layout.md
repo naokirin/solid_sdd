@@ -4,6 +4,7 @@
 |------|------|-------|
 | Active change pointer | `.solidsdd/active-change.json` | `{ "version": "1", "change_id": "<id>" }` |
 | Change Context | `.solidsdd/changes/<change_id>/change-context.md` | Demand / NFR / tech selection (`solidsdd-intake`) |
+| NFR SoT | `.solidsdd/changes/<change_id>/nfr.json` | Structured NFRs; Context §4 is a projection |
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Optional human pause before Brief |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |

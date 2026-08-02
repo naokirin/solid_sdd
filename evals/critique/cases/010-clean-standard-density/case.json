@@ -1,0 +1,5 @@
+{
+  "id": "010-clean-standard-density",
+  "checker": "lint",
+  "description": "must pass clean lint"
+}
