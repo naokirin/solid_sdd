@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl#lookup は W1 ApplicationPlan（dbc apply）と Brief R1/R5/SC1 の認可付き get-by-id 成功を standard 密度で検査可能にしている。pre PrincipalAuthorized / HoldExists、post ResultIsHoldDetails（sku/quantity/expiresAt）、AvailableStockUnchanged、HoldsUnchanged があり vacuous ではない。欠落・非可視および未認可の名前付き失敗 post はコメントスタブで W2 昇格待ちであり ApplicationPlan と整合する。solidsdd-lint は pass（touches 重複の minor のみ）。残りは結果 holdId の明示と W2 失敗 post の本格化。",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run はこれらの item を直列化する必要がある"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#lookup",
+      "detail": "HoldExists / PrincipalAuthorized 違反時の名前付き失敗 post（HoldMissingOrNotVisibleErrorOnLookup、UnauthorizedErrorOnLookup ほか無変更）はコメントアウトのスタブ。pre 自体は存在し W1 は認可成功のみが対象（R2/R3 は W2）のため checkability は失われていないが、W2 で reserve の InsufficientStock/Unauthorized と同水準の live post へ昇格させること。"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "contracts/Reservation.ocl#lookup/ResultIsHoldDetails",
+      "detail": "ResultIsHoldDetails は sku/quantity/expiresAt を @pre の hold と突き合わせるが、OpenAPI LookupResponse が必須とする holdId の一致は OCL 側で明示されていない。W1 の「hold details」検査可能性はフィールド三要素で足りるが、API 語彙との対称性のため result の id/holdId 制約を足すとより強い。"
+    }
+  ]
+}

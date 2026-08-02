@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl#lookup adequately elevates W2 named missing/not-visible and unauthorized failure posts at standard density for Brief R2/R3/SC2/SC3: live HoldMissingOrNotVisibleErrorOnLookup / HoldsUnchangedOnHoldMissingLookup and UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup / AvailableStockUnchangedOnUnauthorizedLookup sit beside PrincipalAuthorized and HoldExists preconditions (no longer W1 comment stubs); missing and not-visible share one PreconditionError channel; success posts retained. Not vacuous. solidsdd-lint pass with zero findings. Remaining items are polish only.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#lookup/HoldMissingOrNotVisibleErrorOnLookup",
+      "detail": "On hold-missing, only HoldsUnchangedOnHoldMissingLookup constrains non-mutation; AvailableStockUnchanged is left implied (no sku when hold absent). Holds equality is enough for R2/SC2 checkability at standard density, but an explicit stock-side post at the level of AvailableStockUnchangedOnInsufficientStock would be stronger."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "contracts/Reservation.ocl#lookup/ResultIsHoldDetails",
+      "detail": "ResultIsHoldDetails matches sku/quantity/expiresAt to @pre but does not assert holdId/id equality required by OpenAPI LookupResponse. Independent of W2 failure-post checkability; success-path symmetry polish only."
+    }
+  ]
+}

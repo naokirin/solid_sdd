@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for add-reservation-lookup is checkable at brief density: non-empty {id,text} in_scope (R1–R5) and out_of_scope (X1–X10) with no in/out contradictions; success_criteria SC1–SC4 are observable (authorized get-by-id details, named missing/not-visible and unauthorized errors with no mutation, additive OpenAPI + OCL/Vitest). open_questions are explicitly non-blocking; confidence high and human_gate.required false match settled Change Context. Aligns with Context §1–§5 and nfr.json NFR1/NFR2/NFR4–NFR6 (lookup correctness, authZ, checkable surfaces, additive compatibility); X9/X10 pin TTL extend and list-by-SKU exclusions from §2/§6. solidsdd-lint --change-id add-reservation-lookup passed with zero findings. WorkPlan absent is expected pre-decompose (lint allows Brief-only).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-reservation-lookup/change-brief.json#assumptions|open_questions",
+      "detail": "Expired-hold visibility remains a deferred default (missing and not-visible share one named domain error). Acceptable for Brief; WorkPlan/OCL must pin that policy so NFR1 missing/not-visible stays machine-checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-reservation-lookup/work-plan.json",
+      "detail": "work-plan.json is absent. Expected at change_brief phase (WorkPlan is produced by solidsdd-decompose next); lint did not flag it and this is not a Brief checkability hole."
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "summary": "Add an authorized get-by-id lookup for an existing soft-hold so operators and client tests can confirm hold state: authorized opaque principals receive hold details; missing or not-visible holds and unauthorized callers fail with named domain errors without mutating stock or holds; extend OpenAPI, UML OCL, and Vitest additively while keeping prior reserve/release/expire behavior and excluding payments, multi-warehouse, full IAM, UI, notifications, TTL extend, and list-by-SKU aggregates.",
+  "goal": "Authorized callers can look up an existing soft-hold by id and receive its details; missing/not-visible and unauthorized lookups fail with named domain errors without mutation; OpenAPI, OCL, and Vitest make the lookup behaviors machine-checkable without breaking prior reserve/release/expire surfaces.",
+  "background": "Follow-on to done change initial-reservation. Callers can soft-hold, release, and expire holds but cannot read an existing soft-hold by id. Demand, inherited TypeScript/Node + OpenAPI + OCL + Vitest stack, and out-of-scope themes were settled in Change Context.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "WHEN an authorized opaque principal looks up an existing visible soft-hold by id THEN THE reservation service SHALL return that hold's details without mutating stock or holds"
+    },
+    {
+      "id": "R2",
+      "text": "IF the soft-hold does not exist or is not visible THEN THE reservation service SHALL fail lookup with a named domain error and leave stock and holds unchanged"
+    },
+    {
+      "id": "R3",
+      "text": "IF the caller is unauthorized THEN THE reservation service SHALL fail lookup with a named domain error and leave stock and holds unchanged"
+    },
+    {
+      "id": "R4",
+      "text": "Additive HTTP/API surface in OpenAPI that exposes get-by-id soft-hold lookup clients and tests can exercise without removing prior reserve/release/expire operations"
+    },
+    {
+      "id": "R5",
+      "text": "Module-level UML OCL contracts with derived Vitest tests that make authorized get-by-id success and named missing/not-visible and unauthorized lookup failures checkable"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Payments, checkout, or money/ledger boundaries"
+    },
+    {
+      "id": "X2",
+      "text": "Multi-warehouse routing or cross-location inventory allocation"
+    },
+    {
+      "id": "X3",
+      "text": "Full IAM product (SSO, OAuth UI, role admin) beyond opaque-principal authorize/deny for this sample"
+    },
+    {
+      "id": "X4",
+      "text": "UI / frontend clients"
+    },
+    {
+      "id": "X5",
+      "text": "Notifications (email, push, webhooks) about holds or expiry"
+    },
+    {
+      "id": "X6",
+      "text": "Backorders, waitlists, or deferred fulfillment beyond hard-fail when stock is below request"
+    },
+    {
+      "id": "X7",
+      "text": "Durable shared persistence across process restarts beyond in-process stock and holds"
+    },
+    {
+      "id": "X8",
+      "text": "Formal methods (e.g. TLA+) for concurrent hold races or distributed consistency"
+    },
+    {
+      "id": "X9",
+      "text": "TTL extend or renewal of an existing soft-hold"
+    },
+    {
+      "id": "X10",
+      "text": "List-by-SKU, aggregates, or other multi-hold query surfaces beyond get-by-id"
+    }
+  ],
+  "assumptions": [
+    "Prior Features at requirements/reservation.feature remain in force; this change does not rewrite reserve/release/expire Scenarios",
+    "AuthZ for lookup mirrors the existing opaque-principal allow/deny pattern; exact wire format stays deferred to OpenAPI apply",
+    "Exact HTTP path/method shape for lookup (e.g. GET /reservations/{id}) is deferred to OpenAPI apply; behavior is get-by-id",
+    "Missing and not-visible holds share one named domain error unless a later apply narrows visibility (e.g. expired-hold visibility)",
+    "Error JSON / status codes for the new named domain error are deferred to OpenAPI apply; the named error itself is required",
+    "Stock and holds remain process-local / in-memory; no new persistence model"
+  ],
+  "constraints": [
+    "Language/runtime: TypeScript / Node HTTP API (inherited)",
+    "OpenAPI SoT path: openapi/openapi.yaml (additive lookup only; do not break prior reserve/release/expire surface)",
+    "UML OCL under contracts/**/*.ocl; derived Vitest under tests/contracts/**",
+    "Missing/not-visible and unauthorized lookup failures must use named domain errors shared by API, OCL, and tests",
+    "Contract kind and density choices are deferred to solidsdd-judge; this brief only requires checkable HTTP/API and module surfaces for lookup",
+    "ChangeBrief only at this step: no Feature files, WorkPlan, OpenAPI, OCL, tests, or implementation edits as part of brief emission"
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "WHEN an authorized opaque principal looks up an existing visible soft-hold by id THEN the service returns that hold's details without mutating stock or holds"
+    },
+    {
+      "id": "SC2",
+      "text": "IF the soft-hold does not exist or is not visible THEN lookup fails with a named domain error and leaves stock and holds unchanged"
+    },
+    {
+      "id": "SC3",
+      "text": "IF the caller is unauthorized THEN lookup fails with a named domain error and never mutates stock or holds"
+    },
+    {
+      "id": "SC4",
+      "text": "openapi/openapi.yaml documents additive lookup while prior reserve/release/expire operations remain; contracts/**/*.ocl and passing tests/contracts/** cover get-by-id success and named missing/unauthorized failures"
+    }
+  ],
+  "open_questions": [
+    "Exact HTTP path/method for lookup (deferred to OpenAPI apply; non-blocking)",
+    "Whether expired holds are not-visible vs a distinct named failure (default: same named missing/not-visible error; non-blocking)",
+    "Error JSON / HTTP status mapping for the new named domain error (deferred to OpenAPI apply; non-blocking)"
+  ],
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Demand (authorized get-by-id + named missing/not-visible and unauthorized errors), inherited stack, and out-of-scope themes including TTL extend and list-by-SKU were settled in Change Context; open_questions are non-blocking deferrals to OpenAPI/OCL apply."
+  }
+}

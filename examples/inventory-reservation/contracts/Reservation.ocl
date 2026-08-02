@@ -12,6 +12,12 @@
 -- W5: service-side expire past TTL restores held quantity and removes the
 --     hold (HoldExists, HoldPastTtl, AvailableStockRestoredOnExpiry,
 --     HoldRemoved); PreconditionError when hold missing or not past TTL.
+-- add-reservation-lookup W1: authorized get-by-id lookup of an existing
+--     visible soft-hold (PrincipalAuthorized, HoldExists, ResultIsHoldDetails,
+--     AvailableStockUnchanged, HoldsUnchanged); no mutation.
+-- add-reservation-lookup W2: named missing/not-visible (PreconditionError)
+--     and unauthorized (UnauthorizedError) lookup failures; stock and holds
+--     unchanged. Missing and not-visible share one PreconditionError channel.
 -- Named error vocabulary shared with OpenAPI.
 
 -- Default TTL when caller omits ttlSeconds (seconds).
@@ -88,3 +94,38 @@ post AvailableStockRestoredOnExpiry:
   self.availableStock(self.hold(holdId)@pre.sku) =
     self.availableStock(self.hold(holdId)@pre.sku)@pre + self.hold(holdId)@pre.quantity
 post HoldRemoved: self.hold(holdId)->isEmpty()
+
+-- add-reservation-lookup W1: authorized get-by-id of an existing visible
+-- soft-hold; return that hold's details; stock and holds unchanged.
+-- Sample visibility: a hold present in self.holds() is visible; whether
+-- expired holds are not-visible vs a distinct failure is deferred (Brief
+-- open_questions) and shares the W2 missing/not-visible named error.
+context Reservation::lookup(principal: String, holdId: String): Hold
+pre PrincipalAuthorized: principal.isAuthorized()
+pre HoldExists: self.hold(holdId)->notEmpty()
+post ResultIsHoldDetails:
+  result.sku = self.hold(holdId)@pre.sku and
+  result.quantity = self.hold(holdId)@pre.quantity and
+  result.expiresAt = self.hold(holdId)@pre.expiresAt
+post AvailableStockUnchanged:
+  self.availableStock(self.hold(holdId)@pre.sku) =
+    self.availableStock(self.hold(holdId)@pre.sku)@pre
+post HoldsUnchanged: self.holds() = self.holds()@pre
+-- W2: HoldExists / not-visible violation → named domain error
+--     PreconditionError (shared missing/not-visible channel; same vocabulary
+--     as release/expire HoldExists failures and OpenAPI getReservation 400);
+--     holds unchanged (stock unchanged implied — no sku when hold absent).
+post HoldMissingOrNotVisibleErrorOnLookup:
+  (self.hold(holdId)@pre->isEmpty()) implies result.oclIsInvalid()
+post HoldsUnchangedOnHoldMissingLookup:
+  (self.hold(holdId)@pre->isEmpty()) implies self.holds() = self.holds()@pre
+-- W2: PrincipalAuthorized violation → named UnauthorizedError; stock and
+--     holds unchanged (aligns with implement UnauthorizedError).
+post UnauthorizedErrorOnLookup:
+  (not principal.isAuthorized()) implies result.oclIsInvalid()
+post HoldsUnchangedOnUnauthorizedLookup:
+  (not principal.isAuthorized()) implies self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnUnauthorizedLookup:
+  (not principal.isAuthorized() and self.hold(holdId)@pre->notEmpty()) implies
+    self.availableStock(self.hold(holdId)@pre.sku) =
+      self.availableStock(self.hold(holdId)@pre.sku)@pre

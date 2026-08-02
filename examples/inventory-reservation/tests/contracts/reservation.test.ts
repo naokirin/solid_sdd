@@ -18,6 +18,13 @@
  *     PreconditionError + no stock/hold mutation when missing or not past TTL.
  *     HoldPastTtl is arranged by expiresAt already in the past (no sleeps);
  *     injectable service clock is an equivalent checkability path.
+ * add-reservation-lookup W1: Reservation::lookup PrincipalAuthorized,
+ *     HoldExists (pre); ResultIsHoldDetails, AvailableStockUnchanged,
+ *     HoldsUnchanged (authorized get-by-id; no mutation).
+ * add-reservation-lookup W2: HoldMissingOrNotVisibleErrorOnLookup /
+ *     HoldsUnchangedOnHoldMissingLookup (PreconditionError; no mutation);
+ *     UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup /
+ *     AvailableStockUnchangedOnUnauthorizedLookup (UnauthorizedError; no mutation).
  */
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -503,5 +510,184 @@ describe("OCL Reservation::expire", () => {
     expect(ReservationService.availableStock("SKU-2")).toBe(3);
     expect(ReservationService.holds()).toHaveLength(1);
     expect(ReservationService.holds()[0]?.holdId).toBe(hold2.holdId);
+  });
+});
+
+describe("OCL Reservation::lookup", () => {
+  afterEach(() => {
+    ReservationService.reset();
+  });
+
+  it("post ResultIsHoldDetails: authorized lookup returns that hold's sku, quantity, and expiresAt", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+
+    const result = ReservationService.lookup(AUTHORIZED, hold.holdId);
+
+    expect(result.holdId).toBe(hold.holdId);
+    expect(result.sku).toBe(hold.sku);
+    expect(result.quantity).toBe(hold.quantity);
+    expect(result.expiresAt).toBe(hold.expiresAt);
+    expect(result.sku).toBe("SKU-1");
+    expect(result.quantity).toBe(4);
+  });
+
+  it("post AvailableStockUnchanged: authorized lookup leaves availableStock equal to @pre", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+    expect(stockBefore).toBe(6);
+
+    ReservationService.lookup(AUTHORIZED, hold.holdId);
+
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+    expect(ReservationService.availableStock("SKU-1")).toBe(6);
+  });
+
+  it("post HoldsUnchanged: authorized lookup leaves holds() equal to holds()@pre", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    const holdsBefore = ReservationService.holds().map((h) => ({ ...h }));
+
+    ReservationService.lookup(AUTHORIZED, hold.holdId);
+
+    const holdsAfter = ReservationService.holds();
+    expect(holdsAfter).toHaveLength(1);
+    expect(holdsAfter[0]?.holdId).toBe(hold.holdId);
+    expect(holdsAfter[0]?.sku).toBe(holdsBefore[0]?.sku);
+    expect(holdsAfter[0]?.quantity).toBe(holdsBefore[0]?.quantity);
+    expect(holdsAfter[0]?.expiresAt).toBe(holdsBefore[0]?.expiresAt);
+  });
+
+  it("post ResultIsHoldDetails + HoldsUnchanged + AvailableStockUnchanged: other holds and stock remain intact", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.seedStock("SKU-2", 5);
+    const hold1 = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const hold2 = ReservationService.reserve(AUTHORIZED, "SKU-2", 2, 300);
+    const stock1Before = ReservationService.availableStock("SKU-1");
+    const stock2Before = ReservationService.availableStock("SKU-2");
+    const holdsBefore = ReservationService.holds().map((h) => h.holdId);
+    expect(stock1Before).toBe(7);
+    expect(stock2Before).toBe(3);
+
+    const result = ReservationService.lookup(AUTHORIZED, hold1.holdId);
+
+    expect(result.holdId).toBe(hold1.holdId);
+    expect(result.sku).toBe(hold1.sku);
+    expect(result.quantity).toBe(hold1.quantity);
+    expect(result.expiresAt).toBe(hold1.expiresAt);
+    expect(ReservationService.availableStock("SKU-1")).toBe(stock1Before);
+    expect(ReservationService.availableStock("SKU-2")).toBe(stock2Before);
+    expect(ReservationService.holds().map((h) => h.holdId)).toEqual(
+      holdsBefore,
+    );
+    expect(ReservationService.holds()).toHaveLength(2);
+    expect(
+      ReservationService.holds().find((h) => h.holdId === hold2.holdId),
+    ).toBeDefined();
+  });
+
+  it("pre HoldExists / post HoldMissingOrNotVisibleErrorOnLookup: missing holdId yields named PreconditionError", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+
+    let caught: unknown;
+    try {
+      ReservationService.lookup(AUTHORIZED, "hold-does-not-exist");
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(PreconditionError);
+    expect(caught).not.toBeInstanceOf(UnauthorizedError);
+    expect(caught).not.toBeInstanceOf(InsufficientStockError);
+    expect(caught).not.toBeInstanceOf(TypeError);
+    expect((caught as PreconditionError).errorType).toBe("PreconditionError");
+    expect((caught as PreconditionError).name).toBe("PreconditionError");
+  });
+
+  it("post HoldsUnchangedOnHoldMissingLookup: holds() equals holds()@pre when hold missing", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const existing = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+    const holdsBefore = ReservationService.holds().map((h) => h.holdId);
+
+    expect(() =>
+      ReservationService.lookup(AUTHORIZED, "hold-does-not-exist"),
+    ).toThrow(PreconditionError);
+
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+    expect(ReservationService.holds().map((h) => h.holdId)).toEqual(
+      holdsBefore,
+    );
+    expect(ReservationService.holds()[0]?.holdId).toBe(existing.holdId);
+  });
+
+  it("post HoldsUnchangedOnHoldMissingLookup: no hold mutation when none existed before missing lookup", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+
+    expect(() =>
+      ReservationService.lookup(AUTHORIZED, "hold-does-not-exist"),
+    ).toThrow(PreconditionError);
+
+    expect(ReservationService.holds()).toHaveLength(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+  });
+
+  it("pre PrincipalAuthorized: unauthorized principal is rejected", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+
+    expect(() =>
+      ReservationService.lookup(UNAUTHORIZED, hold.holdId),
+    ).toThrow(UnauthorizedError);
+  });
+
+  it("post UnauthorizedErrorOnLookup: unauthorized yields named UnauthorizedError (not a language builtin)", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    let caught: unknown;
+    try {
+      ReservationService.lookup(UNAUTHORIZED, hold.holdId);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(UnauthorizedError);
+    expect(caught).not.toBeInstanceOf(PreconditionError);
+    expect(caught).not.toBeInstanceOf(InsufficientStockError);
+    expect(caught).not.toBeInstanceOf(TypeError);
+    expect((caught as UnauthorizedError).errorType).toBe("UnauthorizedError");
+    expect((caught as UnauthorizedError).name).toBe("UnauthorizedError");
+  });
+
+  it("post HoldsUnchangedOnUnauthorizedLookup: holds() equals holds()@pre when unauthorized", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const holdsBefore = ReservationService.holds().map((h) => ({ ...h }));
+
+    expect(() =>
+      ReservationService.lookup(UNAUTHORIZED, hold.holdId),
+    ).toThrow(UnauthorizedError);
+
+    const holdsAfter = ReservationService.holds();
+    expect(holdsAfter).toHaveLength(1);
+    expect(holdsAfter[0]?.holdId).toBe(hold.holdId);
+    expect(holdsAfter[0]?.sku).toBe(holdsBefore[0]?.sku);
+    expect(holdsAfter[0]?.quantity).toBe(holdsBefore[0]?.quantity);
+    expect(holdsAfter[0]?.expiresAt).toBe(holdsBefore[0]?.expiresAt);
+  });
+
+  it("post AvailableStockUnchangedOnUnauthorizedLookup: availableStock for hold sku equals @pre when unauthorized", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+    expect(stockBefore).toBe(7);
+
+    expect(() =>
+      ReservationService.lookup(UNAUTHORIZED, hold.holdId),
+    ).toThrow(UnauthorizedError);
+
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+    expect(ReservationService.availableStock("SKU-1")).toBe(7);
   });
 });

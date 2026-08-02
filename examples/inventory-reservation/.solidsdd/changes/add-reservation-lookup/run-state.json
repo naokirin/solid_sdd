@@ -1,0 +1,55 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "phase": "done",
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "isolation_notes": [
+    "cost_probe_start=2026-08-02T21:38:26Z",
+    "intake Task 48f99c74",
+    "critique(change_context) pass Task 4285e1ca",
+    "brief Task 9574caa1",
+    "critique(change_brief) pass Task 513b8c07",
+    "decompose Task 45953a22 (W1 foundation\u2192W2 depends_on)",
+    "critique(work_plan) pass Task a833459a",
+    "critique(cross_change_consistency) pass Task cbe5fbc0",
+    "loop orchestration: parent Task-per-step (not whole-loop Task)",
+    "W1 loop Task-per-step: judge 9ccb0191; critique(ap) e60c7991; apply-api 508f7223; critique(api) 6dba8a70; apply-dbc 91d0f2ed; critique(dbc) 9bdbaa4b; derive ddfc6970; critique(derived) 09cb6a72; implement b63e1378; verify 7632442e; critique(vr) 244e610f",
+    "W2 loop Task-per-step: judge ac599fcc; critique(ap) 6f0a8ab5; apply-api 583587b6; critique(api) fc8229fe; apply-dbc 23848f38; critique(dbc) 644d0cab; derive 068a1975; critique(derived) d3b1d391; implement a249e0dd (noop); verify ac6b66ba; critique(vr) 851bb2e4",
+    "integration_verify Task b5b8533c",
+    "critique(integration verification_report) Task 5b5efd6f SEPARATE",
+    "cost_probe_task_counts: outer=7 W1=11 W2=11 integration=2 total=31; items=2 foundation_depends_on; whole-loop_Task=0; verify+critique_same_Task=0",
+    "cost_probe_end=2026-08-02T22:01:16Z"
+  ],
+  "updated_at": "2026-08-02T22:01:16Z",
+  "wave_index": 1,
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1"
+    },
+    "W2": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W2"
+    }
+  },
+  "integration": {
+    "verification_report": "integration-verification-report.json",
+    "critique_report": "critique-integration-verification.json"
+  }
+}

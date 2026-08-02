@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest for Reservation::lookup covers every live W2 failure post at standard density: HoldMissingOrNotVisibleErrorOnLookup (named PreconditionError, not UnauthorizedError/builtins), HoldsUnchangedOnHoldMissingLookup (including empty-holds baseline and stock unchanged), UnauthorizedErrorOnLookup (named UnauthorizedError), HoldsUnchangedOnUnauthorizedLookup, and AvailableStockUnchangedOnUnauthorizedLookup; PrincipalAuthorized / HoldExists violation paths are exercised. W1 success posts remain. Suite is not empty or “does not throw” only. solidsdd-lint pass with zero findings. Distinct not-visible (e.g. expired) case remains polish because OCL/Brief share one PreconditionError channel with missing.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup/HoldMissingOrNotVisibleErrorOnLookup",
+      "detail": "Failure coverage uses a missing holdId only. Scenario/Brief also name not-visible; OCL defers whether expired holds are not-visible vs a distinct failure and shares the same PreconditionError channel, so a separate expired/not-visible case is not required for W2 checkability. An optional case that treats an expired-but-still-present hold as the shared missing/not-visible error would strengthen R2 symmetry."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup/HoldsUnchangedOnHoldMissingLookup",
+      "detail": "Missing-hold no-mutation cases assert stock unchanged for the seeded SKU even though live OCL only posts HoldsUnchangedOnHoldMissingLookup when the hold is absent (stock implied). Extra checkability is fine; optional multi-SKU isolation on the failure path (as on the W1 success isolation case) remains polish only."
+    }
+  ]
+}

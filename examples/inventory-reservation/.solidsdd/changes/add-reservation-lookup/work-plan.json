@@ -1,0 +1,66 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "summary": "Two-slice follow-on: foundation authorized get-by-id with additive OpenAPI/OCL/Vitest surfaces, then named missing/not-visible and unauthorized lookup failures without mutation; prior reserve/release/expire Features stay in force.",
+  "acceptance_of_whole": "Scenario: Reservation lookup covers authorized get-by-id and named failures\n  Given the inventory reservation service for clients\n  When clients exercise authorized soft-hold lookup by id, missing or not-visible lookup, and unauthorized lookup\n  Then authorized lookup returns that hold's details without mutating stock or holds\n  And missing/not-visible and unauthorized lookups fail with named domain errors without mutation\n  And openapi/openapi.yaml documents additive lookup while prior reserve/release/expire operations remain\n  And contracts/**/*.ocl and passing tests/contracts/** cover get-by-id success and named missing/unauthorized failures\n  And payments, multi-warehouse, full IAM, UI, notifications, TTL extend, and list-by-SKU aggregates are not required",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "ChangeBrief scope is explicit; open_questions are non-blocking deferrals to OpenAPI/OCL apply; two property-level Scenarios map cleanly to in_scope and success_criteria without blocking ambiguity."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Allow an authorized opaque principal to look up an existing visible soft-hold by id and receive its details without mutating stock or holds, establishing additive OpenAPI and UML OCL surfaces with derived Vitest coverage.",
+      "acceptance_criterion": "Scenario: Authorized lookup returns an existing visible soft-hold without mutation\n  Given a reservation service with an existing visible soft-hold\n  And an authorized opaque principal\n  When the principal looks up that soft-hold by id\n  Then the service returns that hold's details\n  And stock and holds are unchanged",
+      "covers": [
+        "R1",
+        "R4",
+        "R5",
+        "SC1",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation-lookup.feature",
+      "scenario_name": "Authorized lookup returns an existing visible soft-hold without mutation",
+      "depends_on": [],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Authorized get-by-id success and additive OpenAPI/OCL surfaces are unambiguous; path/method deferred to apply."
+      }
+    },
+    {
+      "id": "W2",
+      "intent": "Fail soft-hold lookup with a named domain error and no stock/hold mutation when the hold is missing or not visible, or when the caller is unauthorized.",
+      "acceptance_criterion": "Scenario: Lookup fails with named domain errors without mutation for missing holds and unauthorized callers\n  Given a reservation service with stock and soft-holds\n  When lookup is attempted for a missing or not-visible soft-hold by an authorized principal, or for an existing soft-hold by an unauthorized caller\n  Then the operation fails with a named domain error\n  And stock and holds are unchanged",
+      "covers": [
+        "R2",
+        "R3",
+        "SC2",
+        "SC3",
+        "SC4"
+      ],
+      "touches": [
+        "contracts/Reservation.ocl",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation-lookup.feature",
+      "scenario_name": "Lookup fails with named domain errors without mutation for missing holds and unauthorized callers",
+      "depends_on": [
+        "W1"
+      ],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Named missing/not-visible and unauthorized lookup failures follow settled Brief assumptions; error JSON deferred to apply."
+      }
+    }
+  ]
+}

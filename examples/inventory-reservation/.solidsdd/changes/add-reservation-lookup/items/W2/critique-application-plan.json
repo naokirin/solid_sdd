@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W2 ApplicationPlan applies standard OpenAPI + OCL to elevate W1 named missing/not-visible and unauthorized lookup failure stubs (no mutation), defers formal with Brief X8 / no concurrency_safety rationale, and correctly leaves human_gate false for additive authz work. solidsdd-lint pass with zero findings. Schema target.covers is WorkPlan item ids only—plan correctly uses [\"W2\"]; Brief R2/R3/SC2/SC3 and the failure half of R5/SC4 are cited in rationales and match WorkPlan W2.covers. Density meets authz_boundary floor (standard) with http_boundary/domain_contract apply; not plan thinning.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W2/application-plan.json#targets/api vs work-plan.json#items/W2/touches",
+      "detail": "API apply targets openapi/openapi.yaml#/paths/~1reservations~1{holdId}/get, but WorkPlan W2.touches lists only contracts/Reservation.ocl and src/reservation.ts. Elevation is still required for R2/R3/SC2/SC3/SC4 HTTP checkability and matches W1’s deferral of named error channels to W2—not a density or checkability hole; apply (or a WorkPlan touch update) should treat OpenAPI as in-slice."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W2/application-plan.json#targets/dbc",
+      "detail": "DbC rationale correctly requires unchanged stock and holds on HoldExists/not-visible failure, but the named posts it lists for missing/not-visible are only HoldMissingOrNotVisibleErrorOnLookup and HoldsUnchangedOnHoldMissingLookup (matching current commented stubs). On apply, also elevate or add an AvailableStockUnchanged-on-missing post (or equivalent derived-test oracle) so R2/SC2 stock-unchanged is as explicit as the unauthorized AvailableStockUnchangedOnUnauthorizedLookup path—polish, not a missing-pre / no-error-channel hole."
+    }
+  ]
+}

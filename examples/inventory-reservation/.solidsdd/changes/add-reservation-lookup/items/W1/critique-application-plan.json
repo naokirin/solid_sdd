@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan applies standard OpenAPI + OCL for authorized get-by-id soft-hold lookup, defers formal with Brief X8 / no concurrency_safety rationale, and correctly leaves human_gate false for additive work. Lint pass with one minor (WorkPlan touches overlap). Schema target.covers is WorkPlan item ids only—plan correctly uses [\"W1\"]; W1 Brief covers R1/R4/R5/SC1/SC4 are cited in rationales and match WorkPlan W1.covers. Named missing/unauthorized failure elevation deferred to W2 is intentional slice isolation, not plan thinning or density bias.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run must serialize these items. Acceptable with W2.depends_on=[W1]; not a checkability hole for this ApplicationPlan."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/api,dbc",
+      "detail": "API and DbC targets scope W1 authorized lookup success only; named missing/not-visible and unauthorized failure channels are deferred to W2. Acceptable for slice isolation—R2/R3/SC2/SC3 and the failure half of R5/SC4 wait on W2—while W1 still makes R1/R4/SC1 and the success half of R5/SC4 machine-checkable at standard density."
+    }
+  ]
+}

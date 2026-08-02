@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "summary": "W1: apply standard OpenAPI + OCL for authorized get-by-id soft-hold lookup (additive on existing SoT; no package re-scaffold); defer formal; named missing/unauthorized failure elevation is W2.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive read on existing OpenAPI/OCL/impl; no money_boundary, breaking_change, or formal apply. AuthZ reuses opaque-principal allow/deny at standard density; exact path/error JSON deferred to apply."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}/get",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary: W1 requires an additive HTTP get-by-id so clients/tests can observe authorized lookup returning an existing visible soft-hold's details without mutating stock or holds (R1/R4/SC1/SC4). Extend openapi/openapi.yaml only—do not re-scaffold; keep prior reserve/release/expire operations. additive_change; not breaking_change. Exact path/method shape deferred to OpenAPI apply (behavior is get-by-id). Named missing/not-visible and unauthorized failure channels are W2.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "New additive get-by-id operation on existing OpenAPI SoT; no breaking change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#lookup",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary: module pre/post must make authorized get-by-id checkable—principal authorized, hold exists/visible, result carries that hold's details, and stock plus holds are unchanged (R1/R5/SC1/SC4). Extend contracts/Reservation.ocl and derived Vitest under tests/contracts/**; do not re-scaffold. additive_change on shared OCL. Named missing/not-visible and unauthorized lookup error posts remain W2 while sharing the existing opaque-principal AuthZ vocabulary.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC for authorized lookup success; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W1"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

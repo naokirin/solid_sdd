@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft: OpenAPI Redocly --extends=spec passed and ocl_tests ran a non-empty suite (43 passed) with explicit W2 Reservation::lookup failure coverage (HoldMissingOrNotVisibleErrorOnLookup / HoldsUnchangedOnHoldMissingLookup; UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup / AvailableStockUnchangedOnUnauthorizedLookup). Overall pass matches required checks; no skipped required adapters.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W2/verification-report.json",
+      "detail": "HTTP server path for GET /reservations/{holdId} 403/400 is not exercised by contract tests (domain module only); OpenAPI↔wire mapping relies on implement alignment until later integration checks."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup",
+      "detail": "HoldMissingOrNotVisible channel is exercised via missing holdId only; a distinct not-visible hold is not separately asserted. Acceptable under shared PreconditionError vocabulary and Brief deferral of visibility rules; not a soft-verify zero-coverage hole."
+    }
+  ]
+}

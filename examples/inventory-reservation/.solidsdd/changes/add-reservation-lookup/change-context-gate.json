@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "Demand (authorized get-by-id + named missing/not-visible error), change_id, inherited TypeScript/Node + OpenAPI + OCL + Vitest stack, and out-of-scope themes were settled in the user instruction; security NFR only extends the existing opaque-principal pattern. §7 items are non-blocking deferrals (path shape, visibility nuance, error wire format)."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

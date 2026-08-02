@@ -52,6 +52,7 @@ function principalFrom(req: IncomingMessage): string | undefined {
   return Array.isArray(principalHeader) ? principalHeader[0] : principalHeader;
 }
 
+const lookupPath = /^\/reservations\/([^/]+)$/;
 const releasePath = /^\/reservations\/([^/]+)\/release$/;
 const expirePath = /^\/reservations\/([^/]+)\/expire$/;
 
@@ -96,6 +97,29 @@ createServer(async (req, res) => {
     }
 
     const pathOnly = req.url?.split("?")[0] ?? "";
+
+    // OpenAPI: GET /reservations/{holdId} — authorized lookup (read-only)
+    const lookupMatch =
+      req.method === "GET" ? lookupPath.exec(pathOnly) : null;
+    if (lookupMatch) {
+      const principal = principalFrom(req);
+      if (!principal) {
+        sendJson(res, 403, {
+          error: "X-Principal-Id header is required",
+          errorType: "UnauthorizedError",
+        });
+        return;
+      }
+      const holdId = decodeURIComponent(lookupMatch[1] ?? "");
+      const hold = ReservationService.lookup(principal, holdId);
+      sendJson(res, 200, {
+        holdId: hold.holdId,
+        sku: hold.sku,
+        quantity: hold.quantity,
+        expiresAt: hold.expiresAt,
+      });
+      return;
+    }
 
     const releaseMatch =
       req.method === "POST" ? releasePath.exec(pathOnly) : null;

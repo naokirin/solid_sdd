@@ -12,6 +12,10 @@ info:
     release so held quantity is restored to available stock as a first-class
     checkable success; W5 elevates service-side TTL expiry so a hold past
     its TTL restores held quantity to available stock (no principal / AuthZ).
+    Additive get-by-id lookup (authorized opaque principal) returns an existing
+    visible soft-hold's details without mutating stock or holds; missing or
+    not-visible lookup fails as named PreconditionError and unauthorized
+    lookup as named UnauthorizedError, both with stock and holds unchanged.
 servers:
   - url: http://localhost:3000
 paths:
@@ -92,6 +96,88 @@ paths:
                   value:
                     error: Principal is not authorized to reserve
                     errorType: UnauthorizedError
+  /reservations/{holdId}:
+    get:
+      operationId: getReservation
+      summary: Look up a soft-hold by id (authorized opaque principal)
+      description: >-
+        Returns details of an existing visible soft-hold identified by holdId
+        when the caller is an authorized opaque principal. Read-only: stock
+        and holds are unchanged. When the hold is missing or not visible, the
+        operation fails with named domain error PreconditionError and leaves
+        available stock and existing holds unchanged. When the caller is
+        unauthorized, the operation fails with named domain error
+        UnauthorizedError and leaves available stock and existing holds
+        unchanged. Missing and not-visible share one PreconditionError channel.
+      parameters:
+        - $ref: '#/components/parameters/OpaquePrincipal'
+        - name: holdId
+          in: path
+          required: true
+          description: Identifier of the soft-hold to look up
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: >-
+            Authorized lookup success. Clients and tests MUST observe the
+            returned hold details (holdId, sku, quantity, expiresAt) for the
+            requested holdId, and MUST treat the operation as leaving available
+            stock and existing holds unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+        '403':
+          description: >-
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to look up: available stock and existing holds are
+            unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UnauthorizedError:
+                  summary: Caller not authorized to look up
+                  description: >-
+                    First-class failure channel for unauthorized lookup.
+                    Clients and tests MUST observe errorType UnauthorizedError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged.
+                  value:
+                    error: Principal is not authorized to look up
+                    errorType: UnauthorizedError
+        '400':
+          description: >-
+            Named domain failure PreconditionError when the soft-hold is
+            missing or not visible (shared channel), or for invalid request
+            preconditions: available stock and existing holds are unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                HoldMissingOrNotVisible:
+                  summary: Soft-hold missing or not visible
+                  description: >-
+                    First-class failure channel for missing/not-visible lookup.
+                    Clients and tests MUST observe errorType PreconditionError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged. Missing and not-visible share
+                    this named channel.
+                  value:
+                    error: holdId does not identify a visible soft-hold
+                    errorType: PreconditionError
+                PreconditionError:
+                  summary: Invalid lookup precondition
+                  description: >-
+                    Invalid request (e.g. empty holdId). Stock and holds
+                    unchanged.
+                  value:
+                    error: holdId is required
+                    errorType: PreconditionError
   /reservations/{holdId}/release:
     post:
       operationId: release
@@ -268,6 +354,25 @@ components:
           type: integer
           minimum: 0
           description: Available stock after the reserve
+    LookupResponse:
+      type: object
+      additionalProperties: false
+      required: [holdId, sku, quantity, expiresAt]
+      properties:
+        holdId:
+          type: string
+          description: Identifier of the soft-hold
+        sku:
+          type: string
+          description: SKU held by this soft-hold
+        quantity:
+          type: integer
+          minimum: 1
+          description: Quantity soft-held
+        expiresAt:
+          type: string
+          format: date-time
+          description: Absolute expiry instant for the hold TTL
     ErrorResponse:
       type: object
       additionalProperties: false
@@ -282,12 +387,12 @@ components:
             Named domain error type distinguishable by clients and tests.
             InsufficientStockError: available stock below requested quantity;
             response implies no soft-hold created and available stock unchanged.
-            UnauthorizedError: caller not authorized for reserve or release;
-            no hold created by the failed attempt; available stock and existing
-            holds unchanged.
+            UnauthorizedError: caller not authorized for reserve, release, or
+            lookup; no hold created by the failed attempt (reserve/release);
+            available stock and existing holds unchanged.
             PreconditionError: invalid request precondition (including missing
-            hold, or expire when TTL has not elapsed); no unintended stock or
-            hold mutation.
+            or not-visible hold on lookup/release/expire, or expire when TTL
+            has not elapsed); no unintended stock or hold mutation.
           enum:
             - InsufficientStockError
             - UnauthorizedError
@@ -308,8 +413,9 @@ components:
     UnauthorizedError:
       description: >-
         Named domain failure UnauthorizedError when the caller is not
-        authorized to reserve or release. No soft-hold is created by the
-        failed attempt; available stock and existing holds are unchanged.
+        authorized to reserve, release, or look up. No soft-hold is created by
+        the failed attempt (reserve/release); available stock and existing
+        holds are unchanged.
       content:
         application/json:
           schema:

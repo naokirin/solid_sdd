@@ -1,0 +1,81 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "An authorized opaque principal can look up an existing soft-hold by id and receive its hold details. When the hold does not exist or is not visible, lookup fails with a named domain error and does not mutate stock or holds.",
+      "rationale": "Lookup correctness and a stable missing/not-visible failure vocabulary are the core delta; callers and contract tests need machine-checkable success and failure semantics.",
+      "threshold": "Authorized lookup of an existing visible soft-hold returns that hold; missing or not-visible hold always fails with the named domain error and never mutates stock or holds.",
+      "measurement": "OCL-derived Vitest contract tests plus OpenAPI error-channel exercises for named missing/not-visible lookup failures and successful get-by-id.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "in_scope",
+      "requirement": "Only an authorized opaque principal may look up a soft-hold by id. Unauthorized callers fail with a named domain error; stock and holds are unchanged.",
+      "rationale": "Extends the user-settled opaque-principal authZ pattern from initial-reservation to the additive read API; still not a full IAM product.",
+      "threshold": "Unauthorized lookup always fails with the named unauthorized domain error and never mutates stock or holds; authorized opaque principal can look up when the hold is visible.",
+      "measurement": "Contract tests and OpenAPI authZ failure channel; OCL preconditions on lookup.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no latency or throughput targets for this evaluation sample.",
+      "rationale": "Additive read API on the same sample workload; no SLI asked."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Lookup behavior is checkable via HTTP/API (OpenAPI) and module DbC (UML OCL) with Vitest contract tests; do not rely on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires machine-checkable surfaces for the delta as for prior reserve/release/expire.",
+      "threshold": "openapi/openapi.yaml documents lookup; contracts/**/*.ocl and tests/contracts/** cover get-by-id success and named missing/unauthorized failures and pass.",
+      "measurement": "Presence of OpenAPI + OCL + passing Vitest under tests/contracts/** for lookup.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive OpenAPI change at openapi/openapi.yaml: add lookup without breaking existing reserve/release/expire client surface from initial-reservation.",
+      "rationale": "Follow-on change; prior HTTP surface must remain; lookup is additive.",
+      "threshold": "openapi/openapi.yaml remains structurally valid; existing reserve/release operations stay documented; lookup is added without removing prior operations.",
+      "measurement": "solidsdd-verify OpenAPI lint check (or skipped with tooling reason); review that prior paths remain.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        ".solidsdd/changes/add-reservation-lookup/integration-verification-report.json"
+      ]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL under contracts/**/*.ocl remains the DbC source of truth; Vitest under tests/contracts/** covers lookup behaviors derived from OCL.",
+      "rationale": "Matches solid_sdd adapter policy and inherited contract/test layout from the repo.",
+      "threshold": "contracts/**/*.ocl include lookup pre/post or equivalent invariants; derived Vitest tests exercise get-by-id success and named failures.",
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes.",
+      "verified_by": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
+    }
+  ]
+}

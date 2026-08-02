@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml GET /reservations/{holdId} (operationId getReservation) adequately elevates W2 named lookup failures at standard density: 400 HoldMissingOrNotVisible / PreconditionError and 403 UnauthorizedError carry first-class errorType examples with no stock/hold mutation MUST wording; missing and not-visible share one PreconditionError channel as planned; authorized 200 LookupResponse is retained and prior reserve/release/expire surfaces are not thinned. ErrorResponse.errorType prose now covers lookup. solidsdd-lint pass with zero findings. Remaining items are polish only.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/responses",
+      "detail": "Reusable UnauthorizedError (and InsufficientStockError) response components are defined but unused; getReservation documents the UnauthorizedError channel inline under 403. Polish only—named errorType enum and examples already make the failure distinguishable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}/get/responses/400|403",
+      "detail": "No-mutation side effects for missing/not-visible and unauthorized lookup are stated in description/example prose rather than structured response fields; adequate at standard density with named errorType (OCL owns mutation posts)."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml の GET /reservations/{holdId}（operationId getReservation）は W1 ApplicationPlan と Brief R1 の認可付き get-by-id 成功を standard 密度で検査可能にしている。X-Principal-Id、holdId、200 LookupResponse（holdId/sku/quantity/expiresAt）、無変更の読み取り意味が文書化され、既存の reserve/release/expire は維持されている。400/403 はスタブで名前付き失敗の本格化は W2 に委譲されており、ApplicationPlan と整合し happy-path-only ではない。solidsdd-lint は pass（touches 重複の minor のみ）。残りはスタブ例と ErrorResponse 記述の磨き。",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run はこれらの item を直列化する必要がある"
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}/get/responses",
+      "detail": "403/400 は「named elevation deferred」のスタブで、errorType 付き examples がない。W1 は認可成功（R1）のみが対象で R2/R3 は W2 のため checkability は失われていないが、W2 で InsufficientStock/Unauthorized と同水準の名前付き例へ昇格させること。"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/schemas/ErrorResponse/properties/errorType",
+      "detail": "errorType の説明は UnauthorizedError を reserve/release に限定しており、lookup の認可失敗語彙がまだ反映されていない。enum 自体は再利用可能で W2 昇格まで検査可能だが、lookup 文言の追記が望ましい。"
+    }
+  ]
+}

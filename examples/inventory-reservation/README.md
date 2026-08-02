@@ -10,9 +10,11 @@ Produced by a fresh `solidsdd-run` for change `initial-reservation` (soft-hold i
 |----------|----------------|--------------|
 | Authorized reserve | `POST /reservations` | — |
 | Stock below request | same | `InsufficientStockError` |
-| Unauthorized reserve/release | reserve / release | `UnauthorizedError` |
+| Unauthorized reserve/release/lookup | reserve / release / get | `UnauthorizedError` |
 | Authorized release | `POST /reservations/{id}/release` | — |
 | TTL expire | `POST /reservations/{id}/expire` | — |
+| Authorized lookup | `GET /reservations/{holdId}` | — |
+| Missing / not-visible hold | same GET | `PreconditionError` |
 
 Stock and holds are **in-process** (sample bound). AuthZ is opaque principal allow/deny only—not a full IAM product.
 

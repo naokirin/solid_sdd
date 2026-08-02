@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "summary": "Cross-change consistency for add-reservation-lookup holds: prior requirements/reservation.feature Scenarios remain untouched and in force; the delta lives only in reservation-lookup.feature. Brief/WorkPlan do not pull prior initial-reservation out_of_scope (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable DB, formal concurrency) and keep those themes plus X9 TTL extend / X10 list-by-SKU excluded. Active covers/tags are R1–R5 and SC1–SC4 only—no X* coverage. Context §2/§8 and Brief assumptions explicitly preserve prior acceptance. Lint (optional for this subject) reported only overlapping W1/W2 touches (serialize hint), not a cross-change hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "solidsdd-lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts'] between W1 and W2; solidsdd-run must serialize these items. Same-change scheduling smell only—does not rewrite prior Features or pull out_of_scope themes."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "requirements/reservation.feature vs requirements/reservation-lookup.feature#@R*@SC*",
+      "detail": "R1–R5 / SC* tag ids are reused across Feature files with change-local Brief namespaces (initial-reservation vs add-reservation-lookup). Prior Scenario text is unchanged and lint is change-scoped, so checkability is intact; readers comparing Features without the active change pointer may need the change_id to disambiguate tags."
+    }
+  ]
+}

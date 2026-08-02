@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan add-reservation-lookup is checkable at standard density: two property-level Gherkin items map 1:1 to requirements/reservation-lookup.feature Scenarios and cover all Brief in_scope R1–R5 and success_criteria SC1–SC4; no out_of_scope X* ids appear in covers or tags. W1 establishes authorized get-by-id with additive OpenAPI/OCL surfaces; W2 depends_on W1 and narrows touches to OCL/src for named missing/not-visible and unauthorized failures—foundation + serialize pattern is sound. Lint pass with one minor (overlapping touches on Reservation.ocl and reservation.ts). W2’s single Scenario combining missing and unauthorized failure modes matches Brief R2/R3 as one named-error-without-mutation property and remains checkable.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run must serialize these items. Acceptable with W2.depends_on=[W1] and narrowed W2 touches (no openapi); not a checkability hole."
+    }
+  ]
+}

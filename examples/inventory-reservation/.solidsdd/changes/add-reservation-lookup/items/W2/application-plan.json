@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "summary": "W2: elevate OCL named missing/not-visible and unauthorized lookup failure posts (no stock/hold mutation) and OpenAPI getReservation 403/400 errorType examples on the W1 stubs; formal defer; implement likely skip/minimal because ReservationService.lookup already throws UnauthorizedError / PreconditionError.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive elevation of W1 lookup stubs for R2/R3/SC2/SC3; authz_boundary at standard density; no money_boundary, breaking_change, or formal apply. Named PreconditionError / UnauthorizedError vocabulary already shared; exact error JSON/status remain deferred to OpenAPI apply."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations~1{holdId}/get",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary: W2 requires clients/tests to observe missing/not-visible lookup and unauthorized lookup as named domain errors with no mutation (R2/R3/SC2/SC3/SC4). Elevate W1 light stubs on GET /reservations/{holdId} 403 UnauthorizedError and 400 PreconditionError (shared missing/not-visible vocabulary) with first-class errorType examples and no-mutation wording—do not remove the additive get-by-id success channel. additive_change on shared OpenAPI; not breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive elevation of named error channels on existing getReservation stubs; no breaking API change."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#lookup",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary: R2/R3/SC2/SC3 demand named domain errors and unchanged stock/holds when HoldExists/not-visible fails or PrincipalAuthorized fails on lookup. Elevate Reservation::lookup W2 comment stubs (HoldMissingOrNotVisibleErrorOnLookup / HoldsUnchangedOnHoldMissingLookup; UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup / AvailableStockUnchangedOnUnauthorizedLookup) while retaining W1 success posts. Missing and not-visible share one named PreconditionError channel unless apply narrows visibility. Derived Vitest under tests/contracts/** must cover named failure + no-mutation; implement may stay skip/minimal given existing throws. additive_change on shared OCL.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC elevation for named lookup failures; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W2"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest for Reservation::lookup covers every live W1 success post at standard density: ResultIsHoldDetails (sku/quantity/expiresAt, plus holdId), AvailableStockUnchanged, and HoldsUnchanged, including a multi-hold/multi-SKU isolation case. Prior reserve/release/expire contract suites are retained. PrincipalAuthorized / HoldExists violation cases are deferred with ApplicationPlan and OCL W2 stubs (named failure posts still commented)—not a W1 checkability hole; suite is not empty or “does not throw” only. Red until implement is acceptable. solidsdd-lint pass (overlapping touches minor only).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup",
+      "detail": "Live OCL pre PrincipalAuthorized / HoldExists have no rejection cases yet. W1 ApplicationPlan and OCL defer named missing/not-visible and unauthorized failure posts to W2, so omitting those paths here does not lose W1 authorized-success checkability; elevate named-error + no-mutation tests in W2 alongside the live failure posts."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "tests/contracts/reservation.test.ts#ResultIsHoldDetails",
+      "detail": "Tests assert result.holdId equals the looked-up id, which is stronger than OCL ResultIsHoldDetails (sku/quantity/expiresAt only) and aligns with OpenAPI LookupResponse. Fine as extra checkability; optional OCL holdId equality remains a polish item from dbc critique."
+    }
+  ]
+}

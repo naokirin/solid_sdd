@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 17ms; Woohoo! Your API description is valid. W2 getReservation 403/400 named errorType channels included.",
+      "covers": ["W2", "R2", "R3", "SC2", "SC3", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 43 passed (0 failed). W2 Reservation::lookup coverage: HoldMissingOrNotVisibleErrorOnLookup / HoldsUnchangedOnHoldMissingLookup (named PreconditionError; no hold mutation); UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup / AvailableStockUnchangedOnUnauthorizedLookup (named UnauthorizedError; no stock/hold mutation).",
+      "covers": ["W2", "R2", "R3", "SC2", "SC3", "SC4"]
+    }
+  ]
+}

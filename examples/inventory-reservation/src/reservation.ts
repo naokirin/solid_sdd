@@ -140,6 +140,31 @@ export const ReservationService = {
   },
 
   /**
+   * Look up an existing visible soft-hold by id. Read-only: stock and holds
+   * unchanged. Unauthorized → UnauthorizedError; missing hold →
+   * PreconditionError (W2 elevation-ready named channels).
+   * OCL: Reservation::lookup
+   */
+  lookup(principal: string, holdId: string): Hold {
+    // pre PrincipalAuthorized
+    if (!isAuthorized(principal)) {
+      throw new UnauthorizedError("principal is not authorized");
+    }
+    if (!holdId || typeof holdId !== "string") {
+      throw new PreconditionError("holdId is required");
+    }
+
+    // pre HoldExists → named PreconditionError
+    const hold = holdsById.get(holdId);
+    if (!hold) {
+      throw new PreconditionError(`hold not found: ${holdId}`);
+    }
+
+    // post ResultIsHoldDetails; AvailableStockUnchanged; HoldsUnchanged
+    return { ...hold };
+  },
+
+  /**
    * Release a soft-hold. Unauthorized callers fail with named UnauthorizedError
    * and leave stock/holds unchanged (W3). Authorized success restores held
    * quantity to available stock and removes the hold (W4: HoldExists,

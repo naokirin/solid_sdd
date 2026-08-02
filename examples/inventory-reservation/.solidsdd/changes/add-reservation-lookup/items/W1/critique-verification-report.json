@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft: OpenAPI Redocly --extends=spec passed and ocl_tests ran a non-empty suite (36 passed) with explicit W1 Reservation::lookup post coverage (ResultIsHoldDetails, AvailableStockUnchanged, HoldsUnchanged). Overall pass matches required checks; W2 named missing/unauthorized failure posts remain deferred per plan.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl', 'src/reservation.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json",
+      "detail": "HTTP server path for GET /reservations/{holdId} is not exercised by contract tests (domain module only); OpenAPI↔wire mapping relies on implement alignment until later integration checks."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup",
+      "detail": "Lookup suite asserts happy-path posts only; OCL pre PrincipalAuthorized and HoldExists are not violated in tests yet. Acceptable for W1 (W2 owns named missing/unauthorized failure elevation); not a soft-verify zero-coverage hole."
+    }
+  ]
+}

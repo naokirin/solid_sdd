@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "add-reservation-lookup",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 18ms; Woohoo! Your API description is valid.",
+      "covers": ["W1", "R4", "R5", "SC1", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 36 passed (0 failed). W1 Reservation::lookup coverage: ResultIsHoldDetails, AvailableStockUnchanged, HoldsUnchanged (authorized get-by-id; no mutation). W2 missing/unauthorized failure posts deferred.",
+      "covers": ["W1", "R1", "R4", "R5", "SC1", "SC4"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "Integration VerificationReport is not soft: lint clean; OpenAPI Redocly --extends=spec passed; ocl_tests cite a non-empty suite (43 it() cases in tests/contracts/reservation.test.ts) covering Reservation::lookup success (ResultIsHoldDetails / stock+holds unchanged) and named PreconditionError / UnauthorizedError failure posts; formal skipped only with W1–W2 ApplicationPlan defer rationale (no concurrency_safety). Overall pass matches required checks.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "integration-verification-report.json#checks[ocl_tests]",
+      "detail": "Integration verify still exercises lookup via the domain module (vitest), not an HTTP GET /reservations/{holdId} round-trip for 200/403/400. OpenAPI↔wire mapping remains an implement alignment concern; not a soft-verify zero-coverage hole while Redocly and OCL-derived tests both pass."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup",
+      "detail": "HoldMissingOrNotVisible is exercised via missing holdId only; a distinct not-visible hold is not separately asserted. Acceptable under shared PreconditionError vocabulary and Brief deferral of visibility rules; does not make the integration report soft."
+    }
+  ]
+}
