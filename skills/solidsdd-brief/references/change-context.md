@@ -65,7 +65,7 @@ Use exactly these top-level headings (English). Subheadings under §4 / §5 are 
 | **5. Technology selection** | For each decision (language/runtime, API style, persistence, test stack, contract approach, …): **decision**, **alternatives considered**, **rationale**, **source** (`user` / `repo_existing` / `agent_default` + why). If inheriting the repo stack, say so explicitly—do not leave blank |
 | **6. Key judgments** | Non-obvious calls (e.g. named domain errors vs raw exceptions; single-slot memory; skip auth) |
 | **7. Open questions** | Unresolved items; align with Brief `open_questions` / gates when blocking |
-| **8. Links** | Paths to Brief, WorkPlan, Features (fill placeholders as artifacts appear) |
+| **8. Links** | Paths to Brief, WorkPlan, Features, optional report (fill placeholders as artifacts appear) |
 
 Keep sections concise. Prefer bullets. Do not paste full OpenAPI/OCL.
 

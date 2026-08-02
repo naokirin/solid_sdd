@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Change report: initial-calculator</title>
+<style>
+:root {
+  --bg: #070b14;
+  --bg-elev: #0e1524;
+  --fg: #ffffff;
+  --muted: #c5ced9;
+  --card: #0f1626;
+  --line: #243049;
+  --accent: #7eb6ff;
+  --ok: #7dcea0;
+  --miss: #c9b08b;
+  --code-bg: #0a0f1a;
+  --thead: #152036;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+  color: var(--fg);
+  background:
+    radial-gradient(900px 380px at 12% -12%, rgba(40, 70, 140, 0.22) 0%, transparent 55%),
+    radial-gradient(700px 320px at 100% 0%, rgba(20, 40, 80, 0.18) 0%, transparent 50%),
+    var(--bg);
+  line-height: 1.55;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+header.hero {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+header.hero h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+.meta { color: var(--muted); font-size: 0.95rem; }
+.meta code { font-size: 0.9em; }
+h2 {
+  margin-top: 2.2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  border-left: 4px solid var(--accent);
+  padding-left: 0.6rem;
+  color: #ffffff;
+}
+h3 { margin-top: 1.4rem; font-size: 1.05rem; color: #ffffff; }
+h4 { margin-top: 1rem; font-size: 0.98rem; color: #f2f5f8; }
+p, li, td, th, summary { color: var(--fg); }
+section.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin: 0.85rem 0;
+}
+.status-ok { color: var(--ok); font-weight: 600; }
+.status-miss { color: var(--miss); font-weight: 600; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin: 0.6rem 0 1rem;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--thead); color: #ffffff; }
+ul { padding-left: 1.2rem; }
+li { margin: 0.25rem 0; }
+a { color: var(--accent); }
+.tabs { margin-top: 0.75rem; }
+.tablist {
+  display: flex;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.75rem;
+}
+.tablist button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font: inherit;
+}
+.tablist button[aria-selected="true"] {
+  color: #ffffff;
+  background: var(--bg-elev);
+  border-color: var(--line);
+  font-weight: 600;
+}
+.panel { padding-top: 0.15rem; }
+.highlight {
+  background: var(--code-bg) !important;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.85rem;
+  overflow: auto;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: 0.5rem 0;
+  color: #e8eef7 !important;
+}
+.highlight pre {
+  margin: 0;
+  background: transparent !important;
+  border: 0;
+  padding: 0;
+  overflow: visible;
+  color: inherit;
+}
+.highlight code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  color: inherit;
+}
+/* Pygments github-dark token colors (calmer than monokai) */
+pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+/* Soften any remaining loud accents from the theme */
+.highlight .err { background-color: transparent !important; }
+
+/* Token contrast: keys ≠ strings; Gherkin keywords ≠ step text */
+.highlight .nt,
+.highlight .na { color: #9cdcfe !important; } /* keys / attributes — cool cyan */
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .ss,
+.highlight .sa,
+.highlight .dl,
+.highlight .l,
+.highlight .l-Scalar,
+.highlight .l-Scalar-Plain { color: #ce9178 !important; } /* string / scalar values — warm salmon */
+.highlight .k,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt,
+.highlight .kc { color: #d2a8ff !important; } /* keywords (Gherkin Feature/Given/…, OCL) — soft violet */
+.highlight .nf,
+.highlight .nc,
+.highlight .nn { color: #e6edf3 !important; } /* Gherkin titles / step prose — near-white */
+.highlight .m,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.highlight .il { color: #79c0ff !important; } /* numbers */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .ch,
+.highlight .cp,
+.highlight .cpf,
+.highlight .cs { color: #8b949e !important; font-style: italic; }
+.highlight .o,
+.highlight .ow,
+.highlight .p { color: #c9d1d9 !important; }
+.highlight .n,
+.highlight .nb,
+.highlight .bp,
+.highlight .nv,
+.highlight .vc,
+.highlight .vg,
+.highlight .vi { color: #e6edf3 !important; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+p code, li code, td code, .meta code {
+  background: #152036;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.88em;
+  color: #ffffff;
+}
+details {
+  margin: 0.6rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-elev);
+}
+summary { cursor: pointer; font-weight: 600; color: #ffffff; }
+.badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  margin-left: 0.35rem;
+}
+.badge.ok { background: rgba(125, 206, 160, 0.12); color: var(--ok); border-color: rgba(125, 206, 160, 0.35); }
+.badge.miss { background: rgba(201, 176, 139, 0.12); color: var(--miss); border-color: rgba(201, 176, 139, 0.35); }
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <h1>Change report: initial-calculator</h1>
+  <p class="meta">
+    言語: 日本語 · change 状態: <code>done</code> · 生成元: <code>solidsdd-report</code>（ビューのみ。SoT ではない）
+    · <a href="report.md">report.md</a>
+  </p>
+</header>
+
+<section class="card">
+  <h2 id="status">Status overview</h2>
+  <table>
+    <thead><tr><th>章</th><th>状態</th><th>主なソース / 不足時のスキル</th></tr></thead>
+    <tbody>
+      <tr><td>1. 要求と課題</td><td class="status-ok">実施済</td><td><code>change-context.md</code></td></tr>
+      <tr><td>2. 機能要件</td><td class="status-ok">実施済</td><td><code>change-brief.json</code> + Features</td></tr>
+      <tr><td>3. 非機能要件</td><td class="status-ok">実施済</td><td><code>change-context.md</code> §4</td></tr>
+      <tr><td>4. 技術選定</td><td class="status-ok">実施済</td><td><code>change-context.md</code> §5</td></tr>
+      <tr><td>5. 設計 — WorkPlan</td><td class="status-ok">実施済</td><td><code>work-plan.json</code></td></tr>
+      <tr><td>5. 設計 — ApplicationPlan</td><td class="status-miss">未実施</td><td><code>solidsdd-judge</code></td></tr>
+      <tr><td>5. 設計 — API 契約</td><td class="status-ok">実施済</td><td><code>openapi/openapi.yaml</code></td></tr>
+      <tr><td>5. 設計 — DbC (OCL)</td><td class="status-ok">実施済</td><td><code>contracts/*.ocl</code></td></tr>
+      <tr><td>5. 設計 — Formal</td><td class="status-miss">未実施</td><td><code>solidsdd-apply-formal</code>（本 change では適用しない判断）</td></tr>
+      <tr><td>6. 判断とトレードオフ</td><td class="status-ok">実施済</td><td><code>change-context.md</code> §6</td></tr>
+      <tr><td>7. 未解決事項</td><td class="status-ok">実施済</td><td>Context §7（Brief の open_questions は空）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2 id="demand">1. 要求と課題</h2>
+  <h3>課題（Demand）</h3>
+  <p>クライアントが HTTP 経由で呼べる小型の算術計算機サービスが必要である。四則演算に加え剰余を提供し、除数がゼロのときは明確に失敗すること。単一スロットのメモリ（クリア / リコール / 加算 / 減算）を持ち、初期値はゼロとする。無効な利用に対して、言語・ランタイムの不透明なエラーは許容しない。</p>
+  <h3>推進要因・制約</h3>
+  <ul>
+    <li>solid_sdd の評価・サンプル用サービス（契約は機械検証可能であること）</li>
+    <li>製品としての認証、マルチテナントメモリ、履歴、永続化は要求しない</li>
+    <li>既存の TypeScript HTTP サンプル構成があれば再利用を優先する</li>
+  </ul>
+  <h3>機能意図（要約）</h3>
+  <ul>
+    <li>二項演算: 加算・減算・乗算・除算・剰余</li>
+    <li>ゼロ除算 / ゼロ剰余時は名前付きドメインエラー</li>
+    <li>プロセス内の単一メモリスロット（初期 0、clear / recall / add / subtract）</li>
+    <li>詳細と受入は ChangeBrief + Gherkin に委ねる</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 id="functional">2. 機能要件 <span class="badge ok">実施済</span></h2>
+  
+<div class="tabs" data-tabs id="brief-tabs">
+  <div class="tablist" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="summary">要約</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="raw">Brief Raw</button>
+  </div>
+  <div class="panel" data-panel="summary" role="tabpanel">
+<p><strong>ゴール:</strong> クライアントは検証可能なサービス面で加算・減算・乗算・除算・剰余を実行できる。無効な利用は名前付きドメインエラーで失敗する。単一メモリスロットはゼロ開始で、clear / recall / add-to-memory / subtract-from-memory をサポートする。</p>
+<h4>スコープ内</h4>
+<ul>
+  <li>二項演算: add / subtract / multiply / divide / remainder (mod)</li>
+  <li>無効利用（特にゼロ除算・ゼロ剰余）に対する明確な名前付きドメインエラー</li>
+  <li>ゼロ初期化の単一スロット計算機メモリ</li>
+  <li>メモリ操作: clear / recall / add-to-memory / subtract-from-memory</li>
+  <li>HTTP/API 面とモジュール契約</li>
+</ul>
+<h4>スコープ外</h4>
+<ul>
+  <li>認証・認可・セッション・API キー</li>
+  <li>マルチユーザー / マルチスロットメモリ</li>
+  <li>操作履歴・undo/redo・式ログ</li>
+  <li>科学演算・ビット演算など add/sub/mul/div/remainder を超える数学</li>
+  <li>永続ストレージ / DB</li>
+  <li>UI / フロントエンド / SDK / 第三者連携</li>
+  <li>レート制限・クォータ・観測製品機能・マルチテナンシー</li>
+</ul>
+<p>ソース: <a href="change-brief.json">change-brief.json</a></p>
+</div>
+  <div class="panel" data-panel="raw" role="tabpanel" hidden><p><a href="change-brief.json">change-brief.json</a></p><div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;change_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;initial-calculator&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Deliver a client-facing arithmetic calculator service with the four basic operations plus remainder, clear domain errors for invalid uses (especially division or remainder by zero), and a single-slot memory (clear / recall / add / subtract) that starts at zero, with HTTP/API and module surfaces that make these behaviors checkable\u2014without auth, multi-user memory, history, or other product extras.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;goal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Clients can perform add, subtract, multiply, divide, and remainder through a checkable service surface; invalid uses fail with a named domain error; a single memory slot supports clear, recall, add-to-memory, and subtract-from-memory starting at zero.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;background&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;This change defines scope for the arithmetic-api evaluation sample. An existing TypeScript HTTP stack may already be present; use it only as implementation context. Scope comes from this brief, not from existing OpenAPI, OCL, or Feature files.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;in_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Binary arithmetic operations: add, subtract, multiply, divide, and remainder (mod)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Clear, named domain error for invalid uses\u2014especially division by zero and remainder by zero\u2014rather than opaque language/runtime errors&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Single-slot calculator memory initialized to zero&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Memory operations: clear (set to zero), recall (return current value), add-to-memory, subtract-from-memory&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;HTTP/API surface that exposes calculate and memory behaviors in a form clients and tests can exercise&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Module-level contracts that make the same arithmetic and memory behaviors checkable&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;out_of_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Authentication, authorization, sessions, or API keys&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Multi-user or multi-slot memory; per-client isolated memory stores&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Operation history, undo/redo, or expression/transcript logging&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Persistent storage, databases, or durable memory across process restarts (beyond in-process single slot)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;UI / frontend clients, SDKs, or third-party integrations beyond the service surface itself&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Rate limiting, quotas, observability product features, or multi-tenancy&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;assumptions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Operands and memory values are numeric (real/number) values suitable for the sample service&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Memory is one in-process slot shared by the service instance, not keyed by user or session&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Existing TypeScript arithmetic-api layout (HTTP server, OpenAPI/OCL paths) may be reused as stack context without treating current contracts as the source of required scope&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Do not invent product features beyond the stated arithmetic + single-slot memory scope&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Domain failures for invalid arithmetic (notably / and remainder by zero) must be named and distinguishable from opaque language errors&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;ChangeBrief only at this step: no Feature files, WorkPlan, OpenAPI, OCL, tests, or implementation edits as part of brief emission&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Contract kind and density choices are deferred to later solidsdd-judge; this brief only requires that HTTP/API and module surfaces remain checkable&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;success_criteria&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;A client can request each of add, subtract, multiply, divide, and remainder and receive the correct numeric result for valid inputs&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Division by zero and remainder by zero fail with a named domain error observable at the service boundary&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Memory starts at zero; clear sets it to zero; recall returns the current value; add-to-memory and subtract-from-memory update the single slot as specified&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;HTTP/API and module contract surfaces exist such that the arithmetic and memory behaviors above can be verified without relying on opaque implementation internals alone&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;open_questions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;human_gate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scope is explicit and additive for a sample calculator service; no blocking ambiguity, auth/money boundary, or conflicting requirements.&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+  <h3>受入シナリオ（Gherkin）</h3>
+  
+<div class="tabs" data-tabs id="feature-tabs">
+  <div class="tablist" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="summary">要約</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="raw">Feature Raw</button>
+  </div>
+  <div class="panel" data-panel="summary" role="tabpanel">
+<p>Feature 本文・Scenario 名はソースどおり（英語）。</p>
+<h4>requirements/calculator.feature</h4>
+<table>
+<thead><tr><th>Scenario</th><th>要約</th></tr></thead>
+<tbody>
+<tr><td>Addition returns the sum of its operands</td><td>二数の和を返す</td></tr>
+<tr><td>Subtraction returns the difference of its operands</td><td>二数の差を返す</td></tr>
+<tr><td>Multiplication returns the product of its operands</td><td>二数の積を返す</td></tr>
+<tr><td>Division returns the quotient of its operands</td><td>非ゼロ除数で商を返す</td></tr>
+<tr><td>Remainder returns the modulo of its operands</td><td>非ゼロ除数で剰余を返す</td></tr>
+<tr><td>Division by zero fails with a named domain error</td><td>ゼロ除算は名前付きドメインエラー</td></tr>
+<tr><td>Remainder by zero fails with a named domain error</td><td>ゼロ剰余は名前付きドメインエラー</td></tr>
+</tbody>
+</table>
+<h4>requirements/memory.feature</h4>
+<table>
+<thead><tr><th>Scenario</th><th>要約</th></tr></thead>
+<tbody>
+<tr><td>Memory starts at zero</td><td>新規メモリの recall は 0</td></tr>
+<tr><td>Memory clear yields zero on subsequent recall</td><td>clear 後の recall は 0</td></tr>
+<tr><td>Add-to-memory increases the single slot by the addend</td><td>M+ でスロット増加</td></tr>
+<tr><td>Subtract-from-memory decreases the single slot by the subtrahend</td><td>M- でスロット減少</td></tr>
+</tbody>
+</table>
+</div>
+  <div class="panel" data-panel="raw" role="tabpanel" hidden>
+<details open>
+  <summary>calculator.feature</summary>
+  <p><a href="../../../requirements/calculator.feature">requirements/calculator.feature</a></p>
+  <div class="highlight"><pre><span></span><code><span class="k">Feature:</span><span class="nf"> Arithmetic calculator operations</span>
+<span class="nf">  Clients use an arithmetic calculator service for the usual</span>
+<span class="nf">  binary operations and remainder. Invalid uses—especially</span>
+<span class="nf">  division or remainder by zero—must fail with a named domain</span>
+<span class="nf">  error, not an opaque language or runtime error. Behaviors</span>
+<span class="nf">  must be checkable via the HTTP/API and module contracts.</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Addition returns the sum of its operands</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client adds two numbers</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the result equals the mathematical sum of those operands</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Subtraction returns the difference of its operands</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client subtracts one number from another</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the result equals the mathematical difference of those operands</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Multiplication returns the product of its operands</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client multiplies two numbers</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the result equals the mathematical product of those operands</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Division returns the quotient of its operands</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">And </span><span class="nf">a non-zero divisor</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client divides one number by another</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the result equals the mathematical quotient of those operands</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Remainder returns the modulo of its operands</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">And </span><span class="nf">a non-zero divisor</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client takes the remainder of one number divided by another</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the result equals the mathematical remainder of those operands</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Division by zero fails with a named domain error</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client divides by zero</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the operation fails with a named domain error</span>
+<span class="nf">    </span><span class="k">And </span><span class="nf">the failure is not an opaque language or runtime error</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Remainder by zero fails with a named domain error</span>
+<span class="k">    Given </span><span class="nf">a calculator service available to clients</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client takes the remainder with a zero divisor</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the operation fails with a named domain error</span>
+<span class="nf">    </span><span class="k">And </span><span class="nf">the failure is not an opaque language or runtime error</span>
+</code></pre></div>
+
+</details>
+<details>
+  <summary>memory.feature</summary>
+  <p><a href="../../../requirements/memory.feature">requirements/memory.feature</a></p>
+  <div class="highlight"><pre><span></span><code><span class="k">Feature:</span><span class="nf"> Calculator single-slot memory</span>
+<span class="nf">  The calculator exposes a simple single-slot memory that</span>
+<span class="nf">  starts at zero and supports clear, recall, add-to-memory,</span>
+<span class="nf">  and subtract-from-memory. No multi-user memory or history.</span>
+<span class="nf">  Behaviors must be checkable via the HTTP/API and module contracts.</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Memory starts at zero</span>
+<span class="k">    Given </span><span class="nf">a fresh calculator memory</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client recalls memory</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">the recalled value is zero</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Memory clear yields zero on subsequent recall</span>
+<span class="k">    Given </span><span class="nf">calculator memory holds a non-zero value</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client clears memory</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">recalling memory yields zero</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Add-to-memory increases the single slot by the addend</span>
+<span class="k">    Given </span><span class="nf">calculator memory holds a known value</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client adds a number to memory</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">recalling memory yields the previous value plus that number</span>
+
+<span class="nf">  </span><span class="k">Scenario:</span><span class="nf"> Subtract-from-memory decreases the single slot by the subtrahend</span>
+<span class="k">    Given </span><span class="nf">calculator memory holds a known value</span>
+<span class="nf">    </span><span class="k">When </span><span class="nf">the client subtracts a number from memory</span>
+<span class="nf">    </span><span class="k">Then </span><span class="nf">recalling memory yields the previous value minus that number</span>
+</code></pre></div>
+
+</details>
+</div>
+</div>
+</section>
+
+<section class="card">
+  <h2 id="nfr">3. 非機能要件 <span class="badge ok">実施済</span></h2>
+  <table>
+    <thead><tr><th>品質</th><th>要件</th><th>根拠</th><th>検証 / 延期</th></tr></thead>
+    <tbody>
+      <tr><td>信頼性 / エラー処理</td><td>無効な算術（特に / と rem by 0）は<strong>名前付きドメインエラー</strong>で失敗し、不透明な言語エラーにしない</td><td>呼び出し側と契約テストに安定した信号が必要</td><td>契約テスト + API エラー経路; OCL <code>pre</code></td></tr>
+      <tr><td>セキュリティ</td><td>本 change では N/A</td><td>認証は明示的にスコープ外</td><td>延期 / スコープ外</td></tr>
+      <tr><td>性能</td><td>特別なレイテンシ・スループット目標なし</td><td>サンプル負荷</td><td>N/A</td></tr>
+      <tr><td>運用性</td><td>HTTP/API とモジュール契約で振る舞いを検証可能</td><td>solid_sdd 評価パス</td><td>OpenAPI + OCL 由来テスト</td></tr>
+      <tr><td>互換性</td><td>加算的なサンプル API; 既存外部クライアントの明示なし</td><td>グリーンフィールド</td><td>OpenAPI が面を文書化</td></tr>
+      <tr><td>保守性</td><td>UML OCL を DbC SoT とし、テストは導出</td><td>solid_sdd アダプタ方針に合致</td><td>OCL + derive-tests</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2 id="tech">4. 技術選定 <span class="badge ok">実施済</span></h2>
+  <table>
+    <thead><tr><th>決定事項</th><th>選択</th><th>検討した代替</th><th>根拠</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>言語 / ランタイム</td><td>TypeScript / Node</td><td>Ruby のみ、Go など</td><td>既存 arithmetic-api 評価スタック; Vitest 契約</td><td><code>repo_existing</code></td></tr>
+      <tr><td>API スタイル</td><td>HTTP + OpenAPI 3.x</td><td>GraphQL SDL, Protobuf</td><td>サンプルが OpenAPI 志向; HTTP 境界の lint が容易</td><td><code>repo_existing</code> + <code>agent_default</code></td></tr>
+      <tr><td>永続化</td><td>なし（プロセス内メモリ）</td><td>DB バックのメモリ</td><td>スコープ外; 単一スロットで十分</td><td><code>user</code>（スコープ）</td></tr>
+      <tr><td>モジュール契約</td><td>UML OCL → Vitest 契約テスト</td><td>言語ネイティブ契約 gem 等</td><td>solid_sdd 既定 DbC 経路</td><td><code>agent_default</code></td></tr>
+      <tr><td>形式手法</td><td>本 change では適用しない</td><td>メモリ並行向け TLA+</td><td>単スレッド前提; concurrency_safety は要求にない</td><td><code>agent_default</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2 id="design">5. 設計</h2>
+
+  <h3>WorkPlan <span class="badge ok">実施済</span></h3>
+  
+<div class="tabs" data-tabs id="wp-tabs">
+  <div class="tablist" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="summary">要約</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="raw">Raw</button>
+  </div>
+  <div class="panel" data-panel="summary" role="tabpanel">
+<p>全体受入の要約: 加減乗除・剰余、ゼロ除数の名前付きエラー、単一スロットメモリ（開始ゼロ / clear / add / subtract）、および検証可能な HTTP/API・モジュール面。認証・マルチユーザーメモリ・履歴は不要。</p>
+<table>
+<thead><tr><th>ID</th><th>意図（要約）</th><th>Scenario</th><th>Feature</th><th>状態</th></tr></thead>
+<tbody>
+<tr><td>W1</td><td>加算</td><td>Addition returns the sum of its operands</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W2</td><td>減算</td><td>Subtraction returns the difference of its operands</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W3</td><td>乗算</td><td>Multiplication returns the product of its operands</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W4</td><td>除算（非ゼロ）</td><td>Division returns the quotient of its operands</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W5</td><td>剰余（非ゼロ）</td><td>Remainder returns the modulo of its operands</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W6</td><td>ゼロ除算エラー</td><td>Division by zero fails with a named domain error</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W7</td><td>ゼロ剰余エラー</td><td>Remainder by zero fails with a named domain error</td><td>calculator.feature</td><td>ready</td></tr>
+<tr><td>W8</td><td>メモリ初期ゼロ</td><td>Memory starts at zero</td><td>memory.feature</td><td>ready</td></tr>
+<tr><td>W9</td><td>メモリ clear</td><td>Memory clear yields zero on subsequent recall</td><td>memory.feature</td><td>ready</td></tr>
+<tr><td>W10</td><td>メモリ加算</td><td>Add-to-memory increases the single slot by the addend</td><td>memory.feature</td><td>ready</td></tr>
+<tr><td>W11</td><td>メモリ減算</td><td>Subtract-from-memory decreases the single slot by the subtrahend</td><td>memory.feature</td><td>ready</td></tr>
+</tbody>
+</table>
+<p>ソース: <a href="work-plan.json">work-plan.json</a></p>
+</div>
+  <div class="panel" data-panel="raw" role="tabpanel" hidden><p><a href="work-plan.json">work-plan.json</a></p><div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Decompose ChangeBrief into eleven independent property-level Gherkin Scenarios covering add/sub/mul/div/remainder, zero-divisor named domain errors, and single-slot memory (start zero, clear, add, subtract), with checkable HTTP/API and module surfaces required by acceptance_of_whole.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;acceptance_of_whole&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Calculator service covers ops, zero-divisor failures, and memory\n  Given the arithmetic calculator service for clients\n  When clients exercise add, sub, mul, div, and remainder plus single-slot memory clear/recall/add/subtract\n  Then successful ops return mathematically correct numeric results for valid inputs\n  And division or remainder by zero fails with a named domain error rather than an opaque language error\n  And memory starts at zero and clear/recall/add/subtract update the single slot as specified\n  And the HTTP/API surface and module contracts make these behaviors checkable\n  And no auth, multi-user memory, or history features are required&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;human_gate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ChangeBrief scope is explicit with empty open_questions; property-level Scenarios map one-to-one to in_scope items without blocking ambiguity.&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support addition so clients receive the mathematical sum of two operands via a checkable service surface.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Addition returns the sum of its operands\n  Given a calculator service available to clients\n  When the client adds two numbers\n  Then the result equals the mathematical sum of those operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Addition returns the sum of its operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W2&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support subtraction so clients receive the mathematical difference of two operands via a checkable service surface.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Subtraction returns the difference of its operands\n  Given a calculator service available to clients\n  When the client subtracts one number from another\n  Then the result equals the mathematical difference of those operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Subtraction returns the difference of its operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W3&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support multiplication so clients receive the mathematical product of two operands via a checkable service surface.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Multiplication returns the product of its operands\n  Given a calculator service available to clients\n  When the client multiplies two numbers\n  Then the result equals the mathematical product of those operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Multiplication returns the product of its operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W4&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support division with a non-zero divisor so clients receive the mathematical quotient via a checkable service surface.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Division returns the quotient of its operands\n  Given a calculator service available to clients\n  And a non-zero divisor\n  When the client divides one number by another\n  Then the result equals the mathematical quotient of those operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Division returns the quotient of its operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W5&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support remainder (modulo) with a non-zero divisor so clients receive the mathematical remainder via a checkable service surface.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Remainder returns the modulo of its operands\n  Given a calculator service available to clients\n  And a non-zero divisor\n  When the client takes the remainder of one number divided by another\n  Then the result equals the mathematical remainder of those operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Remainder returns the modulo of its operands&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W6&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fail division by zero with a named domain error observable at the service boundary, not an opaque language or runtime error.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Division by zero fails with a named domain error\n  Given a calculator service available to clients\n  When the client divides by zero\n  Then the operation fails with a named domain error\n  And the failure is not an opaque language or runtime error&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Division by zero fails with a named domain error&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W7&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fail remainder by zero with a named domain error observable at the service boundary, not an opaque language or runtime error.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Remainder by zero fails with a named domain error\n  Given a calculator service available to clients\n  When the client takes the remainder with a zero divisor\n  Then the operation fails with a named domain error\n  And the failure is not an opaque language or runtime error&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/calculator.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Remainder by zero fails with a named domain error&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W8&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Ensure single-slot calculator memory starts at zero and recall returns that initial value.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Memory starts at zero\n  Given a fresh calculator memory\n  When the client recalls memory\n  Then the recalled value is zero&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/memory.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Memory starts at zero&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W9&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support clearing the single-slot memory so subsequent recall yields zero.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Memory clear yields zero on subsequent recall\n  Given calculator memory holds a non-zero value\n  When the client clears memory\n  Then recalling memory yields zero&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/memory.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Memory clear yields zero on subsequent recall&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W10&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support add-to-memory so the single slot increases by the given addend.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Add-to-memory increases the single slot by the addend\n  Given calculator memory holds a known value\n  When the client adds a number to memory\n  Then recalling memory yields the previous value plus that number&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/memory.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Add-to-memory increases the single slot by the addend&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;W11&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;intent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Support subtract-from-memory so the single slot decreases by the given subtrahend.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;acceptance_criterion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scenario: Subtract-from-memory decreases the single slot by the subtrahend\n  Given calculator memory holds a known value\n  When the client subtracts a number from memory\n  Then recalling memory yields the previous value minus that number&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;feature_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;requirements/memory.feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scenario_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Subtract-from-memory decreases the single slot by the subtrahend&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;depends_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+
+  <h3>ApplicationPlan <span class="badge miss">未実施</span></h3>
+  <p><code>.solidsdd/changes/initial-calculator/</code> および関連パスに ApplicationPlan JSON が見つからない。契約密度・適用判断の記録は <code>solidsdd-judge</code> の成果物が必要。</p>
+  <p>（リポジトリ上には OpenAPI / OCL が存在するが、本レポートでは ApplicationPlan 自体は未実施として扱う。）</p>
+
+  <h3>API 契約 <span class="badge ok">実施済</span></h3>
+  
+<div class="tabs" data-tabs id="api-tabs">
+  <div class="tablist" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="summary">要約</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="raw">Raw</button>
+  </div>
+  <div class="panel" data-panel="summary" role="tabpanel">
+<ul>
+  <li>OpenAPI 3.0.3、タイトル Arithmetic API（v0.2.0）</li>
+  <li><code>POST /calculate</code>（operationId: calculate）: 二項演算。成功 200、前提違反等は 400 + ErrorResponse</li>
+  <li>メモリ: <code>POST /memory/clear</code> / <code>recall</code> / <code>add</code> / <code>subtract</code>（MC / MR / M+ / M-）</li>
+  <li>演算 enum: <code>add</code>, <code>sub</code>, <code>mul</code>, <code>div</code>, <code>mod</code></li>
+</ul>
+<p>ソース: <a href="../../../openapi/openapi.yaml">openapi/openapi.yaml</a></p>
+</div>
+  <div class="panel" data-panel="raw" role="tabpanel" hidden><p><a href="../../../openapi/openapi.yaml">openapi/openapi.yaml</a></p><div class="highlight"><pre><span></span><code><span class="nt">openapi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.0.3</span>
+<span class="nt">info</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Arithmetic API</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2.0</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<span class="w">    </span><span class="no">Evaluation sample for solid_sdd — five arithmetic operations over HTTP,</span>
+<span class="w">    </span><span class="no">plus calculator memory (MC/MR/M+/M-).</span>
+<span class="nt">servers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://localhost:3000</span>
+<span class="nt">paths</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">/calculate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">calculate</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Evaluate a binary arithmetic operation</span>
+<span class="w">      </span><span class="nt">requestBody</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/CalculateRequest&#39;</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Calculation succeeded</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/CalculateResponse&#39;</span>
+<span class="w">        </span><span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Invalid request or precondition violation (e.g. division or modulo by zero)</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+<span class="w">  </span><span class="nt">/memory/clear</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">memoryClear</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Clear calculator memory (MC)</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Memory cleared</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryResponse&#39;</span>
+<span class="w">        </span><span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Invalid JSON</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+<span class="w">  </span><span class="nt">/memory/recall</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">memoryRecall</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Recall calculator memory (MR)</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Current memory value</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryResponse&#39;</span>
+<span class="w">        </span><span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Invalid JSON</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+<span class="w">  </span><span class="nt">/memory/add</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">memoryAdd</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Add value to calculator memory (M+)</span>
+<span class="w">      </span><span class="nt">requestBody</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryValueRequest&#39;</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Memory updated</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryResponse&#39;</span>
+<span class="w">        </span><span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Invalid JSON or missing value</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+<span class="w">  </span><span class="nt">/memory/subtract</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">post</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">memorySubtract</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Subtract value from calculator memory (M-)</span>
+<span class="w">      </span><span class="nt">requestBody</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryValueRequest&#39;</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Memory updated</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/MemoryResponse&#39;</span>
+<span class="w">        </span><span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Invalid JSON or missing value</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+<span class="nt">components</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">schemas</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Operation</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">      </span><span class="nt">enum</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">add</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">sub</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">mul</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">div</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">mod</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">CalculateRequest</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">additionalProperties</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">op</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">a</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">b</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;#/components/schemas/Operation&#39;</span>
+<span class="w">        </span><span class="nt">a</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number</span>
+<span class="w">        </span><span class="nt">b</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number</span>
+<span class="w">    </span><span class="nt">CalculateResponse</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">additionalProperties</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">result</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">result</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number</span>
+<span class="w">    </span><span class="nt">MemoryValueRequest</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">additionalProperties</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">value</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number</span>
+<span class="w">    </span><span class="nt">MemoryResponse</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">additionalProperties</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">memory</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">memory</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number</span>
+<span class="w">    </span><span class="nt">ErrorResponse</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">additionalProperties</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">error</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">error</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+</code></pre></div>
+</div>
+</div>
+
+  <h3>DbC (OCL) <span class="badge ok">実施済</span></h3>
+  
+<div class="tabs" data-tabs id="ocl-tabs">
+  <div class="tablist" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="summary">要約</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="raw">Raw</button>
+  </div>
+  <div class="panel" data-panel="summary" role="tabpanel">
+<ul>
+  <li><strong>Calculator</strong>（<a href="../../../contracts/Calculator.ocl">Calculator.ocl</a>）
+    <ul>
+      <li><code>add</code> — post: 和（<code>a + b</code>）</li>
+      <li><code>sub</code> — post: 差（<code>a - b</code>）</li>
+      <li><code>mul</code> — post: 積（<code>a * b</code>）</li>
+      <li><code>div</code> — pre: <code>b &lt;&gt; 0</code> / post: 商（<code>a / b</code>）</li>
+      <li><code>mod</code> — pre: <code>b &lt;&gt; 0</code> / post: 剰余（JS <code>%</code> 相当。符号は被除数側、<code>truncatedTowardZero</code>）</li>
+    </ul>
+  </li>
+  <li><strong>Memory</strong>（<a href="../../../contracts/Memory.ocl">Memory.ocl</a>）
+    <ul>
+      <li>属性: <code>memory: Real</code></li>
+      <li><code>clear</code> — メモリを <code>0</code> にし、戻り値も <code>0</code></li>
+      <li><code>recall</code> — 現在の <code>memory</code> を返す</li>
+      <li><code>add</code> — <code>memory@pre + value</code> に更新し、更新後の値を返す</li>
+      <li><code>subtract</code> — <code>memory@pre - value</code> に更新し、更新後の値を返す</li>
+    </ul>
+  </li>
+</ul>
+</div>
+  <div class="panel" data-panel="raw" role="tabpanel" hidden>
+<details open>
+  <summary>Calculator.ocl</summary>
+  <p><a href="../../../contracts/Calculator.ocl">contracts/Calculator.ocl</a></p>
+  <div class="highlight"><pre><span></span><code><span class="c1">-- Calculator domain contracts for arithmetic-api (solid_sdd evaluation sample)</span>
+<span class="c1">-- Source of truth for DbC; tests under tests/contracts are derived from this.</span>
+
+<span class="k">context</span> <span class="n">Calculator</span><span class="o">::</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">Real</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">ResultIsSum</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="k">context</span> <span class="n">Calculator</span><span class="o">::</span><span class="n">sub</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">Real</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">ResultIsDifference</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+
+<span class="k">context</span> <span class="n">Calculator</span><span class="o">::</span><span class="n">mul</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">Real</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">ResultIsProduct</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+
+<span class="k">context</span> <span class="n">Calculator</span><span class="o">::</span><span class="n">div</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">Real</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">pre</span> <span class="n">DivisorIsNonZero</span><span class="p">:</span> <span class="n">b</span> <span class="o">&lt;&gt;</span> <span class="m">0</span>
+<span class="k">post</span> <span class="n">ResultIsQuotient</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+
+<span class="c1">-- JavaScript `%` remainder: sign follows dividend (a - b * truncTowardZero(a / b))</span>
+<span class="k">context</span> <span class="n">Calculator</span><span class="o">::</span><span class="n">mod</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">Real</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">pre</span> <span class="n">DivisorIsNonZero</span><span class="p">:</span> <span class="n">b</span> <span class="o">&lt;&gt;</span> <span class="m">0</span>
+<span class="k">post</span> <span class="n">ResultIsRemainder</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">).</span><span class="n">truncatedTowardZero</span><span class="p">()</span>
+</code></pre></div>
+
+</details>
+<details>
+  <summary>Memory.ocl</summary>
+  <p><a href="../../../contracts/Memory.ocl">contracts/Memory.ocl</a></p>
+  <div class="highlight"><pre><span></span><code><span class="c1">-- Single calculator memory register (initial 0). Source of truth for DbC.</span>
+<span class="c1">-- Memory type attribute: memory: Real</span>
+
+<span class="k">context</span> <span class="n">Memory</span>
+<span class="k">inv</span> <span class="n">MemoryIsReal</span><span class="p">:</span> <span class="n">memory</span><span class="p">.</span><span class="n">oclIsTypeOf</span><span class="p">(</span><span class="nb">Real</span><span class="p">)</span>
+
+<span class="k">context</span> <span class="n">Memory</span><span class="o">::</span><span class="n">clear</span><span class="p">():</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">MemoryCleared</span><span class="p">:</span> <span class="n">memory</span> <span class="o">=</span> <span class="m">0</span>
+<span class="k">post</span> <span class="n">ResultIsZero</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="m">0</span>
+
+<span class="k">context</span> <span class="n">Memory</span><span class="o">::</span><span class="n">recall</span><span class="p">():</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">ResultIsMemory</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">memory</span>
+
+<span class="k">context</span> <span class="n">Memory</span><span class="o">::</span><span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">MemoryIncreased</span><span class="p">:</span> <span class="n">memory</span> <span class="o">=</span> <span class="n">memory</span><span class="o">@pre</span> <span class="o">+</span> <span class="n">value</span>
+<span class="k">post</span> <span class="n">ResultIsMemory</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">memory</span>
+
+<span class="k">context</span> <span class="n">Memory</span><span class="o">::</span><span class="n">subtract</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">Real</span><span class="p">):</span> <span class="nb">Real</span>
+<span class="k">post</span> <span class="n">MemoryDecreased</span><span class="p">:</span> <span class="n">memory</span> <span class="o">=</span> <span class="n">memory</span><span class="o">@pre</span> <span class="o">-</span> <span class="n">value</span>
+<span class="k">post</span> <span class="n">ResultIsMemory</span><span class="p">:</span> <span class="nb">result</span> <span class="o">=</span> <span class="n">memory</span>
+</code></pre></div>
+
+</details>
+</div>
+</div>
+
+  <h3>Formal <span class="badge miss">未実施</span></h3>
+  <p><code>formal/</code> なし。技術選定でも本 change では形式手法を適用しない。</p>
+</section>
+
+<section class="card">
+  <h2 id="judgments">6. 判断とトレードオフ <span class="badge ok">実施済</span></h2>
+  <ul>
+    <li>「検証可能な HTTP + モジュール契約」を成功条件とするが、密度・アダプタ適用は <code>solidsdd-judge</code> に委ねる</li>
+    <li>生の <code>ZeroDivisionError</code> より<strong>名前付きドメインエラー</strong>を優先し、API とテストで失敗語彙を共有する</li>
+    <li>認証・マルチユーザーメモリ・履歴・永続化を外し、サンプルの境界を保つ</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 id="open">7. 未解決事項 <span class="badge ok">実施済</span></h2>
+  <p>Change Context §7 より:</p>
+  <ul>
+    <li>負数に対する剰余 / 除算の符号規約: 当面 OCL / 実装規約（例: JS <code>%</code>）に委ね、必要なら後続 change で締める</li>
+    <li>正確な HTTP パスとエラー JSON 形状: OpenAPI apply に延期（現 OpenAPI に実装済みの面あり）</li>
+  </ul>
+  <p>ChangeBrief の <code>open_questions</code>: （空）</p>
+</section>
+
+<section class="card">
+  <h2 id="sources">8. Source artifacts</h2>
+  <ul>
+    <li><code>.solidsdd/active-change.json</code></li>
+    <li><code>.solidsdd/changes/initial-calculator/status.json</code></li>
+    <li><code>.solidsdd/changes/initial-calculator/change-context.md</code></li>
+    <li><code>.solidsdd/changes/initial-calculator/change-context-gate.json</code></li>
+    <li><a href="change-brief.json"><code>change-brief.json</code></a></li>
+    <li><a href="work-plan.json"><code>work-plan.json</code></a></li>
+    <li><a href="../../../requirements/calculator.feature"><code>requirements/calculator.feature</code></a></li>
+    <li><a href="../../../requirements/memory.feature"><code>requirements/memory.feature</code></a></li>
+    <li><a href="../../../openapi/openapi.yaml"><code>openapi/openapi.yaml</code></a></li>
+    <li><a href="../../../contracts/Calculator.ocl"><code>contracts/Calculator.ocl</code></a></li>
+    <li><a href="../../../contracts/Memory.ocl"><code>contracts/Memory.ocl</code></a></li>
+    <li>ApplicationPlan: （なし → 未実施）</li>
+    <li>Formal: （なし → 未実施）</li>
+  </ul>
+</section>
+</main>
+<script>
+document.querySelectorAll("[data-tabs]").forEach(function (root) {
+  const buttons = [...root.querySelectorAll("[data-tab]")];
+  const panels = [...root.querySelectorAll("[data-panel]")];
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const id = btn.getAttribute("data-tab");
+      buttons.forEach(function (b) {
+        b.setAttribute("aria-selected", String(b === btn));
+      });
+      panels.forEach(function (p) {
+        p.hidden = p.getAttribute("data-panel") !== id;
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>

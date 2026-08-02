@@ -15,6 +15,8 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
       change-context-gate.json       # optional human gate after intake
       change-brief.json
       work-plan.json                 # after solidsdd-decompose
+      report.md                      # optional human snapshot (solidsdd-report)
+      report.html                    # optional HTML snapshot
       status.json                    # active | done | abandoned
 ```
 
@@ -25,6 +27,7 @@ See also: [change-context.md](change-context.md), [change-brief.md](change-brief
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Whether to pause before Brief |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise / return point |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change |
+| Change report | `.solidsdd/changes/<change_id>/report.md` (+ optional `report.html`) | Human-readable view (`solidsdd-report`; not SoT) |
 | Status | `.solidsdd/changes/<change_id>/status.json` | Lifecycle state |
 | Features / contracts | `requirements/`, `openapi/`, `contracts/`, `tests/`, `formal/` | Cross-change accumulation |
 

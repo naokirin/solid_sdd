@@ -5,6 +5,7 @@ A rules-and-skills Spec-Driven Development (SDD) foundation that runs machine-re
 Most SDD tools center on loops that go from natural-language specs to design, implementation, and tests. This project treats the following as first-class concerns on top of that:
 
 - **Structured change framing** (Change Context Markdown: demand, NFRs, tech selection)—before Brief
+- **Human-readable change report** (optional Markdown/HTML snapshot via `solidsdd-report`)
 - **Structured change premise** (ChangeBrief: goals, in/out of scope)—return point when judgment is ambiguous
 - **Structured requirement intake** (property-level Gherkin Scenarios → WorkPlan slices)—not free-form prose alone
 - **Systematizing judgment** of *where* and *which* specification techniques to apply

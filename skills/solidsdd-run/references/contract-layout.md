@@ -7,6 +7,7 @@
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Optional human pause before Brief |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |
+| Change report | `.solidsdd/changes/<change_id>/report.md` (+ optional `report.html`) | Human-readable snapshot (`solidsdd-report`; not SoT) |
 | Change status | `.solidsdd/changes/<change_id>/status.json` | `active` \| `done` \| `abandoned` |
 | Requirements (Gherkin) | `requirements/**/*.feature` | Property-level acceptance; not executable test SoT; accumulates across changes |
 | OpenAPI | `openapi/openapi.yaml` | HTTP boundary contract (default API adapter) |

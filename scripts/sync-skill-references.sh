@@ -181,6 +181,12 @@ sync_one reference-src/work-decomposition.md skills/solidsdd-run/references/work
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-decompose/references/gherkin-requirements.md
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-run/references/gherkin-requirements.md
 sync_one reference-src/gherkin-requirements.md skills/solidsdd-critique/references/gherkin-requirements.md
+sync_one reference-src/gherkin-requirements.md skills/solidsdd-report/references/gherkin-requirements.md
+sync_one reference-src/change-report.md skills/solidsdd-report/references/change-report.md
+sync_one reference-src/change-lifecycle.md skills/solidsdd-report/references/change-lifecycle.md
+sync_one reference-src/contract-layout.md skills/solidsdd-report/references/contract-layout.md
+sync_one reference-src/change-context.md skills/solidsdd-report/references/change-context.md
+sync_one reference-src/change-brief.md skills/solidsdd-report/references/change-brief.md
 
 if [[ "$MODE" == "check" ]]; then
   if [[ "$mismatch" -ne 0 ]]; then

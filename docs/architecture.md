@@ -66,6 +66,7 @@ Execution policy: [execution-model.md](execution-model.md). Adversarial critique
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
 | `solidsdd.intake` | Change framing (demand / NFR / tech) + optional gate | **subagent required** | `change-context.md`, `change-context-gate.json` |
+| `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) | `report.md` / `report.html` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
 | `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
 | `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
@@ -81,6 +82,10 @@ Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phas
 ## Change context (`solidsdd.intake`) output
 
 Fixed-heading Markdown at `.solidsdd/changes/<change_id>/change-context.md` (demand, NFRs, technology selection, judgments) plus `change-context-gate.json` for an optional human pause before Brief when framing needs confirmation (not when the initial instruction already made decisions clear). Rules: [../reference-src/change-context.md](../reference-src/change-context.md).
+
+## Change report (`solidsdd.report`) output
+
+Manual human-readable snapshot at `.solidsdd/changes/<change_id>/report.md` (optional `report.html`). Projects demand, functional/NFR, tech selection, and design from existing artifacts; missing phases are marked not performed. Not part of `solidsdd-run`. Rules: [../reference-src/change-report.md](../reference-src/change-report.md).
 
 ## Change brief (`solidsdd.brief`) output model
 

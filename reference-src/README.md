@@ -14,5 +14,6 @@ Edit sources for skill-bundled docs that do **not** live under repo-root `adapte
 | `work-decomposition.md` | decompose / run |
 | `gherkin-requirements.md` | decompose / run / critique |
 | `change-brief.md` | brief / run / decompose / critique / judge |
+| `change-report.md` | report |
 
 Sync with `scripts/sync-skill-references.sh`. Do not hand-edit `skills/*/references/` (they will be overwritten).

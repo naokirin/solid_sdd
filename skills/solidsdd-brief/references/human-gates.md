@@ -70,6 +70,10 @@ When the human approves:
 7. Do not thin Change Context, ChangeBrief, or WorkPlan to avoid the gate.
 8. After approval, resume with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
 
+## Optional human-readable report
+
+When stopping for a gate (or after intake / Brief for confirmation), the orchestrator or agent **may suggest** running manual `solidsdd-report` so humans can review demand / NFR / tech / design so far as Markdown (optional HTML). This is **not** a required gate and does not change SoT artifacts. See [change-report.md](change-report.md).
+
 ## Defaults
 
 - **Change Context**: gate only when framing triggers fire; **clear initial instruction → no gate**.

@@ -12,6 +12,7 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 | [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Slice orchestration (one intent) | orchestrator only |
 | [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
 | [solidsdd-intake](solidsdd-intake/SKILL.md) | `solidsdd.intake` | Change Context (demand / NFR / tech selection) | **subagent required** |
+| [solidsdd-report](solidsdd-report/SKILL.md) | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) |
 | [solidsdd-brief](solidsdd-brief/SKILL.md) | `solidsdd.brief` | ChangeBrief (scope premise / return point) | **subagent required** |
 | [solidsdd-decompose](solidsdd-decompose/SKILL.md) | `solidsdd.decompose` | WorkPlan (one property-level Scenario per item) | **subagent required** |
 | [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
@@ -42,7 +43,7 @@ Do **not** hand-edit copies under `skills/*/references/`. Sync from edit sources
 | `docs/execution-model.md` | `solidsdd-loop` / `solidsdd-run` `references/execution-model.md` |
 | `schemas/*.json` | judge / decompose / verify / verify-formal / critique / run |
 | `rules/solidsdd.mdc` | loop / run `references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / change-lifecycle / change-context / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
+| `reference-src/*` | contract-layout / change-lifecycle / change-context / change-report / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
 
 ```bash
 # manual

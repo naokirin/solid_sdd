@@ -15,6 +15,7 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - Change Context gate: `.solidsdd/changes/<change_id>/change-context-gate.json` (optional pause before Brief)
 - ChangeBrief: `.solidsdd/changes/<change_id>/change-brief.json` (scope premise / return point)
 - WorkPlan: `.solidsdd/changes/<change_id>/work-plan.json`
+- Change report (optional human view): `.solidsdd/changes/<change_id>/report.md` (+ `report.html`) — `solidsdd-report`; not source of truth
 - Change status: `.solidsdd/changes/<change_id>/status.json` (`active` | `done` | `abandoned`)
 - Requirements (Gherkin): `requirements/**/*.feature` (property-level acceptance; not executable test SoT; accumulates across changes)
 - OpenAPI: `openapi/openapi.yaml`

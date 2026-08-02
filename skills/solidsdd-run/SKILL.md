@@ -50,7 +50,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 2. **Task subagent** `solidsdd-intake` → `change-context.md` + `change-context-gate.json` under `.solidsdd/changes/<change_id>/` (pass optional user `change_id`; creates lifecycle paths — [change-lifecycle.md](references/change-lifecycle.md))
 3. **Task subagent** `solidsdd-critique` with `subject: change_context`
 4. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-intake as Task, then critique again)
-5. If `change-context-gate.json` has `human_gate.required: true` → **stop** until humans approve (or amend + re-intake); then resume without thinning Change Context — [human-gates.md](references/human-gates.md)
+5. If `change-context-gate.json` has `human_gate.required: true` → **stop** until humans approve (or amend + re-intake); then resume without thinning Change Context — [human-gates.md](references/human-gates.md). Optionally suggest manual `solidsdd-report` for a readable snapshot (not a required gate).
 6. **Task subagent** `solidsdd-brief` → ChangeBrief for the **same** active `change_id` (must read Change Context; migrate legacy flat Brief if needed)
 7. **Task subagent** `solidsdd-critique` with `subject: change_brief`
 8. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-brief; re-intake if framing is wrong)
