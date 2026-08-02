@@ -1,93 +1,93 @@
-# ロードマップ
+# Roadmap
 
-## 評価の前提
+## Evaluation premise
 
-最終系のつながり（判断 → 適用 → 実装 → 検証）が無いと、「想定した構成が機能するか」を評価しにくい。そのため MVP では **形式仕様を除く主要経路を一通りつなぐ**。
+Without the end-state chain (judgment → apply → implement → verify), it is hard to evaluate whether the intended design works. For MVP we therefore **wire the main path once, excluding formal specs**.
 
-形式仕様は有効だが導入が重く、適用範囲も狭くなりやすいため **意図的に後回し** する。ただし判断モデル上は `formal` を欠番にせず、`defer` として理由を残せるようにする。
+Formal specs are valuable but heavy to adopt and tend to narrow scope, so they are **intentionally deferred**. The judgment model still keeps `formal` (no missing kind) and can emit `defer` with a reason.
 
-## フェーズ 0: 構想・設計
+## Phase 0: Vision and design
 
-- [x] 問題意識と目標の明文化（[vision.md](vision.md)）
-- [x] ルール／スキル構成の方針（[architecture.md](architecture.md)）
-- [x] MVP と後続の切り分け（本ドキュメント）
-- [x] 初期アダプタ選定: OpenAPI + OCL→契約テスト（[adapters.md](adapters.md)）
-- [x] 評価シナリオ選定: TypeScript 四則演算 API（[../examples/arithmetic-api](../examples/arithmetic-api)）
-- [x] スキル入出力スキーマ（`ApplicationPlan` 等）
-- [x] スキル定義スケルトン（`skills/`）
-- [x] 利用側への導入手順（[install.md](install.md) — `gh skill` 自己完結スキル）
-- [x] `skills/*/references/` 同期スクリプト（`scripts/sync-skill-references.sh`）
-- [x] Cursor / Claude Code Hook + git pre-commit（ずれ時はエラーと手順表示）
-- [ ] GitHub 公開後の `gh skill publish`（release / `agent-skills` topic）
+- [x] Capture problem and goals ([vision.md](vision.md))
+- [x] Rules / skill architecture ([architecture.md](architecture.md))
+- [x] Split MVP vs later work (this document)
+- [x] Initial adapters: OpenAPI + OCL→contract tests ([adapters.md](adapters.md))
+- [x] Evaluation scenario: TypeScript arithmetic API ([../examples/arithmetic-api](../examples/arithmetic-api))
+- [x] Skill I/O schemas (`ApplicationPlan`, etc.)
+- [x] Skill definition skeletons (`skills/`)
+- [x] Consumer install guide ([install.md](install.md) — self-contained `gh skill` skills)
+- [x] `skills/*/references/` sync script (`scripts/sync-skill-references.sh`)
+- [x] Cursor / Claude Code hooks + git pre-commit (error + fix command on drift)
+- [ ] `gh skill publish` after GitHub publication (release / `agent-skills` topic)
 
-## フェーズ 1: MVP（つながった最小構成）
+## Phase 1: MVP (minimal connected system)
 
-**状態: 評価完了**（詳細は [mvp-evaluation.md](mvp-evaluation.md)）。配布（`gh skill publish`）は後回し。
+**Status: evaluation complete** (see [mvp-evaluation.md](mvp-evaluation.md)). Distribution (`gh skill publish`) deferred.
 
-**含むもの**
+**In scope**
 
-| 要素 | 内容 |
-|------|------|
-| ルール | 適用方針・成果物配置・検証必須の最小セット |
-| `solidsdd.context` | スタック・既存契約の把握 |
-| `solidsdd.judge` | API / DbC / 見送り（formal は defer 可） |
+| Element | Contents |
+|---------|----------|
+| Rules | Minimal set: apply policy, artifact layout, verify-required |
+| `solidsdd.context` | Discover stack and existing contracts |
+| `solidsdd.judge` | API / DbC / skip (formal may defer) |
 | `solidsdd.apply.api` | OpenAPI 3.x |
 | `solidsdd.apply.dbc` | UML OCL |
-| `solidsdd.derive.tests` | OCL→契約テスト（サブエージェント） |
-| `solidsdd.implement` | 契約に沿った実装の更新 |
-| `solidsdd.verify` | Redocly API lint（可なら）+ 契約テスト実行 |
-| `solidsdd.loop` | 上記の自動オーケストレーション |
+| `solidsdd.derive.tests` | OCL→contract tests (subagent) |
+| `solidsdd.implement` | Implementation updates aligned to contracts |
+| `solidsdd.verify` | Redocly API lint (when available) + contract tests |
+| `solidsdd.loop` | Automatic orchestration of the above |
 
-**含まないもの（意図的）**
+**Out of scope (intentional)**
 
-- TLA+ / Alloy / VDM 等の形式仕様の適用・モデル検査
-- 多数スタックの網羅的アダプタ
-- 高度な信頼度推定や大規模ポリシーエンジン
+- Applying / model-checking formal specs (TLA+ / Alloy / VDM, etc.)
+- Exhaustive adapters for many stacks
+- Advanced confidence estimation or large policy engines
 
-**MVP の成功基準**
+**MVP success criteria**
 
-1. [x] サンプル変更に対し、人手でスキルを順に実行して契約が残り、検証が通る／意図的に壊すと検出できる
-2. [x] 同じ変更を `solidsdd.loop` だけでも同等の結果に近づく
-3. [x] `solidsdd.judge` が「なぜ API / DbC / skip か」を軸に沿って説明できる
-4. [x] 形式仕様が望ましいケースでは `defer` と理由が出る（黙って無視しない）
+1. [x] For a sample change, running skills manually leaves contracts in place; verify passes / intentional breakage is detected
+2. [x] The same change via `solidsdd.loop` alone approaches equivalent results
+3. [x] `solidsdd.judge` can explain “why API / DbC / skip” along the axes
+4. [x] When formal specs would help, `defer` + reason appear (not silently ignored)
 
-## フェーズ 2: 適用判断とアダプタの強化
+## Phase 2: Stronger judgment and adapters
 
-**状態: 完了**（詳細は [phase2.md](phase2.md)）。言語ネイティブ契約は意図的に後回し。
+**Status: complete** (see [phase2.md](phase2.md)). Language-native contracts intentionally deferred.
 
-- [x] 判断軸の精度向上（破壊的変更、権限・金銭境界、変更頻度、信頼度など）— [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md)
-- [x] GraphQL アダプタ + 評価サンプル — [../adapters/graphql/README.md](../adapters/graphql/README.md), [../examples/arithmetic-graphql](../examples/arithmetic-graphql)
-- [x] 別言語の契約テスト生成先（Ruby / RSpec）— [../adapters/ruby-rspec/README.md](../adapters/ruby-rspec/README.md), [../examples/arithmetic-ruby](../examples/arithmetic-ruby)
-- [x] 人間ゲート条件の整備（低信頼度・破壊的変更等）— [../reference-src/human-gates.md](../reference-src/human-gates.md)
-- [x] 検証レポートの標準化とループ復帰条件 — schema + [../reference-src/loop-retry.md](../reference-src/loop-retry.md)
-- [x] GraphQL / Ruby サンプルの通し評価 — [phase2-evaluation.md](phase2-evaluation.md)
-- [ ] 言語ネイティブ DbC（任意 gem 等）— **後回し**（プロジェクト拒否を前提にオプトイン設計が必要）
+- [x] Sharper judgment axes (breaking changes, authz/money boundaries, churn, confidence, etc.) — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md)
+- [x] GraphQL adapter + evaluation sample — [../adapters/graphql/README.md](../adapters/graphql/README.md), [../examples/arithmetic-graphql](../examples/arithmetic-graphql)
+- [x] Alternate-language contract-test target (Ruby / RSpec) — [../adapters/ruby-rspec/README.md](../adapters/ruby-rspec/README.md), [../examples/arithmetic-ruby](../examples/arithmetic-ruby)
+- [x] Human-gate conditions (low confidence, breaking changes, etc.) — [../reference-src/human-gates.md](../reference-src/human-gates.md)
+- [x] Standardized verification reports and loop-recovery rules — schema + [../reference-src/loop-retry.md](../reference-src/loop-retry.md)
+- [x] End-to-end evaluation of GraphQL / Ruby samples — [phase2-evaluation.md](phase2-evaluation.md)
+- [ ] Language-native DbC (optional gems, etc.) — **deferred** (opt-in design needed given project gem refusal)
 
-## フェーズ 3: 形式仕様の導入
+## Phase 3: Formal specifications
 
-**状態: 完了**（[phase3.md](phase3.md), [phase3-evaluation.md](phase3-evaluation.md), [phase3-gate-dryrun.md](phase3-gate-dryrun.md)）。
+**Status: complete** ([phase3.md](phase3.md), [phase3-evaluation.md](phase3-evaluation.md), [phase3-gate-dryrun.md](phase3-gate-dryrun.md)).
 
-- [x] `solidsdd.apply.formal` / `solidsdd.verify.formal` スキル骨格
-- [x] `solidsdd.judge` が `formal` を `apply` にしうる条件 — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) + [phase3.md](phase3.md)
-- [x] 適用範囲が狭い前提の導入ガイド（役割分担）— [phase3.md](phase3.md)
-- [x] 既存の API / DbC 経路との役割分担の再確認
-- [x] 具体チェッカー統合（**TLC**）と最小評価サンプル — [../tools/tla](../tools/tla), [../examples/memory-formal](../examples/memory-formal)
-- [x] Phase 3 通し評価の記録（サンプル TLC）— [phase3-evaluation.md](phase3-evaluation.md)
-- [x] ループ上の human_gate → apply-formal ドライラン — [phase3-gate-dryrun.md](phase3-gate-dryrun.md)
+- [x] `solidsdd.apply.formal` / `solidsdd.verify.formal` skill skeletons
+- [x] Conditions under which `solidsdd.judge` may `apply` `formal` — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) + [phase3.md](phase3.md)
+- [x] Narrow-scope adoption guide (role split) — [phase3.md](phase3.md)
+- [x] Reconfirm role split vs existing API / DbC paths
+- [x] Concrete checker integration (**TLC**) + minimal evaluation sample — [../tools/tla](../tools/tla), [../examples/memory-formal](../examples/memory-formal)
+- [x] Phase 3 end-to-end evaluation notes (sample TLC) — [phase3-evaluation.md](phase3-evaluation.md)
+- [x] Loop dry run: human_gate → apply-formal — [phase3-gate-dryrun.md](phase3-gate-dryrun.md)
 
-## フェーズ 4: 運用・エコシステム
+## Phase 4: Operations and ecosystem
 
-**状態: 文書スライス着手**（[phase4.md](phase4.md)）。公開・実プロフィードバックは未。
+**Status: documentation slice started** ([phase4.md](phase4.md)). Public release and real-project feedback still open.
 
-- [x] 他 SDD ツールとの共存パターン — [coexistence.md](coexistence.md)
-- [x] 導入チェックリスト拡充 — [install.md](install.md)
-- [x] プロジェクトテンプレートレイアウト — [project-template.md](project-template.md)
-- [x] 評価コーパスに基づくルール調整（Pass 1）— [feedback-tuning.md](feedback-tuning.md)
-- [x] 敵対的評価スキル（`solidsdd-critique`）と loop 組み込み — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
-- [ ] テンプレートリポジトリの GitHub 公開
-- [ ] 外部実プロジェクトからの追加フィードバック
+- [x] Coexistence patterns with other SDD tools — [coexistence.md](coexistence.md)
+- [x] Expanded adoption checklist — [install.md](install.md)
+- [x] Project template layout — [project-template.md](project-template.md)
+- [x] Rule tuning from eval corpus (Pass 1) — [feedback-tuning.md](feedback-tuning.md)
+- [x] Adversarial critique skill (`solidsdd-critique`) wired into the loop — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
+- [ ] Publish template repository on GitHub
+- [ ] Additional feedback from external production projects
 
-## 直近の次アクション
+## Near-term next actions
 
-1. GitHub remote / `gh skill publish`（配布）
-2. 外部プロジェクト導入 → [feedback-tuning.md](feedback-tuning.md) に intake、または言語ネイティブ DbC のオプトイン設計
+1. GitHub remote / `gh skill publish` (distribution)
+2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC

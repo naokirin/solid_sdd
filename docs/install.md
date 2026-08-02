@@ -1,62 +1,62 @@
-# プロジェクトへの導入手順
+# Installing into a project
 
-solid_sdd のスキルは **自己完結** です。アダプタ要約・スキーマ・実行モデルは各スキルの `references/` に同梱しており、`gh skill` でインストールするだけで MVP を回せます。
+solid_sdd skills are **self-contained**. Adapter summaries, schemas, and the execution model ship in each skill’s `references/`, so installing with `gh skill` is enough to run the MVP.
 
-## 前提
+## Prerequisites
 
-- GitHub CLI **v2.90.0 以降**（`gh skill` コマンド）
-- [Cursor](https://cursor.com/) など Agent Skills 対応ホスト（`--agent cursor` 等）
-- MVP: **OpenAPI 3.x + OCL → 契約テスト**（TypeScript / Vitest を評価サンプルとする）
+- GitHub CLI **v2.90.0+** (`gh skill` command)
+- An Agent Skills host such as [Cursor](https://cursor.com/) (`--agent cursor`, etc.)
+- MVP: **OpenAPI 3.x + OCL → contract tests** (TypeScript / Vitest evaluation sample)
 
-`gh skill` は preview 機能です。仕様変更の可能性があります。
+`gh skill` is a preview feature and may change.
 
-## 推奨: `gh skill` でインストール
+## Recommended: install with `gh skill`
 
-リポジトリが GitHub に公開され、`gh skill publish` 済み（または default branch から install 可能）である前提:
+Assumes the repo is public on GitHub and `gh skill publish` has been run (or install from the default branch works):
 
 ```bash
-# 利用側プロジェクトのルートで
+# at the consuming project root
 gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project
 ```
 
-個別インストール例:
+Per-skill example:
 
 ```bash
 gh skill install <OWNER>/solid_sdd solidsdd-loop --agent cursor --scope project
-gh skill preview <OWNER>/solid_sdd solidsdd-loop   # 導入前の確認
+gh skill preview <OWNER>/solid_sdd solidsdd-loop   # preview before install
 ```
 
-ピン留め:
+Pinning:
 
 ```bash
 gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project --pin v0.1.0
 ```
 
-### インストール先
+### Install location
 
-Cursor の project scope では、多くの場合 **`.agents/skills/solidsdd-*`** に配置されます（Copilot 等と共有ディレクトリ）。従来の `.cursor/skills/` とは異なることがあります。実際のパスは `gh skill list` で確認してください。
+For Cursor project scope, skills usually land under **`.agents/skills/solidsdd-*`** (shared with Copilot and others). That may differ from the older `.cursor/skills/`. Confirm the real path with `gh skill list`.
 
-### プロジェクトルール（任意だが推奨）
+### Project rule (optional but recommended)
 
-`gh skill` は Project Rule を自動では入れません。初回のみ:
+`gh skill` does not install Project Rules automatically. Once after install:
 
 ```bash
-# インストール後のパスは環境により異なる
+# path after install varies by environment
 cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc
 ```
 
-パスが違う場合は `gh skill list` やファイル検索で `solidsdd-loop/references/project-rule.mdc` を見つけてコピーしてください。
+If the path differs, find `solidsdd-loop/references/project-rule.mdc` via `gh skill list` or file search and copy it.
 
-## ローカル検証（未公開リポジトリ）
+## Local verification (unpublished repo)
 
 ```bash
 gh skill install --from-local /path/to/solid_sdd --all --agent cursor --scope project
-gh skill publish --dry-run /path/to/solid_sdd   # 配布前バリデーション
+gh skill publish --dry-run /path/to/solid_sdd   # validate before distribution
 ```
 
-## 利用側に用意する契約レイアウト
+## Contract layout for consuming projects
 
-スキルが参照するデフォルト（ルールで上書き可）:
+Defaults skills expect (overridable in rules):
 
 ```text
 your-project/
@@ -67,92 +67,92 @@ your-project/
   tests/
     contracts/
       *.test.ts
-  .agents/skills/solidsdd-*/   # gh skill が配置
-  .cursor/rules/solidsdd.mdc   # 上記からコピー（推奨）
+  .agents/skills/solidsdd-*/   # placed by gh skill
+  .cursor/rules/solidsdd.mdc   # copied as above (recommended)
 ```
 
-未作成でも導入可能です。`solidsdd-context` → `solidsdd-judge`（または `solidsdd-loop` / `solidsdd-run`）で不足を検出・生成する想定です。
+You can install without creating these yet. `solidsdd-context` → `solidsdd-judge` (or `solidsdd-loop` / `solidsdd-run`) is expected to detect and generate what is missing.
 
-## 動作確認
+## Smoke check
 
-1. `gh skill list` で `solidsdd-*` が出ること
-2. Agent に「`solidsdd-context` を実行して」「`solidsdd-loop` を回して」（1 slice）、または「`solidsdd-run` を回して」（複数受け入れ条件）と依頼
-3. スキルが `references/` 配下を読んでいること
-4. （任意）本リポジトリの [examples/arithmetic-api](../examples/arithmetic-api) で通し確認
+1. `gh skill list` shows `solidsdd-*`
+2. Ask the agent to run `solidsdd-context`, `solidsdd-loop` (one slice), or `solidsdd-run` (multiple acceptance criteria)
+3. Confirm skills read under `references/`
+4. (Optional) End-to-end check with this repo’s [examples/arithmetic-api](../examples/arithmetic-api)
 
-自動実行時:
+For automatic execution:
 
-- **1 つの検証可能な受け入れ条件**が既に分かっている → `solidsdd-loop`
-- **要件が複数条件・大きめ** → `solidsdd-run`（decompose → 各 item で loop → 統合 verify）
+- **One verifiable acceptance criterion** already known → `solidsdd-loop`
+- **Multiple / larger requirements** → `solidsdd-run` (decompose → loop per item → integration verify)
 
-親が context 以外の subagent 必須スキルを Task で起動すること（各スキルの `references/execution-model.md`）。
+The parent must launch subagent-required skills (other than context) via Task (see each skill’s `references/execution-model.md`).
 
-## メンテナー向け: 配布準備
+## Maintainers: distribution prep
 
-スキル本体の変更後:
+After changing skill bodies:
 
 ```bash
 gh skill publish --dry-run
-# remote・認証済みなら（このドキュメントの範囲外）:
+# with remote + auth (out of scope for this doc):
 # gh skill publish --tag v0.1.0
 ```
 
-- リポジトリ topic に `agent-skills` が付く（publish 時に案内）
-- 各 `SKILL.md` に `license: MIT` を含め済み
-- `adapters/`・`schemas/`・`docs/`・`rules/`・`reference-src/` は編集用ソース。**配布物の正は `skills/*/references/`**
-- ソースを直したら必ず同期する:
+- Repo topic should include `agent-skills` (guided at publish time)
+- Each `SKILL.md` already includes `license: MIT`
+- `adapters/`, `schemas/`, `docs/`, `rules/`, and `reference-src/` are edit sources. **Distributed truth is `skills/*/references/`**
+- After editing sources, always sync:
 
 ```bash
 scripts/sync-skill-references.sh
-scripts/sync-skill-references.sh --check   # ずれ検出
+scripts/sync-skill-references.sh --check   # detect drift
 ```
 
-AI エージェント経由の編集では次が自動で sync します。
+Edits via AI agents auto-sync:
 
-- Cursor: `.cursor/hooks.json`（`afterFileEdit`）
-- Claude Code: `.claude/settings.json`（`PostToolUse` / `Edit|Write|MultiEdit`）
+- Cursor: `.cursor/hooks.json` (`afterFileEdit`)
+- Claude Code: `.claude/settings.json` (`PostToolUse` / `Edit|Write|MultiEdit`)
 
-コミット時は `scripts/git-hooks/pre-commit` が `--check` し、ずれていれば失敗して実行コマンドを示します。初回のみ:
+On commit, `scripts/git-hooks/pre-commit` runs `--check` and fails with the command to run if out of sync. Once:
 
 ```bash
 scripts/install-git-hooks.sh
 ```
 
-## 更新
+## Updates
 
 ```bash
 gh skill update --all
-# または
+# or
 gh skill update solidsdd-loop
 ```
 
-`project-rule.mdc` をローカル改変している場合は、上書きコピーに注意してください。
+If you customized `project-rule.mdc` locally, be careful when overwriting the copy.
 
-## 導入チェックリスト
+## Adoption checklist
 
-### 必須（MVP: OpenAPI + OCL）
+### Required (MVP: OpenAPI + OCL)
 
-- [ ] `gh skill install ... --all --agent cursor` が成功した（または `--from-local`）
-- [ ] `gh skill list` に `solidsdd-*` がある（run / loop / context / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify、および formal 系）
-- [ ] （推奨）`project-rule.mdc` を Project Rules へコピーした
-- [ ] 契約レイアウト方針を共有した（[project-template.md](project-template.md)）
-- [ ] `solidsdd-context`、`solidsdd-loop`、または `solidsdd-run` のスモークが通る（生産者の直後に `solidsdd-critique` が Task 起動される）
-- [ ] 契約テストがプロジェクトの `npm test` / `bundle exec rspec` 等で走る
+- [ ] `gh skill install ... --all --agent cursor` succeeded (or `--from-local`)
+- [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
+- [ ] (Recommended) Copied `project-rule.mdc` into Project Rules
+- [ ] Shared contract layout policy ([project-template.md](project-template.md))
+- [ ] Smoke of `solidsdd-context`, `solidsdd-loop`, or `solidsdd-run` passes (`solidsdd-critique` launched via Task right after producers)
+- [ ] Contract tests run via the project’s `npm test` / `bundle exec rspec` / etc.
 
-### 任意（スタック別）
+### Optional (by stack)
 
-- [ ] GraphQL を使う場合: `graphql/schema.graphql` と `adapter_hint: graphql`
-- [ ] Ruby の場合: `spec/contracts` + ruby-rspec 生成先
-- [ ] Formal を使う場合: JDK 17+、`tla2tools` 取得手順、**human_gate** 運用をチームで合意（[phase3-gate-dryrun.md](phase3-gate-dryrun.md)）
+- [ ] GraphQL: `graphql/schema.graphql` and `adapter_hint: graphql`
+- [ ] Ruby: `spec/contracts` + ruby-rspec generation target
+- [ ] Formal: JDK 17+, `tla2tools` fetch steps, team agreement on **human_gate** ([phase3-gate-dryrun.md](phase3-gate-dryrun.md))
 
-### 共存
+### Coexistence
 
-- [ ] NL SDD ツールとの役割分担を読んだ（[coexistence.md](coexistence.md)）
+- [ ] Read role split with NL SDD tools ([coexistence.md](coexistence.md))
 
-## 関連ドキュメント
+## Related docs
 
-- [adapters.md](adapters.md) — OpenAPI / GraphQL / OCL / formal の役割
-- [execution-model.md](execution-model.md) — 実行モデル（スキルにも同梱）
-- [architecture.md](architecture.md) — 全体構成
-- [phase4.md](phase4.md) — 運用・エコシステム
-- [../skills/README.md](../skills/README.md) — スキル一覧
+- [adapters.md](adapters.md) — roles of OpenAPI / GraphQL / OCL / formal
+- [execution-model.md](execution-model.md) — execution model (also bundled in skills)
+- [architecture.md](architecture.md) — overall structure
+- [phase4.md](phase4.md) — operations and ecosystem
+- [../skills/README.md](../skills/README.md) — skill index

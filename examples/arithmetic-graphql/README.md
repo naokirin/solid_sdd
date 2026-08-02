@@ -1,38 +1,38 @@
-# arithmetic-graphql（評価用サンプル）
+# arithmetic-graphql (evaluation sample)
 
-四則演算（+ mod）と電卓メモリを **GraphQL SDL** 境界で扱う TypeScript サンプル。solid_sdd の `adapter_hint: graphql` + OCL→契約テスト経路を評価する題材。
+TypeScript sample for arithmetic (+ mod) and calculator memory over a **GraphQL SDL** boundary. Used to evaluate solid_sdd’s `adapter_hint: graphql` + OCL→contract-test path.
 
-OpenAPI 版は [../arithmetic-api](../arithmetic-api) を参照。
+OpenAPI variant: [../arithmetic-api](../arithmetic-api).
 
-## シナリオ
+## Scenario
 
 ### Query
 
-| Field | 引数 | 意味 |
-|-------|------|------|
-| `calculate` | `op`, `a`, `b` | 四則 + mod |
-| `memory` | （なし） | MR（現在値） |
+| Field | Args | Meaning |
+|-------|------|---------|
+| `calculate` | `op`, `a`, `b` | Arithmetic + mod |
+| `memory` | (none) | MR (current value) |
 
 `op`: `add` \| `sub` \| `mul` \| `div` \| `mod`  
-`div` / `mod` で `b === 0` のときは GraphQL error（precondition）。
+`div` / `mod` with `b === 0` → GraphQL error (precondition).
 
 ### Mutation
 
-| Field | 引数 | 意味 |
-|-------|------|------|
-| `memoryClear` | （なし） | MC |
+| Field | Args | Meaning |
+|-------|------|---------|
+| `memoryClear` | (none) | MC |
 | `memoryAdd` | `value` | M+ |
 | `memorySubtract` | `value` | M- |
 
-## 契約の置き場
+## Contract locations
 
-| 種類 | パス |
+| Kind | Path |
 |------|------|
 | GraphQL SDL | `graphql/schema.graphql` |
 | OCL | `contracts/Calculator.ocl`, `contracts/Memory.ocl` |
-| 契約テスト | `tests/contracts/*.test.ts` |
+| Contract tests | `tests/contracts/*.test.ts` |
 
-## セットアップ
+## Setup
 
 ```bash
 npm install
@@ -40,7 +40,7 @@ npm test
 npm start
 ```
 
-例（GraphiQL 無しの場合）:
+Examples (without GraphiQL):
 
 ```bash
 curl -s localhost:4000/graphql -H 'content-type: application/json' \
@@ -50,8 +50,8 @@ curl -s localhost:4000/graphql -H 'content-type: application/json' \
   -d '{"query":"mutation { memoryAdd(value: 5) }"}'
 ```
 
-## solid_sdd での使い方
+## Using with solid_sdd
 
-1. `solidsdd-judge` で `kind=api`, `adapter_hint=graphql` を期待
+1. Expect `solidsdd-judge` to emit `kind=api`, `adapter_hint=graphql`
 2. `solidsdd-apply-api` / `solidsdd-apply-dbc` / `solidsdd-derive-tests` / `solidsdd-implement` / `solidsdd-verify`
-3. または `solidsdd-loop`
+3. Or `solidsdd-loop`

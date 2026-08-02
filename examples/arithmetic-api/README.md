@@ -1,37 +1,37 @@
-# arithmetic-api（評価用サンプル）
+# arithmetic-api (evaluation sample)
 
-リクエストで四則演算（+ mod）と電卓メモリ（MC / MR / M+ / M-）を扱う小さな TypeScript API。solid_sdd の OpenAPI + OCL→契約テスト経路を評価する題材。
+A small TypeScript API for arithmetic (+ mod) and calculator memory (MC / MR / M+ / M-). Used to evaluate solid_sdd’s OpenAPI + OCL→contract-test path.
 
-## シナリオ
+## Scenario
 
-### 計算
+### Calculate
 
-- `POST /calculate` に `{ "op", "a", "b" }` を送り、計算結果を返す
+- `POST /calculate` with `{ "op", "a", "b" }` returns the result
 - `op`: `add` | `sub` | `mul` | `div` | `mod`
-- `div` / `mod` で `b === 0` のときは 400
+- `div` / `mod` with `b === 0` → 400
 
-### メモリ
+### Memory
 
-単一の Real レジスタ（初期値 0）。
+Single Real register (initial value 0).
 
-| 操作 | HTTP | ボディ | 意味 |
-|------|------|--------|------|
-| MC | `POST /memory/clear` | （空可） | メモリを 0 に |
-| MR | `POST /memory/recall` | （空可） | 現在値を返す |
-| M+ | `POST /memory/add` | `{ "value": number }` | 加算 |
-| M- | `POST /memory/subtract` | `{ "value": number }` | 減算 |
+| Op | HTTP | Body | Meaning |
+|----|------|------|---------|
+| MC | `POST /memory/clear` | (empty OK) | Set memory to 0 |
+| MR | `POST /memory/recall` | (empty OK) | Return current value |
+| M+ | `POST /memory/add` | `{ "value": number }` | Add |
+| M- | `POST /memory/subtract` | `{ "value": number }` | Subtract |
 
-応答は `{ "memory": number }`。不正 JSON / `value` 欠落は 400。
+Response shape: `{ "memory": number }`. Invalid JSON / missing `value` → 400.
 
-## 契約の置き場
+## Contract locations
 
-| 種類 | パス |
+| Kind | Path |
 |------|------|
 | OpenAPI | `openapi/openapi.yaml` |
 | OCL | `contracts/Calculator.ocl`, `contracts/Memory.ocl` |
-| 契約テスト | `tests/contracts/*.test.ts` |
+| Contract tests | `tests/contracts/*.test.ts` |
 
-## セットアップ
+## Setup
 
 ```bash
 npm install
@@ -39,7 +39,7 @@ npm test
 npm start
 ```
 
-例:
+Examples:
 
 ```bash
 curl -s localhost:3000/calculate -H 'content-type: application/json' \
@@ -51,8 +51,8 @@ curl -s localhost:3000/memory/add -H 'content-type: application/json' \
 curl -s localhost:3000/memory/recall -X POST
 ```
 
-## solid_sdd での使い方
+## Using with solid_sdd
 
-1. `solidsdd-context` → `solidsdd-judge` などを手動実行する
-2. または `solidsdd-loop` で自動実行する
-3. 意図的に実装を壊して `solidsdd-verify` が fail することを確認する
+1. Manually run `solidsdd-context` → `solidsdd-judge`, etc.
+2. Or run `solidsdd-loop` automatically
+3. Intentionally break the implementation and confirm `solidsdd-verify` fails

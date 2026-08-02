@@ -1,10 +1,10 @@
 # Skills index
 
-Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skill` 対応）。
+Agent Skills for solid_sdd ([agentskills.io](https://agentskills.io) / `gh skill`).
 
-各スキルは **自己完結** です。必要なアダプタ・スキーマ・実行モデルは当該スキルの `references/` に同梱しています（`gh skill` で個別インストールしても他パスを読みません）。導入は [docs/install.md](../docs/install.md)。
+Each skill is **self-contained**. Required adapter notes, schemas, and the execution model live under that skill’s `references/` (individual `gh skill` installs do not read other paths). Install: [docs/install.md](../docs/install.md).
 
-実行ポリシー: `solidsdd-run/references/execution-model.md` または `solidsdd-loop/references/execution-model.md`（リポジトリ内の設計メモは [../docs/execution-model.md](../docs/execution-model.md)）。
+Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop/references/execution-model.md` (design notes in-repo: [../docs/execution-model.md](../docs/execution-model.md)).
 
 | Skill | Command-like id | Role | Execution |
 |-------|-----------------|------|-----------|
@@ -28,10 +28,10 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 
 ## Maintainer: keep `references/` in sync
 
-編集ソース → `skills/*/references/` のコピーは **手で直さず**、スクリプトで同期します。
+Do **not** hand-edit copies under `skills/*/references/`. Sync from edit sources with the script.
 
-| ソース | 例 |
-|--------|-----|
+| Source | Example targets |
+|--------|-----------------|
 | `adapters/openapi/README.md` | `*/openapi-adapter.md` |
 | `adapters/graphql/README.md` | `*/graphql-adapter.md` |
 | `adapters/ruby-rspec/README.md` | `*/ruby-rspec-adapter.md` |
@@ -43,14 +43,14 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | `reference-src/*` | contract-layout / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition |
 
 ```bash
-# 手動
+# manual
 scripts/sync-skill-references.sh
 scripts/sync-skill-references.sh --check
 
-# AI 編集時（自動）
+# on AI edits (automatic)
 # - Cursor: .cursor/hooks.json → afterFileEdit
 # - Claude Code: .claude/settings.json → PostToolUse (Edit|Write|MultiEdit)
 
-# コミット時（ずれなら失敗し、実行すべきコマンドを表示）
-scripts/install-git-hooks.sh   # 一度だけ: core.hooksPath=scripts/git-hooks
+# on commit (fails on drift and prints the command to run)
+scripts/install-git-hooks.sh   # once: core.hooksPath=scripts/git-hooks
 ```

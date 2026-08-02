@@ -1,78 +1,78 @@
 # solid_sdd
 
-機械可読な仕様（API 契約・契約による設計など）を、AI 開発ループの中で **適用判断から検証まで人の介在を最小化して回す** ための、ルール／スキル型 Spec-Driven Development（SDD）基盤です。
+A rules-and-skills Spec-Driven Development (SDD) foundation that runs machine-readable specs (API contracts, Design by Contract, and more) through an AI development loop—from **application judgment through verification with minimal human intervention**.
 
-現行の多くの SDD ツールは、自然言語仕様から実装・テストを生成するループが中心です。本プロジェクトはそれに加え、次を第一級の関心事にします。
+Most SDD tools center on loops that go from natural-language specs to design, implementation, and tests. This project treats the following as first-class concerns on top of that:
 
-- **どこに・どの仕様技術を載せるか** の判断の仕組み化
-- **スタックに応じた契約の具体化**（OpenAPI 等 / Design by Contract 等）
-- **生成 → 検証 → フィードバック** の自動ループへの組み込み
+- **Systematizing judgment** of *where* and *which* specification techniques to apply
+- **Stack-specific materialization** of contracts (OpenAPI, Design by Contract, etc.)
+- **Wiring generate → verify → feedback** into an automated loop
 
-## 現状
+## Status
 
-構想・設計に加え、MVP アダプタ（OpenAPI + OCL→契約テスト）、評価用サンプル、**`gh skill` 向け自己完結スキル**まで整備しています。
+Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract tests), evaluation samples, and **self-contained skills for `gh skill`**.
 
-## 導入（要約）
+## Install (summary)
 
 ```bash
 gh skill install <OWNER>/solid_sdd --all --agent cursor --scope project
-cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # パスは環境による
+cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # path may vary by environment
 ```
 
-詳細は [docs/install.md](docs/install.md)。
+Details: [docs/install.md](docs/install.md).
 
-メンテナーが `adapters/` 等を直したあと:
+After maintainers change `adapters/` and related sources:
 
 ```bash
 scripts/sync-skill-references.sh
 scripts/sync-skill-references.sh --check
-scripts/install-git-hooks.sh   # 初回のみ（pre-commit 有効化）
+scripts/install-git-hooks.sh   # once (enable pre-commit)
 ```
 
-Cursor / Claude Code ではソース編集時に Hook が sync を自動実行します（`.cursor/hooks.json` / `.claude/settings.json`）。
+In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/hooks.json` / `.claude/settings.json`).
 
-## ドキュメント
+## Documentation
 
-| 文書 | 内容 |
-|------|------|
-| [docs/install.md](docs/install.md) | **導入手順（gh skill 推奨）** |
-| [docs/vision.md](docs/vision.md) | 問題意識・目標・使い分けの軸 |
-| [docs/architecture.md](docs/architecture.md) | ルール・エージェント／スキル構成 |
-| [docs/adapters.md](docs/adapters.md) | アダプタ方針（OpenAPI / GraphQL / OCL） |
-| [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent の実行ポリシー |
-| [docs/roadmap.md](docs/roadmap.md) | MVP 範囲と段階的導入 |
-| [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP 通し評価の記録 |
-| [docs/phase2.md](docs/phase2.md) | Phase 2（判断軸・ゲート・アダプタ） |
-| [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | Phase 2 サンプル評価 |
-| [docs/phase3.md](docs/phase3.md) | Phase 3 形式仕様の設計 |
-| [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | Phase 3 TLC サンプル評価 |
-| [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | formal human_gate ドライラン |
-| [docs/phase4.md](docs/phase4.md) | Phase 4 運用・エコシステム |
-| [docs/coexistence.md](docs/coexistence.md) | 他 SDD ツールとの共存 |
-| [docs/project-template.md](docs/project-template.md) | 利用側レイアウト |
-| [docs/feedback-tuning.md](docs/feedback-tuning.md) | フィードバックとルール調整 |
-| [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI 評価サンプル |
-| [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL 評価サンプル |
-| [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec 評価サンプル |
-| [examples/memory-formal](examples/memory-formal) | TLA+/TLC 評価サンプル |
+| Doc | Contents |
+|-----|----------|
+| [docs/install.md](docs/install.md) | **Install guide (`gh skill` recommended)** |
+| [docs/vision.md](docs/vision.md) | Problem framing, goals, selection axes |
+| [docs/architecture.md](docs/architecture.md) | Rules, agents, and skill layout |
+| [docs/adapters.md](docs/adapters.md) | Adapter policy (OpenAPI / GraphQL / OCL) |
+| [docs/execution-model.md](docs/execution-model.md) | Orchestrator / Subagent execution policy |
+| [docs/roadmap.md](docs/roadmap.md) | MVP scope and phased rollout |
+| [docs/mvp-evaluation.md](docs/mvp-evaluation.md) | MVP end-to-end evaluation notes |
+| [docs/phase2.md](docs/phase2.md) | Phase 2 (judgment axes, gates, adapters) |
+| [docs/phase2-evaluation.md](docs/phase2-evaluation.md) | Phase 2 sample evaluation |
+| [docs/phase3.md](docs/phase3.md) | Phase 3 formal-spec design |
+| [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | Phase 3 TLC sample evaluation |
+| [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | Formal human_gate dry run |
+| [docs/phase4.md](docs/phase4.md) | Phase 4 operations and ecosystem |
+| [docs/coexistence.md](docs/coexistence.md) | Coexistence with other SDD tools |
+| [docs/project-template.md](docs/project-template.md) | Consuming-project layout |
+| [docs/feedback-tuning.md](docs/feedback-tuning.md) | Feedback and rule tuning |
+| [examples/arithmetic-api](examples/arithmetic-api) | OpenAPI evaluation sample |
+| [examples/arithmetic-graphql](examples/arithmetic-graphql) | GraphQL evaluation sample |
+| [examples/arithmetic-ruby](examples/arithmetic-ruby) | Ruby/RSpec evaluation sample |
+| [examples/memory-formal](examples/memory-formal) | TLA+/TLC evaluation sample |
 
-## 実行イメージ（要約）
+## Execution sketch (summary)
 
-Kiro 等と同様に、ユーザーがフェーズ単位のスキルを任意に呼び出せる一方、オーケストレータが同じスキル群を使って自動実行もできます。
+As with Kiro and similar tools, users can invoke phase skills manually, while an orchestrator can also run the same skill set automatically.
 
-- **`solidsdd-run`**: 要件を WorkPlan に分解し、ready item を **wave 並列**で `solidsdd-loop` → 最後に統合 verify
-- **`solidsdd-loop`**: 1 slice（1 変更意図）の契約ループ
+- **`solidsdd-run`**: Decompose requirements into a WorkPlan; run ready items in **parallel waves** via `solidsdd-loop`; finish with integration verify
+- **`solidsdd-loop`**: Contract loop for one slice (one change intent)
 
-詳細は [docs/architecture.md](docs/architecture.md) / [docs/execution-model.md](docs/execution-model.md) を参照してください。
+See [docs/architecture.md](docs/architecture.md) and [docs/execution-model.md](docs/execution-model.md).
 
-## スコープ方針（要約）
+## Scope policy (summary)
 
-- **MVP 中核**: OpenAPI、OCL による DbC（サブエージェントがテスト生成）、適用判断、検証ループ
-- **評価サンプル**: TypeScript の四則演算 API（拡張時は電卓メモリ等）
-- **後回し**: 形式仕様記述言語（TLA+ / Alloy / VDM 等）
+- **MVP core**: OpenAPI, OCL-based DbC (subagent generates tests), application judgment, verification loop
+- **Evaluation sample**: TypeScript arithmetic API (extendable with calculator memory, etc.)
+- **Deferred**: Formal specification languages (TLA+ / Alloy / VDM, etc.)
 
-詳細は [docs/adapters.md](docs/adapters.md) と [docs/roadmap.md](docs/roadmap.md) を参照してください。
+See [docs/adapters.md](docs/adapters.md) and [docs/roadmap.md](docs/roadmap.md).
 
-## ライセンス
+## License
 
 [MIT](LICENSE)

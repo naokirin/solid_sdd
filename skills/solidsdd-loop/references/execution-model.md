@@ -1,123 +1,123 @@
-# 実行モデル（Orchestrator / Subagent）
+# Execution model (Orchestrator / Subagent)
 
-スキルを「同一エージェントの連続実行」だけにすると、次が起きる。
+If skills run only as a continuous sequence in one agent, the following happens:
 
-- 要件が大きいまま 1 本のループに入り、受け入れ条件と成果物のズレが蓄積する
-- 適用判断が、後続の実装・修正コストを見越して契約を薄くする方向に偏る
-- 実装担当の文脈のまま契約を弱める／テストを実装に合わせて書き換える
-- OCL→テスト生成が実装変更と混ざる
-- 検証が自己採点になる
-- **各フェーズの成果物の良し悪し評価が、そのフェーズを実行したエージェント任せになる**
+- A large requirement enters a single loop and acceptance criteria drift from artifacts
+- Application judgment softens contracts to reduce later implementation/fix cost
+- Contracts are weakened or tests rewritten to match the implementation while still in the implementer’s context
+- OCL→test generation mixes with implementation edits
+- Verification becomes self-grading
+- **Each phase’s artifact quality is left to the agent that produced it**
 
-そのため **呼び出し元がオーケストレータ（`solidsdd.run` / `solidsdd.loop` または同等の親エージェント）のとき**、下表の「Subagent 必須」スキルは、親自身がスキル本体を実行してはならない。Cursor では Task ツール等で **明示的にサブエージェントを起動**し、スキル名と入出力だけを渡す。
+Therefore, **when the caller is an orchestrator (`solidsdd.run` / `solidsdd.loop` or an equivalent parent agent)**, the parent must not execute “Subagent required” skills itself. In Cursor, launch an **explicit subagent** (e.g. Task tool) and pass only the skill name and I/O.
 
-加えて、主要フェーズの直後は **`solidsdd.critique`（敵対的評価）を別 Task で必ず起動**する。これは SpecKit の clarify / analyze と同様、品質ゲートを独立コマンドとして分ける構成である。ただし severity は **チェック可能性が失われたときだけ major/fail** とし、標準密度の磨き込みは minor（loop 継続）に留める。詳細はスキル同梱の `adversarial-critique.md`（編集ソース: `reference-src/adversarial-critique.md`）。
+Additionally, after major phases, **always launch `solidsdd.critique` (adversarial evaluation) as a separate Task**. Like SpecKit clarify / analyze, this keeps the quality gate as an independent command. Severity is **major/fail only when checkability is lost**; polishing at standard density stays minor (loop continues). Details: bundled `adversarial-critique.md` (edit source: `reference-src/adversarial-critique.md`).
 
-手動でユーザーが単一スキルを指定した場合は、その会話エージェントが実行してよい（ユーザーが親になる）。
+When a user manually names a single skill, the conversation agent may run it (the user is the parent).
 
-## 二層オーケストレーション
+## Two-layer orchestration
 
 ```text
 User or solidsdd.run (outer parent)
   │
-  ├─ solidsdd.context                 … parent 可
+  ├─ solidsdd.context                 … parent OK
   ├─ Task: solidsdd.decompose         ← WorkPlan
   ├─ Task: solidsdd.critique          ← subject: work_plan
   ├─ wave: all currently ready items (depends_on satisfied)
-  │     ├─ solidsdd.loop (item A)     … 同一 wave は原則並列
-  │     └─ solidsdd.loop (item B)     … 競合パスがあるときだけ直列化
+  │     ├─ solidsdd.loop (item A)     … same wave: parallel by default
+  │     └─ solidsdd.loop (item B)     … serialize only on path contention
   │           └─ Task: judge / critique / apply-* / verify / …
   ├─ … next wave after dependents unlock …
-  └─ Task: solidsdd.verify            ← integration（acceptance_of_whole）
+  └─ Task: solidsdd.verify            ← integration (acceptance_of_whole)
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: 要件の分解と **wave 単位の slice 実行**・統合 verify。loop 内部フェーズを親で再実装しない。
-- **`solidsdd.loop`**: **1 slice**（検証可能な受け入れ条件 1 つ／1 変更意図）専用。WorkPlan を知らなくてよい。
-- item が 1 つだけの WorkPlan でも、run は loop を **1 回** 回してから統合 verify する。
-- **並列**: 同じ wave の `ready` item は原則すべて同時に `solidsdd.loop` を起動する。同一成果物パスへの明らかな競合がある場合のみ、その競合組を直列化する。
+- **`solidsdd.run`**: Decompose requirements, run **wave-scoped slices**, integration verify. Do not reimplement loop phases in the parent.
+- **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan.
+- Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
+- **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
 
-## 役割分担（slice = `solidsdd.loop`）
+## Role split (slice = `solidsdd.loop`)
 
 ```text
 User or solidsdd.loop (parent / orchestrator)
   │
-  ├─ solidsdd.context              … parent 可（run 配下では省略可）
+  ├─ solidsdd.context              … parent OK (optional under run)
   │
-  ├─ Task: solidsdd.judge          ← subagent 必須（偏り回避）
-  ├─ Task: solidsdd.critique       ← subagent 必須（plan の敵対的評価）
-  ├─ Task: solidsdd.apply.api      ← subagent 必須
-  ├─ Task: solidsdd.critique       ← subagent 必須（API 契約）
-  ├─ Task: solidsdd.apply.dbc      ← subagent 必須
-  ├─ Task: solidsdd.critique       ← subagent 必須（OCL）
-  ├─ Task: solidsdd.derive.tests   ← subagent 必須
-  ├─ Task: solidsdd.critique       ← subagent 必須（導出テスト）
-  ├─ Task: solidsdd.implement      ← subagent 必須
-  ├─ Task: solidsdd.verify         ← subagent 必須
-  ├─ Task: solidsdd.critique       ← subagent 必須（検証レポート）
-  ├─ Task: solidsdd.apply.formal   ← subagent 必須（Phase 3・ゲート承認後）
-  ├─ Task: solidsdd.critique       ← subagent 必須（形式仕様）
-  └─ Task: solidsdd.verify.formal  ← subagent 必須（Phase 3）
-       └─ Task: solidsdd.critique  ← subagent 必須（形式検証レポート）
+  ├─ Task: solidsdd.judge          ← subagent required (avoid bias)
+  ├─ Task: solidsdd.critique       ← subagent required (adversarial plan review)
+  ├─ Task: solidsdd.apply.api      ← subagent required
+  ├─ Task: solidsdd.critique       ← subagent required (API contract)
+  ├─ Task: solidsdd.apply.dbc      ← subagent required
+  ├─ Task: solidsdd.critique       ← subagent required (OCL)
+  ├─ Task: solidsdd.derive.tests   ← subagent required
+  ├─ Task: solidsdd.critique       ← subagent required (derived tests)
+  ├─ Task: solidsdd.implement      ← subagent required
+  ├─ Task: solidsdd.verify         ← subagent required
+  ├─ Task: solidsdd.critique       ← subagent required (verification report)
+  ├─ Task: solidsdd.apply.formal   ← subagent required (Phase 3, after gate approval)
+  ├─ Task: solidsdd.critique       ← subagent required (formal spec)
+  └─ Task: solidsdd.verify.formal  ← subagent required (Phase 3)
+       └─ Task: solidsdd.critique  ← subagent required (formal verification report)
 ```
 
-## スキル別ポリシー
+## Per-skill policy
 
-| スキル | 実行ポリシー | 理由 |
-|--------|--------------|------|
-| `solidsdd.run` | **orchestrator のみ** | 外側の親。サブエージェントに委任しない |
-| `solidsdd.loop` | **orchestrator のみ** | slice の親。サブエージェントに委任しない |
-| `solidsdd.context` | orchestrator | 以降の計画用。軽い探索は親でよい |
-| `solidsdd.decompose` | **subagent 必須** | 作業分解を契約判断・実装から隔離する |
-| `solidsdd.judge` | **subagent 必須** | 適用密度の判断を実装文脈から隔離し、契約を薄くする偏りを避ける |
-| `solidsdd.critique` | **subagent 必須** | フェーズ成果物を生産者以外が敵対的に評価する（契約の甘さ指摘を含む） |
-| `solidsdd.apply.api` | **subagent 必須** | API 契約だけに閉じる。実装やテストと混ぜない |
-| `solidsdd.apply.dbc` | **subagent 必須** | OCL だけに閉じる |
-| `solidsdd.derive.tests` | **subagent 必須** | OCL→テストの核。実装改変を禁止する隔離が必要 |
-| `solidsdd.implement` | **subagent 必須** | 契約を書き換えず実装側だけ直す |
-| `solidsdd.verify` | **subagent 必須** | 実装者と同じ文脈での自己採点を避ける |
-| `solidsdd.apply.formal` | **subagent 必須** | 形式仕様だけに閉じる（Phase 3） |
-| `solidsdd.verify.formal` | **subagent 必須** | モデル検査の自己採点を避ける（Phase 3） |
+| Skill | Execution policy | Reason |
+|-------|------------------|--------|
+| `solidsdd.run` | **orchestrator only** | Outer parent; do not delegate to a subagent |
+| `solidsdd.loop` | **orchestrator only** | Slice parent; do not delegate to a subagent |
+| `solidsdd.context` | orchestrator | For later planning; light exploration may stay on the parent |
+| `solidsdd.decompose` | **subagent required** | Isolate work decomposition from contract judgment and implementation |
+| `solidsdd.judge` | **subagent required** | Isolate density judgment from implementation context; avoid thinning contracts |
+| `solidsdd.critique` | **subagent required** | Someone other than the producer adversarially evaluates phase artifacts (including weak contracts) |
+| `solidsdd.apply.api` | **subagent required** | Stay within API contracts; do not mix with implementation or tests |
+| `solidsdd.apply.dbc` | **subagent required** | Stay within OCL |
+| `solidsdd.derive.tests` | **subagent required** | Core of OCL→tests; isolation must forbid implementation edits |
+| `solidsdd.implement` | **subagent required** | Fix implementation only; do not rewrite contracts |
+| `solidsdd.verify` | **subagent required** | Avoid self-grading in the implementer’s context |
+| `solidsdd.apply.formal` | **subagent required** | Stay within formal specs (Phase 3) |
+| `solidsdd.verify.formal` | **subagent required** | Avoid self-grading of model checking (Phase 3) |
 
-親は `solidsdd.decompose` / `solidsdd.judge` が返した計画を受け取り、ループ分岐だけを行う。判断そのものは親で再実行・上書きしない。Critique の判定も親で薄めない。
+The parent accepts plans from `solidsdd.decompose` / `solidsdd.judge` and only drives loop branching. It does not re-run or overwrite the judgment itself. Critique outcomes are not softened by the parent.
 
-Phase 2 以降、親は次も扱う（詳細はスキル `references/human-gates.md` / `loop-retry.md`）。
+From Phase 2 onward, the parent also handles the following (see skill `references/human-gates.md` / `loop-retry.md`):
 
-- `human_gate.required` が真なら **apply 前に停止**（critique(plan) 通過後でもゲートは有効）。run では WorkPlan ゲートで slice loop 前に停止しうる
-- verify / critique fail 時の `loop_action`（`retry` / `human_gate` / `stop`）に従う（既定の自動リトライ上限 3・**オーケストレータ単位の共有予算**。run と各 loop は別予算）
+- If `human_gate.required` is true, **stop before apply** (still effective after critique(plan) passes). Under run, a WorkPlan gate may stop before slice loops
+- Follow `loop_action` (`retry` / `human_gate` / `stop`) on verify / critique fail (default auto-retry cap 3; **shared budget per orchestrator**. run and each loop have separate budgets)
 
-Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.apply.formal` / critique(formal) / `solidsdd.verify.formal` を起動する。`defer` の formal は API/DbC 経路を止めない。
+Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.apply.formal` / critique(formal) / `solidsdd.verify.formal`. Deferred formal must not block the API/DbC path.
 
-## 敵対的隔離とフィードバック
+## Adversarial isolation and feedback
 
-1. Subagent 必須スキルを親がインライン実行した場合 → `solidsdd.critique`（`subject: isolation`）相当として記録し、**当該スキルを Task で再実行**する（親が成果物を「直して」済ませない）
-2. Critique / verify の `retry` → 示唆スキルを **新しい Task** で起動し、該当 subject の critique（および必要なら verify）を再度かける
-3. 自動リトライは **最大 3**（verify 失敗・critique 失敗・isolation 再実行を合算）。同一スキル連続で進捗なし、または予算尽きたら `human_gate`
-4. 無限ループ禁止: 予算超過後に自動再試行しない
+1. If the parent runs a subagent-required skill inline → record as `solidsdd.critique` (`subject: isolation`) and **re-run that skill via Task** (the parent must not “fix” the artifact itself)
+2. Critique / verify `retry` → launch the suggested skill as a **new Task**, then re-run critique for that subject (and verify if needed)
+3. Auto-retry is **at most 3** (verify fail + critique fail + isolation re-run combined). No progress on the same skill repeatedly, or budget exhausted → `human_gate`
+4. No infinite loops: do not auto-retry after the budget is exceeded
 
-## 親エージェントの義務（`solidsdd.loop`）
+## Parent obligations (`solidsdd.loop`)
 
-1. Subagent 必須スキルを、親のツール実行で「スキル手順を自分でやる」形に落とさない
-2. 各 Task に渡すプロンプトへ、対象スキルの `SKILL.md` パス・成果物パス・直前成果（context 要約、ApplicationPlan、critique subject 等）を含める
-3. サブエージェントの成果（差分・レポート・ApplicationPlan・CritiqueReport）だけを受け取り、次フェーズへ渡す
-4. `ApplicationPlan` / CritiqueReport を親が改変して契約や指摘を薄くしない（誤りなら該当スキルを再度 Subagent で起動）
-5. `human_gate.required` なら承認まで apply しない（formal の early rollout を含む）
-6. 生産者ステップの直後に対応する `solidsdd.critique` を **省略しない**
-7. `solidsdd.verify` / `solidsdd.verify.formal` / `solidsdd.critique` が fail なら、`loop_action` と示唆スキルに従い **再度サブエージェントとして** 起動する（またはゲート／停止）
-8. 最大自動リトライを超えたら人間ゲートとして停止する
-9. 最終サマリに、各 subagent 必須ステップと critique subject を Task 起動したことの一覧（隔離チェックリスト）を残す
+1. Do not collapse subagent-required skills into “I’ll follow the skill steps myself” via the parent’s tools
+2. Include in each Task prompt: path to that skill’s `SKILL.md`, artifact paths, and prior outputs (context summary, ApplicationPlan, critique subject, etc.)
+3. Accept only the subagent’s outputs (diffs, reports, ApplicationPlan, CritiqueReport) and pass them to the next phase
+4. Do not thin contracts or findings by rewriting `ApplicationPlan` / CritiqueReport in the parent (if wrong, re-launch the relevant skill as a Subagent)
+5. If `human_gate.required`, do not apply until approved (including early formal rollout)
+6. **Do not skip** the matching `solidsdd.critique` immediately after a producer step
+7. If `solidsdd.verify` / `solidsdd.verify.formal` / `solidsdd.critique` fails, follow `loop_action` and suggested skills and **re-launch as a subagent** (or gate / stop)
+8. Stop at a human gate when the auto-retry cap is exceeded
+9. Leave a final summary listing that each subagent-required step and critique subject was launched via Task (isolation checklist)
 
-## 親エージェントの義務（`solidsdd.run`）
+## Parent obligations (`solidsdd.run`)
 
-1. `solidsdd.decompose` / `critique(work_plan)` / 統合 `verify` をインラインでやらない
-2. 各 item は **`solidsdd.loop` スキルに従う**（judge/apply/implement を run 親が直接実行しない）
-3. `WorkPlan` / CritiqueReport を親が薄めない
-4. WorkPlan の human_gate を slice 起動前に尊重する
-5. 同一 wave の独立した `ready` item は **並列**で loop を起動する（競合時のみ理由付きで直列化）
-6. 全 item 完了後に統合 `solidsdd.verify`（+ critique）を省略しない
-7. run レベルの retry 予算を守り、最終サマリに隔離チェックリスト・wave 構成・blocked items を残す
+1. Do not inline `solidsdd.decompose` / `critique(work_plan)` / integration `verify`
+2. Each item follows the **`solidsdd.loop` skill** (run parent must not directly run judge/apply/implement)
+3. Do not thin `WorkPlan` / CritiqueReport in the parent
+4. Respect WorkPlan human_gate before launching slices
+5. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention)
+6. Do not skip integration `solidsdd.verify` (+ critique) after all items complete
+7. Honor run-level retry budget; leave isolation checklist, wave shape, and blocked items in the final summary
 
-## サブエージェントへの渡し方（テンプレート）
+## Prompt template for subagents
 
 ```text
 You are executing the solid_sdd skill: <skill-name>
@@ -130,11 +130,11 @@ Constraints:
   - Return: summary, changed files, artifacts (plan/report JSON if any)
 ```
 
-Critique の場合は必ず `subject` と評価対象パス／抜粋を含める。
+For critique, always include `subject` and the path/excerpt under evaluation.
 
-## 手動実行時
+## Manual execution
 
-ユーザーが `solidsdd-derive-tests` だけを呼ぶ場合、現行エージェントが実行してよい。  
-ただし **別スキルを続けて同一応答でやる場合**（例: judge のあとすぐ implement）は、混線を避けるため subagent 必須スキルを Task で切ることを推奨する。連続チェインでは生産者の直後に `solidsdd-critique` を Task で挟むことを推奨する。
+If the user calls only `solidsdd-derive-tests`, the current agent may run it.  
+If **another skill continues in the same response** (e.g. implement right after judge), prefer Task for subagent-required skills to avoid crosstalk. In continuous chains, recommend inserting `solidsdd-critique` via Task right after each producer.
 
-既に 1 つの検証可能な受け入れ条件だけが分かっている場合は `solidsdd-loop` 単体でよい。要件が複数条件・曖昧な場合は `solidsdd-run` を使う。
+If a single verifiable acceptance criterion is already known, `solidsdd-loop` alone is enough. For multi-criterion or ambiguous requirements, use `solidsdd-run`.

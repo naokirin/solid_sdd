@@ -1,90 +1,90 @@
-# 構想（Vision）
+# Vision
 
-## 背景
+## Background
 
-[Agile Lab の SDD 解説](https://www.agilelab.jp/index.php/2025/09/15/sdd/) が整理する方向性——仕様を第一級成果物とし、形式寄り・機械可読な仕様で早期に整合性を取る——は、本プロジェクトの問題意識と一致する。
+The direction laid out in [Agile Lab’s SDD overview](https://www.agilelab.jp/index.php/2025/09/15/sdd/)—treating specs as first-class artifacts and aligning early with formal-leaning, machine-readable specs—matches this project’s problem framing.
 
-同記事が挙げる代表技術とメリットは、次のように読み替えられる。
+Representative techniques and benefits from that article map as follows.
 
-| 記事上の要素 | 本プロジェクトでの読み |
-|--------------|------------------------|
-| 形式仕様記述言語 | 実装前の深い検証。有効だが重い。MVP では後回し |
-| API 仕様駆動 | システム境界の契約。適用範囲が広く、自動化と相性が良い |
-| 契約による設計（DbC） | モジュール単位の事前/事後/不変条件。実装に近い検証 |
-| 不具合の早期発見 | **自然言語だけでは弱い**。機械可読仕様とチェックがあって初めて効く |
-| 複雑ドメインで有効 | 適用範囲の明示が必要。技術選択と密度の判断が本質 |
+| Element in the article | Reading in this project |
+|------------------------|-------------------------|
+| Formal specification languages | Deep pre-implementation checking. Valuable but heavy. Deferred for MVP |
+| API-spec-driven development | Contracts at system boundaries. Broad applicability; automation-friendly |
+| Design by Contract (DbC) | Module-level pre/post/invariants. Verification close to the implementation |
+| Earlier defect detection | **Natural language alone is weak**. Machine-readable specs plus checks make it work |
+| Effective in complex domains | Scope must be explicit. Technique choice and density judgment are essential |
 
-一方、記事や一般的な SDD 解説では次がほぼ語られない。
+Typical SDD write-ups almost never cover:
 
-1. **技術の使い分け**（何をどの粒度で、どの技術に載せるか）
-2. **現実の開発フローへの適用手順**
-3. **AI 自動化（ループエンジニアリング）との接続**
+1. **Technique selection** (what to put where, at what granularity, on which technology)
+2. **How to apply this in a real development workflow**
+3. **Connection to AI automation (loop engineering)**
 
-## 現状のギャップ
+## Current gaps
 
-### ツール側
+### Tooling
 
-Kiro をはじめとする一般的な SDD ツールは、自然言語スペック → 設計/実装/テストのループが主戦場である。形式仕様・API 契約の一貫検証・DbC の適用とチェックまでは、ほぼサポートされない。
+Mainstream SDD tools such as Kiro focus on natural-language spec → design / implementation / test loops. They rarely support formal specs, consistent API-contract checking, or DbC application and verification.
 
-### 契約の技術依存
+### Stack dependence of contracts
 
-API やモジュール契約は「どの技術スタックを採用しているか」に強く依存する。OpenAPI / GraphQL SDL / Protobuf、言語の contract・assert・型システムなど、検証可能な形が変わる。汎用仕組みは **スタックを抽象しつつ、具体アダプタで落とす** 必要がある。
+API and module contracts depend heavily on the tech stack: OpenAPI / GraphQL SDL / Protobuf, language-level contracts, asserts, type systems, and so on. A general mechanism must **abstract the stack while materializing via concrete adapters**.
 
-### 人による適用判断の限界
+### Limits of human application judgment
 
-仕組みを作っても、「ここに OpenAPI」「ここに DbC」「ここは形式仕様」を人が都度判断するのは、AI による開発の速度・量に対してスケールしない。
+Even with a mechanism, asking people to decide “OpenAPI here,” “DbC here,” “formal here” for every change does not scale with AI-driven development volume and speed.
 
-そのため、次が求められる。
+We therefore need:
 
-- 適用判断そのものの仕組み化
-- 適用後のチェック・フィードバックまで、基本的に人が介在しない運用
+- Systematizing application judgment itself
+- An operating mode where post-application checks and feedback mostly run without people in the loop
 
-人が介在するのは、例外・方針変更・リスク受容の承認に寄せる。
+Human involvement should concentrate on exceptions, policy changes, and accepting risk.
 
-## 目標
+## Goals
 
-**汎用的に、「機械可読仕様の適用判断 → 具体化 → 検証 → フィードバック」を、ルール／スキルとして実行可能な形で実現する。**
+**Generally, make “machine-readable-spec application judgment → materialization → verification → feedback” executable as rules and skills.**
 
-より具体的には次を満たすことを目指す。
+More specifically:
 
-1. **仕様技術の適用範囲を明示できる**  
-   自然言語だけの SDD と、API 契約 / DbC（将来は形式仕様）を区別し、それぞれが効く条件を仕組み側が持つ。
-2. **使い分けが再現可能**  
-   リスク・境界・変更頻度などの軸で、適用密度を決められる（人が暗黙知で決めない）。
-3. **手動でも自動でも同じスキルを使える**  
-   ユーザーがフェーズ単位で呼び出し可能。エージェントがループ内で同じスキルを自動実行可能。
-4. **スタック依存をアダプタで吸収**  
-   「契約がある」という抽象と、「OpenAPI 3.x でこう書く」という具体を分離する。
-5. **最終系の構成要素が揃っていないと評価できない**  
-   単独機能のデモではなく、判断・適用・検証がつながった構成として機能するかを評価基準にする。
+1. **Make the scope of each specification technique explicit**  
+   Distinguish NL-only SDD from API contracts / DbC (and later formal specs), with conditions for when each pays off encoded in the system.
+2. **Make selection reproducible**  
+   Decide application density from axes such as risk, boundaries, and change frequency (not tacit human judgment).
+3. **Use the same skills manually or automatically**  
+   Users can invoke phase skills; agents can run the same skills inside a loop.
+4. **Absorb stack dependence in adapters**  
+   Separate the abstraction “there is a contract” from the concrete “write it like this in OpenAPI 3.x.”
+5. **Evaluate only when the end-state pieces connect**  
+   Success is judged on a connected judgment → apply → verify path, not isolated feature demos.
 
-## 使い分けの軸（たたき台）
+## Selection axes (draft)
 
-人が判断する代わりに、仕組みが参照する軸の初期案。
+Initial axes the system uses instead of ad-hoc human judgment.
 
-| 対象の性質 | 向きやすい技術 | MVP |
-|------------|----------------|-----|
-| システム境界・I/O・互換性 | API 仕様（OpenAPI 等） | 対象 |
-| モジュールの入出力不変・失敗条件 | DbC（MVP では OCL→契約テスト） | 対象 |
-| 並行・分散・障害・状態爆発 | 形式仕様（TLA+ / Alloy 等） | 後回し |
-| ドメインルールの深い整合 | 形式仕様 or 制約ソルバ寄り | 後回し（一部は DbC で近似） |
-| 変更が頻繁で探索的 | 自然言語＋薄い契約 | 対象（過剰形式化を避ける） |
+| Nature of the target | Natural fit | MVP |
+|----------------------|-------------|-----|
+| System boundary, I/O, compatibility | API specs (OpenAPI, etc.) | In scope |
+| Module I/O invariants and failure conditions | DbC (MVP: OCL→contract tests) | In scope |
+| Concurrency, distribution, faults, state explosion | Formal specs (TLA+ / Alloy, etc.) | Deferred |
+| Deep domain-rule consistency | Formal specs or constraint-solver leaning | Deferred (some approximated via DbC) |
+| High churn, exploratory | Natural language + thin contracts | In scope (avoid over-formalizing) |
 
-原則は「全部を形式化する」ではなく、**リスクと変更頻度から適用密度を決める**ことである。
+The principle is not “formalize everything,” but **set application density from risk and change frequency**.
 
-## 非目標（現時点）
+## Non-goals (for now)
 
-- 特定 IDE / 特定 SDD 製品のプラグインとしての最適化のみを目的にすること
-- 形式仕様言語の教育・導入そのものを主目的にすること（将来の拡張点としては残す）
-- 自然言語仕様の執筆支援だけに閉じたプロダクトにすること
+- Optimizing only as a plugin for a specific IDE or SDD product
+- Making education/adoption of formal languages the primary goal (kept as a future extension point)
+- Closing the product around NL-spec authoring assistance alone
 
-## 成功の定義（構想段階の仮説）
+## Definition of success (vision-stage hypothesis)
 
-次が「人が都度決めなくても」回る状態。
+A state where the loop runs **without people deciding case by case**:
 
-1. 変更や新規機能に対し、適用判断スキルが API / DbC /（将来）形式仕様の要否と粒度を出す
-2. 採用スタックに応じたアダプタが契約成果物を生成・更新する
-3. 検証スキルが契約と実装のずれを検出し、ループに戻す
-4. ユーザーはスキルを単体実行しても、自動オーケストレーションに任せてもよい
+1. For changes or new features, the judgment skill emits whether/at what grain API / DbC / (later) formal specs are needed
+2. Stack-appropriate adapters generate or update contract artifacts
+3. The verify skill detects contract–implementation drift and feeds it back into the loop
+4. Users may run skills alone or rely on automatic orchestration
 
-評価方法の詳細は [roadmap.md](roadmap.md) を参照。
+Evaluation detail: [roadmap.md](roadmap.md).

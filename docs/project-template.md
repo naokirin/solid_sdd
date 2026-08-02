@@ -39,4 +39,4 @@ your-project/
 
 ## Checklist link
 
-Use the expanded list in [install.md](install.md) §導入チェックリスト.
+Use the expanded list in [install.md](install.md) §Adoption checklist.

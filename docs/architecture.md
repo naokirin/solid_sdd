@@ -1,170 +1,170 @@
-# アーキテクチャ方針
+# Architecture
 
-## 全体像
+## Overview
 
-solid_sdd は、次の二層で動くことを想定する。
+solid_sdd is designed to run in two layers:
 
-1. **ルール（持続的制約）**  
-   いつ・何を・どの品質で仕様化するかを、プロジェクトに常駐する指針として持つ。
-2. **スキル（呼び出し可能なフェーズ単位の手続き）**  
-   ユーザーまたはオーケストレータが、任意の手順で実行できるコマンド相当。
+1. **Rules (persistent constraints)**  
+   Standing guidance for when, what, and at what quality to specify.
+2. **Skills (callable phase procedures)**  
+   Command-like units that a user or orchestrator can run in any order.
 
-Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による自動実行**が同じスキル集合を共有する。
+As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automation** share the same skill set.
 
 ```text
 ┌─────────────────────────────────────────┐
-│              Rules（常駐制約）            │
-│  適用方針 / 成果物配置 / 検証必須条件 など │
+│              Rules (standing constraints)│
+│  policy / layout / verify-required, etc. │
 └──────────────────┬──────────────────────┘
-                   │ 制約・文脈
+                   │ constraints & context
 ┌──────────────────▼──────────────────────┐
-│ Outer = solidsdd.run（要件 → WorkPlan）  │
+│ Outer = solidsdd.run (req → WorkPlan)    │
 │   decompose + critique(work_plan)        │
 │   → parallel solidsdd.loop waves         │
 │   → integration verify                   │
 └──────────────────┬──────────────────────┘
                    │
 ┌──────────────────▼──────────────────────┐
-│ Slice = solidsdd.loop / 親エージェント   │
-│   context は親。judge 以降は Subagent 必須 │
-│   各生産者の直後に critique（敵対的評価） │
+│ Slice = solidsdd.loop / parent agent     │
+│   context on parent; judge+ must Subagent│
+│   critique after each producer           │
 └──────────────────┬──────────────────────┘
-                   │ Task（明示的 Subagent）
+                   │ Task (explicit Subagent)
         ┌──────────┼──────────┐
         ▼          ▼          ▼
    judge / apply.*   derive.tests   implement / verify
-        └──── critique（別 Task）────┘
+        └──── critique (separate Task) ────┘
 ```
 
-実行ポリシーの詳細は [execution-model.md](execution-model.md)。敵対的評価は [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)。
+Execution policy: [execution-model.md](execution-model.md). Adversarial critique: [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md).
 
-## 設計原則
+## Design principles
 
-1. **スキルは単体で完結し、組み合わせ可能**  
-   「適用判断だけ」「API 契約の更新だけ」も可能。自動ループはそれらの合成。
-2. **判断と具体化を分離**  
-   「何を載せるべきか」と「OpenAPI / 言語契約としてどう書くか」を混ぜない。
-3. **検証をループの必須ノードにする**  
-   生成して終わりにしない。契約と実装のずれを検出して戻す。
-4. **スタックはアダプタで吸収**  
-   コアは契約の種類と検証結果のモデルを持ち、具体技術はプラグイン的に扱う。
-5. **人が介在する点を明示する**  
-   デフォルトは自動。承認・例外・方針変更だけを人間ゲートにする（ゲートの有無はルールで設定可能）。
-6. **関心の隔離は Subagent で強制する**  
-   適用判断・適用・テスト導出・実装・検証を同一エージェント文脈で連続実行しない（判断の偏り・自己採点・契約の弱体化を防ぐ）。
-7. **フェーズ成果物の評価は生産者に任せない**  
-   SpecKit の clarify / analyze と同様、`solidsdd.critique` を独立コマンドとし、契約の甘さ指摘を含む敵対的評価を別 Task で行う。
+1. **Skills are self-contained and composable**  
+   “Judgment only” or “API contract update only” must work. The auto loop is composition of those skills.
+2. **Separate judgment from materialization**  
+   Do not mix “what should be applied” with “how to write it as OpenAPI / language contracts.”
+3. **Make verification a required loop node**  
+   Generation is not the end. Detect contract–implementation drift and return to the loop.
+4. **Absorb the stack in adapters**  
+   The core owns contract kinds and verification-result models; concrete tech is plugin-like.
+5. **Make human touchpoints explicit**  
+   Default is automatic. Only approvals, exceptions, and policy changes are human gates (configurable in rules).
+6. **Enforce separation of concerns with Subagents**  
+   Do not run judgment, apply, derive-tests, implement, and verify in one continuous agent context (avoids bias, self-grading, and watered-down contracts).
+7. **Producers do not grade their own phase artifacts**  
+   Like SpecKit clarify / analyze, `solidsdd.critique` is an independent command that adversarially evaluates (including weak contracts) in a separate Task.
 
-## コアスキル（MVP 想定）
+## Core skills (MVP)
 
-| スキル | 責務 | 実行ポリシー | 主な入出力 |
-|--------|------|--------------|------------|
-| `solidsdd.run` | 外側オーケストレーション（分解→**並列** slice loop→統合 verify） | orchestrator のみ | ループログ・最終状態 |
-| `solidsdd.loop` | slice オーケストレーション（1 変更意図） | orchestrator のみ | ループログ・最終状態 |
-| `solidsdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
-| `solidsdd.decompose` | 作業分解 | **subagent 必須** | WorkPlan |
-| `solidsdd.judge` | 適用判断 | **subagent 必須** | ApplicationPlan |
-| `solidsdd.critique` | フェーズ成果物の敵対的評価 | **subagent 必須** | CritiqueReport |
-| `solidsdd.apply.api` | OpenAPI 追加・更新 | **subagent 必須** | OpenAPI 差分 |
-| `solidsdd.apply.dbc` | OCL 追加・更新 | **subagent 必須** | `.ocl` 差分 |
-| `solidsdd.derive.tests` | OCL→契約テスト | **subagent 必須** | テスト差分 |
-| `solidsdd.implement` | 契約に従う実装 | **subagent 必須** | コード差分 |
-| `solidsdd.verify` | OpenAPI + 契約テスト検証 | **subagent 必須** | VerificationReport |
+| Skill | Responsibility | Execution policy | Main I/O |
+|-------|----------------|------------------|----------|
+| `solidsdd.run` | Outer orchestration (decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
+| `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
+| `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
+| `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
+| `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
+| `solidsdd.critique` | Adversarial evaluation of phase artifacts | **subagent required** | CritiqueReport |
+| `solidsdd.apply.api` | Add/update OpenAPI | **subagent required** | OpenAPI diff |
+| `solidsdd.apply.dbc` | Add/update OCL | **subagent required** | `.ocl` diff |
+| `solidsdd.derive.tests` | OCL→contract tests | **subagent required** | Test diff |
+| `solidsdd.implement` | Implement to contracts | **subagent required** | Code diff |
+| `solidsdd.verify` | OpenAPI + contract-test verification | **subagent required** | VerificationReport |
 
-形式仕様向け（例: `solidsdd.apply.formal` / `solidsdd.verify.formal`）は Phase 3。`solidsdd.judge` は「形式仕様が望ましいが未対応」と明示して見送り可能にする。
+Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phase 3. `solidsdd.judge` may explicitly defer when formal specs would help but are not yet supported.
 
-## 作業分解（`solidsdd.decompose`）の出力モデル
+## Work decomposition (`solidsdd.decompose`) output model
 
-共有スキーマ: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
+Shared schema: [../schemas/work-plan.schema.json](../schemas/work-plan.schema.json)
 
 ```text
 WorkPlan:
   acceptance_of_whole? / human_gate? / confidence?
   items[]:
-    id / intent / acceptance_criterion   … 1 item = 検証可能な受け入れ条件 1 つ
+    id / intent / acceptance_criterion   … 1 item = 1 verifiable acceptance criterion
     depends_on[] / status
     confidence? / human_gate?
 ```
 
-`ApplicationPlan.targets`（契約の載せ先）とは別物。分解ルールは [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md)。
+Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
-## 適用判断（`solidsdd.judge`）の出力モデル
+## Application judgment (`solidsdd.judge`) output model
 
-共有スキーマ: [../schemas/application-plan.schema.json](../schemas/application-plan.schema.json)
+Shared schema: [../schemas/application-plan.schema.json](../schemas/application-plan.schema.json)
 
 ```text
 ApplicationPlan:
-  human_gate? / confidence?          … Phase 2（任意）
+  human_gate? / confidence?          … Phase 2 (optional)
   targets[]:
     kind: api | dbc | formal | natural_only
-    location: 境界やモジュールの識別子
+    location: boundary or module id
     density: thin | standard | strict
-    rationale: 判断理由（軸への参照）
+    rationale: reason (references axes)
     adapter_hint: openapi | graphql | ocl | ...
     status: apply | defer | skip
     signals? / breaking? / confidence? / human_gate?  … Phase 2
 ```
 
-`formal` は主に `defer`（理由付き）または Phase 3 条件付き `apply`。
+`formal` is mainly `defer` (with reason) or conditional Phase 3 `apply`.
 
-判断に使う軸は [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) と [vision.md](vision.md)。ルールでプロジェクト固有の閾値を上書きできる。人間ゲートとループ復帰は [phase2.md](phase2.md)。
+Axes: [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md) and [vision.md](vision.md). Rules may override project-specific thresholds. Human gates and loop recovery: [phase2.md](phase2.md).
 
-## アダプタ層
+## Adapter layer
 
-MVP の初期アダプタは次で固定する（詳細は [adapters.md](adapters.md)）。Phase 2 で GraphQL 骨格を追加。
+MVP adapters are fixed as follows (see [adapters.md](adapters.md)). Phase 2 adds a GraphQL skeleton.
 
 ```text
 Contract Kind          Adapter
 ─────────────          ─────────────────────────────
-API boundary    →      OpenAPI 3.x（既定） / GraphQL SDL
-Module DbC      →      UML OCL → 契約テスト（Vitest 既定 / RSpec 可）
-Formal          →      TLA+ / Alloy 等（Phase 3 設計。judge は条件付き apply 可、早期はゲート必須）
+API boundary    →      OpenAPI 3.x (default) / GraphQL SDL
+Module DbC      →      UML OCL → contract tests (Vitest default / RSpec ok)
+Formal          →      TLA+ / Alloy etc. (Phase 3 design; judge may apply conditionally; early rollout requires gates)
 ```
 
-OCL 経路のポイント: OCL がソース・オブ・トゥルース。テストコードはサブエージェントが OCL から生成する従属物であり、`solidsdd.verify` はそのテスト実行で契約遵守を見る。言語ネイティブ契約は任意・後回し。形式仕様の役割分担は [phase3.md](phase3.md)。
+OCL path: OCL is the source of truth. Test code is a dependent artifact generated by a subagent from OCL; `solidsdd.verify` checks compliance by running those tests. Language-native contracts are optional and deferred. Formal role split: [phase3.md](phase3.md).
 
-アダプタの責務:
+Adapter responsibilities:
 
-- 成果物の配置規約（パス、命名）
-- 生成・更新のテンプレート
-- 検証の呼び出し方（OpenAPI 検証、OCL 由来テストの実行等）
-- スタック未検出時のフォールバック（提案のみ / 人間ゲート）
+- Artifact layout conventions (paths, naming)
+- Generate/update templates
+- How to invoke verification (OpenAPI checks, OCL-derived test runs, etc.)
+- Fallback when the stack is undetected (propose only / human gate)
 
-## ルール層で持つもの（例）
+## What the rules layer holds (examples)
 
-- デフォルトの適用密度（探索的領域は thin、金銭・権限境界は strict など）
-- 検証なしのマージ/完了を禁止するか
-- API 破壊的変更の扱い（警告 / ブロック / 承認必須）
-- オーケストレータの最大ループ回数・失敗時のエスカレーション
-- 人間ゲートの条件（初回導入、破壊的変更、判断信頼度が低い場合など）
+- Default application density (thin for exploratory areas; strict for money / authz boundaries, etc.)
+- Whether merge/done without verification is forbidden
+- Handling of API breaking changes (warn / block / require approval)
+- Orchestrator max loop count and escalation on failure
+- Human-gate conditions (first adoption, breaking changes, low judgment confidence, etc.)
 
-## 手動実行と自動実行
+## Manual vs automatic execution
 
-| モード | 振る舞い |
-|--------|----------|
-| 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切り、生産者の直後に `critique` を推奨 |
-| 自動 | `solidsdd.run`（外側）が分解と **ready item の wave 並列** slice 実行・統合 verify。各 slice は `solidsdd.loop` が context（省略可）・judge・critique・apply・derive・implement・verify を **必ず Subagent** で実行。失敗時も Subagent で再実行（リトライ上限あり）。単一 slice なら `solidsdd.loop` のみでも可 |
+| Mode | Behavior |
+|------|----------|
+| Manual | User names a skill. The conversation agent may run it. For chained skills, launch subagent-required skills via Task; recommend `critique` right after each producer |
+| Automatic | `solidsdd.run` (outer) decomposes, runs **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
 
-両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
+Both modes use the **same rules, skills, and artifact layout**. Automation has no private back door.
 
-## リポジトリ配置
+## Repository layout
 
 ```text
 solid_sdd/
   README.md
-  docs/                 # 構想・設計
-  schemas/              # ApplicationPlan / WorkPlan 等の共有スキーマ
-  adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec / formal アダプタ規約
-  skills/               # Cursor Skill 形式のスキル定義
-  rules/                # 常駐ルール（順次追加）
-  examples/             # 評価用サンプル
+  docs/                 # vision & design
+  schemas/              # shared schemas (ApplicationPlan / WorkPlan, etc.)
+  adapters/             # OpenAPI / GraphQL / OCL / ruby-rspec / formal conventions
+  skills/               # Cursor Skill definitions
+  rules/                # standing rules (grow over time)
+  examples/             # evaluation samples
 ```
 
-スキルは Cursor / Agent Skills（`SKILL.md`）形式で、**`references/` 込みの自己完結パッケージ**として定義する。利用側は `gh skill install` が主経路（[install.md](install.md)）。
+Skills follow the Cursor / Agent Skills (`SKILL.md`) format as **self-contained packages including `references/`**. The main install path for consumers is `gh skill install` ([install.md](install.md)).
 
-## 未決事項
+## Open questions
 
-- 検証の「どこまでを必須にするか」のデフォルト閾値
-- OCL 方言・ツールチェーン（構文チェックをどこまで機械化するか）。API 側は `@redocly/cli --extends=spec`（PATH / `npx`、不可なら skip）で構造 lint 済み
-- 言語ネイティブ DbC のオプトイン設計（gem 拒否を前提）
-- 他 SDD ツール（Kiro 等）との共存・置き換えの境界
+- Default thresholds for “how much verification is required”
+- OCL dialect / toolchain (how far to automate syntax checks). API side already uses `@redocly/cli --extends=spec` (PATH / `npx`; skip if unavailable)
+- Opt-in design for language-native DbC (assuming gem refusal)
+- Boundaries of coexistence / replacement with other SDD tools (Kiro, etc.)
