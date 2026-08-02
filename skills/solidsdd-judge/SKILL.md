@@ -44,4 +44,4 @@ Emit an `ApplicationPlan`.
 
 ## Output
 
-JSON conforming to the ApplicationPlan schema, plus a one-paragraph summary. Return these artifacts to the parent unchanged in meaning.
+JSON conforming to the ApplicationPlan schema, plus a one-paragraph summary. When invoked from `solidsdd-loop` / `solidsdd-run`, **write** the plan to `.solidsdd/changes/<change_id>/items/<item_id>/application-plan.json` (caller supplies paths) and return those artifacts to the parent unchanged in meaning.

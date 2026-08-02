@@ -154,9 +154,11 @@ Keep existing Brief / WorkPlan / Context paths. Update `contract-layout.md`, `ch
 
 ### Acceptance
 
-- [ ] Interrupted run can resume from `run-state.json` + item artifacts without re-deriving density from chat
-- [ ] Retry budget is a state machine, not model memory
-- [ ] Report / human gate can cite persisted ApplicationPlan paths
+- [x] Interrupted run can resume from `run-state.json` + item artifacts without re-deriving density from chat
+- [x] Retry budget is a state machine, not model memory
+- [x] Report / human gate can cite persisted ApplicationPlan paths
+
+Shipped: `schemas/run-state.schema.json`, [run-state.md](../reference-src/run-state.md), orchestrator skill + layout updates (2026-08-03).
 
 ---
 
@@ -248,8 +250,8 @@ Shipped artifacts: `schemas/*` (`covers` / scoped items), `scripts/solidsdd-lint
 
 ### Milestone M2 — Runs are resumable and auditable
 
-- Workstream **C**
-- Report discovery + human-gates resume read `run-state` / item plans
+- [x] Workstream **C**
+- [x] Report discovery + human-gates resume read `run-state` / item plans
 
 ### Milestone M3 — NFR + critique quality bar
 

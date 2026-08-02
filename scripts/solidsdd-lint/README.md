@@ -42,8 +42,8 @@ Exit `1` when any finding is `blocker` or `major` (same rule as CritiqueReport).
 
 | Check | Severity |
 |-------|----------|
-| JSON Schema (Brief, WorkPlan, gate, status, optional plans/reports) | blocker |
-| `change_id` vs directory name | blocker |
+| JSON Schema (Brief, WorkPlan, gate, status, run-state, optional plans/reports) | blocker |
+| `change_id` vs directory name (Brief / run-state) | blocker |
 | Unknown / duplicate Brief ids; `covers` → unknown id | blocker |
 | `depends_on` unknown id or cycle | blocker / major |
 | Acceptance not Given/When/Then or >1 Scenario | major |

@@ -63,7 +63,8 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` â†
 3. Inspect the artifact with LLM review for **adequacy** (not re-deriving coverage existence). Draft additional findings; assign severity using the major vs not-major table.
 4. Set `result` to `fail` only if any finding is `blocker` or `major`; otherwise `pass` (minors allowed).
 5. On fail, choose `suggested_next_skills` that own the defect at the **source** ([loop-retry.md](references/loop-retry.md)).
-6. Shape output per [critique-report.schema.json](references/critique-report.schema.json).
+6. Shape output per [critique-report.schema.json](references/critique-report.schema.json). When the parent supplies an output path (e.g. `items/<id>/critique-application-plan.json`), **write** the CritiqueReport there.
+7. Return the report to the parent unchanged in meaning.
 
 ## Success criteria
 

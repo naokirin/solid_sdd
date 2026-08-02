@@ -7,6 +7,8 @@
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Optional human pause before Brief |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |
+| Run state | `.solidsdd/changes/<change_id>/run-state.json` | Orchestrator phase, waves, retry budgets ([run-state.md](run-state.md)) |
+| Per-item loop artifacts | `.solidsdd/changes/<change_id>/items/<item_id>/` | ApplicationPlan, CritiqueReports, VerificationReport for that slice |
 | Change report | `.solidsdd/changes/<change_id>/report.md` (+ optional `report.html`) | Human-readable snapshot (`solidsdd-report`; not SoT) |
 | Change status | `.solidsdd/changes/<change_id>/status.json` | `active` \| `done` \| `abandoned` |
 | Requirements (Gherkin) | `requirements/**/*.feature` | Property-level acceptance; not executable test SoT; accumulates across changes |
@@ -17,9 +19,9 @@
 | Contract specs (Ruby) | `spec/contracts/**/*_spec.rb` | Derived from OCL (RSpec target) |
 | Formal specs (Phase 3) | `formal/**` | Optional; TLA+ / Alloy — see `solidsdd-apply-formal` when installed |
 
-Resolve the active change via `active-change.json` → `changes/<change_id>/`. See [change-lifecycle.md](change-lifecycle.md).
+Resolve the active change via `active-change.json` → `changes/<change_id>/`. See [change-lifecycle.md](change-lifecycle.md). Per-item filenames and resume rules: [run-state.md](run-state.md).
 
-**Legacy:** flat `.solidsdd/change-brief.json` only — migrate on next intake/brief/run (do not keep a dual SoT).
+**Legacy:** flat `.solidsdd/change-brief.json` only — migrate on next intake/brief/run (do not keep a dual SoT). Ad-hoc `.solidsdd/application-plan*.json` at repo root is legacy; prefer `items/<id>/application-plan.json`.
 
 Projects may override paths via a project rule (commonly installed from the `solidsdd-loop` skill as `project-rule.mdc`).
 

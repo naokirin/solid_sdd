@@ -1,0 +1,83 @@
+{
+  "version": "1",
+  "change_id": "initial-calculator",
+  "phase": "done",
+  "wave_index": 0,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W1"
+    },
+    "W2": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W2"
+    },
+    "W3": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W3"
+    },
+    "W4": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W4"
+    },
+    "W5": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W5"
+    },
+    "W6": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W6"
+    },
+    "W7": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W7"
+    },
+    "W8": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W8"
+    },
+    "W9": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W9"
+    },
+    "W10": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W10"
+    },
+    "W11": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": { "remaining": 3, "max": 3, "last_suggested_skills": [] },
+      "artifact_dir": "items/W11"
+    }
+  },
+  "isolation_notes": [
+    "Historical sample: item ApplicationPlan/critique/verification JSON under items/ may be absent; layout is canonical for new runs."
+  ],
+  "updated_at": "2026-08-03T00:00:00Z"
+}

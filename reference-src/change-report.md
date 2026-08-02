@@ -87,9 +87,12 @@ Rules:
 
 Look for (first match set wins; include all that clearly belong to this change):
 
+- `.solidsdd/changes/<change_id>/items/*/application-plan.json` (**preferred**)
 - `.solidsdd/changes/<change_id>/application-plan*.json`
-- `.solidsdd/application-plan*.json` whose content/summary clearly ties to this `change_id` or its WorkPlan item ids
+- `.solidsdd/application-plan*.json` whose content/summary clearly ties to this `change_id` or its WorkPlan item ids (legacy)
 - Paths listed in Context §8 Links
+
+Also cite `run-state.json` in §8 Source artifacts when present (phase / item statuses).
 
 If none found → Design — ApplicationPlan = **Not performed**.
 

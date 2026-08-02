@@ -43,32 +43,32 @@ When `required: true`, list concrete `decisions_to_confirm` for the human.
 
 ## Orchestrator behavior (`solidsdd-loop`)
 
-1. After `solidsdd-judge`, run **Task** `solidsdd-critique` (`subject: application_plan`). Resolve critique retries before treating the plan as ready.
-2. If any `human_gate.required` is true → **stop before apply**.
-3. Final summary must list gate reasons and waiting locations.
+1. After `solidsdd-judge`, **persist** ApplicationPlan under `.solidsdd/changes/<change_id>/items/<item_id>/application-plan.json`, then run **Task** `solidsdd-critique` (`subject: application_plan`) and persist the CritiqueReport beside it. Update `run-state.json` ([run-state.md](run-state.md)).
+2. If any `human_gate.required` is true → **stop before apply**; set item `status` / `loop_phase` accordingly in `run-state.json`.
+3. Final summary must list gate reasons and waiting locations (and cite persisted plan paths).
 4. Do not thin the plan to avoid the gate.
-5. Resume only after explicit human approval in the conversation (or updated plan from a re-run of `solidsdd-judge` under new instructions).
+5. Resume only after explicit human approval in the conversation (or updated plan from a re-run of `solidsdd-judge` under new instructions). On resume, **re-read** `items/<id>/application-plan.json` and `run-state.json`—do not reconstruct density from chat alone.
 
 ### Resume after approval
 
 When the human approves:
 
-1. Keep the approved `ApplicationPlan` (do not strip `formal` or lower density).
-2. Continue from the interrupted step:
-   - pending `api` / `dbc` → apply-* → **critique** → derive-tests → **critique** → implement → verify → **critique** as usual
+1. Keep the approved `ApplicationPlan` on disk (do not strip `formal` or lower density).
+2. Continue from the interrupted `loop_phase` in `run-state.json`:
+   - pending `api` / `dbc` → apply-* → **critique** (persist) → derive-tests → **critique** → implement → verify → **critique** as usual
    - pending `formal` → `solidsdd-apply-formal` → **critique** → `solidsdd-verify-formal` → **critique**
 3. If approval is **partial** (e.g. allow API but not formal), re-run `solidsdd-judge` with that instruction as a subagent, or set the refused target to `defer`/`skip` only via a new judge plan—not by parent edits.
 
 ## Orchestrator behavior (`solidsdd-run`)
 
-1. After `solidsdd-intake`, run **Task** `solidsdd-critique` (`subject: change_context`).
-2. If `change-context-gate.json` has `human_gate.required` → **stop before brief** until approved (or re-intake after amendment).
+1. After `solidsdd-intake`, create/update `run-state.json`; run **Task** `solidsdd-critique` (`subject: change_context`); persist critique JSON when practical.
+2. If `change-context-gate.json` has `human_gate.required` → **stop before brief** until approved (or re-intake after amendment); set `phase` / `stopped_reason` in `run-state.json`.
 3. After `solidsdd-brief`, run **Task** `solidsdd-critique` (`subject: change_brief`).
 4. If ChangeBrief has `human_gate.required` → **stop before decompose** until approved.
-5. After `solidsdd-decompose`, run **Task** `solidsdd-critique` (`subject: work_plan`).
+5. After `solidsdd-decompose`, initialize `items` in `run-state.json` from the WorkPlan; run **Task** `solidsdd-critique` (`subject: work_plan`).
 6. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop).
 7. Do not thin Change Context, ChangeBrief, or WorkPlan to avoid the gate.
-8. After approval, resume with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
+8. After approval, resume from `run-state.json` `phase` with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
 
 ## Optional human-readable report
 

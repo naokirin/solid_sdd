@@ -272,6 +272,20 @@ def lint_change(
             load_json(status_path), "change-status.schema.json", str(status_path), findings
         )
 
+    run_state_path = change_dir / "run-state.json"
+    if run_state_path.is_file():
+        rs = load_json(run_state_path)
+        validate_schema(rs, "run-state.schema.json", str(run_state_path), findings)
+        if rs.get("change_id") and rs["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "run-state.json#change_id",
+                    f"change_id {rs['change_id']!r} != directory {change_id!r}",
+                )
+            )
+
     work = None
     if plan_path.is_file():
         work = load_json(plan_path)

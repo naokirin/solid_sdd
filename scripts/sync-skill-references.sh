@@ -145,6 +145,10 @@ sync_one reference-src/contract-layout.md skills/solidsdd-context/references/con
 sync_one reference-src/contract-layout.md skills/solidsdd-implement/references/contract-layout.md
 sync_one reference-src/contract-layout.md skills/solidsdd-loop/references/contract-layout.md
 sync_one reference-src/contract-layout.md skills/solidsdd-run/references/contract-layout.md
+sync_one reference-src/run-state.md skills/solidsdd-loop/references/run-state.md
+sync_one reference-src/run-state.md skills/solidsdd-run/references/run-state.md
+sync_one schemas/run-state.schema.json skills/solidsdd-loop/references/run-state.schema.json
+sync_one schemas/run-state.schema.json skills/solidsdd-run/references/run-state.schema.json
 sync_one reference-src/change-lifecycle.md skills/solidsdd-brief/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-run/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-decompose/references/change-lifecycle.md
