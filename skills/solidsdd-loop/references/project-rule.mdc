@@ -32,9 +32,10 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 ## Work decomposition
 
-- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-decompose` → WorkPlan (one verifiable acceptance criterion per item) → `solidsdd-loop` per item → integration `solidsdd-verify`
+- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-decompose` → WorkPlan (one verifiable acceptance criterion per item) → **parallel** `solidsdd-loop` waves for all currently `ready` items → integration `solidsdd-verify`
 - Single known slice → `solidsdd-loop` alone is enough
 - Do not thin or rewrite `WorkPlan` in the parent; re-run `solidsdd-decompose` if wrong
+- Serialize loops in a wave only when items clearly contend on the same primary edit paths
 
 ## Adversarial critique
 

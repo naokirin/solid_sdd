@@ -23,7 +23,7 @@ Agent Skills for solid_sdd（[agentskills.io](https://agentskills.io) / `gh skil
 | [solidsdd-verify-formal](solidsdd-verify-formal/SKILL.md) | `solidsdd.verify.formal` | Formal VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
-- Automatic (`solidsdd-run`): parent decomposes, runs `solidsdd-loop` per item, then integration verify; never inline subagent-required skills.
+- Automatic (`solidsdd-run`): parent decomposes, runs **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify; never inline subagent-required skills.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
 
 ## Maintainer: keep `references/` in sync

@@ -20,7 +20,7 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 ┌──────────────────▼──────────────────────┐
 │ Outer = solidsdd.run（要件 → WorkPlan）  │
 │   decompose + critique(work_plan)        │
-│   → solidsdd.loop per item               │
+│   → parallel solidsdd.loop waves         │
 │   → integration verify                   │
 └──────────────────┬──────────────────────┘
                    │
@@ -59,7 +59,7 @@ Kiro 等の SDD ツールと同様、**人手の段階実行**と **AI による
 
 | スキル | 責務 | 実行ポリシー | 主な入出力 |
 |--------|------|--------------|------------|
-| `solidsdd.run` | 外側オーケストレーション（分解→slice loop→統合 verify） | orchestrator のみ | ループログ・最終状態 |
+| `solidsdd.run` | 外側オーケストレーション（分解→**並列** slice loop→統合 verify） | orchestrator のみ | ループログ・最終状態 |
 | `solidsdd.loop` | slice オーケストレーション（1 変更意図） | orchestrator のみ | ループログ・最終状態 |
 | `solidsdd.context` | スタック・既存契約の把握 | orchestrator | コンテキスト要約 |
 | `solidsdd.decompose` | 作業分解 | **subagent 必須** | WorkPlan |
@@ -143,7 +143,7 @@ OCL 経路のポイント: OCL がソース・オブ・トゥルース。テス�
 | モード | 振る舞い |
 |--------|----------|
 | 手動 | ユーザーがスキルを単体指定。その会話エージェントが実行してよい。連続チェイン時は subagent 必須スキルを Task で切り、生産者の直後に `critique` を推奨 |
-| 自動 | `solidsdd.run`（外側）が分解と slice 順実行・統合 verify。各 slice は `solidsdd.loop` が context（省略可）・judge・critique・apply・derive・implement・verify を **必ず Subagent** で実行。失敗時も Subagent で再実行（リトライ上限あり）。単一 slice なら `solidsdd.loop` のみでも可 |
+| 自動 | `solidsdd.run`（外側）が分解と **ready item の wave 並列** slice 実行・統合 verify。各 slice は `solidsdd.loop` が context（省略可）・judge・critique・apply・derive・implement・verify を **必ず Subagent** で実行。失敗時も Subagent で再実行（リトライ上限あり）。単一 slice なら `solidsdd.loop` のみでも可 |
 
 両方で **同じルール・同じスキル・同じ成果物配置** を使う。自動だけが特別な裏道を持たない。
 

@@ -23,17 +23,19 @@ User or solidsdd.run (outer parent)
   ├─ solidsdd.context                 … parent 可
   ├─ Task: solidsdd.decompose         ← WorkPlan
   ├─ Task: solidsdd.critique          ← subject: work_plan
-  ├─ for each ready WorkPlan item:
-  │     solidsdd.loop (slice orchestrator; item.intent)
-  │       ├─ Task: judge / critique / apply-* / …
-  │       └─ Task: verify / critique
+  ├─ wave: all currently ready items (depends_on satisfied)
+  │     ├─ solidsdd.loop (item A)     … 同一 wave は原則並列
+  │     └─ solidsdd.loop (item B)     … 競合パスがあるときだけ直列化
+  │           └─ Task: judge / critique / apply-* / verify / …
+  ├─ … next wave after dependents unlock …
   └─ Task: solidsdd.verify            ← integration（acceptance_of_whole）
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: 要件の分解と slice 順実行・統合 verify。loop 内部フェーズを親で再実装しない。
+- **`solidsdd.run`**: 要件の分解と **wave 単位の slice 実行**・統合 verify。loop 内部フェーズを親で再実装しない。
 - **`solidsdd.loop`**: **1 slice**（検証可能な受け入れ条件 1 つ／1 変更意図）専用。WorkPlan を知らなくてよい。
 - item が 1 つだけの WorkPlan でも、run は loop を **1 回** 回してから統合 verify する。
+- **並列**: 同じ wave の `ready` item は原則すべて同時に `solidsdd.loop` を起動する。同一成果物パスへの明らかな競合がある場合のみ、その競合組を直列化する。
 
 ## 役割分担（slice = `solidsdd.loop`）
 
@@ -111,8 +113,9 @@ Phase 3: `formal` の `apply` は人間ゲート承認後にのみ `solidsdd.app
 2. 各 item は **`solidsdd.loop` スキルに従う**（judge/apply/implement を run 親が直接実行しない）
 3. `WorkPlan` / CritiqueReport を親が薄めない
 4. WorkPlan の human_gate を slice 起動前に尊重する
-5. 全 item 完了後に統合 `solidsdd.verify`（+ critique）を省略しない
-6. run レベルの retry 予算を守り、最終サマリに隔離チェックリストと blocked items を残す
+5. 同一 wave の独立した `ready` item は **並列**で loop を起動する（競合時のみ理由付きで直列化）
+6. 全 item 完了後に統合 `solidsdd.verify`（+ critique）を省略しない
+7. run レベルの retry 予算を守り、最終サマリに隔離チェックリスト・wave 構成・blocked items を残す
 
 ## サブエージェントへの渡し方（テンプレート）
 

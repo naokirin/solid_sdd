@@ -13,6 +13,7 @@
 - Cover the whole requirement: union of item criteria (+ `acceptance_of_whole`) must not leave silent gaps
 - Prefer criteria that map to existing contract checks (API responses/errors, OCL-derived tests, TLC invariants) or clearly extendable ones
 - Order via `depends_on` (acyclic); set initial `status` to `ready` when `depends_on` is empty, else `pending`
+- Prefer independent items (empty `depends_on`) when slices do not need each other’s artifacts — `solidsdd-run` will execute a wave of all `ready` items **in parallel**
 - Set `human_gate` / low `confidence` when the requirement is ambiguous or slicing is uncertain
 
 ## Do not

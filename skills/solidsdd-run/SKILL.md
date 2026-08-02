@@ -44,11 +44,14 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 3. **Task subagent** `solidsdd-critique` with `subject: work_plan`
 4. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-decompose as Task, then critique again)
 5. If WorkPlan or any item has `human_gate.required: true` → **stop** until humans approve; then resume without thinning the plan
-6. While items remain:
-   - Pick a `ready` item (or promote `pending` → `ready` when all `depends_on` are `done`)
-   - If none ready and some `pending`/`blocked` remain → stop with dependency / gate report
-   - Run **`solidsdd-loop`** with that item’s `intent` as the change intent (loop uses its own Task subagents and retry budget)
-   - On loop success → mark item `done`; on loop human_gate/stop → mark `blocked` or end run with report
+6. While items remain, run **waves** of independent loops:
+   - Promote any `pending` → `ready` when all `depends_on` are `done`
+   - Collect **all** currently `ready` items as the wave (empty → if `pending`/`blocked` remain, stop with dependency / gate report; else proceed to integration)
+   - Launch **`solidsdd-loop` for every item in the wave in parallel** (same parent turn: concurrent Task / concurrent loop sessions). Do **not** wait for one ready item before starting another in the same wave
+   - Each loop uses that item’s `intent`, its own Task subagents, and its own retry budget
+   - After **all** loops in the wave finish: mark each `done` or `blocked`; on human_gate/stop for an item, leave siblings’ results intact and decide whether to end the run or continue remaining waves
+   - Then form the next wave from newly unblocked items
+   - **Serialize only when necessary**: if two+ ready items would clearly contend on the same primary edit paths (e.g. both rewriting the same OpenAPI SoT as the main deliverable), run those contending items sequentially within the wave; still parallelize non-contending ready items
 7. After all items `done` (or single-item plan finished its one loop):
    - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole`
    - **Task subagent** `solidsdd-critique` (`subject: verification_report`)
@@ -58,7 +61,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Isolation checklist (required in final summary)
 
-List: `decompose`, `critique(work_plan)`, each item id → `loop` (and note that loop’s own isolation checklist applies), `verify` (integration), `critique(verification_report)`, plus formal steps if any. Mark inline execution of subagent-required skills as violations.
+List: `decompose`, `critique(work_plan)`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, plus formal steps if any. Mark inline execution of subagent-required skills as violations.
 
 ## Subagent / loop prompt requirements
 
@@ -75,11 +78,13 @@ When starting `solidsdd-loop` for an item, provide:
 - **Change intent** = that item’s `intent`
 - The item’s `acceptance_criterion` (for verify focus)
 - Context summary and WorkPlan excerpt (item id + depends)
+- Note that sibling loops in the **same wave** may run concurrently; keep edits scoped to this item’s intent
 
 ## Success criteria
 
 - Subagent-required steps were not run inline in the parent (or were re-run via Task and counted)
 - WorkPlan came from decompose without parent thinning; `critique(work_plan)` ran
 - Each done item had a `solidsdd-loop` run scoped to its intent
+- Independent `ready` items in a wave were started **in parallel** (or serialized only with an explicit contention reason)
 - Integration `solidsdd-verify` (+ critique) ran after all items (or after the single item)
-- Human gates honored; final summary includes the isolation checklist and any blocked items
+- Human gates honored; final summary includes the isolation checklist, wave grouping, and any blocked items
