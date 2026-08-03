@@ -9,6 +9,10 @@ dist/
 vendor/bundle/
 .bundle/
 
+# Python
+__pycache__/
+*.py[cod]
+
 # Logs / secrets
 *.log
 .env
