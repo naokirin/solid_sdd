@@ -13,6 +13,7 @@ import (
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/config"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/contextx"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/format"
+	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/promote"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/query"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/scope"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/validate"
@@ -38,6 +39,8 @@ func main() {
 		os.Exit(cmdScope(args))
 	case "context":
 		os.Exit(cmdContext(args))
+	case "promote":
+		os.Exit(cmdPromote(args))
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -60,6 +63,9 @@ Usage:
   solidsdd-kg scope   <scope> [--root DIR] [--json]
   solidsdd-kg context <node-id> [--root DIR] [--hops N] [--include a,b]
                       [--budget 30k]
+  solidsdd-kg promote suggest [--root DIR] [--json]
+  solidsdd-kg promote apply --approve --id ID --title TITLE [--scope S]
+                      [--from-node SRC] [--root DIR]
 
 Commands:
   build    Parse sources and rebuild SQLite index (skips when unchanged)
@@ -68,6 +74,7 @@ Commands:
   impact   List nodes reachable from a start id (FR-301)
   scope    Resolve policies applicable to a dotted scope (FR-304)
   context  Extract a Markdown context pack for agents (FR-401..405)
+  promote  Suggest or (with --approve) apply knowledge promotion (FR-501..504)
 `)
 }
 
@@ -382,6 +389,115 @@ func cmdContext(args []string) int {
 		return 1
 	}
 	fmt.Print(md)
+	return 0
+}
+
+func cmdPromote(args []string) int {
+	if len(args) < 1 {
+		fmt.Fprintln(os.Stderr, "promote requires subcommand: suggest | apply")
+		return 2
+	}
+	switch args[0] {
+	case "suggest":
+		return cmdPromoteSuggest(args[1:])
+	case "apply":
+		return cmdPromoteApply(args[1:])
+	default:
+		fmt.Fprintf(os.Stderr, "unknown promote subcommand %q\n", args[0])
+		return 2
+	}
+}
+
+func cmdPromoteSuggest(args []string) int {
+	fs := flag.NewFlagSet("promote suggest", flag.ContinueOnError)
+	cfg, jsonOut, err := loadCfg(fs, args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 2
+	}
+	res, err := build.Full(cfg)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	cands := promote.AllCandidates(res.Graph)
+	if jsonOut {
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{"candidates": cands})
+		return 0
+	}
+	if len(cands) == 0 {
+		fmt.Println("no promotion candidates")
+		return 0
+	}
+	for _, c := range cands {
+		fmt.Printf("[%s] %s\n", c.Kind, c.Summary)
+	}
+	fmt.Println("Promotion is never automatic; review then: solidsdd-kg promote apply --approve ...")
+	return 0
+}
+
+func cmdPromoteApply(args []string) int {
+	fs := flag.NewFlagSet("promote apply", flag.ContinueOnError)
+	root := fs.String("root", ".", "project root")
+	cfgPath := fs.String("config", "", "config path")
+	approve := fs.Bool("approve", false, "required human approval flag (FR-504)")
+	id := fs.String("id", "", "new policy id")
+	title := fs.String("title", "", "new policy title")
+	scopeVal := fs.String("scope", "org", "policy scope")
+	fromNode := fs.String("from-node", "", "optional source node id whose body is copied")
+	bodyFile := fs.String("body-file", "", "optional markdown body file")
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+	if !*approve {
+		fmt.Fprintln(os.Stderr, "refusing to apply without --approve (FR-504)")
+		return 2
+	}
+	cfg, err := config.Load(*root, *cfgPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 2
+	}
+	body := ""
+	if *fromNode != "" {
+		res, err := build.Full(cfg)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+		n := res.Graph.NodeByID(*fromNode)
+		if n == nil {
+			fmt.Fprintf(os.Stderr, "unknown from-node %q\n", *fromNode)
+			return 1
+		}
+		body = n.Body
+		if *title == "" {
+			*title = n.Title
+		}
+	}
+	if *bodyFile != "" {
+		data, err := os.ReadFile(*bodyFile)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+		body = string(data)
+	}
+	if *id == "" || *title == "" {
+		fmt.Fprintln(os.Stderr, "--id and --title are required")
+		return 2
+	}
+	kd := "knowledge"
+	if len(cfg.KnowledgeDirs) > 0 {
+		kd = cfg.KnowledgeDirs[0]
+	}
+	res, err := promote.ApplyPolicy(cfg.ProjectRoot, kd, *id, *title, *scopeVal, body)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	fmt.Printf("created %s\n", res.CreatedPath)
+	fmt.Println("Add derives_from on the source requirement/brief side manually (downstream declaration).")
 	return 0
 }
 

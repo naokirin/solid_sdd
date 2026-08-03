@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/model"
+	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/promote"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/schema"
 )
 
@@ -242,6 +243,8 @@ func EvaluateRules(g *model.Graph, sch schema.Schema, opts KnowledgeOptions) []V
 			out = append(out, checkDeprecatedRefs(idx, g, rule, sev)...)
 		case "implicit_concept_use", "unreferenced_knowledge", "contradicting_policies", "stale_knowledge", "deviate_without_reason":
 			out = append(out, evalKnowledgeAssert(g, rule, sev, opts)...)
+		case "duplicate_node_candidate":
+			out = append(out, duplicateNodeCandidates(g, rule, sev)...)
 		default:
 			if edge, ok := parseHasIncoming(rule.Assert); ok {
 				typeFilter := whenType(rule.When)
@@ -452,4 +455,16 @@ func parseHasOutgoing(assert string) (string, bool) {
 		return "", false
 	}
 	return strings.TrimSuffix(strings.TrimPrefix(assert, p), ")"), true
+}
+
+func duplicateNodeCandidates(g *model.Graph, rule schema.Rule, sev string) []Violation {
+	var out []Violation
+	for _, c := range promote.DuplicateNodes(g) {
+		out = append(out, Violation{
+			Rule: rule.ID, Severity: sev,
+			Message: c.Summary,
+			Node:    strings.Join(c.IDs, ","),
+		})
+	}
+	return out
 }

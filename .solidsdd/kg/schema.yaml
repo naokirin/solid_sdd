@@ -127,3 +127,7 @@ rules:
   - id: DEVIATE_WITHOUT_REASON
     severity: error
     assert: deviate_without_reason
+
+  - id: DUPLICATE_NODE_CANDIDATE
+    severity: warn
+    assert: duplicate_node_candidate
