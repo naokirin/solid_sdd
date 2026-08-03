@@ -123,7 +123,9 @@ paths:
           description: >-
             Authorized lookup success. Clients and tests MUST observe the
             returned hold details (holdId, sku, quantity, expiresAt) for the
-            requested holdId, and MUST treat the operation as leaving available
+            requested holdId, and MUST observe availableStock as the current
+            available stock for the hold's SKU. The operation remains
+            non-mutating: clients and tests MUST treat it as leaving available
             stock and existing holds unchanged.
           content:
             application/json:
@@ -357,7 +359,7 @@ components:
     LookupResponse:
       type: object
       additionalProperties: false
-      required: [holdId, sku, quantity, expiresAt]
+      required: [holdId, sku, quantity, expiresAt, availableStock]
       properties:
         holdId:
           type: string
@@ -373,6 +375,10 @@ components:
           type: string
           format: date-time
           description: Absolute expiry instant for the hold TTL
+        availableStock:
+          type: integer
+          minimum: 0
+          description: Current available stock for the hold's SKU
     ErrorResponse:
       type: object
       additionalProperties: false

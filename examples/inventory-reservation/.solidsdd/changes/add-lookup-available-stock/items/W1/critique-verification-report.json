@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft for W1: OpenAPI Redocly --extends=spec passed against LookupResponse availableStock / GET 200 description (covers W1/R4/SC4), and ocl_tests ran a non-empty regression suite (43 passed). No required checks skipped without tooling reason. ApplicationPlan dbc=skip and report detail explicitly defer OCL posts, derived Vitest for availableStock on lookup, and implementation emit to W2—documented deferral, not a soft-verify hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json#checks/ocl_tests",
+      "detail": "ocl_tests are regression-only for prior lookup posts; W1 does not yet assert lookup result includes availableStock. Acceptable because ApplicationPlan status skip for dbc and WorkPlan assign OCL/Vitest/impl to W2 with depends_on W1; not a pass-with-zero-coverage soft verify."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json",
+      "detail": "HTTP server path for GET /reservations/{holdId} is not exercised by contract tests (domain module regression only); OpenAPI↔wire mapping for availableStock relies on later W2 implement / integration verify."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan add-lookup-available-stock is checkable at standard density: two property-level Gherkin items map 1:1 to requirements/reservation-lookup-available-stock.feature Scenarios and cover all Brief in_scope R1–R5 and success_criteria SC1–SC4; no out_of_scope X* ids appear in covers or tags. W1 is foundation OpenAPI-only (narrow touches); W2 depends_on W1 and extends OCL/Vitest/impl for authorized availableStock plus preserved UnauthorizedError / PreconditionError channels—no intersecting touches, no dependency cycle, no unverifiable acceptance. solidsdd-lint --project-root passed with zero findings. Foundation→depends_on with narrow touches is sound; W2 bundling success and named failures in one Scenario matches the Feature and remains checkable.",
+  "findings": []
+}

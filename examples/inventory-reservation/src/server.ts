@@ -117,6 +117,7 @@ createServer(async (req, res) => {
         sku: hold.sku,
         quantity: hold.quantity,
         expiresAt: hold.expiresAt,
+        availableStock: hold.availableStock,
       });
       return;
     }

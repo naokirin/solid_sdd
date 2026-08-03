@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "summary": "Cross-change consistency for add-lookup-available-stock holds: prior requirements/reservation.feature and requirements/reservation-lookup.feature Scenarios remain untouched and in force; the delta lives only in reservation-lookup-available-stock.feature as an additive availableStock on authorized lookup success. Brief/Context/WorkPlan do not pull prior out_of_scope themes (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable DB, formal concurrency, TTL extend, list-by-SKU) and keep those plus X11 (no rewrite of prior behaviors) and X12 (no separate stock-query endpoint) excluded. Active covers/tags are R1–R5 and SC1–SC4 only—no X* coverage. Context §2/§8 and Brief assumptions explicitly preserve prior acceptance. solidsdd-lint reported pass with empty findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "requirements/reservation.feature vs requirements/reservation-lookup.feature vs requirements/reservation-lookup-available-stock.feature#@R*@SC*",
+      "detail": "R1–R5 / SC* tag ids are reused across Feature files with change-local Brief namespaces (initial-reservation vs add-reservation-lookup vs add-lookup-available-stock). Prior Scenario text is unchanged and lint is change-scoped, so checkability is intact; readers comparing Features without the active change pointer may need the change_id to disambiguate tags."
+    }
+  ]
+}

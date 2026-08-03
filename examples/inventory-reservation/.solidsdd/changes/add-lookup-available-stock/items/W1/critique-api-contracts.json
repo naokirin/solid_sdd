@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml documents W1 additive availableStock on LookupResponse at standard density against ApplicationPlan and Brief R4/SC4: required holdId, sku, quantity, expiresAt, and availableStock remain; GET /reservations/{holdId} 200 MUST semantics cover current available stock for the hold's SKU without mutation; prior reserve, release, expire, and lookup operations remain. Named 403 UnauthorizedError and 400 PreconditionError channels are preserved (not happy-path-only). solidsdd-lint --project-root passed with zero findings; run-state W1 loop_phase is valid apply. OpenAPI needs no retry.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/components/schemas/LookupResponse",
+      "detail": "LookupResponse stays a distinct schema with its own required availableStock rather than sharing a component with ReserveResponse. Matches Brief open_question deferral to OpenAPI apply; checkability is intact. Optional later allOf/shared fragment is polish only."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/info/description",
+      "detail": "Top-level info.description still summarizes lookup without mentioning additive availableStock on success. Path/schema SoT already documents the field; polish only."
+    }
+  ]
+}

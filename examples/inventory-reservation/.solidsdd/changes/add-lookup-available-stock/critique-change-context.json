@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "summary": "Change Context for add-lookup-available-stock is checkable at intake density: all eight required headings are present; nfr.json covers the six qualities with thresholds/measurement for every in_scope item and §4 projects it without contradiction; §5 inherits TypeScript/OpenAPI/OCL/Vitest as repo_existing/user with alternatives and rationale; §2/§8 list prior Features and out_of_scope still in force; §7 deferrals are non-blocking; human_gate.required false matches a user-settled additive availableStock on authorized lookup (opaque-principal authZ extension, no blocking open questions). Lint’s missing change-brief.json is expected pre-brief and out of scope for this subject. Remaining notes are polish only (availableStock numeric concurrency nuance deferred to Brief/OCL).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-lookup-available-stock/change-brief.json",
+      "detail": "solidsdd-lint reports major scope_gap: change-brief.json missing for active change. Expected at change_context phase (Brief is produced by solidsdd-brief next); not a framing/NFR checkability hole for this subject."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-lookup-available-stock/change-context.md#7",
+      "detail": "Exact numeric semantics of availableStock under concurrent soft-holds are deferred to Brief/OCL with a default of current available stock for the hold’s SKU (as on reserve success). Acceptable for Change Context; Brief and contracts must pin the observation so NFR1 availableStock remains verifiable."
+    }
+  ]
+}

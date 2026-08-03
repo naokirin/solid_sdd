@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan applies standard OpenAPI for additive LookupResponse.availableStock (R4/SC4), skips dbc with explicit W2 ownership (WorkPlan OpenAPI-only slice), and defers formal citing Brief X8 / no concurrency_safety. Lint pass with no findings. human_gate false matches additive_change; density and signals align; no thinning, silent formal drop, or scope drift.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/dbc",
+      "detail": "domain_contract is signaled but status is skip because W1 touches only openapi/openapi.yaml; OCL/Vitest/impl and named UnauthorizedError / PreconditionError channels wait on W2. Intentional slice isolation with non-silent rationale—not density bias or a checkability hole for this OpenAPI foundation item."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for add-lookup-available-stock is checkable at brief density: non-empty {id,text} in_scope (R1–R5) and out_of_scope (X1–X12) with no in/out contradictions; success_criteria SC1–SC4 are observable (authorized lookup with holdId/sku/quantity/expiresAt/availableStock and no mutation; named PreconditionError / UnauthorizedError; additive OpenAPI LookupResponse + OCL/Vitest). open_questions are explicitly non-blocking; confidence high and human_gate.required false match settled Change Context. Aligns with Context §1–§5 and nfr.json NFR1/NFR2/NFR4–NFR6; X11/X12 pin non-breaking additive-only and no separate stock-query endpoint. solidsdd-lint --project-root examples/inventory-reservation passed with zero findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-lookup-available-stock/change-brief.json#open_questions|assumptions",
+      "detail": "Exact numeric semantics of availableStock under concurrent soft-holds remain a deferred default (current available for the hold's SKU as on reserve success). Acceptable for Brief; OCL/WorkPlan must pin the observation so NFR1 availableStock stays machine-checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-lookup-available-stock/work-plan.json",
+      "detail": "work-plan.json is absent. Expected at change_brief phase (WorkPlan is produced by solidsdd-decompose next); lint did not flag it and this is not a Brief checkability hole."
+    }
+  ]
+}

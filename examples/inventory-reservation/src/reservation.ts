@@ -160,8 +160,12 @@ export const ReservationService = {
       throw new PreconditionError(`hold not found: ${holdId}`);
     }
 
-    // post ResultIsHoldDetails; AvailableStockUnchanged; HoldsUnchanged
-    return { ...hold };
+    // post ResultIsHoldDetails (current availableStock, not reserve-time snapshot);
+    // AvailableStockUnchanged; HoldsUnchanged
+    return {
+      ...hold,
+      availableStock: ReservationService.availableStock(hold.sku),
+    };
   },
 
   /**

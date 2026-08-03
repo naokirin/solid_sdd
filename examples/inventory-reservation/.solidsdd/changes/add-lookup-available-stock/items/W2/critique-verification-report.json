@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "W2 VerificationReport is not a soft green: OpenAPI Redocly check is pass (not skipped), and ocl_tests reports a non-empty Vitest suite (44 cases) with concrete W2 lookup coverage—ResultIsHoldDetails including current availableStock, no-mutation posts, and named PreconditionError / UnauthorizedError failures. Spot-check of openapi/openapi.yaml LookupResponse, contracts/Reservation.ocl ResultIsHoldDetails, and tests/contracts/reservation.test.ts (44 it() blocks matching the claimed count) supports the check details. Formal correctly omitted given ApplicationPlan defer. solidsdd-lint pass with zero findings. No checkability hole.",
+  "findings": []
+}

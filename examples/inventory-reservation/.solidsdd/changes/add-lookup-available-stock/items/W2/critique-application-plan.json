@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W2 ApplicationPlan correctly skips OpenAPI (LookupResponse.availableStock and named GET failure channels already applied in W1), applies standard OCL on Reservation::lookup for authorized success including current availableStock with retained UnauthorizedError / PreconditionError no-mutation posts, and defers formal with Brief X8 / no concurrency_safety rationale. human_gate stays false for additive authz work. solidsdd-lint pass with zero findings. Density meets authz_boundary floor (standard); api skip is justified foundation reuse, not plan thinning or silent http_boundary drop.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W2/application-plan.json#targets/dbc",
+      "detail": "DbC apply correctly elevates availableStock on lookup success while retaining named failure posts. Hold values already carry a reserve-time availableStock snapshot, and ResultIsHoldDetails today asserts only sku/quantity/expiresAt. On apply-dbc / derive-tests / implement, bind success availableStock to current self.availableStock(hold.sku) (and surface it on GET 200)—do not treat the stored Hold snapshot as the W2 success oracle. Guidance for apply, not a missing-pre or no-error-channel hole."
+    }
+  ]
+}

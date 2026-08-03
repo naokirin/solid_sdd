@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "approved_at": "2026-08-03T21:30:00Z",
+  "approver": "naoki.guest (plan confirmation: E2E kg run — promote 1 policy)",
+  "scope": "knowledge_harvest",
+  "decision": "approve",
+  "note": "Pre-approved in Example kg run E2E plan: apply POL-OPAQUE-PRINCIPAL-AUTHZ only; do not harvest Brief/Scenario text as living PRD.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-lookup-available-stock/knowledge-harvest.json",
+    ".solidsdd/changes/add-lookup-available-stock/critique-knowledge-harvest.json"
+  ]
+}

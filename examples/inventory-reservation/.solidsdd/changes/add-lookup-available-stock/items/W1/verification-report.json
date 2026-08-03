@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 31ms; Woohoo! Your API description is valid. W1 checked: LookupResponse required includes holdId, sku, quantity, expiresAt, and additive availableStock; GET /reservations/{holdId} 200 description references availableStock; prior reserve / getReservation / release / expire operations remain.",
+      "covers": ["W1", "R4", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — regression only",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test (vitest run) → tests/contracts/reservation.test.ts: 43 passed (0 failed). W1 scope is OpenAPI-only (ApplicationPlan dbc=skip); existing lookup posts (ResultIsHoldDetails, AvailableStockUnchanged, HoldsUnchanged, named UnauthorizedError / PreconditionError) still pass. Deferred to W2: OCL posts asserting lookup result includes availableStock, derived Vitest for that post, and implementation emitting availableStock on lookup success.",
+      "covers": ["W1"]
+    }
+  ]
+}

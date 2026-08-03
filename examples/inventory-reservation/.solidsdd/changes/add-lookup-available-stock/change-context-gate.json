@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "Demand (additive availableStock on authorized GET /reservations/{holdId} success; keep holdId/sku/quantity/expiresAt; UnauthorizedError / PreconditionError; no mutation), change_id, inherited TypeScript/Node + OpenAPI + OCL + Vitest stack, and out-of-scope themes were settled in the user instruction; security NFR only extends the existing opaque-principal pattern. §7 items are non-blocking deferrals."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

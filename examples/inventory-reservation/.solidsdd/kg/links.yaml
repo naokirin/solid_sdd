@@ -1,0 +1,9 @@
+# Optional explicit edges when annotations cannot be embedded.
+# Requirement → knowledge edges use links.yaml (downstream declaration).
+edges:
+  - type: derives_from
+    from: add-lookup-available-stock/R1
+    to: POL-OPAQUE-PRINCIPAL-AUTHZ
+  - type: derives_from
+    from: add-lookup-available-stock/R3
+    to: POL-OPAQUE-PRINCIPAL-AUTHZ

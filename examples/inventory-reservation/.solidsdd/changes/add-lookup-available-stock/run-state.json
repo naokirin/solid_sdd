@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "phase": "done",
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "isolation_notes": [
+    "intake Task",
+    "knowledge consult Task",
+    "brief Task",
+    "decompose Task (W1 foundation\u2192W2 depends_on; OpenAPI-only then OCL/Vitest/impl)",
+    "judge Task W1 (ApplicationPlan: apply.api openapi only; skip dbc; defer formal)",
+    "apply-api Task W1 (LookupResponse availableStock + GET 200 description; openapi only)",
+    "verify Task W1 (Redocly pass; npm test 43 pass; availableStock OCL/impl deferred W2)",
+    "W1 loop done (judge/critique/apply-api/critique-api/verify/critique-vr); promote W2 ready",
+    "judge Task W2 (ApplicationPlan: skip.api already W1; apply.dbc ocl; defer formal; derive-tests+implement follow)",
+    "apply-dbc Task W2 (Reservation::lookup ResultIsHoldDetails += current availableStock; OCL only; loop_phase=apply)",
+    "derive-tests Task W2 (Vitest ResultIsHoldDetails += current availableStock; no prod impl; loop_phase=derive_tests)",
+    "implement Task W2 (lookup returns current availableStock; GET exposes it; UnauthorizedError/PreconditionError paths unchanged; loop_phase=implement)",
+    "verify Task W2 (Redocly pass; npm test 44 pass; availableStock OCL/Vitest/impl covered SC1-SC4 R1-R5; loop_phase=verify)",
+    "W2 loop done (judge/critique/apply-dbc/critique-dbc/derive/critique-derived/implement/verify/critique-vr)",
+    "integration_verify Task (Redocly pass; npm test 44 pass; SC1-SC4 + acceptance_of_whole; report=integration-verification-report.json)",
+    "knowledge harvest Task (apply=false; 1 proposed policy POL-OPAQUE-PRINCIPAL-AUTHZ; no knowledge/ write; human_gate required)",
+    "critique knowledge_harvest Task (pass; no findings; harvest JSON untouched)",
+    "knowledge harvest apply Task (gate approve; POL-OPAQUE-PRINCIPAL-AUTHZ applied; R1/R3 derives_from links; kg check ok errors=0; status done deferred to parent)",
+    "knowledge harvest gate approve + apply POL-OPAQUE-PRINCIPAL-AUTHZ; status done",
+    "isolation checklist: knowledge(consult), intake, critique(change_context), brief, critique(change_brief), decompose, critique(work_plan), critique(cross_change_consistency), W1 loop Task-per-step, W2 loop Task-per-step, verify(integration), critique(verification_report), knowledge(harvest), critique(knowledge_harvest), knowledge gate, knowledge apply"
+  ],
+  "updated_at": "2026-08-03T21:39:32Z",
+  "wave_index": 1,
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1"
+    },
+    "W2": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W2"
+    }
+  },
+  "integration": {
+    "verification_report": "integration-verification-report.json",
+    "critique_report": "critique-integration-verification.json"
+  }
+}

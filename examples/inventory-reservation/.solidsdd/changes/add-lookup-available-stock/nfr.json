@@ -1,0 +1,81 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Authorized GET /reservations/{holdId} success response includes existing hold detail fields (holdId, sku, quantity, expiresAt) plus current availableStock for the hold's SKU. Missing or not-visible holds fail with PreconditionError; no stock or hold mutation on any path.",
+      "rationale": "Callers need current available stock alongside hold details without a separate stock query; failure and non-mutation semantics must stay machine-checkable.",
+      "threshold": "Authorized success always returns holdId, sku, quantity, expiresAt, and availableStock for the hold's SKU; missing/not-visible always fails as PreconditionError with zero stock/hold mutation.",
+      "measurement": "OCL-derived Vitest contract tests plus OpenAPI success-schema and PreconditionError channel exercises for additive lookup response and non-mutation.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "in_scope",
+      "requirement": "Only an authorized opaque principal may look up a soft-hold. Unauthorized callers fail with UnauthorizedError; stock and holds are unchanged.",
+      "rationale": "Extends the settled opaque-principal authZ pattern on the existing GET lookup; not a new IAM product.",
+      "threshold": "Unauthorized lookup always fails with UnauthorizedError and never mutates stock or holds; authorized opaque principal can look up when the hold is visible.",
+      "measurement": "Contract tests and OpenAPI UnauthorizedError channel; OCL preconditions on lookup.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A \u2014 no latency or throughput targets for this evaluation sample.",
+      "rationale": "Additive response-field change on the same sample workload; no SLI asked."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Additive availableStock on lookup success is checkable via HTTP/API (OpenAPI) and module DbC (UML OCL) with Vitest contract tests; do not rely on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires machine-checkable surfaces for the delta as for prior lookup and reserve/release/expire.",
+      "threshold": "openapi/openapi.yaml documents availableStock on lookup success; contracts/**/*.ocl and tests/contracts/** cover success with availableStock and named UnauthorizedError/PreconditionError failures and pass.",
+      "measurement": "Presence of OpenAPI + OCL + passing Vitest under tests/contracts/** for the additive lookup response field and error paths.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive OpenAPI change: include availableStock on GET /reservations/{holdId} success without removing existing hold detail fields or breaking prior reserve/release/expire/lookup client surfaces.",
+      "rationale": "Follow-on change; prior HTTP surfaces must remain; availableStock is additive on lookup success.",
+      "threshold": "openapi/openapi.yaml remains structurally valid; LookupResponse keeps holdId, sku, quantity, expiresAt and adds availableStock; prior operations remain documented.",
+      "measurement": "solidsdd-verify OpenAPI lint check (or skipped with tooling reason); review that prior paths and required lookup fields remain.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        ".solidsdd/changes/add-lookup-available-stock/integration-verification-report.json"
+      ]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL under contracts/**/*.ocl remains the DbC source of truth; Vitest under tests/contracts/** covers authorized lookup success including availableStock and named UnauthorizedError/PreconditionError failures.",
+      "rationale": "Matches solid_sdd adapter policy and inherited contract/test layout from the repo.",
+      "threshold": "contracts/**/*.ocl constrain lookup success availableStock (and non-mutation); derived Vitest tests exercise the additive field and named failures.",
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes.",
+      "verified_by": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
+    }
+  ]
+}

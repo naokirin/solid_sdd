@@ -25,6 +25,10 @@
  *     HoldsUnchangedOnHoldMissingLookup (PreconditionError; no mutation);
  *     UnauthorizedErrorOnLookup / HoldsUnchangedOnUnauthorizedLookup /
  *     AvailableStockUnchangedOnUnauthorizedLookup (UnauthorizedError; no mutation).
+ * add-lookup-available-stock W2: ResultIsHoldDetails includes
+ *     result.availableStock = ReservationService.availableStock(hold.sku)
+ *     at lookup time (current stock, not a reserve-time snapshot);
+ *     AvailableStockUnchanged / HoldsUnchanged / error channels retained.
  */
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -518,9 +522,11 @@ describe("OCL Reservation::lookup", () => {
     ReservationService.reset();
   });
 
-  it("post ResultIsHoldDetails: authorized lookup returns that hold's sku, quantity, and expiresAt", () => {
+  it("post ResultIsHoldDetails: authorized lookup returns that hold's sku, quantity, expiresAt, and current availableStock", () => {
     ReservationService.seedStock("SKU-1", 10);
     const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    const currentStock = ReservationService.availableStock("SKU-1");
+    expect(currentStock).toBe(6);
 
     const result = ReservationService.lookup(AUTHORIZED, hold.holdId);
 
@@ -530,6 +536,35 @@ describe("OCL Reservation::lookup", () => {
     expect(result.expiresAt).toBe(hold.expiresAt);
     expect(result.sku).toBe("SKU-1");
     expect(result.quantity).toBe(4);
+    // OCL: result.availableStock = self.availableStock(hold.sku) now
+    expect(result.availableStock).toBe(currentStock);
+    expect(result.availableStock).toBe(
+      ReservationService.availableStock(result.sku),
+    );
+    expect(result.availableStock).toBe(6);
+  });
+
+  it("post ResultIsHoldDetails: availableStock is current stock, not a reserve-time snapshot", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    expect(hold.availableStock).toBe(6);
+    // Further reserve reduces current available stock after hold creation.
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 300);
+    const currentStock = ReservationService.availableStock("SKU-1");
+    expect(currentStock).toBe(4);
+
+    const result = ReservationService.lookup(AUTHORIZED, hold.holdId);
+
+    expect(result.holdId).toBe(hold.holdId);
+    expect(result.sku).toBe(hold.sku);
+    expect(result.quantity).toBe(hold.quantity);
+    expect(result.expiresAt).toBe(hold.expiresAt);
+    expect(result.availableStock).toBe(currentStock);
+    expect(result.availableStock).toBe(
+      ReservationService.availableStock("SKU-1"),
+    );
+    expect(result.availableStock).toBe(4);
+    expect(result.availableStock).not.toBe(hold.availableStock);
   });
 
   it("post AvailableStockUnchanged: authorized lookup leaves availableStock equal to @pre", () => {
@@ -576,6 +611,11 @@ describe("OCL Reservation::lookup", () => {
     expect(result.sku).toBe(hold1.sku);
     expect(result.quantity).toBe(hold1.quantity);
     expect(result.expiresAt).toBe(hold1.expiresAt);
+    expect(result.availableStock).toBe(stock1Before);
+    expect(result.availableStock).toBe(
+      ReservationService.availableStock(hold1.sku),
+    );
+    expect(result.availableStock).toBe(7);
     expect(ReservationService.availableStock("SKU-1")).toBe(stock1Before);
     expect(ReservationService.availableStock("SKU-2")).toBe(stock2Before);
     expect(ReservationService.holds().map((h) => h.holdId)).toEqual(

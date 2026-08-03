@@ -1,0 +1,55 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "candidates": [
+    {
+      "id": "POL-OPAQUE-PRINCIPAL-AUTHZ",
+      "type": "policy",
+      "title": "Opaque principal authorize/deny only (not full IAM)",
+      "scope": "product.inventory_reservation",
+      "body": "AuthZ for reserve, release, expire, and lookup is opaque-principal allow/deny only. Full IAM (SSO, OAuth UI, role admin) is out of scope for this sample product. Unauthorized callers fail with a named UnauthorizedError (or equivalent named domain error) and must not mutate stock or holds.",
+      "rationale": "Cross-cutting AuthZ bound repeated across initial-reservation, add-reservation-lookup, and add-lookup-available-stock (opaque-principal allow/deny; full IAM excluded). It rarely changes and must not remain buried only in successive ChangeBriefs / out_of_scope lists.",
+      "source_refs": [
+        "add-lookup-available-stock/R1",
+        "add-lookup-available-stock/R3"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-lookup-available-stock/R1",
+          "to": "POL-OPAQUE-PRINCIPAL-AUTHZ"
+        },
+        {
+          "type": "derives_from",
+          "from": "add-lookup-available-stock/R3",
+          "to": "POL-OPAQUE-PRINCIPAL-AUTHZ"
+        }
+      ],
+      "status": "applied"
+    }
+  ],
+  "skipped_reasons": [
+    "Additive availableStock on LookupResponse is change-local acceptance (R4/R5/SC1/SC4), not a durable cross-cutting policy.",
+    "Named PreconditionError for missing/not-visible holds (R2) stays requirement SoT in Brief/Features; not promoted as a living PRD.",
+    "OpenAPI / OCL / Vitest bodies remain adapter SoT; not harvested.",
+    "cli promote suggest duplicate_title (R1 vs add-reservation-lookup/R1) is a tag/title collision hint, not a knowledge node."
+  ],
+  "cli_suggest": [
+    {
+      "kind": "duplicate_title",
+      "ids": [
+        "add-lookup-available-stock/R1",
+        "add-reservation-lookup/R1"
+      ],
+      "summary": "normalized title/alias collision among add-lookup-available-stock/R1, add-reservation-lookup/R1",
+      "paths": [
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-lookup-available-stock/change-brief.json",
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-reservation-lookup/change-brief.json"
+      ]
+    }
+  ],
+  "human_gate": {
+    "required": true,
+    "reason": "One durable policy candidate (POL-OPAQUE-PRINCIPAL-AUTHZ) proposed; apply requires gate-approval.json scope knowledge_harvest before writing knowledge/."
+  }
+}

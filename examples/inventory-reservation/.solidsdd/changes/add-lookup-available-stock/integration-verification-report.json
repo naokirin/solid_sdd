@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec (integration)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 26ms; Woohoo! Your API description is valid. Documents additive availableStock on LookupResponse (required with holdId, sku, quantity, expiresAt); GET /reservations/{holdId} 200 description references current availableStock; prior reserve / getReservation / release / expire operations remain. Covers acceptance_of_whole / SC4 additive OpenAPI surface.",
+      "covers": ["W1", "W2", "R4", "SC1", "SC2", "SC3", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest, integration)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 44 passed (44). Suite covers Reservation::lookup authorized get-by-id ResultIsHoldDetails with current availableStock (= ReservationService.availableStock(hold.sku), not reserve-time snapshot) plus AvailableStockUnchanged / HoldsUnchanged (SC1); named PreconditionError on missing/not-visible with no mutation (SC2); named UnauthorizedError with no mutation (SC3); contracts/Reservation.ocl-derived coverage for R5 / SC4. Prior reserve/release/expire/lookup contract coverage remains in the same file.",
+      "covers": ["W1", "W2", "R1", "R2", "R3", "R5", "SC1", "SC2", "SC3", "SC4"]
+    },
+    {
+      "name": "Formal (TLC) — deferred across W1–W2 ApplicationPlans",
+      "kind": "formal",
+      "result": "skipped",
+      "detail": "W1 and W2 ApplicationPlans set formal status=defer (adapter_hint defer-formal). Brief X8 / no concurrency_safety; no Phase 3 formal apply for this change.",
+      "covers": ["W1", "W2"]
+    },
+    {
+      "name": "acceptance_of_whole / SC1–SC4 artifact presence",
+      "kind": "other",
+      "result": "pass",
+      "detail": "openapi/openapi.yaml, contracts/Reservation.ocl, tests/contracts/reservation.test.ts, and requirements/reservation-lookup-available-stock.feature exist; WorkPlan items W1–W2 status=done. Authorized lookup success with availableStock and named missing/not-visible (PreconditionError) and unauthorized (UnauthorizedError) failures are checkable without opaque internals alone. Out-of-scope themes (payments, multi-warehouse, full IAM, UI, notifications, TTL extend, list-by-SKU aggregates, separate stock-query endpoint) are not required by this verify.",
+      "covers": ["SC1", "SC2", "SC3", "SC4", "R1", "R2", "R3", "R4", "R5"]
+    }
+  ]
+}

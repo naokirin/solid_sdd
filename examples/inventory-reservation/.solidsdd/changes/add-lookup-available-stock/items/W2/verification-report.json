@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 15ms; Woohoo! Your API description is valid. W2 re-checked: LookupResponse retains holdId, sku, quantity, expiresAt and required availableStock; GET /reservations/{holdId} 200 description references current availableStock; prior reserve / getReservation / release / expire operations remain.",
+      "covers": ["W2", "R4", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 44 passed (0 failed). W2 Reservation::lookup coverage: ResultIsHoldDetails returns holdId/sku/quantity/expiresAt plus current availableStock (= ReservationService.availableStock(hold.sku), not reserve-time snapshot) with AvailableStockUnchanged / HoldsUnchanged; HoldMissingOrNotVisibleErrorOnLookup named PreconditionError without mutation; UnauthorizedErrorOnLookup named UnauthorizedError without mutation. OCL ResultIsHoldDetails includes result.availableStock = self.availableStock(hold.sku).",
+      "covers": ["W2", "R1", "R2", "R3", "R5", "SC1", "SC2", "SC3", "SC4"]
+    }
+  ]
+}

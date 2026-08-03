@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "knowledge_harvest",
+  "result": "pass",
+  "summary": "knowledge-harvest.json is adequate for human gate: solidsdd-lint pass with zero findings. Single candidate POL-OPAQUE-PRINCIPAL-AUTHZ is a durable cross-cutting AuthZ policy (opaque-principal allow/deny across reserve/release/expire/lookup; full IAM excluded; UnauthorizedError + no mutation) with explicit universality rationale spanning initial-reservation, add-reservation-lookup, and this change—not a pasted Brief in_scope item or Scenario. skipped_reasons correctly keep availableStock acceptance (R4/R5/SC1/SC4), PreconditionError missing-hold wording, and OpenAPI/OCL/Vitest bodies out of knowledge/. knowledge/ is empty (.gitkeep only); no active duplicate requiring supersedes. human_gate.required true matches candidates.length >= 1. cli_suggest duplicate_title is recorded as tag collision, not promoted. No living-PRD leakage, missing-universality, silent-duplicate, or gate-omission hole.",
+  "findings": []
+}

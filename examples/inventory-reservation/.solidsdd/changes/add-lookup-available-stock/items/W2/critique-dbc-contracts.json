@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl#lookup meets W2 ApplicationPlan dbc apply at standard density: ResultIsHoldDetails now binds result.availableStock to self.availableStock(hold.sku) (current stock, not a reserve-time Hold snapshot), retains AvailableStockUnchanged / HoldsUnchanged, and keeps live HoldMissingOrNotVisibleErrorOnLookup / UnauthorizedErrorOnLookup plus no-mutation failure posts beside PrincipalAuthorized and HoldExists. Not vacuous; named failure channels remain checkable. solidsdd-lint pass with zero findings. Remaining items are polish only.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "contracts/Reservation.ocl#lookup/ResultIsHoldDetails",
+      "detail": "ResultIsHoldDetails now asserts sku/quantity/expiresAt and current availableStock against @pre hold / self.availableStock, but still does not assert holdId/id equality required by OpenAPI LookupResponse. Independent of W2 availableStock checkability; success-path API symmetry polish only."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#lookup/HoldMissingOrNotVisibleErrorOnLookup",
+      "detail": "On hold-missing, only HoldsUnchangedOnHoldMissingLookup constrains non-mutation; AvailableStockUnchanged remains implied (no sku when hold absent). Enough for R2/SC2 at standard density with retained PreconditionError channel; an explicit stock-side post would be stronger polish, not a missing-pre hole."
+    }
+  ]
+}

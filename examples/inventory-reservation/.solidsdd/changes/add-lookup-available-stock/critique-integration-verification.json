@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "Integration VerificationReport is not a soft green: OpenAPI Redocly is pass (not skipped), and ocl_tests reports a non-empty Vitest suite (44 cases) matching tests/contracts/reservation.test.ts. Spot-check confirms LookupResponse.availableStock in openapi/openapi.yaml, ResultIsHoldDetails with current availableStock in contracts/Reservation.ocl, and named PreconditionError / UnauthorizedError lookup coverage in the suite and requirements/reservation-lookup-available-stock.feature. Formal correctly skipped with ApplicationPlan defer / Brief X8 rationale (W2 plan on disk; Brief X8 covers the change). acceptance_of_whole covers SC1–SC4 / R1–R5 without requiring out-of-scope themes. solidsdd-lint pass with zero findings. No checkability hole.",
+  "findings": []
+}

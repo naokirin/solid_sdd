@@ -1,0 +1,133 @@
+# solidsdd-kg schema — node/edge types and validation rules
+schema_version: 1
+
+node_types:
+  requirement:
+    required: [status]
+    statuses: [draft, active, deprecated]
+    description: "Imported from ChangeBrief in_scope (R*). Not authored as a separate living PRD."
+  acceptance_criterion:
+    required: [status]
+    statuses: [draft, active, deprecated]
+    description: "Imported from ChangeBrief success_criteria (SC*) and/or Gherkin Scenario tags."
+  design:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  task:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  code:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  test:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  concept:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+  policy:
+    required: [status, scope]
+    statuses: [draft, active, deprecated, contested]
+  invariant:
+    required: [status, scope]
+    statuses: [draft, active, deprecated, contested]
+  pattern:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+  decision:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  lesson:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+
+edge_types:
+  derives_from:
+    from: [requirement, acceptance_criterion, policy, design]
+    to: [policy, invariant, requirement, decision, lesson]
+    declared_by: downstream
+  refines:
+    from: [requirement, concept, acceptance_criterion]
+    to: [concept]
+    declared_by: downstream
+  implements:
+    from: [code, design]
+    to: [requirement, acceptance_criterion]
+    declared_by: downstream
+  verifies:
+    from: [test]
+    to: [requirement, acceptance_criterion]
+    declared_by: downstream
+  depends_on:
+    from: [task]
+    to: [task]
+    declared_by: downstream
+  rationale:
+    from: [requirement, policy, decision, acceptance_criterion]
+    to: [decision, lesson]
+    declared_by: downstream
+  contradicts:
+    from: [concept, policy, invariant, pattern, decision, lesson]
+    to: [concept, policy, invariant, pattern, decision, lesson]
+    declared_by: either
+  supersedes:
+    from: [concept, policy, invariant, pattern, decision, lesson, requirement]
+    to: [concept, policy, invariant, pattern, decision, lesson, requirement]
+    declared_by: newer
+  deviates_from:
+    from: [requirement, design, code, policy, pattern]
+    to: [policy, pattern]
+    declared_by: deviant
+  mentions:
+    from: [requirement, acceptance_criterion, design, policy, decision, lesson, concept]
+    to: [concept]
+    declared_by: auto
+
+rules:
+  - id: NO_DANGLING_REFS
+    severity: error
+    assert: no_dangling_references
+
+  # Coverage — warn by default so existing solid_sdd projects can adopt via baseline (FR-213 / RQ-010).
+  - id: REQ_MUST_HAVE_IMPL
+    severity: warn
+    when: {type: requirement, status: active}
+    assert: has_incoming(implements)
+
+  - id: REQ_MUST_HAVE_VERIFY
+    severity: warn
+    when: {type: requirement, status: active}
+    assert: has_incoming(verifies)
+
+  - id: ORPHAN_CODE_OR_TASK
+    severity: warn
+    assert: orphan_code_or_task
+
+  - id: NO_ACTIVE_REFS_TO_DEPRECATED
+    severity: error
+    assert: no_active_refs_to_deprecated
+
+  # Phase 3 — knowledge layer
+  - id: IMPLICIT_CONCEPT_USE
+    severity: warn
+    assert: implicit_concept_use
+
+  - id: UNREFERENCED_KNOWLEDGE
+    severity: warn
+    assert: unreferenced_knowledge
+
+  - id: CONTRADICTING_POLICIES
+    severity: error
+    assert: contradicting_policies
+
+  - id: STALE_KNOWLEDGE
+    severity: warn
+    assert: stale_knowledge
+
+  - id: DEVIATE_WITHOUT_REASON
+    severity: error
+    assert: deviate_without_reason
+
+  - id: DUPLICATE_NODE_CANDIDATE
+    severity: warn
+    assert: duplicate_node_candidate

@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "summary": "W2: skip OpenAPI (availableStock already on LookupResponse from W1); apply standard OCL on Reservation::lookup so authorized success includes current availableStock for the hold's SKU with no mutation, retaining named UnauthorizedError / PreconditionError failure posts; derive Vitest and implement accordingly; defer formal.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive availableStock on authorized lookup success with preserved named failure channels; no money_boundary, breaking_change, low_confidence, or formal apply. OpenAPI already applied in W1; numeric semantics of availableStock deferred to OCL apply (Brief open_question, non-blocking)."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/components/schemas/LookupResponse",
+      "density": "standard",
+      "rationale": "http_boundary + additive_change: LookupResponse already documents required availableStock and GET /reservations/{holdId} 200 success wording from W1 apply-api (R4/SC4 foundation done). This WorkPlan slice touches contracts/Reservation.ocl, tests/contracts/reservation.test.ts, src/reservation.ts, and src/server.ts—not openapi. Skip re-applying OpenAPI; do not remove or thin the W1 additive field. Not breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "skip",
+      "covers": ["W2"],
+      "signals": ["http_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "API surface already applied in W1; skip avoids duplicate OpenAPI edits."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#lookup",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary + additive_change: W2 acceptance (R1–R3/R5/SC1–SC4) requires authorized lookup success to include current availableStock for the hold's SKU without mutating stock or holds, while UnauthorizedError and PreconditionError failure channels remain checkable with no mutation. Extend Reservation::lookup success posts (ResultIsHoldDetails / no-mutation) to make availableStock first-class; retain existing HoldMissingOrNotVisibleErrorOnLookup / UnauthorizedErrorOnLookup and no-mutation posts. Derived Vitest under tests/contracts/** must cover success with availableStock plus named failures; implement must surface the field on the HTTP/module path (server currently omits availableStock on GET 200). density standard per project defaults for additive authz_boundary DbC.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard additive DbC for availableStock on lookup success; named failures already present; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W2"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

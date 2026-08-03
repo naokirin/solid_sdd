@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "summary": "W1 foundation: apply standard OpenAPI only—add availableStock on LookupResponse and refresh GET /reservations/{holdId} success description; skip dbc (and thus derive-tests/impl) for this slice because W2 owns OCL/Vitest/implementation; defer formal.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive non-breaking LookupResponse field on existing OpenAPI SoT; no money_boundary, breaking_change, low_confidence, or formal apply. Schema-component sharing with ReserveResponse is a non-blocking open_question deferred to OpenAPI apply."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/components/schemas/LookupResponse",
+      "density": "standard",
+      "rationale": "http_boundary + additive_change: W1 acceptance requires LookupResponse to retain holdId, sku, quantity, expiresAt and add availableStock, with prior reserve/release/expire/lookup operations remaining (R4/SC4; WorkPlan touches openapi/openapi.yaml only). Extend components/schemas/LookupResponse and the GET /reservations/{holdId} 200 success description so clients/tests can observe current availableStock for the hold's SKU on authorized success; do not remove or tighten prior required fields or operations. Not breaking_change. Exact schema-component sharing with ReserveResponse deferred to OpenAPI apply (Brief open_question).",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive availableStock on existing LookupResponse; no breaking API change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#lookup",
+      "density": "standard",
+      "rationale": "domain_contract applies to authorized lookup success including availableStock and named UnauthorizedError / PreconditionError channels (R1–R3/R5), but this WorkPlan slice is OpenAPI-only foundation (touches openapi/openapi.yaml; acceptance is LookupResponse documentation). Skip dbc here; W2 depends_on W1 and owns OCL, derived Vitest, and implementation. Not a silent drop—W2 will apply ocl.",
+      "adapter_hint": "ocl",
+      "status": "skip",
+      "covers": ["W1"],
+      "signals": ["domain_contract"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "DbC deferred to W2 by WorkPlan slice boundary; no gate for skip."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety / distributed consistency remain out of demand (Change Context §5; Brief X8). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W1"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

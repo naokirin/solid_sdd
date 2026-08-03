@@ -1,0 +1,66 @@
+{
+  "version": "1",
+  "change_id": "add-lookup-available-stock",
+  "summary": "Two-slice follow-on (foundation\u2192properties): W1 documents additive availableStock on LookupResponse in OpenAPI only; W2 depends_on W1 and extends OCL, Vitest, and implementation so authorized lookup returns availableStock while UnauthorizedError / PreconditionError failure channels stay checkable without mutation.",
+  "acceptance_of_whole": "Scenario: Lookup availableStock covers authorized success and preserved named failures\n  Given the inventory reservation service for clients\n  When clients exercise authorized soft-hold lookup by id, missing or not-visible lookup, and unauthorized lookup\n  Then authorized lookup returns holdId, sku, quantity, expiresAt, and current availableStock for that hold's SKU without mutating stock or holds\n  And missing/not-visible and unauthorized lookups fail with PreconditionError and UnauthorizedError respectively without mutation\n  And openapi/openapi.yaml documents additive availableStock on LookupResponse while prior reserve/release/expire/lookup operations and required hold fields remain\n  And contracts/**/*.ocl and passing tests/contracts/** cover success with availableStock and named UnauthorizedError / PreconditionError failures\n  And payments, multi-warehouse, full IAM, UI, notifications, TTL extend, list-by-SKU aggregates, and a separate stock-query endpoint are not required",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "ChangeBrief scope is explicit; open_questions are non-blocking deferrals to OpenAPI/OCL apply; foundation OpenAPI then OCL/Vitest/impl maps cleanly to in_scope and success_criteria without blocking ambiguity."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Document additive availableStock on authorized lookup success in OpenAPI LookupResponse / GET description while retaining holdId, sku, quantity, and expiresAt and keeping prior reserve/release/expire/lookup operations.",
+      "acceptance_criterion": "Scenario: LookupResponse documents additive availableStock on authorized success\n  Given the reservation lookup OpenAPI surface\n  When LookupResponse for authorized get-by-id success is inspected\n  Then LookupResponse retains holdId, sku, quantity, and expiresAt\n  And LookupResponse includes additive availableStock\n  And prior reserve, release, expire, and lookup operations remain",
+      "covers": [
+        "R4",
+        "SC4"
+      ],
+      "touches": [
+        "openapi/openapi.yaml"
+      ],
+      "feature_path": "requirements/reservation-lookup-available-stock.feature",
+      "scenario_name": "LookupResponse documents additive availableStock on authorized success",
+      "depends_on": [],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive LookupResponse availableStock documentation is unambiguous; schema component sharing deferred to OpenAPI apply."
+      }
+    },
+    {
+      "id": "W2",
+      "intent": "Extend UML OCL, derived Vitest, and implementation so authorized lookup success includes current availableStock for the hold's SKU without mutation, while UnauthorizedError and PreconditionError failure channels remain checkable with no stock or hold mutation.",
+      "acceptance_criterion": "Scenario: Authorized lookup returns availableStock and preserves named failure channels without mutation\n  Given a reservation service with an existing visible soft-hold and stock for that hold's SKU\n  And an authorized opaque principal\n  When the principal looks up that soft-hold by id\n  Then the service returns holdId, sku, quantity, expiresAt, and current availableStock for that hold's SKU\n  And stock and holds are unchanged\n  And lookup of a missing or not-visible soft-hold fails with PreconditionError without mutation\n  And unauthorized lookup fails with UnauthorizedError without mutation",
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R5",
+        "SC1",
+        "SC2",
+        "SC3",
+        "SC4"
+      ],
+      "touches": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts",
+        "src/reservation.ts",
+        "src/server.ts"
+      ],
+      "feature_path": "requirements/reservation-lookup-available-stock.feature",
+      "scenario_name": "Authorized lookup returns availableStock and preserves named failure channels without mutation",
+      "depends_on": [
+        "W1"
+      ],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive availableStock on lookup success and preserved named failure channels follow settled Brief assumptions; numeric semantics deferred to OCL apply."
+      }
+    }
+  ]
+}

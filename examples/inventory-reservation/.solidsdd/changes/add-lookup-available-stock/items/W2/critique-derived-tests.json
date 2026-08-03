@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest for Reservation::lookup covers every live W2 OCL success and failure post at standard density: ResultIsHoldDetails now asserts sku/quantity/expiresAt plus result.availableStock = ReservationService.availableStock(hold.sku) at lookup time, with a dedicated case that stock must be current (not the reserve-time Hold snapshot), plus AvailableStockUnchanged, HoldsUnchanged, multi-hold/multi-SKU isolation, HoldMissingOrNotVisibleErrorOnLookup (named PreconditionError), HoldsUnchangedOnHoldMissingLookup, UnauthorizedErrorOnLookup, HoldsUnchangedOnUnauthorizedLookup, and AvailableStockUnchangedOnUnauthorizedLookup. Suite is not empty or “does not throw” only; prior reserve/release/expire suites retained. Red on the current-vs-snapshot case until implement refreshes availableStock on lookup is acceptable and documented. solidsdd-lint pass with zero findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "tests/contracts/reservation.test.ts#ResultIsHoldDetails",
+      "detail": "Success cases also assert result.holdId equals the looked-up id, which is stronger than OCL ResultIsHoldDetails (sku/quantity/expiresAt/availableStock only) and aligns with OpenAPI LookupResponse. Fine as extra checkability; optional OCL holdId equality remains polish from dbc critique."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#OCL Reservation::lookup/HoldMissingOrNotVisibleErrorOnLookup",
+      "detail": "Failure coverage uses a missing holdId only. Scenario/Brief also name not-visible; OCL shares one PreconditionError channel with missing and defers expired/not-visible semantics, so a separate expired case is not required for W2 checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#ResultIsHoldDetails/current availableStock",
+      "detail": "The baseline ResultIsHoldDetails case coincides with reserve-time hold.availableStock when no intervening mutation; current-vs-snapshot checkability is carried by the dedicated follow-on case (further reserve then expect 4 ≠ hold.availableStock). That follow-on case is expected red until implement returns self.availableStock(sku) now rather than copying the Hold snapshot—acceptable documented red, not a derive-tests hole."
+    }
+  ]
+}

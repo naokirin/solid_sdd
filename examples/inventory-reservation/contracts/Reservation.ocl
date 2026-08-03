@@ -18,6 +18,11 @@
 -- add-reservation-lookup W2: named missing/not-visible (PreconditionError)
 --     and unauthorized (UnauthorizedError) lookup failures; stock and holds
 --     unchanged. Missing and not-visible share one PreconditionError channel.
+-- add-lookup-available-stock W2: authorized lookup success includes current
+--     availableStock for the hold's SKU (self.availableStock(hold.sku), not a
+--     reserve-time snapshot); retain ResultIsHoldDetails hold fields and
+--     AvailableStockUnchanged / HoldsUnchanged; UnauthorizedError /
+--     PreconditionError failure posts unchanged (no mutation).
 -- Named error vocabulary shared with OpenAPI.
 
 -- Default TTL when caller omits ttlSeconds (seconds).
@@ -100,13 +105,17 @@ post HoldRemoved: self.hold(holdId)->isEmpty()
 -- Sample visibility: a hold present in self.holds() is visible; whether
 -- expired holds are not-visible vs a distinct failure is deferred (Brief
 -- open_questions) and shares the W2 missing/not-visible named error.
+-- add-lookup-available-stock W2: authorized success also returns current
+-- availableStock for the hold's SKU (= self.availableStock(hold.sku) now;
+-- not the value observed at reserve time). Failure posts unchanged.
 context Reservation::lookup(principal: String, holdId: String): Hold
 pre PrincipalAuthorized: principal.isAuthorized()
 pre HoldExists: self.hold(holdId)->notEmpty()
 post ResultIsHoldDetails:
   result.sku = self.hold(holdId)@pre.sku and
   result.quantity = self.hold(holdId)@pre.quantity and
-  result.expiresAt = self.hold(holdId)@pre.expiresAt
+  result.expiresAt = self.hold(holdId)@pre.expiresAt and
+  result.availableStock = self.availableStock(self.hold(holdId)@pre.sku)
 post AvailableStockUnchanged:
   self.availableStock(self.hold(holdId)@pre.sku) =
     self.availableStock(self.hold(holdId)@pre.sku)@pre
