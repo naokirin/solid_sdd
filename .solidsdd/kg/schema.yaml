@@ -1,0 +1,89 @@
+# solidsdd-kg schema — node/edge types and validation rules (Phase 1 subset)
+schema_version: 1
+
+node_types:
+  requirement:
+    required: [status]
+    statuses: [draft, active, deprecated]
+    description: "Imported from ChangeBrief in_scope (R*). Not authored as a separate living PRD."
+  acceptance_criterion:
+    required: [status]
+    statuses: [draft, active, deprecated]
+    description: "Imported from ChangeBrief success_criteria (SC*) and/or Gherkin Scenario tags."
+  design:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  task:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  code:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  test:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  concept:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+  policy:
+    required: [status, scope]
+    statuses: [draft, active, deprecated, contested]
+  invariant:
+    required: [status, scope]
+    statuses: [draft, active, deprecated, contested]
+  pattern:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+  decision:
+    required: [status]
+    statuses: [draft, active, deprecated]
+  lesson:
+    required: [status]
+    statuses: [draft, active, deprecated, contested]
+
+edge_types:
+  derives_from:
+    from: [requirement, acceptance_criterion, policy, design]
+    to: [policy, invariant, requirement, decision, lesson]
+    declared_by: downstream
+  refines:
+    from: [requirement, concept, acceptance_criterion]
+    to: [concept]
+    declared_by: downstream
+  implements:
+    from: [code, design]
+    to: [requirement, acceptance_criterion]
+    declared_by: downstream
+  verifies:
+    from: [test]
+    to: [requirement, acceptance_criterion]
+    declared_by: downstream
+  depends_on:
+    from: [task]
+    to: [task]
+    declared_by: downstream
+  rationale:
+    from: [requirement, policy, decision, acceptance_criterion]
+    to: [decision, lesson]
+    declared_by: downstream
+  contradicts:
+    from: [concept, policy, invariant, pattern, decision, lesson]
+    to: [concept, policy, invariant, pattern, decision, lesson]
+    declared_by: either
+  supersedes:
+    from: [concept, policy, invariant, pattern, decision, lesson, requirement]
+    to: [concept, policy, invariant, pattern, decision, lesson, requirement]
+    declared_by: newer
+  deviates_from:
+    from: [requirement, design, code, policy, pattern]
+    to: [policy, pattern]
+    declared_by: deviant
+  mentions:
+    from: [requirement, acceptance_criterion, design, policy, decision, lesson, concept]
+    to: [concept]
+    declared_by: auto
+
+rules:
+  - id: NO_DANGLING_REFS
+    severity: error
+    assert: no_dangling_references

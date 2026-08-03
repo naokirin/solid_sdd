@@ -33,6 +33,19 @@ jobs:
       - name: Critique / lint regression fixtures
         run: python3 scripts/solidsdd-critique-eval.py
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache-dependency-path: tools/solidsdd-kg/go.sum
+
+      - name: solidsdd-kg test / fmt / check
+        run: |
+          go test ./...
+          go build -o ../../bin/solidsdd-kg ./cmd/solidsdd-kg
+          ../../scripts/solidsdd-kg.sh fmt --root ../.. --check
+          ../../scripts/solidsdd-kg.sh check --root ../..
+        working-directory: tools/solidsdd-kg
+
       - name: Validate example change JSON against schemas
         run: |
           python3 - <<'PY'

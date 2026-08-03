@@ -1,0 +1,22 @@
+# solidsdd-kg project config
+root: .
+
+knowledge_dirs:
+  - knowledge
+
+# ChangeBrief / Gherkin are the authority for requirement-like nodes.
+brief_glob: .solidsdd/changes/*/change-brief.json
+feature_glob: requirements/**/*.feature
+
+# Optional document-anchor specs (knowledge restatements, design notes).
+# Not used as requirement SoT in solid_sdd.
+spec_dirs: []
+
+links_files:
+  - .solidsdd/kg/links.yaml
+
+cache_dir: .solidsdd-cache
+db_filename: kg.db
+
+# Imported Brief IDs become "<change_id>/<id>" (e.g. initial-reservation/R1).
+brief_id_separator: "/"

@@ -18,3 +18,7 @@ vendor/bundle/
 tools/tla/tla2tools.jar
 **/states/
 *.toolbox/
+
+# solidsdd-kg derived index / local binaries
+.solidsdd-cache/
+bin/
