@@ -1,4 +1,4 @@
-# solidsdd-kg schema — node/edge types and validation rules (Phase 1 subset)
+# solidsdd-kg schema — node/edge types and validation rules
 schema_version: 1
 
 node_types:
@@ -87,3 +87,22 @@ rules:
   - id: NO_DANGLING_REFS
     severity: error
     assert: no_dangling_references
+
+  # Coverage — warn by default so existing solid_sdd projects can adopt via baseline (FR-213 / RQ-010).
+  - id: REQ_MUST_HAVE_IMPL
+    severity: warn
+    when: {type: requirement, status: active}
+    assert: has_incoming(implements)
+
+  - id: REQ_MUST_HAVE_VERIFY
+    severity: warn
+    when: {type: requirement, status: active}
+    assert: has_incoming(verifies)
+
+  - id: ORPHAN_CODE_OR_TASK
+    severity: warn
+    assert: orphan_code_or_task
+
+  - id: NO_ACTIVE_REFS_TO_DEPRECATED
+    severity: error
+    assert: no_active_refs_to_deprecated

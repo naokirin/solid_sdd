@@ -56,7 +56,7 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | TLC sample evaluation |
 | [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | Formal human_gate dry run |
 | [docs/phase4.md](docs/phase4.md) | Operations and ecosystem |
-| [tools/solidsdd-kg](tools/solidsdd-kg) | Knowledge graph (Phase 1: build / dangling / fmt) |
+| [tools/solidsdd-kg](tools/solidsdd-kg) | Knowledge graph (build / check / impact / baseline) |
 | [docs/coexistence.md](docs/coexistence.md) | Coexistence with other SDD tools |
 | [docs/project-template.md](docs/project-template.md) | Consuming-project layout |
 | [docs/feedback-tuning.md](docs/feedback-tuning.md) | Feedback and rule tuning |

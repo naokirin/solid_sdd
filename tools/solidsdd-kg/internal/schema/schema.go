@@ -9,10 +9,10 @@ import (
 
 // Schema is .solidsdd/kg/schema.yaml
 type Schema struct {
-	SchemaVersion int                   `yaml:"schema_version"`
-	NodeTypes     map[string]NodeType   `yaml:"node_types"`
-	EdgeTypes     map[string]EdgeType   `yaml:"edge_types"`
-	Rules         []Rule                `yaml:"rules"`
+	SchemaVersion int                 `yaml:"schema_version"`
+	NodeTypes     map[string]NodeType `yaml:"node_types"`
+	EdgeTypes     map[string]EdgeType `yaml:"edge_types"`
+	Rules         []Rule              `yaml:"rules"`
 }
 
 type NodeType struct {
@@ -27,9 +27,10 @@ type EdgeType struct {
 }
 
 type Rule struct {
-	ID       string `yaml:"id"`
-	Severity string `yaml:"severity"`
-	Assert   string `yaml:"assert"`
+	ID       string         `yaml:"id"`
+	Severity string         `yaml:"severity"`
+	When     map[string]any `yaml:"when"`
+	Assert   string         `yaml:"assert"`
 }
 
 func Load(path string) (Schema, error) {
@@ -58,6 +59,16 @@ func (s Schema) HasNodeType(t string) bool {
 func (s Schema) HasEdgeType(t string) bool {
 	_, ok := s.EdgeTypes[t]
 	return ok
+}
+
+func (s Schema) NodeType(t string) (NodeType, bool) {
+	nt, ok := s.NodeTypes[t]
+	return nt, ok
+}
+
+func (s Schema) EdgeType(t string) (EdgeType, bool) {
+	et, ok := s.EdgeTypes[t]
+	return et, ok
 }
 
 // KnownEdgeKeys are frontmatter keys that declare outbound edges.
