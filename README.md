@@ -57,6 +57,7 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | Formal human_gate dry run |
 | [docs/phase4.md](docs/phase4.md) | Operations and ecosystem |
 | [tools/solidsdd-kg](tools/solidsdd-kg) | Knowledge graph CLI (engine for `solidsdd-knowledge`) |
+| [scripts/solidsdd-host-toolchain.sh](scripts/solidsdd-host-toolchain.sh) | Host toolchain preflight (`.solidsdd/host-toolchain.json`; detect env thrash vs run cost) |
 | [skills/solidsdd-knowledge](skills/solidsdd-knowledge) | SDD consult / harvest of durable knowledge |
 | [docs/coexistence.md](docs/coexistence.md) | Coexistence with other SDD tools |
 | [docs/project-template.md](docs/project-template.md) | Consuming-project layout |

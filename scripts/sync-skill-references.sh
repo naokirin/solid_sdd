@@ -154,6 +154,12 @@ sync_one schemas/gate-approval.schema.json skills/solidsdd-knowledge/references/
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-knowledge/references/knowledge-harvest.schema.json
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-run/references/knowledge-harvest.schema.json
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-critique/references/knowledge-harvest.schema.json
+sync_one schemas/host-toolchain.schema.json skills/solidsdd-context/references/host-toolchain.schema.json
+sync_one schemas/host-toolchain.schema.json skills/solidsdd-run/references/host-toolchain.schema.json
+sync_one schemas/host-toolchain.schema.json skills/solidsdd-loop/references/host-toolchain.schema.json
+sync_one reference-src/host-toolchain.md skills/solidsdd-context/references/host-toolchain.md
+sync_one reference-src/host-toolchain.md skills/solidsdd-run/references/host-toolchain.md
+sync_one reference-src/host-toolchain.md skills/solidsdd-loop/references/host-toolchain.md
 sync_one reference-src/knowledge.md skills/solidsdd-knowledge/references/knowledge.md
 sync_one reference-src/knowledge.md skills/solidsdd-run/references/knowledge.md
 sync_one reference-src/knowledge.md skills/solidsdd-context/references/knowledge.md

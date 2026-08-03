@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/host-toolchain.schema.json",
+  "title": "HostToolchain",
+  "description": "Machine-local resolved host toolchain for solid_sdd runs. Written by scripts/solidsdd-host-toolchain.sh to .solidsdd/host-toolchain.json (typically gitignored). Agents must copy preferred commands into Task prompts and must not rediscover npm/node via find.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "project_root",
+    "resolved_at",
+    "ready",
+    "missing",
+    "stack",
+    "tools",
+    "commands",
+    "hints"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "project_root": {
+      "type": "string",
+      "description": "Absolute path of the consuming project root that was probed."
+    },
+    "resolved_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp when this file was written."
+    },
+    "ready": {
+      "type": "boolean",
+      "description": "True when minimum tools for detected stack verify commands are resolvable without LLM search."
+    },
+    "missing": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool ids required by stack that were not resolved."
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "ruby", "go", "verify_sh", "package_json"],
+      "properties": {
+        "node": { "type": "boolean" },
+        "ruby": { "type": "boolean" },
+        "go": { "type": "boolean" },
+        "verify_sh": { "type": "boolean" },
+        "package_json": { "type": "boolean" }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["found", "path"],
+        "properties": {
+          "found": { "type": "boolean" },
+          "path": {
+            "type": ["string", "null"],
+            "description": "Absolute path when found; null when missing."
+          },
+          "via": {
+            "type": "string",
+            "enum": ["path", "mise_which", "mise_exec_which", "missing"],
+            "description": "How the tool was resolved."
+          }
+        }
+      },
+      "description": "Map of tool id → resolution result (node, npm, npx, bundle, ruby, go, redocly, mise, …)."
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Preferred shell snippets for Task prompts (e.g. npm_test, openapi_lint). Agents must use these instead of searching."
+    },
+    "hints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Short remediation hints when ready is false (mise activate, PATH, etc.)."
+    }
+  }
+}

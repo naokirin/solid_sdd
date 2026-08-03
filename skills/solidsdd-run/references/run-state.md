@@ -54,6 +54,21 @@ Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `referen
 
 After decompose, populate `items` from the WorkPlan (`pending` / `ready` mirroring `depends_on`). Each item should get `loop_retry: { "remaining": 3, "max": 3, "last_suggested_skills": [] }` and `artifact_dir: "items/<id>"`.
 
+## Host toolchain
+
+After `solidsdd-context` (or at run start), copy readiness from `.solidsdd/host-toolchain.json` into optional `host_toolchain`:
+
+```json
+"host_toolchain": {
+  "ready": true,
+  "source": ".solidsdd/host-toolchain.json",
+  "missing": [],
+  "resolved_at": "2026-08-04T00:00:00Z"
+}
+```
+
+If a Subagent must rediscover tools despite that file, append `isolation_notes` with `toolchain_rediscovery:<tool>:<reason>`. Policy: [host-toolchain.md](host-toolchain.md).
+
 ## Retry budgets (state machine)
 
 | Budget | Owned by | Scope |

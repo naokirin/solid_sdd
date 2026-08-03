@@ -26,3 +26,8 @@ tools/tla/tla2tools.jar
 # solidsdd-kg derived index / local binaries
 .solidsdd-cache/
 bin/
+
+# Machine-local host toolchain probe (absolute paths; do not commit)
+.solidsdd/host-toolchain.json
+**/.solidsdd/host-toolchain.json
+

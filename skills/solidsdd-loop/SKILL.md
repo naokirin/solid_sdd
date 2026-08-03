@@ -26,8 +26,9 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 - [contract-layout.md](references/contract-layout.md) — default artifact paths
 - [run-state.md](references/run-state.md) — **persist plans / critiques / retry budget (required)**
 - [run-state.schema.json](references/run-state.schema.json)
-- [run-cost.md](references/run-cost.md) — isolation: never whole-loop Task; never produce+critique in one Task
+- [run-cost.md](references/run-cost.md) — isolation: never whole-loop Task; never produce+critique in one Task; host toolchain thrash vs cost
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
+- [host-toolchain.md](references/host-toolchain.md) — preflight; paste commands into Tasks
 
 ## Execution policy
 
@@ -45,7 +46,7 @@ Never execute a subagent-required skill's procedure in the parent. Do not rewrit
 ## Sequence
 
 1. Resolve `change_id` / `item_id` / artifact dir from the caller (or active change + `items/ad-hoc`). Read `run-state.json` when present; if this item’s `loop_phase` is mid-slice and artifacts exist, **resume** from that phase.
-2. Parent: `solidsdd-context`
+2. Parent: `solidsdd-context` (include **Toolchain** from `scripts/solidsdd-host-toolchain.sh` / `.solidsdd/host-toolchain.json`; copy into `run-state.host_toolchain` when persisting)
 3. **Task subagent** `solidsdd-judge` → write `application-plan.json` into the item dir (include `change_id` / `covers` when known)
 4. **Task subagent** `solidsdd-critique` with `subject: application_plan`; write `critique-application-plan.json`
 5. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-judge as Task, then critique again); decrement `items.<id>.loop_retry.remaining` in `run-state.json`
@@ -69,7 +70,7 @@ Never execute a subagent-required skill's procedure in the parent. Do not rewrit
 
 ## Isolation checklist (required in final summary)
 
-List each required Task launch with skill id + critique `subject` when applicable. Example rows: `judge`, `critique(application_plan)`, `apply-api`, `critique(api_contracts)`, … Mark any inline execution as a violation that was re-run or gated. Append notable notes to `run-state.isolation_notes` when under `solidsdd-run`.
+List each required Task launch with skill id + critique `subject` when applicable. Example rows: `toolchain(ready|gap)`, `judge`, `critique(application_plan)`, `apply-api`, `critique(api_contracts)`, … Mark any inline execution as a violation that was re-run or gated. Append notable notes to `run-state.isolation_notes` when under `solidsdd-run` (including `toolchain_rediscovery:<tool>:<reason>`).
 
 ## Subagent prompt requirements
 
@@ -78,6 +79,7 @@ Each Task prompt must include:
 - Skill id and path to the installed `solidsdd-*/SKILL.md`
 - Working directory (consuming project root)
 - Inputs (context summary, ApplicationPlan path under `items/<id>/`, critique `subject`, changed OCL paths, etc.)
+- **Toolchain commands** from context / `.solidsdd/host-toolchain.json` for verify / implement / derive / shell npm|node|bundle — use only those; **do not** filesystem-search for tools ([host-toolchain.md](references/host-toolchain.md))
 - Constraint: only that skill's allowed edits; follow that skill's `references/`
 - Expected return: summary, changed files, and **paths** of written plan/report JSON under the item dir
 
@@ -89,5 +91,6 @@ Each Task prompt must include:
 - `loop_retry.remaining` in `run-state.json` matches consumed retries
 - Human gates honored before apply (including formal early-rollout policy)
 - Verification and critiques pass, or stop with clear `loop_action` / human-gate reason within the retry budget
-- Final summary includes the isolation checklist
+- Final summary includes the isolation checklist (including `toolchain(ready|gap)`)
 - Artifacts remain consistent with the plan
+- Host tools were not rediscovered when Toolchain commands were available (or rediscovery was recorded)

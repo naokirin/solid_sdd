@@ -28,6 +28,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 | F9 | Phase evaluation left to the producing agent; contracts can stay thin | Dedicated `solidsdd-critique` Task after judge/apply/derive/verify; contract-weakness checklist; shared max_auto_retries=3 |
 | F10 | First critique dry-run failed all examples on polish (error unions, OCL exception names, formal liveness) | Severity calibration: `major` only when checkability is lost; polish → `minor` / pass |
 | F11 | Large requirements as one loop increase intent↔output drift | Outer `solidsdd-run` + `solidsdd-decompose` (one verifiable AC per item); `solidsdd-loop` stays slice-only; integration verify after items |
+| F12 | Subagent shells miss mise/npm PATH; thrash looks like “solid_sdd is slow” | Deterministic `host-toolchain` preflight + context Toolchain paste + forbid rediscovery; run-cost thrash table |
 
 ## Intake template (external projects)
 
@@ -44,6 +45,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
+| 2026-08-04 | host toolchain thrash | Subagent shells miss mise PATH; users cannot tell run cost vs env rediscovery | Applied — `scripts/solidsdd-host-toolchain.sh`, `host-toolchain.json`, context/run/loop paste rules, [run-cost.md](run-cost.md) thrash section |
 | 2026-08-03 | run-cost mitigations | After inventory E2E: greenfield WorkPlan (`depends_on`/narrow `touches`), forbid whole-loop Task & verify+critique same Task, lint smell, `docs/run-cost.md` | Applied — [run-cost.md](run-cost.md) |
 | 2026-08-03 | inventory-reservation E2E | Fresh solidsdd-run sample: soft-hold + authZ + TTL; OpenAPI/OCL/Vitest green (32 tests) | Applied — `examples/inventory-reservation` |
 | 2026-08-03 | solid_sdd hardening M4 | GateApproval, WorkPlan `touches`, `cross_change_consistency`, critique `allowed-tools`, schema-evolution, EARS note, `examples/inventory-reservation` | Applied — [hardening-plan.md](hardening-plan.md) |

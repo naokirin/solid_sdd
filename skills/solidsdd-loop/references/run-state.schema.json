@@ -73,7 +73,29 @@
     "isolation_notes": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Checklist / violation notes that must survive resume."
+      "description": "Checklist / violation notes that must survive resume. Use toolchain_rediscovery:<tool>:<reason> when a Subagent had to re-resolve host tools."
+    },
+    "host_toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Snapshot of .solidsdd/host-toolchain.json readiness for cost vs thrash diagnosis.",
+      "properties": {
+        "ready": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string",
+          "description": "Usually .solidsdd/host-toolchain.json"
+        },
+        "missing": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "resolved_at": {
+          "type": "string",
+          "description": "Copied from host-toolchain.json when present."
+        }
+      }
     },
     "stopped_reason": {
       "type": "string",

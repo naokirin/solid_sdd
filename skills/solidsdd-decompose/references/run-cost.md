@@ -34,6 +34,18 @@ See **Greenfield / shared-contract changes** in [work-decomposition.md](../refer
 
 Do not treat a live replay’s wall-clock as a defect in the *implementation size*; treat bad decomposition or collapsed isolation as defects in the *run*.
 
+## Host toolchain thrash vs orchestration cost
+
+Subagents often start **non-interactive** shells without mise/asdf PATH hooks. If each verify/implement Task rediscovers `npm`/`node`, the run looks “mysteriously slow” even when isolation is correct.
+
+| Signal | Interpretation |
+|--------|----------------|
+| Task counts match O(N × loop steps); `host_toolchain.ready=true`; no `toolchain_rediscovery:` notes | **Expected solid_sdd orchestration cost** |
+| Long shell turns with `find` / many `which`; `isolation_notes` contain `toolchain_rediscovery:<tool>:…` | **Host toolchain thrash** — fix PATH / mise; paste `.solidsdd/host-toolchain.json` `commands` into Tasks |
+| `solidsdd-context` / probe shows `ready=false` before waves | **Stop and fix the host** before a multi-Task run |
+
+Probe: `scripts/solidsdd-host-toolchain.sh --project-root .` (see [host-toolchain.md](../reference-src/host-toolchain.md)). Parents must copy Toolchain commands into verify/implement/derive Task prompts and forbid filesystem rediscovery when commands are present.
+
 ## Relation to hardening
 
 Mechanical lint / `covers` / `run-state` reduce LLM-only hardness. They do **not** remove per-phase Task cost. Further speed-ups (skipping critique on additive no-ops, batch apply) would be explicit product changes — not silent parent thinning.

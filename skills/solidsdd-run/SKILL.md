@@ -34,8 +34,9 @@ Drive **requirement → Change Context → ChangeBrief → WorkPlan → per-slic
 - [contract-layout.md](references/contract-layout.md)
 - [run-state.md](references/run-state.md) — **persist phase / retries / item artifacts (required)**
 - [run-state.schema.json](references/run-state.schema.json)
-- [run-cost.md](references/run-cost.md) — wall-clock cost model; greenfield mitigations; do not whole-loop Task
+- [run-cost.md](references/run-cost.md) — wall-clock cost model; greenfield mitigations; do not whole-loop Task; **host toolchain thrash vs orchestration cost**
 - [knowledge.md](references/knowledge.md) — durable knowledge consult / harvest in the run
+- [host-toolchain.md](references/host-toolchain.md) — preflight; paste commands into Tasks; no rediscovery
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
 
 ## Execution policy
@@ -52,7 +53,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Sequence
 
-1. Parent: `solidsdd-context` (include existing Features/contracts, `knowledge/` / `.solidsdd/kg/` presence, and any `.solidsdd/active-change.json` / `run-state.json`)
+1. Parent: `solidsdd-context` (include existing Features/contracts, `knowledge/` / `.solidsdd/kg/` presence, **host toolchain** via `scripts/solidsdd-host-toolchain.sh` → `.solidsdd/host-toolchain.json`, and any `.solidsdd/active-change.json` / `run-state.json`). Copy readiness into `run-state.host_toolchain` when the change dir / run-state exists (or on first run-state write). If `ready=false`, warn in the summary and prefer fixing the host before a long multi-Task run.
 2. If `run-state.json` exists with `phase` not `done` and `status.json` is `active` → **resume** from that phase (skip completed outer steps; do not re-invent Brief/WorkPlan unless critique failed).
 3. **Task subagent** `solidsdd-knowledge` with `mode: consult` when starting a change (or when `knowledge/` / `.solidsdd/kg/` exists). Prefer after intake has created the change directory so `knowledge-consult.md` lands under `.solidsdd/changes/<change_id>/`; if consulting before intake, re-run or move the pack after the dir exists. Set `phase: knowledge_consult` when persisting run-state.
 4. **Task subagent** `solidsdd-intake` → `change-context.md` + `change-context-gate.json` under `.solidsdd/changes/<change_id>/` (pass optional user `change_id`; creates lifecycle paths — [change-lifecycle.md](references/change-lifecycle.md)). Pass `knowledge-consult.md` when present. Create initial `run-state.json` (`phase: intake`, `run_retry` remaining 3) if not already created. After the change dir exists, ensure consult output is under that dir (Task re-consult if needed).
@@ -92,13 +93,15 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Isolation checklist (required in final summary)
 
-List: `knowledge(consult)`, `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes`.
+List: `toolchain(ready|gap)`, `knowledge(consult)`, `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes` (including `toolchain_rediscovery:<tool>:<reason>` when a Subagent had to re-resolve host tools).
 
 ## Subagent / loop prompt requirements
 
 ### Intake / brief / decompose / knowledge / critique / integration verify
 
 Each Task prompt must include skill id, `SKILL.md` path, working directory, inputs, constraints, expected return (same pattern as `solidsdd-loop`). For brief and later steps, include Change Context and ChangeBrief paths. For knowledge harvest, include Context/Brief paths and whether `apply` is allowed. Tell critique/verify/knowledge where to **write** JSON when under this change.
+
+**Toolchain (required for verify / implement / derive-tests / any shell that runs npm|node|bundle|npx):** paste the context **Toolchain** `commands` block (or `.solidsdd/host-toolchain.json` `commands`). Instruct the Subagent: use only those commands; **do not** `find` / multi-path search for npm/node; on failure report immediately. See [host-toolchain.md](references/host-toolchain.md).
 
 ### Per-item loop
 
@@ -113,6 +116,7 @@ When starting `solidsdd-loop` for an item, provide:
 - Change Context path/excerpt (§4 NFR / §5 tech when relevant)
 - ChangeBrief path/excerpt (in/out of scope)
 - Context summary and WorkPlan excerpt (item id + depends)
+- **Toolchain commands** from context / `host-toolchain.json` (required)
 - Instruction to read/write that item’s `loop_retry` via parent-updated `run-state.json`
 - Note that sibling loops in the **same wave** may run concurrently; keep edits scoped to this item’s intent
 
