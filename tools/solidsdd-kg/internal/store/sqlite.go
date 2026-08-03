@@ -140,9 +140,67 @@ func WriteGraph(db *sql.DB, g *model.Graph) error {
 	return tx.Commit()
 }
 
+// LoadGraph reads nodes/edges/issues from an existing DB.
+func LoadGraph(db *sql.DB) (*model.Graph, error) {
+	g := &model.Graph{}
+	rows, err := db.Query(`SELECT id, type, title, status, aliases, scope, supersedes, superseded_by,
+		verified_at, confidence, owner, tags, source_path, source_line, layer, body FROM nodes`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var n model.Node
+		var aliases, supersedes, supersededBy, tags string
+		if err := rows.Scan(
+			&n.ID, &n.Type, &n.Title, &n.Status, &aliases, &n.Scope, &supersedes, &supersededBy,
+			&n.VerifiedAt, &n.Confidence, &n.Owner, &tags, &n.SourcePath, &n.SourceLine, &n.Layer, &n.Body,
+		); err != nil {
+			return nil, err
+		}
+		n.Aliases = splitCSV(aliases)
+		n.Supersedes = splitCSV(supersedes)
+		n.SupersededBy = splitCSV(supersededBy)
+		n.Tags = splitCSV(tags)
+		g.Nodes = append(g.Nodes, n)
+	}
+	erows, err := db.Query(`SELECT type, "from", "to", source_path, source_line, reason FROM edges`)
+	if err != nil {
+		return nil, err
+	}
+	defer erows.Close()
+	for erows.Next() {
+		var e model.Edge
+		if err := erows.Scan(&e.Type, &e.From, &e.To, &e.SourcePath, &e.SourceLine, &e.Reason); err != nil {
+			return nil, err
+		}
+		g.Edges = append(g.Edges, e)
+	}
+	irows, err := db.Query(`SELECT path, line, message FROM parse_issues`)
+	if err != nil {
+		return nil, err
+	}
+	defer irows.Close()
+	for irows.Next() {
+		var iss model.ParseIssue
+		if err := irows.Scan(&iss.Path, &iss.Line, &iss.Message); err != nil {
+			return nil, err
+		}
+		g.Issues = append(g.Issues, iss)
+	}
+	return g, nil
+}
+
 func joinCSV(xs []string) string {
 	if len(xs) == 0 {
 		return ""
 	}
 	return strings.Join(xs, ",")
+}
+
+func splitCSV(s string) []string {
+	if s == "" {
+		return nil
+	}
+	return strings.Split(s, ",")
 }

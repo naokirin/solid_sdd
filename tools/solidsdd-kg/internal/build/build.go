@@ -13,18 +13,69 @@ import (
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/store"
 )
 
-// Result is a full build outcome.
+// Result is a build outcome.
 type Result struct {
-	Graph  *model.Graph
-	Schema schema.Schema
-	DBPath string
+	Graph      *model.Graph
+	Schema     schema.Schema
+	DBPath     string
+	Incremental bool
+	Skipped    bool // true when sources unchanged and graph loaded from cache
 }
 
-// Full parses all sources and writes the derived SQLite index.
+// Options controls build behavior.
+type Options struct {
+	Force bool // ignore incremental cache
+}
+
+// Full parses all sources and writes the derived SQLite index (FR-101/102).
 func Full(cfg config.Config) (*Result, error) {
+	return Run(cfg, Options{})
+}
+
+// Run builds with options.
+func Run(cfg config.Config, opts Options) (*Result, error) {
 	sch, err := schema.Load(cfg.SchemaFile())
 	if err != nil {
 		return nil, fmt.Errorf("load schema: %w", err)
+	}
+
+	sourcePaths, err := listSourcePaths(cfg)
+	if err != nil {
+		return nil, err
+	}
+	sources, err := store.CollectSources(sourcePaths)
+	if err != nil {
+		return nil, err
+	}
+	schemaHash, _, err := store.FileHash(cfg.SchemaFile())
+	if err != nil {
+		return nil, err
+	}
+	configHash := ""
+	if cfg.ConfigPath != "" {
+		if h, _, err := store.FileHash(cfg.ConfigPath); err == nil {
+			configHash = h
+		}
+	}
+
+	dbPath := cfg.DBPath()
+	db, err := store.Open(dbPath)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	if !opts.Force {
+		ok, err := store.Unchanged(db, sources, schemaHash, configHash)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			g, err := store.LoadGraph(db)
+			if err == nil {
+				return &Result{Graph: g, Schema: sch, DBPath: dbPath, Incremental: true, Skipped: true}, nil
+			}
+		}
 	}
 
 	g := &model.Graph{}
@@ -69,17 +120,60 @@ func Full(cfg config.Config) (*Result, error) {
 		parse.LinksFile(cfg.Abs(lf), g)
 	}
 
-	dbPath := cfg.DBPath()
-	db, err := store.Open(dbPath)
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
 	if err := store.WriteGraph(db, g); err != nil {
 		return nil, err
 	}
+	if err := store.WriteMeta(db, sources, schemaHash, configHash); err != nil {
+		return nil, err
+	}
 
-	return &Result{Graph: g, Schema: sch, DBPath: dbPath}, nil
+	return &Result{Graph: g, Schema: sch, DBPath: dbPath, Incremental: true, Skipped: false}, nil
+}
+
+func listSourcePaths(cfg config.Config) ([]string, error) {
+	var paths []string
+	paths = append(paths, cfg.SchemaFile())
+	if cfg.ConfigPath != "" {
+		paths = append(paths, cfg.ConfigPath)
+	}
+	for _, dir := range cfg.KnowledgeDirs {
+		abs := cfg.Abs(dir)
+		_ = filepath.WalkDir(abs, func(path string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() {
+				return nil
+			}
+			if strings.HasSuffix(strings.ToLower(path), ".md") {
+				paths = append(paths, path)
+			}
+			return nil
+		})
+	}
+	briefs, err := expandGlob(cfg.ProjectRoot, cfg.BriefGlob)
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, briefs...)
+	feats, err := expandGlob(cfg.ProjectRoot, cfg.FeatureGlob)
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, feats...)
+	for _, dir := range cfg.SpecDirs {
+		abs := cfg.Abs(dir)
+		_ = filepath.WalkDir(abs, func(path string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() {
+				return nil
+			}
+			if filepath.Ext(path) == ".md" {
+				paths = append(paths, path)
+			}
+			return nil
+		})
+	}
+	for _, lf := range cfg.LinksFiles {
+		paths = append(paths, cfg.Abs(lf))
+	}
+	return paths, nil
 }
 
 // expandGlob supports "*", "?", and "**" relative to root.
@@ -120,11 +214,9 @@ func expandGlob(root, pattern string) ([]string, error) {
 		if err != nil {
 			return nil
 		}
-		// also allow match on basename when suffix is like "*.feature"
 		if !ok {
 			ok, _ = filepath.Match(suffix, filepath.Base(path))
 		}
-		// suffix may be "**/*.feature" residual like "/*.feature" after split — handle "*.feature"
 		if !ok && strings.Contains(suffix, "/") {
 			ok, _ = filepath.Match(filepath.Base(suffix), filepath.Base(path))
 		}

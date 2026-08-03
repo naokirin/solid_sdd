@@ -11,6 +11,7 @@ import (
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/baseline"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/build"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/config"
+	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/contextx"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/format"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/query"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/scope"
@@ -35,6 +36,8 @@ func main() {
 		os.Exit(cmdImpact(args))
 	case "scope":
 		os.Exit(cmdScope(args))
+	case "context":
+		os.Exit(cmdContext(args))
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -55,13 +58,16 @@ Usage:
   solidsdd-kg impact  <node-id> [--root DIR] [--direction out|in|both]
                       [--hops N] [--types a,b] [--json]
   solidsdd-kg scope   <scope> [--root DIR] [--json]
+  solidsdd-kg context <node-id> [--root DIR] [--hops N] [--include a,b]
+                      [--budget 30k]
 
 Commands:
-  build    Parse sources and rebuild SQLite index
+  build    Parse sources and rebuild SQLite index (skips when unchanged)
   check    Build then validate (dangling, schema rules, coverage, knowledge); baseline filters known violations
   fmt      Normalize knowledge frontmatter key/array order
   impact   List nodes reachable from a start id (FR-301)
   scope    Resolve policies applicable to a dotted scope (FR-304)
+  context  Extract a Markdown context pack for agents (FR-401..405)
 `)
 }
 
@@ -78,27 +84,39 @@ func loadCfg(fs *flag.FlagSet, args []string) (config.Config, bool, error) {
 
 func cmdBuild(args []string) int {
 	fs := flag.NewFlagSet("build", flag.ContinueOnError)
-	cfg, jsonOut, err := loadCfg(fs, args)
+	root := fs.String("root", ".", "project root")
+	cfgPath := fs.String("config", "", "path to .solidsdd/kg/config.yaml")
+	jsonOut := fs.Bool("json", false, "machine-readable JSON output")
+	force := fs.Bool("force", false, "ignore incremental cache")
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+	cfg, err := config.Load(*root, *cfgPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 2
 	}
-	res, err := build.Full(cfg)
+	res, err := build.Run(cfg, build.Options{Force: *force})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
-	if jsonOut {
+	if *jsonOut {
 		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
 			"ok":           true,
 			"db":           res.DBPath,
 			"nodes":        len(res.Graph.Nodes),
 			"edges":        len(res.Graph.Edges),
 			"parse_issues": res.Graph.Issues,
+			"skipped":      res.Skipped,
 		})
 		return 0
 	}
-	fmt.Printf("built %s\n", res.DBPath)
+	if res.Skipped {
+		fmt.Printf("up-to-date %s (skipped parse)\n", res.DBPath)
+	} else {
+		fmt.Printf("built %s\n", res.DBPath)
+	}
 	fmt.Printf("nodes=%d edges=%d parse_issues=%d\n", len(res.Graph.Nodes), len(res.Graph.Edges), len(res.Graph.Issues))
 	for _, iss := range res.Graph.Issues {
 		fmt.Fprintf(os.Stderr, "parse: %s:%d: %s\n", iss.Path, iss.Line, iss.Message)
@@ -311,6 +329,59 @@ func cmdScope(args []string) int {
 	for _, p := range pols {
 		fmt.Printf("dist=%d %s  %s (scope=%s)\n", p.Distance, p.ID, p.Title, p.Scope)
 	}
+	return 0
+}
+
+func cmdContext(args []string) int {
+	fs := flag.NewFlagSet("context", flag.ContinueOnError)
+	root := fs.String("root", ".", "project root")
+	cfgPath := fs.String("config", "", "path to config.yaml")
+	hops := fs.Int("hops", 2, "max hops")
+	include := fs.String("include", "", "comma-separated types (knowledge types always kept)")
+	budget := fs.String("budget", "", "token budget e.g. 30k (approx chars=tokens*4)")
+	flagArgs, positional := splitFlags(args)
+	if err := fs.Parse(flagArgs); err != nil {
+		return 2
+	}
+	if len(positional) < 1 {
+		fmt.Fprintln(os.Stderr, "context requires a node id")
+		return 2
+	}
+	start := positional[0]
+	cfg, err := config.Load(*root, *cfgPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 2
+	}
+	res, err := build.Full(cfg)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	opts := contextx.Options{Hops: *hops}
+	if *include != "" {
+		opts.IncludeTypes = map[string]bool{}
+		for _, t := range strings.Split(*include, ",") {
+			t = strings.TrimSpace(t)
+			if t != "" {
+				opts.IncludeTypes[t] = true
+			}
+		}
+	}
+	if *budget != "" {
+		b, err := contextx.ParseBudget(*budget)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 2
+		}
+		opts.BudgetChars = b
+	}
+	md, err := contextx.Extract(res.Graph, start, opts)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	fmt.Print(md)
 	return 0
 }
 
