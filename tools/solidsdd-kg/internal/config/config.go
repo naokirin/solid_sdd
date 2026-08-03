@@ -10,18 +10,19 @@ import (
 
 // Config is .solidsdd/kg/config.yaml
 type Config struct {
-	Root              string   `yaml:"root"`
-	KnowledgeDirs     []string `yaml:"knowledge_dirs"`
-	BriefGlob         string   `yaml:"brief_glob"`
-	FeatureGlob       string   `yaml:"feature_glob"`
-	SpecDirs          []string `yaml:"spec_dirs"`
-	LinksFiles        []string `yaml:"links_files"`
-	CacheDir          string   `yaml:"cache_dir"`
-	DBFilename        string   `yaml:"db_filename"`
-	BriefIDSeparator  string   `yaml:"brief_id_separator"`
-	SchemaPath        string   `yaml:"schema_path"`
-	ProjectRoot       string   `yaml:"-"`
-	ConfigPath        string   `yaml:"-"`
+	Root             string   `yaml:"root"`
+	KnowledgeDirs    []string `yaml:"knowledge_dirs"`
+	BriefGlob        string   `yaml:"brief_glob"`
+	FeatureGlob      string   `yaml:"feature_glob"`
+	SpecDirs         []string `yaml:"spec_dirs"`
+	LinksFiles       []string `yaml:"links_files"`
+	CacheDir         string   `yaml:"cache_dir"`
+	DBFilename       string   `yaml:"db_filename"`
+	BriefIDSeparator string   `yaml:"brief_id_separator"`
+	SchemaPath       string   `yaml:"schema_path"`
+	FreshnessDays    int      `yaml:"freshness_days"`
+	ProjectRoot      string   `yaml:"-"`
+	ConfigPath       string   `yaml:"-"`
 }
 
 // Default returns Phase 1 defaults.
@@ -37,6 +38,7 @@ func Default() Config {
 		DBFilename:       "kg.db",
 		BriefIDSeparator: "/",
 		SchemaPath:       ".solidsdd/kg/schema.yaml",
+		FreshnessDays:    180,
 	}
 }
 

@@ -44,7 +44,7 @@ func TestCoverageAndDeprecated(t *testing.T) {
 			{Type: "rationale", From: "POL", To: "OLD"},
 		},
 	}
-	vs := validate.All(g, testSchema())
+	vs := validate.All(g, testSchema(), validate.KnowledgeOptions{})
 	rules := map[string]int{}
 	for _, v := range vs {
 		rules[v.Rule]++
@@ -75,7 +75,7 @@ func TestSatisfiedCoverage(t *testing.T) {
 			{Type: "verifies", From: "T1", To: "R1"},
 		},
 	}
-	vs := validate.All(g, testSchema())
+	vs := validate.All(g, testSchema(), validate.KnowledgeOptions{})
 	for _, v := range vs {
 		if v.Rule == "REQ_MUST_HAVE_IMPL" || v.Rule == "REQ_MUST_HAVE_VERIFY" || v.Rule == "ORPHAN_CODE_OR_TASK" {
 			t.Fatalf("unexpected %s: %s", v.Rule, v.Message)

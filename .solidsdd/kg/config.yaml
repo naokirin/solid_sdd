@@ -20,3 +20,6 @@ db_filename: kg.db
 
 # Imported Brief IDs become "<change_id>/<id>" (e.g. initial-reservation/R1).
 brief_id_separator: "/"
+
+# FR-210: warn when knowledge verified_at is older than this many days (0 disables).
+freshness_days: 180

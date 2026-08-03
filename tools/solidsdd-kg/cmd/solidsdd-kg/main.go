@@ -13,6 +13,7 @@ import (
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/config"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/format"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/query"
+	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/scope"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/validate"
 )
 
@@ -32,6 +33,8 @@ func main() {
 		os.Exit(cmdFmt(args))
 	case "impact":
 		os.Exit(cmdImpact(args))
+	case "scope":
+		os.Exit(cmdScope(args))
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -51,12 +54,14 @@ Usage:
   solidsdd-kg fmt     [--root DIR] [--check] [paths...]
   solidsdd-kg impact  <node-id> [--root DIR] [--direction out|in|both]
                       [--hops N] [--types a,b] [--json]
+  solidsdd-kg scope   <scope> [--root DIR] [--json]
 
 Commands:
   build    Parse sources and rebuild SQLite index
-  check    Build then validate (dangling, schema rules, coverage); baseline filters known violations
+  check    Build then validate (dangling, schema rules, coverage, knowledge); baseline filters known violations
   fmt      Normalize knowledge frontmatter key/array order
   impact   List nodes reachable from a start id (FR-301)
+  scope    Resolve policies applicable to a dotted scope (FR-304)
 `)
 }
 
@@ -124,7 +129,9 @@ func cmdCheck(args []string) int {
 		return 1
 	}
 
-	all := validate.All(res.Graph, res.Schema)
+	all := validate.All(res.Graph, res.Schema, validate.KnowledgeOptions{
+		FreshnessDays: cfg.FreshnessDays,
+	})
 	bp := *baselinePath
 	if bp == "" {
 		bp = baseline.Path(cfg.ProjectRoot)
@@ -259,6 +266,50 @@ func cmdImpact(args []string) int {
 	}
 	for _, h := range hits {
 		fmt.Printf("hops=%d %s %s  %s\n", h.Hops, h.Type, h.ID, h.Title)
+	}
+	return 0
+}
+
+func cmdScope(args []string) int {
+	fs := flag.NewFlagSet("scope", flag.ContinueOnError)
+	root := fs.String("root", ".", "project root")
+	cfgPath := fs.String("config", "", "path to config.yaml")
+	jsonOut := fs.Bool("json", false, "JSON output")
+	flagArgs, positional := splitFlags(args)
+	if err := fs.Parse(flagArgs); err != nil {
+		return 2
+	}
+	if len(positional) < 1 {
+		fmt.Fprintln(os.Stderr, "scope requires a dotted scope string (e.g. org.solid_sdd.kg)")
+		return 2
+	}
+	target := positional[0]
+	cfg, err := config.Load(*root, *cfgPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 2
+	}
+	res, err := build.Full(cfg)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	pols := scope.ResolvePolicies(res.Graph, target)
+	if *jsonOut {
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+			"scope":    target,
+			"chain":    scope.Chain(target),
+			"policies": pols,
+		})
+		return 0
+	}
+	fmt.Printf("scope %s  chain=%v\n", target, scope.Chain(target))
+	if len(pols) == 0 {
+		fmt.Println("no applicable policies")
+		return 0
+	}
+	for _, p := range pols {
+		fmt.Printf("dist=%d %s  %s (scope=%s)\n", p.Distance, p.ID, p.Title, p.Scope)
 	}
 	return 0
 }

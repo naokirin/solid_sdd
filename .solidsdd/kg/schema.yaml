@@ -106,3 +106,24 @@ rules:
   - id: NO_ACTIVE_REFS_TO_DEPRECATED
     severity: error
     assert: no_active_refs_to_deprecated
+
+  # Phase 3 — knowledge layer
+  - id: IMPLICIT_CONCEPT_USE
+    severity: warn
+    assert: implicit_concept_use
+
+  - id: UNREFERENCED_KNOWLEDGE
+    severity: warn
+    assert: unreferenced_knowledge
+
+  - id: CONTRADICTING_POLICIES
+    severity: error
+    assert: contradicting_policies
+
+  - id: STALE_KNOWLEDGE
+    severity: warn
+    assert: stale_knowledge
+
+  - id: DEVIATE_WITHOUT_REASON
+    severity: error
+    assert: deviate_without_reason

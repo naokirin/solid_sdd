@@ -10,7 +10,8 @@ solid_sdd 内の知識グラフ基盤（Phase 1）。
 |------|------|------|
 | 1 | フルビルド / dangling / fmt | ✅ |
 | 2 | schema ルール・カバレッジ・impact・baseline | ✅ |
-| 3+ | 知識層検査・context 抽出・昇格 | 未 |
+| 3 | 知識層検査・scope 解決 | ✅ |
+| 4+ | context 抽出・昇格 | 未 |
 
 ## 配置
 
@@ -39,6 +40,7 @@ go build -o ../../bin/solidsdd-kg ./cmd/solidsdd-kg
 ./scripts/solidsdd-kg.sh check --root . --baseline
 ./scripts/solidsdd-kg.sh check --root . --update-baseline
 ./scripts/solidsdd-kg.sh impact POL-KG-PERSISTENCE --direction out --hops 2
+./scripts/solidsdd-kg.sh scope org.solid_sdd.kg
 ./scripts/solidsdd-kg.sh fmt --root .
 ./scripts/solidsdd-kg.sh fmt --root . --check
 ```

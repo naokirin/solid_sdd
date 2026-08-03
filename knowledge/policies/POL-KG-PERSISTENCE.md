@@ -10,7 +10,7 @@ aliases:
 tags: [kg]
 owner: solid_sdd
 confidence: high
-verified_at: 2026-08-03
+verified_at: "2026-08-03"
 supersedes: []
 superseded_by: []
 rationale:

@@ -56,13 +56,13 @@ func buildIndex(g *model.Graph) index {
 	return idx
 }
 
-// All runs structural checks plus schema rules (FR-201..206, dangling, duplicates).
-func All(g *model.Graph, sch schema.Schema) []Violation {
+// All runs structural checks plus schema rules (FR-201..211, dangling, duplicates).
+func All(g *model.Graph, sch schema.Schema, opts KnowledgeOptions) []Violation {
 	var out []Violation
 	out = append(out, DuplicateIDs(g)...)
 	out = append(out, DanglingReferences(g)...)
 	out = append(out, Structural(g, sch)...)
-	out = append(out, EvaluateRules(g, sch)...)
+	out = append(out, EvaluateRules(g, sch, opts)...)
 	sortViolations(out)
 	return out
 }
@@ -220,8 +220,8 @@ func contains(xs []string, v string) bool {
 	return false
 }
 
-// EvaluateRules runs schema.yaml rules with when/assert (FR-201, 203-206).
-func EvaluateRules(g *model.Graph, sch schema.Schema) []Violation {
+// EvaluateRules runs schema.yaml rules with when/assert (FR-201, 203-211).
+func EvaluateRules(g *model.Graph, sch schema.Schema, opts KnowledgeOptions) []Violation {
 	idx := buildIndex(g)
 	var out []Violation
 	for _, rule := range sch.Rules {
@@ -231,7 +231,6 @@ func EvaluateRules(g *model.Graph, sch schema.Schema) []Violation {
 		}
 		switch rule.Assert {
 		case "no_dangling_references":
-			// already covered by DanglingReferences; skip duplicate
 			continue
 		case "has_incoming(implements)":
 			out = append(out, checkHasIncoming(idx, rule, sev, "implements", "requirement")...)
@@ -241,8 +240,9 @@ func EvaluateRules(g *model.Graph, sch schema.Schema) []Violation {
 			out = append(out, checkOrphans(idx, rule, sev)...)
 		case "no_active_refs_to_deprecated":
 			out = append(out, checkDeprecatedRefs(idx, g, rule, sev)...)
+		case "implicit_concept_use", "unreferenced_knowledge", "contradicting_policies", "stale_knowledge", "deviate_without_reason":
+			out = append(out, evalKnowledgeAssert(g, rule, sev, opts)...)
 		default:
-			// Support generic has_incoming(TYPE) / has_outgoing(TYPE)
 			if edge, ok := parseHasIncoming(rule.Assert); ok {
 				typeFilter := whenType(rule.When)
 				out = append(out, checkHasIncoming(idx, rule, sev, edge, typeFilter)...)

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/model"
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/schema"
@@ -53,6 +54,8 @@ func KnowledgeFile(path string) (model.Node, []model.Edge, *model.ParseIssue) {
 		switch t := v.(type) {
 		case string:
 			return t
+		case time.Time:
+			return t.Format("2006-01-02")
 		default:
 			return fmt.Sprint(t)
 		}
@@ -111,26 +114,79 @@ func KnowledgeFile(path string) (model.Node, []model.Edge, *model.ParseIssue) {
 		if _, ok := edgeKeySet[key]; !ok {
 			continue
 		}
-		targets := getStrings(key)
-		edgeType := key
-		// superseded_by is stored on node; also emit edges for dangling checks
-		for _, to := range targets {
-			to = strings.TrimSpace(to)
-			if to == "" {
+		for _, pe := range parseEdgeList(raw[key]) {
+			if pe.To == "" {
 				continue
 			}
 			edges = append(edges, model.Edge{
-				Type:       edgeType,
+				Type:       key,
 				From:       n.ID,
-				To:         to,
+				To:         pe.To,
+				Reason:     pe.Reason,
 				SourcePath: path,
 				SourceLine: lineOffset,
 			})
 		}
 	}
 
-	_ = lineOffset
 	return n, edges, nil
+}
+
+type parsedEdge struct {
+	To     string
+	Reason string
+}
+
+func parseEdgeList(v any) []parsedEdge {
+	if v == nil {
+		return nil
+	}
+	switch t := v.(type) {
+	case string:
+		if strings.TrimSpace(t) == "" {
+			return nil
+		}
+		return []parsedEdge{{To: strings.TrimSpace(t)}}
+	case []any:
+		var out []parsedEdge
+		for _, item := range t {
+			switch it := item.(type) {
+			case string:
+				if s := strings.TrimSpace(it); s != "" {
+					out = append(out, parsedEdge{To: s})
+				}
+			case map[string]any:
+				to := firstString(it, "to", "target", "id")
+				reason := firstString(it, "reason")
+				if to != "" {
+					out = append(out, parsedEdge{To: to, Reason: reason})
+				}
+			}
+		}
+		return out
+	case []string:
+		out := make([]parsedEdge, 0, len(t))
+		for _, s := range t {
+			if s = strings.TrimSpace(s); s != "" {
+				out = append(out, parsedEdge{To: s})
+			}
+		}
+		return out
+	default:
+		return nil
+	}
+}
+
+func firstString(m map[string]any, keys ...string) string {
+	for _, k := range keys {
+		if v, ok := m[k]; ok && v != nil {
+			if s, ok := v.(string); ok {
+				return strings.TrimSpace(s)
+			}
+			return strings.TrimSpace(fmt.Sprint(v))
+		}
+	}
+	return ""
 }
 
 func splitFrontmatter(data []byte) (fm []byte, body string, bodyStartLine int, err error) {
