@@ -12,6 +12,9 @@ Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `referen
   critique-change-context.json          # optional persisted outer critiques
   critique-change-brief.json
   critique-work-plan.json
+  knowledge-consult.md
+  knowledge-harvest.json
+  critique-knowledge-harvest.json       # optional
   integration-verification-report.json
   critique-integration-verification.json
   items/<item_id>/

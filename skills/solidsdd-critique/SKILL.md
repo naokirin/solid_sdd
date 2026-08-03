@@ -3,11 +3,11 @@ name: solidsdd-critique
 description: >-
   Adversarial, read-only critique of a prior solid_sdd phase artifact (change
   context, change brief, work plan, application plan, contracts, derived tests,
-  formal specs, verification, or cross-change consistency). When called from
-  solidsdd-loop or solidsdd-run, must run as an explicit Task subagent. Runs
-  deterministic solidsdd-lint first, then LLM adequacy review. Emits
-  CritiqueReport; does not edit artifacts. Calibrated so only checkability
-  holes fail the loop.
+  formal specs, verification, knowledge harvest, or cross-change consistency).
+  When called from solidsdd-loop or solidsdd-run, must run as an explicit Task
+  subagent. Runs deterministic solidsdd-lint first, then LLM adequacy review.
+  Emits CritiqueReport; does not edit artifacts. Calibrated so only
+  checkability holes fail the loop.
 license: MIT
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -32,6 +32,8 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 - [ears-requirements.md](references/ears-requirements.md) — optional Brief wording (not lint-required)
 - [change-brief.md](references/change-brief.md) — when `subject` is `change_brief`
 - [change-context.md](references/change-context.md) — when `subject` is `change_context` or `cross_change_consistency`
+- [knowledge.md](references/knowledge.md) — when `subject` is `knowledge_harvest`
+- [knowledge-harvest.schema.json](references/knowledge-harvest.schema.json) — harvest artifact shape
 - [change-context-gate.schema.json](references/change-context-gate.schema.json) — when reviewing Change Context gate
 - [loop-retry.md](references/loop-retry.md)
 - [judgment-axes.md](references/judgment-axes.md)

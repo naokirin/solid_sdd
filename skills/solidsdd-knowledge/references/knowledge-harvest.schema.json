@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/knowledge-harvest.schema.json",
+  "title": "KnowledgeHarvest",
+  "description": "Output of solidsdd-knowledge harvest: durable knowledge candidates promoted from a finished change. Not applied until a human gate approves. Path: .solidsdd/changes/<change_id>/knowledge-harvest.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "change_id",
+    "candidates",
+    "human_gate"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "candidates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/candidate" },
+      "description": "Proposed knowledge nodes. Empty array → no gate required for harvest."
+    },
+    "skipped_reasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Why change-local facts were not proposed (ephemeral, already covered, living-PRD risk)."
+    },
+    "cli_suggest": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": true },
+      "description": "Raw rows from solidsdd-kg promote suggest --json when available."
+    },
+    "human_gate": {
+      "$ref": "#/$defs/human_gate"
+    }
+  },
+  "$defs": {
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "rationale", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Proposed stable knowledge node id (e.g. POL-SESSION-TTL)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["concept", "policy", "invariant", "pattern", "decision", "lesson"]
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "scope": {
+          "type": "string",
+          "description": "Dotted scope for policy/invariant (e.g. org.security)."
+        },
+        "body": {
+          "type": "string",
+          "description": "Proposed node body (prose). Keep universal; do not paste whole Brief."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why this survives the change (universality / reuse)."
+        },
+        "source_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Brief R*/SC* ids as <change_id>/<id>, Context paths, or feature paths."
+        },
+        "link_edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "from", "to"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["derives_from", "rationale", "refines", "mentions"]
+              },
+              "from": { "type": "string" },
+              "to": { "type": "string" }
+            }
+          },
+          "description": "Downstream edges to write after approval (usually requirement → policy)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "approved", "rejected", "applied", "skipped"],
+          "description": "proposed until gate; applied after promote/file write."
+        }
+      }
+    }
+  }
+}

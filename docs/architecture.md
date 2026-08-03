@@ -64,9 +64,10 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 
 | Skill | Responsibility | Execution policy | Main I/O |
 |-------|----------------|------------------|----------|
-| `solidsdd.run` | Outer orchestration (intake → brief → decompose → **parallel** slice loops → integration verify) | orchestrator only | Loop log / final state |
+| `solidsdd.run` | Outer orchestration (knowledge consult → intake → brief → decompose → **parallel** slice loops → integration verify → knowledge harvest) | orchestrator only | Loop log / final state |
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
+| `solidsdd.knowledge` | Consult / harvest durable `knowledge/` (CLI: `solidsdd-kg`) | **subagent required** (from run) | `knowledge-consult.md` / `knowledge-harvest.json` |
 | `solidsdd.intake` | Change framing (demand / NFR / tech) + optional gate | **subagent required** | `change-context.md`, `change-context-gate.json` |
 | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) | `report.md` / `report.html` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
@@ -79,7 +80,7 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 | `solidsdd.implement` | Implement to contracts | **subagent required** | Code diff |
 | `solidsdd.verify` | OpenAPI + contract-test verification | **subagent required** | VerificationReport |
 
-Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phase 3. `solidsdd.judge` may explicitly defer when formal specs would help but are not yet supported.
+Formal skills (e.g. `solidsdd.apply.formal` / `solidsdd.verify.formal`) are Phase 3. `solidsdd.judge` may explicitly defer when formal specs would help but are not yet supported. Durable knowledge is not a living PRD—see [../reference-src/knowledge.md](../reference-src/knowledge.md).
 
 ## Change context (`solidsdd.intake`) output
 

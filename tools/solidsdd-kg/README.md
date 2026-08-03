@@ -43,11 +43,15 @@ go build -o ../../bin/solidsdd-kg ./cmd/solidsdd-kg
 ./scripts/solidsdd-kg.sh impact POL-KG-PERSISTENCE --direction out --hops 2
 ./scripts/solidsdd-kg.sh scope org.solid_sdd.kg
 ./scripts/solidsdd-kg.sh context POL-KG-PERSISTENCE --hops 2 --budget 8k
+./scripts/solidsdd-kg.sh promote suggest --root .
+./scripts/solidsdd-kg.sh promote apply --approve --type decision --id DEC-X --title "…"
 ./scripts/solidsdd-kg.sh build --root .          # skips when unchanged
 ./scripts/solidsdd-kg.sh build --root . --force
 ./scripts/solidsdd-kg.sh fmt --root .
 ./scripts/solidsdd-kg.sh fmt --root . --check
 ```
+
+SDD 組み込み: スキル [`solidsdd-knowledge`](../../skills/solidsdd-knowledge/SKILL.md)（`consult` / `harvest`）が本 CLI を呼び、`solidsdd-run` の作業の一貫としてナレッジを消費・収穫する。手順は [reference-src/knowledge.md](../../reference-src/knowledge.md)。
 
 カバレッジ（implements / verifies）は **warn** 既定。導入時は `--update-baseline` で既存穴を記録し、`--baseline` で新規違反のみをエラーにする（RQ-010 / FR-213）。
 

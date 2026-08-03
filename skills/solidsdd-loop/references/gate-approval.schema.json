@@ -41,6 +41,7 @@
         "work_plan",
         "application_plan",
         "formal_apply",
+        "knowledge_harvest",
         "other"
       ],
       "description": "Which gate was approved."

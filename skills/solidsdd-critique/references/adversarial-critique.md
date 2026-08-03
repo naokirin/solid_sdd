@@ -50,6 +50,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Plan thinning | Rationale cites implementation cost or “keep tests green” to lower density | Brief rationales that still cite axes |
 | Formal gap (plan) | Shared mutable multi-client protocol omitted with neither `formal` nor `defer`+reason | Formal model that checks a documented invariant set for a smoke sample |
 | Formal specs | CFG/spec checks **nothing** meaningful (no invariant/property), or claims exclusive/safety but has **zero** related invariant | Missing liveness/WF; toy `Clients=2`; TypeOK+domain invariant without a separate named mutex lemma |
+| Knowledge harvest | Durable candidate is a pasted Brief/Scenario; gate false while candidates non-empty; silent duplicate of active knowledge | Empty harvest; wording polish on a real policy draft |
 | Soft verify | Required checks `skipped` without tooling reason; `pass` with **zero** contract tests while OCL files exist | Redocly/npx unavailable → API lint `skipped` with reason; single skipped optional adapter; green run with a non-empty contract suite |
 | WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` ids not in any `item.covers`; Scenario tags missing those ids; items that `covers` Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; writing step prose in the working language while keeping English keywords ([working-language.md](working-language.md)). **Existence** of id coverage is primarily `scripts/solidsdd-lint.sh`; critique focuses on whether the cover is *adequate*. Greenfield smell: many `ready` items share intersecting `touches` with empty `depends_on` → **minor** (suggest foundation `depends_on` / narrow touches; not major if Scenarios remain checkable) |
 | Scope drift | WorkPlan / ApplicationPlan invents features listed in Brief `out_of_scope`, or drops Brief `in_scope` without rationale | Naming differences that still match Brief intent |
@@ -74,8 +75,20 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `verification_report` | `solidsdd-verify` / `solidsdd-verify-formal` | verify* | loop; also **run** after integration verify |
 | `isolation` | Parent detects inline execution of a subagent-required skill | — | loop or run |
 | `cross_change_consistency` | After `work_plan` critique when prior Features / prior changes exist | — | `solidsdd-run` (optional but recommended on follow-on changes) |
+| `knowledge_harvest` | `solidsdd-knowledge` harvest (before human gate / done) | knowledge | `solidsdd-run` (recommended when candidates exist) |
 
 Skip a subject only when that producer step did not run in this orchestrator iteration.
+
+### `knowledge_harvest` (major examples)
+
+| Check | `major` | Not major |
+|-------|---------|-----------|
+| Living-PRD leakage | Candidate body is essentially a Brief `in_scope` item or full Scenario pasted as “policy” | Short restatement that points at Brief ids |
+| Missing universality | Candidate is clearly change-ephemeral (sample path, one-off id) with no rationale for reuse | Conservative empty candidate list |
+| Duplicate without linkage | Same concept/policy already exists and candidate does not `supersedes` / merge / skip | Near-duplicate flagged for human merge |
+| Gate omitted | `candidates.length >= 1` but `human_gate.required: false` | Empty candidates, `required: false` |
+
+Prefer **Task** critique with this subject after harvest emit and **before** the knowledge human gate.
 
 ### `cross_change_consistency` (major examples)
 
@@ -99,7 +112,7 @@ Prefer **Task** critique with this subject after decompose on iterative products
 
 - Any `blocker` or `major` → `result: fail`, set `loop_action` + `suggested_next_skills`
 - Only `minor` (or empty findings) → `result: pass` (minors may still be listed)
-- Map producers: change context → `solidsdd-intake`; change brief → `solidsdd-brief`; work plan → `solidsdd-decompose`; plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts; scope drift → `solidsdd-brief` and/or `solidsdd-decompose`; framing/NFR/tech gaps → `solidsdd-intake`
+- Map producers: change context → `solidsdd-intake`; change brief → `solidsdd-brief`; work plan → `solidsdd-decompose`; plan → `solidsdd-judge`; API → `solidsdd-apply-api`; OCL → `solidsdd-apply-dbc` (± `derive-tests`); tests → `solidsdd-derive-tests` or `apply-dbc`; formal → `solidsdd-apply-formal`; verify softness → re-`verify` or fix upstream contracts; scope drift → `solidsdd-brief` and/or `solidsdd-decompose`; framing/NFR/tech gaps → `solidsdd-intake`; knowledge harvest → `solidsdd-knowledge`
 
 ## Isolation violations
 

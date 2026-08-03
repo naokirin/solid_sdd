@@ -38,7 +38,12 @@ Produce a concise context summary so later skills do not rediscover the stack.
    - RSpec: `spec/contracts/**`
 7. Locate formal artifacts: `formal/**/*.tla` (+ `.cfg`); note whether TLC tooling is documented/available
 8. Note package/verify commands (`npm test`, `bundle exec rspec`, `./verify.sh`, `tools/tla/tlc.sh`, …)
-9. Flag gaps (missing API SoT, OCL, tests, or formal tooling when `formal/` exists)
+9. Locate durable knowledge (if any):
+   - `knowledge/**` (concepts / policies / decisions / …)
+   - `.solidsdd/kg/` (`schema.yaml` / `config.yaml` / `links.yaml`)
+   - Per-change snapshots: `knowledge-consult.md` / `knowledge-harvest.json` under the active change when present
+   - Do **not** deeply extract policy bodies here—that is `solidsdd-knowledge` consult
+10. Flag gaps (missing API SoT, OCL, tests, or formal tooling when `formal/` exists; missing `.solidsdd/kg/` when `knowledge/` exists)
 
 ## Output
 
@@ -47,5 +52,6 @@ Write a short markdown summary with:
 - stack
 - active `change_id` / Brief path (or legacy / none)
 - contract artifact paths (api / dbc / formal), Feature paths, and test target (vitest / rspec)
+- knowledge layout (`knowledge/` / `.solidsdd/kg/` present or absent)
 - gaps
-- suggested next skill (`solidsdd-judge`, `solidsdd-loop` for one slice, or `solidsdd-run` / `solidsdd-brief` for a new or multi-criterion change)
+- suggested next skill (`solidsdd-knowledge` consult before intake when knowledge exists; else `solidsdd-judge`, `solidsdd-loop` for one slice, or `solidsdd-run` / `solidsdd-brief` for a new or multi-criterion change)

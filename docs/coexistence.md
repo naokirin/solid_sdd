@@ -15,10 +15,13 @@ solid_sdd complements—not replaces—natural-language Spec-Driven Development 
 | Concurrency / safety properties | Rare | **Optional formal** (TLA+/TLC), human-gated |
 | “Make the feature work” coding loop | Primary implementer | `solidsdd-implement` only after contracts exist |
 | Apply density (where to put contracts) | Human judgment | **`solidsdd-judge` + axes** (guided by Brief) |
+| Durable cross-cutting knowledge (terms, policies, ADRs) | Buried in NL specs / chat | **`solidsdd-knowledge`** + `knowledge/` (consult in run; harvest before done; human-gated) |
 
 ## Artifact stance
 
 Machine-checkable outputs are for **gap reduction and mechanical verification during a change**, not everlasting living docs. History of “what was specified then” is fine; requiring perpetual human editorial ownership of every past contract is not.
+
+**Exception (narrow):** `knowledge/` stores **rarely updated, high-universality** policies/concepts/decisions/lessons built **inside** the SDD run (`solidsdd-knowledge`). It must not become a living PRD of change scope—Brief / Gherkin remain requirement SoT.
 
 **Reuse**: keeping contracts from continuous active development is healthy. Reusing stale contracts from dormant / poorly maintained work is usually unsafe. Fitness is **situational**—not a single toolkit default.
 

@@ -13,6 +13,7 @@ Set `human_gate.required: true` (plan-level and/or per target **or** Change Cont
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **brief** has blocking `open_questions`; **decompose** cannot form checkable Gherkin Scenarios |
+| **Knowledge harvest** | Non-empty `knowledge-harvest.json` candidates, or agent-judged durable knowledge needing confirmation before writing `knowledge/` — see [knowledge.md](knowledge.md). **Always** gate before applying promote / writing knowledge files |
 | `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` |
 
 ## Plan / Brief / WorkPlan fields
@@ -99,6 +100,7 @@ When the human approves:
 6. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop); write `gate-approval.json` with `scope: work_plan`.
 7. Do not thin Change Context, ChangeBrief, or WorkPlan to avoid the gate.
 8. After approval + `gate-approval.json`, resume from `run-state.json` `phase` with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
+9. After successful integration verify (+ critique): **Task** `solidsdd-knowledge` (`mode: harvest`) → write `knowledge-harvest.json`; set `phase: knowledge_harvest`. Optionally **Task** `solidsdd-critique` (`subject: knowledge_harvest`). If `human_gate.required` → **stop before `done`** until `gate-approval.json` with `scope: knowledge_harvest`; on approve apply selected candidates (CLI promote / hand-authored files + links), then mark change `done`. On reject/skip with empty apply set, still mark `done` after recording decisions on candidates.
 
 ## Optional human-readable report
 
@@ -111,3 +113,4 @@ When stopping for a gate (or after intake / Brief for confirmation), the orchest
 - Evaluation / sample work: same rule—do not gate routine additive changes or clear sample stacks.
 - Production defaults may set stricter always-gate rules via project rule overrides.
 - Formal `apply` in early Phase 3: **always** gate.
+- Knowledge harvest apply: **always** gate when candidates are non-empty (never auto-promote).

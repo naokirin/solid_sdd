@@ -64,8 +64,8 @@ Usage:
   solidsdd-kg context <node-id> [--root DIR] [--hops N] [--include a,b]
                       [--budget 30k]
   solidsdd-kg promote suggest [--root DIR] [--json]
-  solidsdd-kg promote apply --approve --id ID --title TITLE [--scope S]
-                      [--from-node SRC] [--root DIR]
+  solidsdd-kg promote apply --approve --id ID --title TITLE [--type policy]
+                      [--scope S] [--from-node SRC] [--root DIR]
 
 Commands:
   build    Parse sources and rebuild SQLite index (skips when unchanged)
@@ -441,9 +441,10 @@ func cmdPromoteApply(args []string) int {
 	root := fs.String("root", ".", "project root")
 	cfgPath := fs.String("config", "", "config path")
 	approve := fs.Bool("approve", false, "required human approval flag (FR-504)")
-	id := fs.String("id", "", "new policy id")
-	title := fs.String("title", "", "new policy title")
-	scopeVal := fs.String("scope", "org", "policy scope")
+	id := fs.String("id", "", "new node id")
+	title := fs.String("title", "", "new node title")
+	nodeType := fs.String("type", "policy", "concept|policy|invariant|pattern|decision|lesson")
+	scopeVal := fs.String("scope", "org", "scope (required for policy/invariant)")
 	fromNode := fs.String("from-node", "", "optional source node id whose body is copied")
 	bodyFile := fs.String("body-file", "", "optional markdown body file")
 	if err := fs.Parse(args); err != nil {
@@ -491,13 +492,13 @@ func cmdPromoteApply(args []string) int {
 	if len(cfg.KnowledgeDirs) > 0 {
 		kd = cfg.KnowledgeDirs[0]
 	}
-	res, err := promote.ApplyPolicy(cfg.ProjectRoot, kd, *id, *title, *scopeVal, body)
+	res, err := promote.ApplyNode(cfg.ProjectRoot, kd, *nodeType, *id, *title, *scopeVal, body)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 	fmt.Printf("created %s\n", res.CreatedPath)
-	fmt.Println("Add derives_from on the source requirement/brief side manually (downstream declaration).")
+	fmt.Println("Add derives_from / links.yaml on the requirement side manually (downstream declaration).")
 	return 0
 }
 

@@ -1,6 +1,8 @@
 package promote_test
 
 import (
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/naokirin/solid_sdd/tools/solidsdd-kg/internal/model"
@@ -19,5 +21,19 @@ func TestDuplicateAndShared(t *testing.T) {
 	shared := promote.SharedPhrases(g, 20)
 	if len(shared) != 1 {
 		t.Fatalf("shared=%+v", shared)
+	}
+}
+
+func TestApplyNodeTypes(t *testing.T) {
+	root := t.TempDir()
+	res, err := promote.ApplyNode(root, "knowledge", "decision", "DEC-T", "Title", "", "body")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(res.CreatedPath); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(res.CreatedPath, "decisions") {
+		t.Fatalf("path=%s", res.CreatedPath)
 	}
 }

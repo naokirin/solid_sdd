@@ -21,6 +21,7 @@
       "type": "string",
       "enum": [
         "context",
+        "knowledge_consult",
         "intake",
         "critique_change_context",
         "brief",
@@ -30,6 +31,8 @@
         "waves",
         "integration_verify",
         "critique_integration",
+        "knowledge_harvest",
+        "critique_knowledge_harvest",
         "done",
         "stopped"
       ],

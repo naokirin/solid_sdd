@@ -12,7 +12,12 @@ your-project/
         change-context-gate.json # optional human pause before brief
         change-brief.json        # scope for this change (solidsdd-brief)
         work-plan.json           # after solidsdd-decompose
+        knowledge-consult.md     # solidsdd-knowledge consult (optional until kg adopted)
+        knowledge-harvest.json   # solidsdd-knowledge harvest before done
         status.json              # active | done | abandoned
+    kg/                          # solidsdd-kg schema/config/links (when knowledge adopted)
+  knowledge/                     # durable cross-cutting nodes (not living Brief)
+    concepts/ | policies/ | decisions/ | lessons/ | patterns/
   requirements/
     *.feature                    # property-level Gherkin (not Cucumber SoT); accumulates
   openapi/
@@ -35,6 +40,8 @@ your-project/
 ```
 
 `change_id` is a meaningful kebab-case name (e.g. `initial-calculator`, `add-operation-history`). Additional requirements start a **new** change directory—do not enlarge an old Brief into a living PRD.
+
+`knowledge/` holds rarely changing cross-cutting policies/concepts/decisions. `solidsdd-run` **consults** it before framing and **harvests** candidates after integration verify (human-gated). It is not a second requirement SoT—see [knowledge.md](../reference-src/knowledge.md) and [tools/solidsdd-kg](../tools/solidsdd-kg).
 
 ## Bootstrap steps
 

@@ -46,7 +46,7 @@ Emit `change-context.md` so later skills (and humans) can see **why** NFRs and t
 
 ## Steps
 
-1. Read change request / user intent and context (`solidsdd-context` output if available).
+1. Read change request / user intent and context (`solidsdd-context` output if available). If `knowledge-consult.md` exists for this change (or a draft from `solidsdd-knowledge` consult), treat applicable policies/decisions as framing inputs for § Drivers / Constraints / Links—**cite ids**, do not paste full living docs.
 2. Resolve **working language** per [working-language.md](references/working-language.md) (project rule → user request → `en`).
 3. If only legacy flat Brief exists, migrate per [change-lifecycle.md](references/change-lifecycle.md) first when paths collide; otherwise proceed.
 4. Decide `change_id`: use caller-supplied id when valid; otherwise derive meaningful kebab-case from goal; on collision under `changes/`, append `-2`, `-3`, …

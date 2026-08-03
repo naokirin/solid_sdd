@@ -46,7 +46,7 @@ Emit a `ChangeBrief` so later skills share an explicit premise for what this cha
 
 ## Steps
 
-1. Read change request / user intent, `solidsdd-context` output if available, and **Change Context** for the active change (`.solidsdd/changes/<change_id>/change-context.md`). Resolve working language from project rule or Context §6.
+1. Read change request / user intent, `solidsdd-context` output if available, **Change Context** for the active change (`.solidsdd/changes/<change_id>/change-context.md`), and `knowledge-consult.md` when present. Resolve working language from project rule or Context §6. Existing knowledge policy/decision ids may appear in `assumptions` / `constraints` as citations—do **not** duplicate policy bodies as a second SoT.
 2. If only legacy `.solidsdd/change-brief.json` exists, migrate it first per [change-lifecycle.md](references/change-lifecycle.md).
 3. Resolve `change_id`:
    - Prefer `.solidsdd/active-change.json` when `change-context.md` exists for that id.

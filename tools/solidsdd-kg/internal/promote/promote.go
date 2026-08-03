@@ -179,12 +179,28 @@ type ApplyResult struct {
 	NodeID      string
 }
 
-// ApplyPolicy writes a new policy file. Must be invoked explicitly (FR-504).
-func ApplyPolicy(cfgRoot, knowledgeDir, id, title, scope, sourceBody string) (ApplyResult, error) {
+var typeDir = map[string]string{
+	"policy":    "policies",
+	"concept":   "concepts",
+	"decision":  "decisions",
+	"lesson":    "lessons",
+	"pattern":   "patterns",
+	"invariant": "invariants",
+}
+
+// ApplyNode writes a new knowledge markdown file. Must be invoked explicitly (FR-504).
+func ApplyNode(cfgRoot, knowledgeDir, nodeType, id, title, scope, sourceBody string) (ApplyResult, error) {
 	if id == "" || title == "" {
 		return ApplyResult{}, fmt.Errorf("id and title required")
 	}
-	dir := filepath.Join(cfgRoot, knowledgeDir, "policies")
+	if nodeType == "" {
+		nodeType = "policy"
+	}
+	sub, ok := typeDir[nodeType]
+	if !ok {
+		return ApplyResult{}, fmt.Errorf("unsupported type %q (want concept|policy|invariant|pattern|decision|lesson)", nodeType)
+	}
+	dir := filepath.Join(cfgRoot, knowledgeDir, sub)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return ApplyResult{}, err
 	}
@@ -195,10 +211,15 @@ func ApplyPolicy(cfgRoot, knowledgeDir, id, title, scope, sourceBody string) (Ap
 	var b strings.Builder
 	b.WriteString("---\n")
 	fmt.Fprintf(&b, "id: %s\n", id)
-	b.WriteString("type: policy\n")
+	fmt.Fprintf(&b, "type: %s\n", nodeType)
 	fmt.Fprintf(&b, "title: %s\n", title)
 	b.WriteString("status: active\n")
-	fmt.Fprintf(&b, "scope: %s\n", scope)
+	if scope != "" || nodeType == "policy" || nodeType == "invariant" {
+		if scope == "" {
+			scope = "org"
+		}
+		fmt.Fprintf(&b, "scope: %s\n", scope)
+	}
 	b.WriteString("aliases: []\n")
 	fmt.Fprintf(&b, "verified_at: %q\n", time.Now().UTC().Format("2006-01-02"))
 	b.WriteString("---\n\n")
@@ -208,4 +229,9 @@ func ApplyPolicy(cfgRoot, knowledgeDir, id, title, scope, sourceBody string) (Ap
 		return ApplyResult{}, err
 	}
 	return ApplyResult{CreatedPath: path, NodeID: id}, nil
+}
+
+// ApplyPolicy is a convenience wrapper for type=policy.
+func ApplyPolicy(cfgRoot, knowledgeDir, id, title, scope, sourceBody string) (ApplyResult, error) {
+	return ApplyNode(cfgRoot, knowledgeDir, "policy", id, title, scope, sourceBody)
 }

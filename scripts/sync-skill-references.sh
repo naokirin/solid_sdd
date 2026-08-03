@@ -150,6 +150,19 @@ sync_one schemas/gate-approval.schema.json skills/solidsdd-judge/references/gate
 sync_one schemas/gate-approval.schema.json skills/solidsdd-intake/references/gate-approval.schema.json
 sync_one schemas/gate-approval.schema.json skills/solidsdd-brief/references/gate-approval.schema.json
 sync_one schemas/gate-approval.schema.json skills/solidsdd-decompose/references/gate-approval.schema.json
+sync_one schemas/gate-approval.schema.json skills/solidsdd-knowledge/references/gate-approval.schema.json
+sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-knowledge/references/knowledge-harvest.schema.json
+sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-run/references/knowledge-harvest.schema.json
+sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-critique/references/knowledge-harvest.schema.json
+sync_one reference-src/knowledge.md skills/solidsdd-knowledge/references/knowledge.md
+sync_one reference-src/knowledge.md skills/solidsdd-run/references/knowledge.md
+sync_one reference-src/knowledge.md skills/solidsdd-context/references/knowledge.md
+sync_one reference-src/knowledge.md skills/solidsdd-intake/references/knowledge.md
+sync_one reference-src/knowledge.md skills/solidsdd-brief/references/knowledge.md
+sync_one reference-src/knowledge.md skills/solidsdd-critique/references/knowledge.md
+sync_one reference-src/human-gates.md skills/solidsdd-knowledge/references/human-gates.md
+sync_one reference-src/change-lifecycle.md skills/solidsdd-knowledge/references/change-lifecycle.md
+sync_one reference-src/working-language.md skills/solidsdd-knowledge/references/working-language.md
 sync_one rules/solidsdd.mdc skills/solidsdd-loop/references/project-rule.mdc
 sync_one rules/solidsdd.mdc skills/solidsdd-run/references/project-rule.mdc
 
