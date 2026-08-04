@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan applies standard OpenAPI documentation and UML OCL post for expiresAt-ascending sort on existing GET /reservations / Reservation::list, keeps UnauthorizedError and AuthZ/visibility/DTO unchanged, and defers formal with Brief X9 / Change Context §5 rationale. Lint pass with no findings. No plan thinning, density bias, silent formal drop, or Brief/WorkPlan scope drift; additive human_gate false is appropriate.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/api",
+      "detail": "API target leaves exact OpenAPI encoding (description/200 prose vs schema annotation) to apply-api; Brief open_question explicitly deferred this non-blocking choice. Co-applied standard dbc post on Reservation::list still makes non-decreasing expiresAt checkable—not a checkability hole."
+    }
+  ]
+}

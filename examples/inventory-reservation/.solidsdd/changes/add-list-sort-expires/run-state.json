@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "change_id": "add-list-sort-expires",
+  "phase": "done",
+  "wave_index": 0,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1",
+      "loop_phase": "done"
+    }
+  },
+  "isolation_notes": [
+    "knowledge_consult_copied",
+    "grill_skipped_ask_settled",
+    "cost_rules_b1b5_context_pack_active",
+    "decompose_N1_follow_on",
+    "context_pack_W1_written",
+    "cost_skip:B4",
+    "W1_done_sorted_list",
+    "knowledge_harvest_empty_no_gate",
+    "cost_skip:B4_integration_verify",
+    "no_cost_skip:B1_had_apply_targets"
+  ],
+  "host_toolchain": {
+    "ready": true,
+    "source": ".solidsdd/host-toolchain.json",
+    "missing": [],
+    "resolved_at": "2026-08-04T16:04:27Z"
+  },
+  "updated_at": "2026-08-04T16:19:48Z"
+}

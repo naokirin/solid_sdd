@@ -44,6 +44,10 @@
  *     AvailableStockUnchangedOnUnauthorizedList (UnauthorizedError; no
  *     mutation). Aligns with OpenAPI GET /reservations bare array of
  *     LookupResponse (empty OK).
+ * add-list-sort-expires W1: ResultOrderedByExpiresAtAscending —
+ *     authorized list success has non-decreasing expiresAt (adjacent
+ *     pairs); equal expiresAt any stable order; size 0/1 vacuously
+ *     ordered. UnauthorizedError / AuthZ / dump posts unchanged.
  */
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -861,6 +865,62 @@ describe("OCL Reservation::list", () => {
     expect(item2?.availableStock).toBe(
       ReservationService.availableStock(hold2.sku),
     );
+  });
+
+  it("post ResultOrderedByExpiresAtAscending: authorized list returns non-decreasing expiresAt", () => {
+    ReservationService.seedStock("SKU-1", 20);
+    // Insert later-expiring hold first so insertion order is reverse of
+    // expiresAt ascending (fails until list sorts).
+    const later = ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 300);
+    const middle = ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 200);
+    const earlier = ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 100);
+    expect(Date.parse(earlier.expiresAt)).toBeLessThan(
+      Date.parse(middle.expiresAt),
+    );
+    expect(Date.parse(middle.expiresAt)).toBeLessThan(
+      Date.parse(later.expiresAt),
+    );
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    expect(result).toHaveLength(3);
+    for (let i = 0; i < result.length - 1; i++) {
+      expect(result[i]!.expiresAt <= result[i + 1]!.expiresAt).toBe(true);
+    }
+    expect(result.map((r) => r.holdId)).toEqual([
+      earlier.holdId,
+      middle.holdId,
+      later.holdId,
+    ]);
+  });
+
+  it("post ResultOrderedByExpiresAtAscending: equal expiresAt may appear in any stable order (still non-decreasing)", () => {
+    ReservationService.seedStock("SKU-1", 20);
+    const a = ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 300);
+    const b = ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 300);
+    const sameExpiresAt = a.expiresAt;
+    const storedB = ReservationService.holds().find((h) => h.holdId === b.holdId);
+    if (!storedB) {
+      throw new Error(`hold not found: ${b.holdId}`);
+    }
+    storedB.expiresAt = sameExpiresAt;
+    b.expiresAt = sameExpiresAt;
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]!.expiresAt).toBe(result[1]!.expiresAt);
+    expect(result[0]!.expiresAt <= result[1]!.expiresAt).toBe(true);
+  });
+
+  it("post ResultOrderedByExpiresAtAscending: empty and singleton lists are vacuously ordered", () => {
+    ReservationService.seedStock("SKU-1", 10);
+
+    expect(ReservationService.list(AUTHORIZED)).toEqual([]);
+
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const singleton = ReservationService.list(AUTHORIZED);
+    expect(singleton).toHaveLength(1);
   });
 
   it("post ResultIsFullDumpOfVisibleHolds: availableStock is current stock, not a reserve-time snapshot", () => {

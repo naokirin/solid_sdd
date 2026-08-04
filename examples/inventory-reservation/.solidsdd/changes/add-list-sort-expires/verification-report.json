@@ -1,0 +1,79 @@
+{
+  "version": "1",
+  "change_id": "add-list-sort-expires",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "host-toolchain openapi_lint: mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec \u2014 validated in 13ms; Woohoo! Your API description is valid. GET /reservations (listReservations) documents expiresAt-ascending order (ties stable/unspecified), 200 LookupResponse array (empty OK), 403 UnauthorizedError; no sort/filter/paging query params; prior reserve/get/release/expire remain.",
+      "covers": [
+        "W1",
+        "R2",
+        "SC3",
+        "acceptance_of_whole"
+      ]
+    },
+    {
+      "name": "OpenAPI sort + AuthZ surface (W1 / acceptance_of_whole spot-check)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "paths./reservations.get description and 200 response require non-decreasing expiresAt ascending (earlier first; equal expiresAt any stable order); dump remains unfiltered LookupResponse-equivalent with no filters/paging/DTO field changes; UnauthorizedError 403 unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ). Prior surfaces unbroken: POST /reservations, GET /reservations/{holdId}, POST .../release, POST .../expire.",
+      "covers": [
+        "W1",
+        "R1",
+        "R2",
+        "SC1",
+        "SC2",
+        "SC3",
+        "acceptance_of_whole"
+      ]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) \u2014 full suite",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "host-toolchain npm_test: mise exec -- npm test \u2192 vitest run tests/contracts/reservation.test.ts: 64 passed (64), 0 failed. Duration ~383ms. Includes ResultOrderedByExpiresAtAscending (non-decreasing multi-hold, equal-expiresAt stable non-decreasing, empty/singleton vacuous), ResultIsFullDumpOfVisibleHolds / EmptyCollectionWhenNoneVisible, UnauthorizedErrorOnList + no-mutation posts, plus prior reserve/release/expire/lookup/concurrent and list AuthZ/visibility/DTO regressions.",
+      "covers": [
+        "W1",
+        "R1",
+        "R2",
+        "SC1",
+        "SC2",
+        "SC3",
+        "acceptance_of_whole"
+      ]
+    },
+    {
+      "name": "OpenAPI / OCL / impl alignment (sorted list)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "contracts/Reservation.ocl Reservation::list post ResultOrderedByExpiresAtAscending (adjacent expiresAt <=); prior full-dump / empty / HoldsUnchanged / AvailableStockUnchanged / UnauthorizedErrorOnList* posts unchanged. src/reservation.ts list() sorts by expiresAt ascending after AuthZ; no writes. Aligns with W1 acceptance_criterion and WorkPlan acceptance_of_whole (N=1 co-delivered Scenario).",
+      "covers": [
+        "W1",
+        "R1",
+        "SC1",
+        "SC2",
+        "acceptance_of_whole"
+      ]
+    },
+    {
+      "name": "acceptance_of_whole / SC1\u2013SC3 (single-item plan; enables cost_skip:B4)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "WorkPlan N=1 (only W1). This item verify covers WorkPlan acceptance_of_whole and Brief success_criteria SC1\u2013SC3 / in_scope R1\u2013R2 with pass: authorized list returns currently visible soft-holds with non-decreasing expiresAt without mutation (SC1); unauthorized list \u2192 UnauthorizedError without mutation; dump shape/filters/paging/DTO unchanged (SC2); openapi/openapi.yaml + contracts/Reservation.ocl + passing tests/contracts/** make sorted success and UnauthorizedError checkable; prior ops unbroken (SC3). Parent may record cost_skip:B4 and reuse items/W1/verification-report.json instead of a duplicate integration solidsdd-verify + critique.",
+      "covers": [
+        "W1",
+        "R1",
+        "R2",
+        "SC1",
+        "SC2",
+        "SC3",
+        "acceptance_of_whole"
+      ]
+    }
+  ],
+  "cost_skip": "B4",
+  "reused_from": "items/W1/verification-report.json"
+}

@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "summary": "Cross-change consistency for add-list-sort-expires holds: prior Features (reservation, lookup, availableStock, concurrent-safety, list-holds) remain in force and are not rewritten; the delta lives only in requirements/reservation-list-sort-expires.feature as additive expiresAt-ascending sort on the existing authorized soft-hold collection list. Prior list-holds out_of_scope themes that must stay out (filters/paging, DTO reshape, full IAM/ownership scoping, new list endpoint, formal for list order, latency SLOs, payments/UI/etc.) remain excluded in this Brief's X1–X11 and in WorkPlan Scenario wording. AuthZ/visibility/full-dump Means are explicitly reused (POL-OPAQUE-PRINCIPAL-AUTHZ, POL-SOFT-HOLD-SHARED-READ-VISIBILITY, DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP)—not a silent reopen of prior exclusions. Adding deterministic order does not contradict prior list Scenarios that left order unspecified. Active covers/tags are R1–R2 and SC1–SC3 only—no X* coverage. solidsdd-lint for this change passed with zero findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "requirements/*.feature#@R*@SC*",
+      "detail": "R1–R2 / SC* tag ids are reused across Feature files with change-local Brief namespaces (add-list-holds vs add-list-sort-expires, and earlier changes). Prior Scenario text is unchanged and lint is change-scoped, so checkability is intact; readers comparing Features without the active change pointer may need the change_id to disambiguate tags."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "requirements/reservation-list-holds.feature vs requirements/reservation-list-sort-expires.feature",
+      "detail": "Prior list-holds Scenarios require an unfiltered full dump without specifying order; this change adds expiresAt-ascending order while restating dump shape and UnauthorizedError. Compatible refinement documented in Context §2/§6 and Brief assumptions—not a silent rewrite of prior acceptance."
+    }
+  ]
+}

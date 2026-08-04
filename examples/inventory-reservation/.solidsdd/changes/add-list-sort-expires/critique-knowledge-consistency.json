@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "knowledge_consistency",
+  "result": "pass",
+  "summary": "Context and Brief for add-list-sort-expires do not contradict consulted canonical knowledge. Brief assumptions/constraints cite POL-OPAQUE-PRINCIPAL-AUTHZ, POL-SOFT-HOLD-SHARED-READ-VISIBILITY, and DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP and keep AuthZ/visibility/full-dump Means unchanged (X1–X4); sort-only R1/SC1 is orthogonal to the DEC and invents no filters/paging. Context reuses the same Means (unauthorized → UnauthorizedError; shared get-by-id visibility; no filters/paging/DTO). solidsdd-lint --project-root . passed with zero findings. No WorkPlan/contracts yet to drift from cited invariants.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "change-context.md §6",
+      "detail": "Visibility Means are labeled maturity confirmed while POL-SOFT-HOLD-SHARED-READ-VISIBILITY (and Brief assumptions) are canonical. Content still reuses the shared get-by-id universe with no conflicting Means; label polish only."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "change-context.md §8",
+      "detail": "§8 Links cites only POL-OPAQUE-PRINCIPAL-AUTHZ.md; consult also named POL-SOFT-HOLD-SHARED-READ-VISIBILITY and DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP, which Brief already cites. Missing §8 links do not override those policies."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml documents additive expiresAt-ascending order on existing GET /reservations (operationId listReservations) at standard density against W1 ApplicationPlan and Feature R1/R2/SC1–SC3: authorized full-dump 200 as bare LookupResponse array with MUST non-decreasing expiresAt (equal expiresAt any stable order), no sort/filter/paging query params, UnauthorizedError 403 and PreconditionError 400 with no-mutation unchanged. Not happy-path-only; solidsdd-lint passed with zero findings. No API retry.",
+  "findings": []
+}

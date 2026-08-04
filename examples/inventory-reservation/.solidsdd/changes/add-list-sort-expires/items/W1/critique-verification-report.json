@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft for W1: OpenAPI Redocly --extends=spec passed; GET /reservations documents expiresAt-ascending order with UnauthorizedError 403 unchanged; ocl_tests ran a non-empty suite (64 passed) including ResultOrderedByExpiresAtAscending and UnauthorizedErrorOnList; OpenAPI/OCL/impl alignment and acceptance_of_whole / SC1–SC3 coverage claimed with pass. No required-check skip without reason; not a pass-with-zero-coverage hole. solidsdd-lint pass (no findings).",
+  "findings": []
+}

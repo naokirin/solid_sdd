@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest for Reservation::list covers every live OCL pre/post at standard density: PrincipalAuthorized → named UnauthorizedError; ResultIsFullDumpOfVisibleHolds; ResultOrderedByExpiresAtAscending (reverse-insert multi-hold non-decreasing expiresAt, equal expiresAt any order, size 0/1 vacuous); EmptyCollectionWhenNoneVisible; HoldsUnchanged / AvailableStockUnchanged; UnauthorizedErrorOnList plus HoldsUnchangedOnUnauthorizedList / AvailableStockUnchangedOnUnauthorizedList. Not happy-path-only or “does not throw” only. Prior reserve/release/expire/lookup suites remain. solidsdd-lint pass (no findings).",
+  "findings": []
+}

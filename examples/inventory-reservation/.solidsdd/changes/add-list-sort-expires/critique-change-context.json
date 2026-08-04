@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "summary": "Change Context for add-list-sort-expires is checkable at intake density: all eight required headings are present; nfr.json covers the six qualities with thresholds/measurement for every in_scope item and §4 projects it without contradiction; §5 inherits TypeScript/OpenAPI/OCL/Vitest as repo_existing and records expiresAt-ascending sort Means as user-settled with alternatives; AuthZ/visibility/full-dump framing reuses prior Means without inventing filters/paging/DTO changes; prior Features and add-list-holds are listed under §2/§8. human_gate.required false is appropriate (user ask settled; no material agent_default; security NFR extends existing AuthZ reuse; §7 non-blocking; confidence high). Lint’s missing change-brief.json is expected pre-brief and out of scope for this subject.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-sort-expires/change-brief.json",
+      "detail": "solidsdd-lint reports major scope_gap: change-brief.json missing for active change. Expected at change_context phase (Brief is produced by solidsdd-brief next); not a framing/NFR checkability hole for this subject."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": ".solidsdd/changes/add-list-sort-expires/change-context.md#2,#6,#8",
+      "detail": "knowledge-consult.md suggests citing POL-SOFT-HOLD-SHARED-READ-VISIBILITY and DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP by id alongside POL-OPAQUE-PRINCIPAL-AUTHZ. Context states shared visibility and unfiltered full-dump Means in prose and cites POL-OPAQUE-PRINCIPAL-AUTHZ, but omits the other two knowledge ids. Framing checkability remains; Brief assumptions/constraints should keep the consult citations so reuse stays explicit."
+    }
+  ]
+}

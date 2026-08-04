@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "change_id": "add-list-sort-expires",
+  "candidates": [],
+  "skipped_reasons": [
+    "expiresAt-ascending sort (ties: any stable order) is the sole LIGHT acceptance delta of this change (R1/SC1, Feature, OpenAPI, OCL). It is already machine-checkable in adapter/requirement SoT. Universality is weak: later list elevations (filters/paging/new sort keys) would reopen order in a new Brief rather than consult a durable sort ADR. ASC vs DESC is a settled user choice but low-information once encoded in contracts; promoting DEC-SOFT-HOLD-LIST-SORT-EXPIRES-ASC would largely restate change-local acceptance and risk living-PRD duplication of Brief/Feature. Prefer leave change-local (ADR optional, not proposed).",
+    "Tie-break underspecification (no secondary key; any stable order) is an intentional non-decision (X7 / open_questions)—not ADR-worthy to freeze as knowledge.",
+    "AuthZ / shared visibility / unfiltered full-dump Means are unchanged and already canonical (POL-OPAQUE-PRINCIPAL-AUTHZ, POL-SOFT-HOLD-SHARED-READ-VISIBILITY, DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP). Do not re-propose or extend them for a sort-only delta.",
+    "GET /reservations path/method, OpenAPI/OCL/Vitest/Feature bodies, and Brief in_scope/out_of_scope lists stay adapter or change-local SoT—not harvested wholesale.",
+    "cli promote suggest duplicate_title rows (add-list-holds/SC3 vs add-list-sort-expires/SC2; add-lookup-available-stock/R1 vs add-reservation-lookup/R1) are title-collision hints, not knowledge nodes."
+  ],
+  "cli_suggest": [
+    {
+      "kind": "duplicate_title",
+      "ids": [
+        "add-list-holds/SC3",
+        "add-list-sort-expires/SC2"
+      ],
+      "summary": "normalized title/alias collision among add-list-holds/SC3, add-list-sort-expires/SC2",
+      "paths": [
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-list-holds/change-brief.json",
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-list-sort-expires/change-brief.json"
+      ]
+    },
+    {
+      "kind": "duplicate_title",
+      "ids": [
+        "add-lookup-available-stock/R1",
+        "add-reservation-lookup/R1"
+      ],
+      "summary": "normalized title/alias collision among add-lookup-available-stock/R1, add-reservation-lookup/R1",
+      "paths": [
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-lookup-available-stock/change-brief.json",
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-reservation-lookup/change-brief.json"
+      ]
+    }
+  ],
+  "human_gate": {
+    "required": false,
+    "reason": "No durable non-trivial candidates: expiresAt ASC sort left change-local (Feature/OpenAPI/OCL SoT); existing list Means already canonical and unchanged. Empty candidates → no knowledge_harvest gate."
+  }
+}

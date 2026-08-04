@@ -41,6 +41,10 @@
 --     LookupResponse-equivalent items including availableStock; empty
 --     collection when none visible; no mutation. Unauthorized → named
 --     UnauthorizedError; stock and holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
+-- add-list-sort-expires W1: authorized list success dump ordered by
+--     expiresAt ascending (non-decreasing); equal expiresAt may use any
+--     stable order (no secondary key). AuthZ / UnauthorizedError /
+--     full-dump / no-mutation posts retained unchanged.
 -- Named error vocabulary shared with OpenAPI.
 
 -- Default TTL when caller omits ttlSeconds (seconds).
@@ -183,6 +187,10 @@ post AvailableStockUnchangedOnUnauthorizedLookup:
 -- stock and holds unchanged. No paging / sku/status/time filters in OCL.
 -- PrincipalAuthorized violation → named UnauthorizedError; no mutation
 -- (aligns with lookup/reserve/release UnauthorizedError posts).
+-- add-list-sort-expires W1: success result ordered by expiresAt
+-- ascending (non-decreasing adjacent pairs); equal expiresAt may use
+-- any stable order (no secondary key required). Size 0/1 vacuously
+-- ordered. AuthZ and UnauthorizedError posts unchanged.
 context Reservation::list(principal: String): Sequence(Hold)
 pre PrincipalAuthorized: principal.isAuthorized()
 post ResultIsFullDumpOfVisibleHolds:
@@ -193,6 +201,9 @@ post ResultIsFullDumpOfVisibleHolds:
       r.quantity = h.quantity and
       r.expiresAt = h.expiresAt and
       r.availableStock = self.availableStock(h.sku)))
+post ResultOrderedByExpiresAtAscending:
+  Sequence{1..result->size()-1}->forAll(i |
+    result->at(i).expiresAt <= result->at(i + 1).expiresAt)
 post EmptyCollectionWhenNoneVisible:
   self.holds()@pre->isEmpty() implies result->isEmpty()
 post HoldsUnchanged: self.holds() = self.holds()@pre

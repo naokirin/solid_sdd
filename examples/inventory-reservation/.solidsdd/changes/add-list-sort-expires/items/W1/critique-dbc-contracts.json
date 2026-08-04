@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl#list meets W1 ApplicationPlan dbc apply at standard density: pre PrincipalAuthorized retained; new post ResultOrderedByExpiresAtAscending (adjacent non-decreasing expiresAt; size 0/1 vacuous; equal expiresAt unconstrained, matching Brief X7); prior ResultIsFullDumpOfVisibleHolds / EmptyCollectionWhenNoneVisible / HoldsUnchanged / AvailableStockUnchanged and live UnauthorizedErrorOnList (+ no-mutation) unchanged. Sort success and UnauthorizedError channels remain checkable; not vacuous. solidsdd-lint pass with no findings.",
+  "findings": []
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "User ask settled (no Grill): additive sort-only delta on existing GET /reservations / Reservation::list by expiresAt ascending; ties any stable order; reuse POL-OPAQUE-PRINCIPAL-AUTHZ and shared visibility Means; unauthorized remains UnauthorizedError with no mutation; no filters/paging/DTO changes; prior reserve/release/expire/lookup/concurrent unchanged. Stack is repo_existing. No new security/money NFR beyond extending existing AuthZ. §7 has no blocking questions."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for add-list-sort-expires is checkable at brief density: non-empty {id,text} in_scope (R1–R2) and out_of_scope (X1–X11) with no in/out contradictions; success_criteria SC1–SC3 are observable (authorized list dump has non-decreasing expiresAt; UnauthorizedError + no mutation; OpenAPI and/or OCL + Vitest make sorted success + UnauthorizedError checkable). open_questions are explicitly non-blocking deferrals; confidence high and human_gate.required false match settled Change Context. Aligns with Context §1–§5, knowledge-consult citations (POL-OPAQUE-PRINCIPAL-AUTHZ, POL-SOFT-HOLD-SHARED-READ-VISIBILITY, DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP), and sort-only delta without filters/paging/DTO/AuthZ reopen. solidsdd-lint --project-root . passed with zero findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-sort-expires/work-plan.json",
+      "detail": "work-plan.json is absent. Expected at change_brief phase (WorkPlan is produced by solidsdd-decompose next); lint did not flag it and this is not a Brief checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-sort-expires/change-brief.json#open_questions|assumptions",
+      "detail": "Whether OpenAPI prose must mention sort vs OCL/tests alone remains deferred to judge/apply. Acceptable for Brief; SC1/SC3 still require the sorted-success property to be machine-checkable by at least one contract path."
+    }
+  ]
+}

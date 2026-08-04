@@ -21,8 +21,9 @@ info:
     insufficient stock (additive; prior success and error surfaces remain).
     Additive collection list (GET /reservations) returns a full dump of
     currently visible soft-holds as a JSON array of LookupResponse items
-    (including empty); unauthorized list fails as named UnauthorizedError
-    with stock and holds unchanged.
+    (including empty), ordered by expiresAt ascending (earlier first; equal
+    expiresAt order unspecified but stable); unauthorized list fails as named
+    UnauthorizedError with stock and holds unchanged.
 servers:
   - url: http://localhost:3000
 paths:
@@ -34,14 +35,17 @@ paths:
         Returns one full dump of all currently visible soft-holds in the same
         visibility universe as get-by-id when the caller is an authorized
         opaque principal. No paging and no sku, status, or time filter
-        dimensions. Success body is a bare JSON array of LookupResponse
-        objects (holdId, sku, quantity, expiresAt, availableStock) — chosen
-        over an { items } envelope because this document has no prior
-        collection wrapper pattern and items are exactly LookupResponse.
-        Empty array when none are visible. Read-only: stock and holds are
-        unchanged. When the caller is unauthorized, the operation fails with
-        named domain error UnauthorizedError and leaves available stock and
-        existing holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
+        dimensions; no sort query parameters. Success body is a bare JSON
+        array of LookupResponse objects (holdId, sku, quantity, expiresAt,
+        availableStock) — chosen over an { items } envelope because this
+        document has no prior collection wrapper pattern and items are
+        exactly LookupResponse. The array is ordered by expiresAt ascending
+        (earlier expiry first); when two items share the same expiresAt,
+        their relative order is unspecified but stable. Empty array when
+        none are visible. Read-only: stock and holds are unchanged. When the
+        caller is unauthorized, the operation fails with named domain error
+        UnauthorizedError and leaves available stock and existing holds
+        unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
       parameters:
         - $ref: '#/components/parameters/OpaquePrincipal'
       responses:
@@ -50,9 +54,11 @@ paths:
             Authorized list success. Clients and tests MUST observe a JSON
             array (possibly empty) whose elements are LookupResponse-
             equivalent (holdId, sku, quantity, expiresAt, availableStock)
-            covering all currently visible soft-holds. The operation remains
-            non-mutating: clients and tests MUST treat it as leaving available
-            stock and existing holds unchanged.
+            covering all currently visible soft-holds, ordered by expiresAt
+            ascending (earlier first). Equal expiresAt may appear in any
+            stable order. The operation remains non-mutating: clients and
+            tests MUST treat it as leaving available stock and existing holds
+            unchanged.
           content:
             application/json:
               schema:
@@ -61,13 +67,18 @@ paths:
                   $ref: '#/components/schemas/LookupResponse'
               examples:
                 nonempty:
-                  summary: One or more visible soft-holds
+                  summary: Visible soft-holds ordered by expiresAt ascending
                   value:
-                    - holdId: hold-1
+                    - holdId: hold-earlier
                       sku: SKU-1
                       quantity: 2
+                      expiresAt: '2026-08-04T14:00:00.000Z'
+                      availableStock: 5
+                    - holdId: hold-later
+                      sku: SKU-2
+                      quantity: 1
                       expiresAt: '2026-08-04T15:00:00.000Z'
-                      availableStock: 8
+                      availableStock: 5
                 empty:
                   summary: No visible soft-holds
                   value: []

@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-list-sort-expires",
+  "summary": "W1: apply standard OpenAPI documentation of expiresAt-ascending sort on existing GET /reservations and UML OCL post requiring non-decreasing expiresAt on authorized list; UnauthorizedError and full-dump/AuthZ/visibility/DTO unchanged; defer formal (Brief X9; concurrent safety owns formal/).",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive non-breaking sort-order documentation and OCL post on existing list surface; no money_boundary, breaking_change, low_confidence, or formal apply. AuthZ/UnauthorizedError unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ); Brief open_questions are non-blocking."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/get",
+      "density": "standard",
+      "rationale": "http_boundary + additive_change + stable_core: W1 requires documenting expiresAt-ascending sort on the existing GET /reservations (operationId listReservations) so clients/tests can rely on non-decreasing expiresAt order without a new path or operation (R1/R2/SC1/SC3; Change Context §5). Extend description/200 response prose only; keep UnauthorizedError, bare LookupResponse array envelope, and AuthZ/visibility/DTO unchanged. Not breaking_change. Exact OpenAPI wording vs schema-only is left to apply-api; property must be checkable.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "additive_change", "stable_core"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive sort documentation on existing GET /reservations; no breaking change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#list",
+      "density": "standard",
+      "rationale": "domain_contract + additive_change + stable_core: W1 requires an OCL postcondition on Reservation::list so authorized success yields Sequence(Hold) with non-decreasing expiresAt (ascending; equal expiresAt any stable order) and no stock/hold mutation (R1/SC1/SC3; NFR1/NFR6). Extend contracts/Reservation.ocl list post; keep existing AuthZ pre and UnauthorizedError coverage (POL-OPAQUE-PRINCIPAL-AUTHZ); derived Vitest under tests/contracts/** follows apply/derive. Not breaking_change. No secondary sort key mandated (Brief X7).",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "additive_change", "stable_core"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC post for expiresAt non-decreasing on existing list; AuthZ/UnauthorizedError and dump shape unchanged; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety for list order is out of demand (Change Context §5; Brief X9 — concurrent safety already owns formal/; sort is a read-order property). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W1"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

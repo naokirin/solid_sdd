@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan add-list-sort-expires is N=1 follow-on compliant and checkable at standard density: exactly one item W1 maps 1:1 to requirements/reservation-list-sort-expires.feature Scenario and covers all Brief in_scope R1–R2 and success_criteria SC1–SC3; Scenario tags match covers; no out_of_scope X* ids. W1 is not a vocabulary-only foundation—list OpenAPI/OCL already exist from add-list-holds; the slice co-delivers expiresAt-ascending sort on authorized list with UnauthorizedError and dump-shape unchanged on the same GET /reservations path (follow-on cost rule). Acceptance is Gherkin Given/When/Then with observable non-decreasing expiresAt, no filters/paging/DTO drift, and contract/test checkability. No dependency cycle. solidsdd-lint --project-root . --change-id add-list-sort-expires passed with zero findings.",
+  "findings": []
+}

@@ -172,6 +172,8 @@ export const ReservationService = {
    * Full dump of currently visible soft-holds. Read-only: stock and holds
    * unchanged. Unauthorized → UnauthorizedError; empty array when none.
    * Each item uses current availableStock (LookupResponse-equivalent).
+   * Ordered by expiresAt ascending (ISO-8601 string compare; equal expiresAt
+   * keeps insertion / Map iteration order — stable).
    * OCL: Reservation::list
    */
   list(principal: string): Hold[] {
@@ -181,11 +183,13 @@ export const ReservationService = {
     }
 
     // post ResultIsFullDumpOfVisibleHolds / EmptyCollectionWhenNoneVisible;
-    // HoldsUnchanged; AvailableStockUnchanged
-    return [...holdsById.values()].map((hold) => ({
-      ...hold,
-      availableStock: ReservationService.availableStock(hold.sku),
-    }));
+    // ResultOrderedByExpiresAtAscending; HoldsUnchanged; AvailableStockUnchanged
+    return [...holdsById.values()]
+      .map((hold) => ({
+        ...hold,
+        availableStock: ReservationService.availableStock(hold.sku),
+      }))
+      .sort((a, b) => (a.expiresAt < b.expiresAt ? -1 : a.expiresAt > b.expiresAt ? 1 : 0));
   },
 
   /**
