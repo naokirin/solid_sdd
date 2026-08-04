@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "subject": "knowledge_harvest",
+  "result": "pass",
+  "summary": "knowledge-harvest.json proposes three durable candidates (never-negative / last-unit invariant, shared InsufficientStockError channel policy, bounded TLA+ soft-hold pattern) with human_gate.required true; bodies are universal norms with Brief id citations, not living-PRD dumps of in_scope or Scenarios. Existing POL-OPAQUE-PRINCIPAL-AUTHZ correctly skipped; no silent duplicate of active knowledge. solidsdd-lint pass with Brief/WorkPlan ambiguity lexicon minors only (InsufficientStockError false positives). No knowledge_harvest major.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable. Not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; not a harvest defect."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "knowledge-harvest.json#candidates/INV-AVAILABLE-STOCK-NEVER-NEGATIVE",
+      "detail": "Single invariant packs both never-negative available stock and last-unit ≤1 soft-hold. Durable and not a Brief paste; human gate may optionally split into two nodes on apply. Polish only."
+    }
+  ]
+}

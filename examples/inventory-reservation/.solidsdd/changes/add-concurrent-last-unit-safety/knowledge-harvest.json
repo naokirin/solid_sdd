@@ -1,0 +1,115 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "candidates": [
+    {
+      "id": "INV-AVAILABLE-STOCK-NEVER-NEGATIVE",
+      "type": "invariant",
+      "title": "Available stock never negative; last unit at most one soft-hold",
+      "scope": "product.inventory_reservation",
+      "body": "Under concurrent or sequential authorized soft-hold reserves against the same SKU, available stock must never go negative. When only one unit of available stock remains, at most one reserve may create a soft-hold for that unit. This invariant outlives any single change's acceptance wording and applies to future reservation mutations that touch shared stock.",
+      "rationale": "Cross-cutting stock-safety norm elevated from deferred formal-concurrency scope into checkable OpenAPI/OCL/TLA+. Later agents must not silently weaken non-negative or last-unit exclusivity when extending reserve paths.",
+      "source_refs": [
+        "add-concurrent-last-unit-safety/R1",
+        "add-concurrent-last-unit-safety/R2",
+        "add-concurrent-last-unit-safety/SC1",
+        "add-concurrent-last-unit-safety/SC2",
+        "requirements/reservation-concurrent-safety.feature",
+        "formal/ConcurrentReserve.tla"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-concurrent-last-unit-safety/R1",
+          "to": "INV-AVAILABLE-STOCK-NEVER-NEGATIVE"
+        },
+        {
+          "type": "derives_from",
+          "from": "add-concurrent-last-unit-safety/R2",
+          "to": "INV-AVAILABLE-STOCK-NEVER-NEGATIVE"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "id": "POL-INSUFFICIENT-STOCK-SHARED-CHANNEL",
+      "type": "policy",
+      "title": "InsufficientStockError is the shared race-loser channel",
+      "scope": "product.inventory_reservation",
+      "body": "When an authorized reserve fails because stock is insufficient\u2014including concurrent race losers for the last unit\u2014the service MUST fail with the same named InsufficientStockError used for sequential insufficient stock. Do not invent a concurrent-only error type. Losers create no extra hold and leave without a successful reservation.",
+      "rationale": "Stable error-channel contract for clients and contracts: sequential and concurrent insufficient outcomes share one named domain error. Prevents future briefs from introducing parallel race-loser types that fragment OpenAPI/OCL surfaces.",
+      "source_refs": [
+        "add-concurrent-last-unit-safety/R3",
+        "add-concurrent-last-unit-safety/R5",
+        "add-concurrent-last-unit-safety/SC3",
+        "requirements/reservation-concurrent-safety.feature"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-concurrent-last-unit-safety/R3",
+          "to": "POL-INSUFFICIENT-STOCK-SHARED-CHANNEL"
+        },
+        {
+          "type": "derives_from",
+          "from": "add-concurrent-last-unit-safety/R5",
+          "to": "POL-INSUFFICIENT-STOCK-SHARED-CHANNEL"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "id": "PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING",
+      "type": "pattern",
+      "title": "Bounded TLA+/TLC for soft-hold concurrency interleaving",
+      "scope": "product.inventory_reservation",
+      "body": "When soft-hold reserve properties depend on interleaving (last-unit exclusivity, non-negative available stock under concurrent authorized clients), prefer a bounded TLA+ model plus .cfg under formal/, checkable via TLC (solid_sdd tools/tla/). Keep bounds TLC-checkable. Do not substitute Alloy or other formal languages as SoT for this product sample unless an explicit later decision supersedes this pattern.",
+      "rationale": "ADR-worthy verification practice: prior briefs deferred formal concurrency; this change established formal/ + TLC as the durable check path for soft-hold races. Future concurrency elevations should reuse the pattern rather than re-litigating formal language choice.",
+      "source_refs": [
+        "add-concurrent-last-unit-safety/R7",
+        "add-concurrent-last-unit-safety/SC5",
+        "formal/ConcurrentReserve.tla",
+        "formal/ConcurrentReserve.cfg"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-concurrent-last-unit-safety/R7",
+          "to": "PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING"
+        },
+        {
+          "type": "rationale",
+          "from": "add-concurrent-last-unit-safety/R1",
+          "to": "PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING"
+        }
+      ],
+      "status": "rejected"
+    }
+  ],
+  "skipped_reasons": [
+    "POL-OPAQUE-PRINCIPAL-AUTHZ already exists and covers opaque-principal AuthZ on reserve (and related) paths; R4/SC4 confirmed it still applies under concurrent reserve without a new AuthZ angle\u2014cite existing policy, do not duplicate.",
+    "Exact in-process sync mechanism (mutex/CAS/queue) remains an ApplicationPlan/implement detail, not a durable knowledge node.",
+    "TLA+ bound parameters (process counts, stock sizes) are cfg-local, not universal policy.",
+    "OpenAPI / OCL / Vitest / Feature Scenario wording stay adapter or requirement SoT; not harvested wholesale.",
+    "Brief in_scope / out_of_scope lists and acceptance_of_whole prose are change-local; not promoted as living PRD.",
+    "cli promote suggest duplicate_title (add-lookup-available-stock/R1 vs add-reservation-lookup/R1) is a prior-change title collision hint, not a knowledge node for this harvest."
+  ],
+  "cli_suggest": [
+    {
+      "kind": "duplicate_title",
+      "ids": [
+        "add-lookup-available-stock/R1",
+        "add-reservation-lookup/R1"
+      ],
+      "summary": "normalized title/alias collision among add-lookup-available-stock/R1, add-reservation-lookup/R1",
+      "paths": [
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-lookup-available-stock/change-brief.json",
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-reservation-lookup/change-brief.json"
+      ]
+    }
+  ],
+  "human_gate": {
+    "required": true,
+    "reason": "Gate decided reject-all at 2026-08-04T00:49:18Z; all candidates marked rejected; no knowledge/ writes."
+  }
+}

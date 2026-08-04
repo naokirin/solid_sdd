@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W2 ApplicationPlan correctly skips OpenAPI (W1 already elevated InsufficientStockError / UnauthorizedError), applies thin additive OCL only as a sequential/AuthZ/non-negative SoT bridge (no inventing interleaving OCL), and applies strict bounded TLA+/TLC under formal/ for concurrent last-unit exclusivity and never-negative stock. Plan-level and formal-target human_gate.required true match Phase 3 early-rollout policy—correct, not a fail. solidsdd-lint pass with minor Brief/WorkPlan 'sufficient' lexicon hits only. No silent concurrency_safety drop, no plan thinning for implementation cost, no out_of_scope drift.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R3",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R5",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R6",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC3",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC5",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "lint: ambiguous phrase 'sufficient'"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "lint: ambiguous phrase 'sufficient'"
+    },
+    {
+      "severity": "minor",
+      "category": "density_bias",
+      "location": "items/W2/application-plan.json#targets/dbc",
+      "detail": "DbC target lists authz_boundary + concurrency_safety yet density is thin. Acceptable here: W1 already elevated UnauthorizedError / InsufficientStockError / AvailableStockNonNegative posts; true interleaving exclusivity is owned by formal apply (strict); rationale forbids inventing concurrency OCL. On apply-dbc keep thin additive only—do not raise density to invent interleaving contracts. Guidance, not a checkability hole."
+    }
+  ]
+}

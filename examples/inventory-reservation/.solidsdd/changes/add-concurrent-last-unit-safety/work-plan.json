@@ -1,0 +1,72 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "summary": "Two-slice shared-contract follow-on (foundation\u2192properties): W1 elevates additive OpenAPI and UML OCL vocabulary so InsufficientStockError is the named channel for sequential insufficient stock and race losers and non-negative available stock is checkable on sequential/contract paths; W2 depends_on W1 and delivers the concurrent last-unit property (\u22641 hold, never-negative stock, race-loser InsufficientStockError, opaque-principal AuthZ) with remaining OCL/tests/impl plus bounded TLA+/TLC under formal/.",
+  "acceptance_of_whole": "Scenario: Concurrent last-unit safety is checkable end-to-end\n  Given the inventory reservation service for clients\n  When concurrent authorized opaque principals race for the last unit of a SKU and unauthorized callers attempt concurrent reserve\n  Then available stock never goes negative for any checkable interleaving\n  And at most one soft-hold is created when availableStock is 1\n  And race losers fail with named InsufficientStockError and create no extra hold\n  And unauthorized callers fail with UnauthorizedError without mutation (POL-OPAQUE-PRINCIPAL-AUTHZ)\n  And openapi/openapi.yaml documents InsufficientStockError (and UnauthorizedError) on reserve additively\n  And contracts/**/*.ocl and passing tests/contracts/** cover insufficient-stock / race-loser naming and non-negative stock\n  And formal/**/*.tla (+ .cfg) is TLC-checkable for last-unit exclusivity and non-negative available stock\n  And payments, multi-warehouse, full IAM, UI, notifications, backorders, durable shared DB productization, Alloy, TTL extend, and list-by-SKU aggregates are not required",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "ChangeBrief scope is explicit; open_questions are non-blocking deferrals to implement / formal cfg; foundation OpenAPI+OCL then concurrent property+formal maps cleanly to in_scope and success_criteria. Formal apply remains a later Phase 3 human gate, not this WorkPlan."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Elevate additive OpenAPI and UML OCL so reserve documents InsufficientStockError as the shared named channel for sequential insufficient stock and concurrent race losers, and non-negative available stock is a checkable contract property on sequential/contract-testable paths, without removing or renaming prior success/error surfaces.",
+      "acceptance_criterion": "Scenario: OpenAPI and OCL elevate InsufficientStockError and non-negative stock vocabulary\n  Given the reservation OpenAPI and module OCL surfaces for soft-hold reserve\n  When insufficient-stock and race-loser failure channels and available-stock invariants are inspected\n  Then reserve documents named InsufficientStockError for sequential insufficient stock and concurrent race losers on the same named channel\n  And OpenAPI elevation is additive without removing or renaming prior success or error surfaces\n  And UML OCL makes InsufficientStockError naming and non-negative available stock checkable for sequential and contract-testable paths\n  And UnauthorizedError remains the named channel for unauthorized callers",
+      "covers": [
+        "R3",
+        "R5",
+        "R6",
+        "SC3",
+        "SC5"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl"
+      ],
+      "feature_path": "requirements/reservation-concurrent-safety.feature",
+      "scenario_name": "OpenAPI and OCL elevate InsufficientStockError and non-negative stock vocabulary",
+      "depends_on": [],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Additive OpenAPI + OCL vocabulary elevation for InsufficientStockError and non-negative stock is unambiguous from the Brief; density deferred to judge."
+      }
+    },
+    {
+      "id": "W2",
+      "intent": "Deliver concurrent last-unit safety so available stock never goes negative and at most one soft-hold is created when one unit remains, race losers fail with InsufficientStockError, opaque-principal AuthZ stays in force, and a bounded TLA+/TLC model under formal/ makes the interleaving property checkable\u2014extending remaining OCL/tests/impl only as needed after W1.",
+      "acceptance_criterion": "Scenario: Concurrent last-unit reserves yield at most one hold and never-negative stock\n  Given a reservation service with a SKU whose available stock is one\n  And concurrent authorized opaque principals racing to reserve that last unit\n  When those principals request soft-hold reservations against that SKU concurrently\n  Then available stock never goes negative for any checkable interleaving\n  And at most one soft-hold is created\n  And race losers fail with named InsufficientStockError and create no extra hold\n  And unauthorized concurrent reserve attempts fail with UnauthorizedError without mutating stock or holds\n  And a bounded TLA+/TLC model under formal/ is checkable for last-unit exclusivity and non-negative available stock",
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R7",
+        "SC1",
+        "SC2",
+        "SC3",
+        "SC4",
+        "SC5"
+      ],
+      "touches": [
+        "formal/",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts",
+        "src/reservation.ts"
+      ],
+      "feature_path": "requirements/reservation-concurrent-safety.feature",
+      "scenario_name": "Concurrent last-unit reserves yield at most one hold and never-negative stock",
+      "depends_on": [
+        "W1"
+      ],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Concurrent property and formal SoT path are settled in Brief/Context; sync mechanism and TLC bounds deferred to implement / apply-formal. Formal apply gate is Phase 3, not this item start."
+      }
+    }
+  ]
+}

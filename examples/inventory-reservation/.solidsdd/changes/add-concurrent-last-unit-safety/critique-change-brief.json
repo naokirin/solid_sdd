@@ -1,0 +1,44 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for add-concurrent-last-unit-safety is checkable at brief density: non-empty {id,text} in_scope (R1–R7) and out_of_scope (X1–X12) with no in/out contradictions; success_criteria SC1–SC5 are observable (non-negative stock under concurrent reserves; last-unit ≤1 hold; race-loser InsufficientStockError; UnauthorizedError + no mutation; additive OpenAPI + OCL/Vitest + TLC-checkable formal/). open_questions are explicitly non-blocking deferrals; confidence high and human_gate.required false match settled Change Context. Aligns with Context §1–§5, nfr.json NFR1/NFR2/NFR4–NFR6, and knowledge consult (POL-OPAQUE-PRINCIPAL-AUTHZ cited; no invented concurrency knowledge ids). solidsdd-lint passed with only minor lexicon hits on the substring 'sufficient' inside InsufficientStockError.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside the named error InsufficientStockError — not a real unverifiable slogan; no Brief rewrite required for checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; R5 still pins additive OpenAPI elevation of the race-loser / insufficient-stock channel."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; R6 still requires OCL + derived Vitest for that named error and stock properties."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; SC3 remains observable (named error + no extra hold)."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; SC5 still lists concrete OpenAPI / OCL / formal paths to inspect."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#open_questions|assumptions",
+      "detail": "Exact in-process synchronization mechanism and TLA+ bound parameters remain deferred. Acceptable for Brief; ApplicationPlan / apply-formal must pin them so NFR1 / R7 stay machine-checkable."
+    }
+  ]
+}

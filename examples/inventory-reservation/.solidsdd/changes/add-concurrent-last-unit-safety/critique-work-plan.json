@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan for add-concurrent-last-unit-safety is checkable: two property-level Gherkin Scenarios (W1 foundation OpenAPI+OCL vocabulary; W2 concurrent last-unit + formal) with matching feature tags and covers for all Brief in_scope R1–R7 and success_criteria SC1–SC5, no out_of_scope X* covers, and no depends_on cycle. Greenfield mitigation is correct—W1 ready with empty depends_on and narrow touches (openapi + Reservation.ocl); W2 pending with depends_on [W1] and distinct touches (formal/ + OCL + tests + src), not identical shared paths on multiple ready items. solidsdd-lint passed with only minor lexicon hits on 'sufficient' inside InsufficientStockError and an expected overlapping touches note on Reservation.ocl.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; W1 Scenario still pins additive OpenAPI + OCL elevation of that named channel and non-negative stock vocabulary."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; W2 Scenario remains checkable (never-negative stock, ≤1 hold, named race-loser error, UnauthorizedError, TLC-checkable formal/)."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Overlapping touches on contracts/Reservation.ocl (lint). Acceptable for foundation→property extend: only W1 is ready; W2 depends_on W1 with otherwise narrowed touches (no openapi stamp on W2). solidsdd-run should serialize if both were ready; with current statuses this is intentional sequencing, not the identical-shared-touches smell."
+    }
+  ]
+}

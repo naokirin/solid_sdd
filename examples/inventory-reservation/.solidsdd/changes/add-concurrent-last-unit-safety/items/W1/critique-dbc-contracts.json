@@ -1,0 +1,68 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl elevates W1 DbC at standard density: module inv AvailableStockNonNegative plus reserve posts InsufficientStockError / NoHoldCreatedOnInsufficientStock / AvailableStockUnchangedOnInsufficientStock / AvailableStockNonNegativeAfterReserve make InsufficientStockError naming (sequential insufficient stock and contract-testable race-loser as the same named channel) and non-negative available stock checkable; SufficientAvailableStock remains a hard pre; UnauthorizedErrorOnReserve / no-hold / stock-unchanged posts stay in force. Full interleaving last-unit exclusivity correctly deferred to W2/formal. Matches ApplicationPlan dbc target and W1 acceptance (OCL portion). solidsdd-lint pass with minors only. No checkability hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items. Acceptable foundation→property with W2.depends_on=[W1]; not a DbC checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#AvailableStockNonNegative",
+      "detail": "Module invariant quantifies only SKUs present in self.holds(); operated-SKU coverage on sequential paths is reinforced by AvailableStockNonNegativeAfterReserve. Optional polish: quantify over a tracked-SKU set if the domain exposes one, so stock-only SKUs without holds are covered by the same inv."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#reserve",
+      "detail": "InsufficientStockError / race-loser same-channel semantics are named in comments and post labels with result.oclIsInvalid(); no formal OCL raises clause. Acceptable at standard density (error class is adapter/runtime SoT with OpenAPI); full concurrent exclusivity remains W2."
+    }
+  ]
+}

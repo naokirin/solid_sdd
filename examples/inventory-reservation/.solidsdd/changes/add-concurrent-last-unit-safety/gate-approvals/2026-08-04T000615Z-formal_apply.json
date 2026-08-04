@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "approved_at": "2026-08-04T00:06:15Z",
+  "approver": "naoki (user)",
+  "scope": "formal_apply",
+  "decision": "approve",
+  "note": "Approve solidsdd-apply-formal for concurrent last-unit TLA+/TLC under formal/.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-concurrent-last-unit-safety/items/W2/application-plan.json"
+  ]
+}

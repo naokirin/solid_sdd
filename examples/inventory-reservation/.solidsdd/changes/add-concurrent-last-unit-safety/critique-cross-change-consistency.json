@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "summary": "Cross-change consistency for add-concurrent-last-unit-safety holds: prior Features (reservation, lookup, availableStock) remain in force and are not silently rewritten; prior out_of_scope themes that must stay out (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable shared DB productization, TTL extend, list-by-SKU, Alloy) stay in this Brief's X1–X7 and X8–X12; formal concurrency (prior X8 deferral) is intentionally lifted into R7/W2 with explicit Context §1/§5 and Brief assumption; AuthZ continues POL-OPAQUE-PRINCIPAL-AUTHZ (R4/SC4, UnauthorizedError, no mutation) without inventing full IAM. solidsdd-lint passed with only minor lexicon/touches notes.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive for cross-change checkability; race-loser channel still pins the same named error as sequential insufficient stock."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; additive OpenAPI elevation remains checkable against prior reserve surfaces."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; OCL/Vitest coverage intent does not contradict prior Feature acceptance."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; SC3 remains observable (named error + no extra hold)."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' inside InsufficientStockError — false positive; SC5 still lists concrete OpenAPI / OCL / formal paths."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' in W1 acceptance — false positive from InsufficientStockError naming."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit on 'sufficient' in W2 acceptance — false positive from InsufficientStockError naming."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Overlapping touches on contracts/Reservation.ocl; solidsdd-run must serialize W1 then W2 (W2 already depends_on W1). Not a cross-change scope contradiction."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "requirements/reservation.feature vs change-brief.json#assumptions",
+      "detail": "Prior reserve/insufficient-stock Scenarios still say generic 'named domain error' while this change elevates InsufficientStockError for sequential and race-loser paths. Compatible refinement (OpenAPI/OCL already name InsufficientStockError); Brief X11 correctly keeps prior Features in force without rewriting them. Optional later polish only."
+    }
+  ]
+}

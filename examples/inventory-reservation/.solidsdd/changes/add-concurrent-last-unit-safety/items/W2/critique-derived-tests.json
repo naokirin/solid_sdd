@@ -1,0 +1,68 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "derive-tests no-op is adequate for W2: OCL apply was comments-only (no new pre/post/inv); sequential/AuthZ/non-negative SoT bridge already exercised in tests/contracts/reservation.test.ts from W1 (InsufficientStockError including race-loser stand-in, NoHoldCreated / AvailableStockUnchanged on insufficient stock, AvailableStockNonNegative / AvailableStockNonNegativeAfterReserve, UnauthorizedErrorOnReserve + no-mutation). True concurrent interleaving exclusivity correctly left to formal. Existing suite is not empty or “does not throw” only; W2 DbC portion remains machine-checkable. solidsdd-lint pass with minors only. No checkability hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts (derive-tests no-op)",
+      "detail": "No new Vitest cases were added for W2 because apply-dbc was comments-only and W1 already covers the thin sequential SoT bridge. Appropriate; regenerating or duplicating cases would not add checkability. Concurrent exclusivity remains formal-owned."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#InsufficientStockError (race-loser)",
+      "detail": "Race-loser coverage remains a sequential stand-in (winner holds last unit, loser observes availableStock@pre < quantity). Matches W2 ApplicationPlan / OCL SoT bridge; true interleaving exclusivity is formal — not a derived-tests checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "weak_test",
+      "location": "tests/contracts/reservation.test.ts#AvailableStockNonNegative",
+      "detail": "Non-negative assertions focus on the operated SKU after reserve success/failure; they do not separately quantify every SKU in holds() as the module inv writes. Operated-SKU checkability remains via AvailableStockNonNegativeAfterReserve cases for the W2 DbC portion."
+    }
+  ]
+}

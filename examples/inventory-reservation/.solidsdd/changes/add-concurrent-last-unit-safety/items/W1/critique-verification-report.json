@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "W1 VerificationReport is not a soft green: OpenAPI Redocly --extends=spec is pass (not skipped), and ocl_tests reports a non-empty Vitest suite (49 passed) with concrete W1 coverage—InsufficientStockError as the shared sequential/race-loser channel, inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve, and UnauthorizedErrorOnReserve preserved. Spot-check of openapi/openapi.yaml (race-loser InsufficientStockError wording), contracts/Reservation.ocl, and tests/contracts/reservation.test.ts (49 it() blocks matching the claimed count) supports the check details. Formal correctly omitted given ApplicationPlan defer-formal to W2. solidsdd-lint pass with minor ambiguity/overlap findings only. No checkability hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R3",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R5",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#in_scope/R6",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC3",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json#success_criteria/SC5",
+      "detail": "lint: ambiguous phrase 'sufficient' in scope text"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "lint: ambiguous phrase 'sufficient'"
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "lint: ambiguous phrase 'sufficient'"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items"
+    }
+  ]
+}

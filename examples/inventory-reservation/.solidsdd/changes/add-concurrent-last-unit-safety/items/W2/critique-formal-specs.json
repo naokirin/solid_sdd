@@ -1,0 +1,68 @@
+{
+  "version": "1",
+  "subject": "formal_specs",
+  "result": "pass",
+  "summary": "W2 formal apply is checkable: formal/ConcurrentReserve.tla + ConcurrentReserve.cfg define Spec with Inv (TypeOK, available >= 0, holds <= Stock, stock conservation) and FinalOK (terminal holds = min(Clients, Stock)). CFG binds Clients=2 Stock=1 (last-unit race) and checks both invariants under TLC with CHECK_DEADLOCK FALSE for intentional Terminating stutter. Matches ApplicationPlan formal target (concurrency_safety, adapter tla, ExclusiveMemory-shaped CONSTANTS/VARIABLES/Init/Next/Spec) and W2 acceptance for last-unit exclusivity and never-negative available stock. solidsdd-lint pass with minors only. No checkability hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "formal/ConcurrentReserve.cfg#CONSTANTS",
+      "detail": "Smoke bounds Clients=2 Stock=1 are the last-unit race sample; not a checkability hole. Optional polish: document or add a second TLC run with larger Clients/Stock if verify-formal wants extra coverage beyond the Scenario's stock=1 case."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "formal/ConcurrentReserve.tla#FailInsufficient",
+      "detail": "Race-loser outcome is modeled as no hold + unchanged stock (FailInsufficient); named InsufficientStockError and opaque-principal AuthZ stay API/OCL-owned per ApplicationPlan split. Formal does not need to encode error class strings for last-unit / never-negative checkability."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "formal/ConcurrentReserve.tla#Spec",
+      "detail": "Spec is safety-only ([][Next]_vars) with no WF/liveness. Acceptable: W2 acceptance asks exclusivity and never-negative stock, not progress properties; missing WF is polish per calibration."
+    }
+  ]
+}

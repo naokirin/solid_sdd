@@ -1,0 +1,91 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Under concurrent authorized reserves against the same SKU, available stock never goes negative; when only one unit remains, at most one concurrent reserve creates a soft-hold. Race losers fail with the same named InsufficientStockError as sequential insufficient stock.",
+      "rationale": "Soft-hold safety under interleaving is the demand; last-unit exclusivity and non-negative available stock must be machine-checkable, not only sequential.",
+      "threshold": "No interleaving yields negative available stock; with availableStock=1, at most one concurrent reserve succeeds with a hold; other concurrent authorized losers return InsufficientStockError with no extra hold created.",
+      "measurement": "OpenAPI + UML OCL + Vitest for sequential/checkable channels; bounded TLA+/TLC model under formal/ for the interleaving property.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts",
+        "formal/ConcurrentReserve.tla",
+        "formal/ConcurrentReserve.cfg",
+        ".solidsdd/changes/add-concurrent-last-unit-safety/integration-verification-report.json"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "in_scope",
+      "requirement": "Concurrent authorized reserves continue opaque-principal authorize/deny only (POL-OPAQUE-PRINCIPAL-AUTHZ). Unauthorized callers fail with named UnauthorizedError (or equivalent) and must not mutate stock or holds.",
+      "rationale": "Concurrency must not weaken AuthZ; full IAM remains out of scope.",
+      "threshold": "Unauthorized reserve always fails with UnauthorizedError and never mutates; authorized opaque principal may reserve subject to stock/concurrency rules.",
+      "measurement": "Contract tests + OpenAPI UnauthorizedError channel; OCL preconditions on reserve; cite POL-OPAQUE-PRINCIPAL-AUTHZ.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml",
+        "knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md"
+      ]
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A \u2014 no latency or throughput targets for this evaluation sample.",
+      "rationale": "Concurrency safety is a correctness property, not an SLI/SLO ask for this sample."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "Concurrent last-unit / non-negative stock safety is checkable via OpenAPI, UML OCL \u2192 Vitest, and a bounded TLA+/TLC model under formal/; do not rely on opaque internals alone.",
+      "rationale": "solid_sdd Phase 3 formal path elevates interleaving beyond sequential DbC; host TLC toolchain exists at solid_sdd tools/tla/.",
+      "threshold": "openapi/openapi.yaml documents InsufficientStockError (and UnauthorizedError) on reserve; contracts/**/*.ocl + tests/contracts/** cover insufficient-stock / race-loser naming; formal/**/*.tla (+ .cfg) model last-unit exclusivity and non-negative available stock with TLC-checkable bounds.",
+      "measurement": "Presence of OpenAPI + OCL + passing Vitest; TLC run via solid_sdd tools/tla/tlc.sh (or documented equivalent) against formal/ for the bounded model.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts",
+        "formal/ConcurrentReserve.tla",
+        "formal/ConcurrentReserve.cfg",
+        "verify-formal.sh",
+        ".solidsdd/changes/add-concurrent-last-unit-safety/integration-verification-report.json"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive, non-breaking: keep prior reserve/release/expire/lookup HTTP and OCL surfaces; reuse named InsufficientStockError for race losers (same as sequential insufficient stock); do not remove or rename existing success/error channels.",
+      "rationale": "Follow-on change; prior clients and Features must remain valid.",
+      "threshold": "openapi/openapi.yaml remains structurally valid; prior operations and named errors remain; concurrency safety strengthens invariants without breaking additive API shape.",
+      "measurement": "solidsdd-verify OpenAPI lint (or skip with tooling reason); review prior paths and InsufficientStockError reuse; prior Features stay in force.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        ".solidsdd/changes/add-concurrent-last-unit-safety/integration-verification-report.json"
+      ]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL under contracts/**/*.ocl remains DbC SoT with Vitest under tests/contracts/**; introduce formal/ with bounded TLA+ (+ .cfg) as the concurrency SoT checked by TLC\u2014not Alloy or other formal languages.",
+      "rationale": "Matches solid_sdd adapter policy, inherited contract/test layout, and user-settled TLA+/TLC-only formal path.",
+      "threshold": "contracts/**/*.ocl + derived Vitest cover sequential/checkable InsufficientStockError; formal/** holds a bounded TLA+/TLC model for interleaving; no Alloy/other formal SoT introduced.",
+      "measurement": "Inspect contracts/, tests/contracts/, and formal/; regenerate Vitest via solidsdd-derive-tests when OCL changes; TLC against formal/ cfg.",
+      "verified_by": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts",
+        "formal/ConcurrentReserve.tla",
+        "formal/ConcurrentReserve.cfg"
+      ]
+    }
+  ]
+}

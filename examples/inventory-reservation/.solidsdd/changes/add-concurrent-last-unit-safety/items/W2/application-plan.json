@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "summary": "W2: skip OpenAPI (W1 already elevated InsufficientStockError / UnauthorizedError and race-loser channel); thin additive OCL only to keep sequential/AuthZ/non-negative SoT aligned for derive-tests/impl (no interleaving OCL); apply bounded TLA+/TLC under formal/ for concurrent last-unit exclusivity and never-negative available stock (adapter tla; Phase 3 human_gate required before apply-formal).",
+  "confidence": "high",
+  "human_gate": {
+    "required": true,
+    "reason": "Phase 3 early rollout: formal apply (concurrency_safety TLA+/TLC under formal/) requires human approval before solidsdd-apply-formal; do not thin this gate."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations",
+      "density": "standard",
+      "rationale": "http_boundary + additive_change: W1 already elevates reserve InsufficientStockError as the shared named channel for sequential insufficient stock and concurrent race losers, UnauthorizedError on unauthorized reserve, and additive non-breaking documentation (R5 / SC5 OpenAPI portion). W2 WorkPlan touches formal/, contracts/Reservation.ocl, tests/contracts/reservation.test.ts, and src/reservation.ts—not openapi. Skip re-applying OpenAPI unless a gap appears; no breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "skip",
+      "covers": ["W2"],
+      "signals": ["http_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "API surface already applied in W1; skip avoids duplicate OpenAPI edits."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#reserve",
+      "density": "thin",
+      "rationale": "domain_contract + authz_boundary + additive_change: W1 already applied AvailableStockNonNegative, InsufficientStockError / NoHoldCreated / AvailableStockUnchanged posts (including race-loser naming on sequential/contract-testable paths), AvailableStockNonNegativeAfterReserve, and UnauthorizedErrorOnReserve no-mutation posts. True interleaving last-unit exclusivity cannot be expressed in OCL and belongs to formal (concurrency_safety). Prefer thin additive only if apply-dbc/derive-tests need a small SoT bridge for W2 Vitest/impl (AuthZ + named InsufficientStockError + non-negative on sequential stand-ins); do not invent concurrency OCL. density thin per judge preference when remaining concurrent property is formal-owned.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change", "concurrency_safety"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Thin additive DbC only; W1 vocabulary elevation done; no money_boundary, breaking_change, or low_confidence."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "strict",
+      "rationale": "concurrency_safety + stable_core: W2 acceptance (R1–R4, R7, SC1–SC5) requires concurrent authorized same-SKU reserves to keep available stock non-negative, create ≤1 soft-hold when availableStock=1, surface race losers as InsufficientStockError, and keep opaque-principal AuthZ. Phase 3 formal apply conditions all hold: (1) concurrency_safety in demand/NFR1; (2) documented TLA+/TLC adapter and checker at solid_sdd tools/tla/ (tlc.sh, tla2tools.jar; Java via mise); (3) single shared-resource protocol (process-local SKU stock + soft-holds under sample bounds); (4) human_gate.required true. Change Context §5 selects bounded TLA+/TLC under formal/ only (no Alloy). Shape reference: examples/memory-formal ExclusiveMemory (CONSTANTS/VARIABLES/Init/Next/Spec + Inv/.cfg)—adapt to reserve last-unit / never-negative stock; do not copy ExclusiveMemory wholesale. Bound parameters deferred to solidsdd-apply-formal / .cfg (must remain TLC-checkable).",
+      "adapter_hint": "tla",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["concurrency_safety", "stable_core"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": true,
+        "reason": "formal apply under Phase 3 early rollout policy; pause before solidsdd-apply-formal until gate-approval.json (scope application_plan or formal_apply)."
+      }
+    }
+  ]
+}

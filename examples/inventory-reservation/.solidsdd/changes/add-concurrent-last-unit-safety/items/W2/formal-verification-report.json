@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "TLC ConcurrentReserve (formal/ConcurrentReserve.tla + .cfg)",
+      "kind": "formal",
+      "result": "pass",
+      "detail": "./verify-formal.sh → tools/tla/tlc.sh formal/ConcurrentReserve.tla -config formal/ConcurrentReserve.cfg. TLC2 2026.07.31; CONSTANTS Clients=2 Stock=1; INVARIANT Inv + FinalOK; CHECK_DEADLOCK FALSE. Outcome: Model checking completed. No error has been found. 11 states generated, 9 distinct states, depth 5. Covers last-unit exclusivity (holds ≤ Stock), never-negative available, stock conservation (holds + available = Stock), and FinalOK when Done.",
+      "covers": ["W2", "R1", "R2", "R3", "R4", "SC1", "SC2", "SC3", "SC4"]
+    }
+  ]
+}

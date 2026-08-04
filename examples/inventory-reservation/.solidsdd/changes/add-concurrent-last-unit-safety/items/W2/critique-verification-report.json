@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "W2 solidsdd-verify report is not soft: OpenAPI Redocly pass and 49 OCL-derived Vitest passes are real and reconfirmed; overall result pass is backed by a non-empty contract suite. Formal ConcurrentReserve is correctly result skipped with explicit ownership by solidsdd-verify-formal (no false formal pass without TLC); TLC coverage lives in formal-verification-report.json. solidsdd-lint pass with Brief/WorkPlan ambiguity minors only. No checkability hole for this subject.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W2/verification-report.json#checks/formal",
+      "detail": "Formal ConcurrentReserve is skipped here with documented handoff to solidsdd-verify-formal; TLC is not claimed passed in this report. Appropriate separation from API/DbC verify; concurrent exclusivity for this slice is evidenced in formal-verification-report.json, not a soft-verify hole."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W2/verification-report.json#checks/formal.covers",
+      "detail": "Skipped formal check still lists covers for R1/R2/SC1/SC2. Those ids are ownership markers for formal, not evidence from this verify pass; acceptable given explicit skip detail and separate formal-verification-report, but covers on skipped checks can be read as stronger than intended."
+    }
+  ]
+}

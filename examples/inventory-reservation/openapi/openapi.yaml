@@ -16,6 +16,9 @@ info:
     visible soft-hold's details without mutating stock or holds; missing or
     not-visible lookup fails as named PreconditionError and unauthorized
     lookup as named UnauthorizedError, both with stock and holds unchanged.
+    Concurrent last-unit safety elevates that concurrent race losers on reserve
+    use the same named InsufficientStockError channel as sequential
+    insufficient stock (additive; prior success and error surfaces remain).
 servers:
   - url: http://localhost:3000
 paths:
@@ -27,11 +30,14 @@ paths:
         Creates a soft-hold when the caller is authorized and available stock
         is at least the requested quantity. Reduces available stock by that
         quantity for the hold TTL. When available stock is below the requested
-        quantity, the operation fails with named domain error
-        InsufficientStockError: no soft-hold is created and available stock
-        is unchanged. When the caller is unauthorized, the operation fails
-        with named domain error UnauthorizedError: no soft-hold is created
-        and available stock and existing holds are unchanged.
+        quantity (sequential insufficient stock), or when an authorized
+        concurrent reserve loses a same-SKU race (including last-unit races),
+        the operation fails with the same named domain error
+        InsufficientStockError: no soft-hold is created for the loser and
+        available stock is unchanged by that failed attempt. When the caller
+        is unauthorized, the operation fails with named domain error
+        UnauthorizedError: no soft-hold is created and available stock and
+        existing holds are unchanged.
       parameters:
         - $ref: '#/components/parameters/OpaquePrincipal'
       requestBody:
@@ -50,21 +56,25 @@ paths:
         '400':
           description: >-
             Named domain failure InsufficientStockError when available stock
-            is below the requested quantity: no hold is created and available
-            stock is unchanged. Also used for invalid request /
-            PreconditionError (same no-mutation semantics).
+            is below the requested quantity or when an authorized concurrent
+            reserve loses a same-SKU race (shared channel with sequential
+            insufficient stock): no hold is created for the failing attempt
+            and available stock is unchanged by that attempt. Also used for
+            invalid request / PreconditionError (same no-mutation semantics).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
                 InsufficientStockError:
-                  summary: Insufficient available stock
+                  summary: Insufficient available stock (sequential or race loser)
                   description: >-
-                    First-class W2 failure channel. Clients and tests MUST
-                    observe errorType InsufficientStockError, and MUST treat
-                    the failure as creating no soft-hold with available stock
-                    left unchanged.
+                    First-class shared failure channel for sequential
+                    insufficient stock and concurrent race losers. Clients
+                    and tests MUST observe errorType InsufficientStockError
+                    for both cases, and MUST treat the failure as creating no
+                    soft-hold for that attempt with available stock left
+                    unchanged by the failed attempt.
                   value:
                     error: Insufficient available stock for requested quantity
                     errorType: InsufficientStockError
@@ -391,8 +401,11 @@ components:
           type: string
           description: >-
             Named domain error type distinguishable by clients and tests.
-            InsufficientStockError: available stock below requested quantity;
-            response implies no soft-hold created and available stock unchanged.
+            InsufficientStockError: available stock below requested quantity,
+            or authorized concurrent same-SKU race loser (same named channel
+            as sequential insufficient stock); response implies no soft-hold
+            created for the failing attempt and available stock unchanged by
+            that attempt.
             UnauthorizedError: caller not authorized for reserve, release, or
             lookup; no hold created by the failed attempt (reserve/release);
             available stock and existing holds unchanged.
@@ -407,8 +420,9 @@ components:
     InsufficientStockError:
       description: >-
         Named domain failure InsufficientStockError when available stock is
-        below the requested quantity. No soft-hold is created; available stock
-        is unchanged.
+        below the requested quantity, or when an authorized concurrent reserve
+        loses a same-SKU race (shared channel). No soft-hold is created for
+        the failing attempt; available stock is unchanged by that attempt.
       content:
         application/json:
           schema:

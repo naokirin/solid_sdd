@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan is adequate at standard density after lint blockers were cleared: apply OpenAPI + OCL for InsufficientStockError race-loser channel and non-negative available-stock vocabulary; defer formal with concurrency_safety + defer-formal rationale to W2 (not silent skip); human_gate false for additive non-breaking work. Project lint pass with minors only (ambiguity lexicon on 'sufficient' in InsufficientStockError wording; overlapping W1/W2 touches on Reservation.ocl with depends_on). No checkability hole for this foundation slice.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items. Acceptable foundation→property with W2.depends_on=[W1]; not an ApplicationPlan checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/formal",
+      "detail": "Formal is deferred (thin + defer-formal) with explicit concurrency_safety rationale pointing at W2 — correct for this foundation slice; not silent skip. Full interleaving exclusivity remains W2 apply-formal."
+    }
+  ]
+}

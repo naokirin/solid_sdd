@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "Demand (concurrent last-unit safety; non-negative available stock; race-loser InsufficientStockError; OpenAPI + OCL + bounded TLA+/TLC under formal/; POL-OPAQUE-PRINCIPAL-AUTHZ; additive non-breaking; out-of-scope themes) and change_id were settled in the user instruction; inherited TypeScript/Node + OpenAPI + OCL + Vitest stack with no conflict; security NFR only continues opaque-principal AuthZ. Formal apply remains a later Phase 3 human gate, not Change Context framing. §7 items are non-blocking deferrals."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

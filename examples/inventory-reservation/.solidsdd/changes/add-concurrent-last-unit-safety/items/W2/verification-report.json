@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 41ms; Woohoo! Your API description is valid. W2 OpenAPI acceptance portions (applied in W1, re-checked): POST /reservations documents named InsufficientStockError as shared channel for sequential insufficient stock and concurrent race losers; UnauthorizedError for unauthorized reserve; ErrorResponse enum retains both errorTypes additively.",
+      "covers": ["W2", "R3", "R4", "SC3", "SC5"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 49 passed (0 failed). W2 checkable via OCL/tests/impl (sequential/contract stand-ins): InsufficientStockError race-loser contract path (last unit held → further reserve yields named InsufficientStockError, no extra hold); inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve (stock stays >= 0 on success, deplete-to-zero, InsufficientStockError, and race-loser path); UnauthorizedErrorOnReserve named UnauthorizedError with no mutation. True interleaving last-unit exclusivity is not asserted here (formal-owned).",
+      "covers": ["W2", "R1", "R3", "R4", "R7", "SC1", "SC3", "SC4"]
+    },
+    {
+      "name": "formal ConcurrentReserve.tla/.cfg (informational)",
+      "kind": "formal",
+      "result": "skipped",
+      "detail": "formal/ConcurrentReserve.tla and formal/ConcurrentReserve.cfg present for last-unit exclusivity and never-negative available stock. TLC execution is solidsdd-verify-formal's job; not run in this solidsdd-verify pass.",
+      "covers": ["W2", "R1", "R2", "SC1", "SC2"]
+    }
+  ]
+}

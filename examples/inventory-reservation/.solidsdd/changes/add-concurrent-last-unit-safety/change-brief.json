@@ -1,0 +1,139 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "summary": "Elevate concurrent authorized same-SKU soft-hold safety so available stock never goes negative and the last unit yields at most one hold, with race losers returning the same named InsufficientStockError as sequential insufficient stock; keep opaque-principal AuthZ (POL-OPAQUE-PRINCIPAL-AUTHZ); make the property checkable via additive OpenAPI and UML OCL plus a bounded TLA+/TLC model under formal/, without payments, multi-warehouse, full IAM, Alloy, durable shared DB productization beyond sample bounds, or rewriting prior lookup/TTL features.",
+  "goal": "Under concurrent authorized reserves against the same SKU, available stock never goes negative and when only one unit remains at most one reserve creates a soft-hold; race losers fail with InsufficientStockError; OpenAPI, OCL→Vitest, and bounded TLA+/TLC under formal/ make these properties machine-checkable without breaking prior surfaces.",
+  "background": "Follow-on to done changes add-lookup-available-stock, add-reservation-lookup, and initial-reservation. Sequential insufficient-stock, release, TTL expire, and authorized lookup with availableStock are already checkable; prior briefs deferred formal concurrency (e.g. X8). This change lifts interleaving last-unit / non-negative stock safety into OpenAPI + OCL and Phase 3 bounded TLA+/TLC. Demand, inherited TypeScript/Node + OpenAPI + OCL + Vitest stack, POL-OPAQUE-PRINCIPAL-AUTHZ, and out-of-scope themes were settled in Change Context.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "WHEN concurrent authorized opaque principals reserve against the same SKU THEN THE reservation service SHALL keep available stock non-negative for every interleaving"
+    },
+    {
+      "id": "R2",
+      "text": "WHEN only one unit of available stock remains and concurrent authorized reserves race for that SKU THEN THE reservation service SHALL create at most one soft-hold"
+    },
+    {
+      "id": "R3",
+      "text": "IF an authorized concurrent reserve loses the last-unit (or otherwise insufficient) race THEN THE reservation service SHALL fail with named InsufficientStockError, create no extra hold, and leave losers without a successful reservation"
+    },
+    {
+      "id": "R4",
+      "text": "WHILE concurrent reserve paths run THE reservation service SHALL keep opaque-principal AuthZ (POL-OPAQUE-PRINCIPAL-AUTHZ): unauthorized callers fail with UnauthorizedError and never mutate stock or holds"
+    },
+    {
+      "id": "R5",
+      "text": "Additive OpenAPI elevation of reserve insufficient-stock / race-loser channels reusing InsufficientStockError without removing or renaming prior success/error surfaces"
+    },
+    {
+      "id": "R6",
+      "text": "Module-level UML OCL with derived Vitest that make InsufficientStockError (including race-loser naming) and non-negative / last-unit checkable properties for sequential and contract-testable paths"
+    },
+    {
+      "id": "R7",
+      "text": "Bounded TLA+/TLC model under formal/ (with .cfg) for concurrent last-unit exclusivity and non-negative available stock, checkable via solid_sdd tools/tla/"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Payments, checkout, or money/ledger boundaries"
+    },
+    {
+      "id": "X2",
+      "text": "Multi-warehouse routing or cross-location inventory allocation"
+    },
+    {
+      "id": "X3",
+      "text": "Full IAM product (SSO, OAuth UI, role admin) beyond opaque-principal authorize/deny (POL-OPAQUE-PRINCIPAL-AUTHZ)"
+    },
+    {
+      "id": "X4",
+      "text": "UI / frontend clients"
+    },
+    {
+      "id": "X5",
+      "text": "Notifications (email, push, webhooks) about holds or expiry"
+    },
+    {
+      "id": "X6",
+      "text": "Backorders, waitlists, or deferred fulfillment beyond hard-fail when stock is below request"
+    },
+    {
+      "id": "X7",
+      "text": "Productizing durable shared persistence across process restarts beyond sample in-process stock and holds"
+    },
+    {
+      "id": "X8",
+      "text": "Alloy or other formal languages besides bounded TLA+/TLC under formal/"
+    },
+    {
+      "id": "X9",
+      "text": "TTL extend or renewal of an existing soft-hold"
+    },
+    {
+      "id": "X10",
+      "text": "List-by-SKU, aggregates, or other multi-hold query surfaces beyond existing get-by-id lookup"
+    },
+    {
+      "id": "X11",
+      "text": "Rewriting prior lookup, release, or TTL expire Features beyond keeping them in force while adding concurrent reserve safety"
+    },
+    {
+      "id": "X12",
+      "text": "Latency or throughput SLIs/SLOs for concurrent reserves (correctness sample only)"
+    }
+  ],
+  "assumptions": [
+    "Prior Features at requirements/reservation.feature and requirements/reservation-lookup.feature remain in force; this change does not rewrite lookup/release/expire Scenarios except to keep them valid alongside concurrent reserve safety",
+    "Race losers reuse the same named InsufficientStockError as sequential insufficient stock — not a new concurrent-only error type",
+    "AuthZ continues POL-OPAQUE-PRINCIPAL-AUTHZ (opaque-principal allow/deny only; unauthorized → UnauthorizedError, no mutation); do not invent full IAM",
+    "Stock and holds remain process-local / in-memory within sample bounds; durable shared DB productization stays out",
+    "Prior Brief out_of_scope X8 (formal concurrency deferred) is intentionally lifted here into R7; other prior X* themes remain non-goals",
+    "Exact in-process synchronization mechanism (mutex, CAS, queue, etc.) is deferred to implement / ApplicationPlan as long as OpenAPI/OCL/TLA+ properties hold",
+    "TLA+ bound parameters (process counts, stock sizes) are deferred to solidsdd-apply-formal / formal cfg and must remain TLC-checkable",
+    "Do not invent knowledge ids for concurrency invariants yet; keep them in Brief / Gherkin / contracts until a later harvest gate"
+  ],
+  "constraints": [
+    "Language/runtime: TypeScript / Node HTTP API (inherited)",
+    "OpenAPI SoT path: openapi/openapi.yaml (additive elevation; reuse InsufficientStockError; do not break prior reserve/release/expire/lookup surfaces)",
+    "UML OCL under contracts/**/*.ocl; derived Vitest under tests/contracts/**",
+    "Formal SoT: bounded TLA+ (+ .cfg) under formal/ only; TLC via solid_sdd tools/tla/; no Alloy/other formal SoT",
+    "Cite POL-OPAQUE-PRINCIPAL-AUTHZ for AuthZ on concurrent reserve paths; unauthorized must never mutate",
+    "Additive non-breaking compatibility (NFR5): prior ops and named errors remain",
+    "Contract kind and density choices are deferred to solidsdd-judge; this brief only requires checkable OpenAPI, OCL, and formal surfaces for the concurrency property",
+    "Human gate for formal apply is expected later (Phase 3 orchestrator), not at this Brief",
+    "ChangeBrief only at this step: no Feature files, WorkPlan, OpenAPI, OCL, formal, tests, or implementation edits as part of brief emission"
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "Under concurrent authorized same-SKU reserves, available stock never goes negative for any checkable interleaving"
+    },
+    {
+      "id": "SC2",
+      "text": "WHEN availableStock is 1 and concurrent authorized reserves race THEN at most one soft-hold is created"
+    },
+    {
+      "id": "SC3",
+      "text": "Concurrent race losers fail with named InsufficientStockError and create no extra hold"
+    },
+    {
+      "id": "SC4",
+      "text": "Unauthorized reserve still fails with UnauthorizedError and never mutates stock or holds (POL-OPAQUE-PRINCIPAL-AUTHZ)"
+    },
+    {
+      "id": "SC5",
+      "text": "openapi/openapi.yaml documents InsufficientStockError (and UnauthorizedError) on reserve additively; contracts/**/*.ocl and passing tests/contracts/** cover insufficient-stock / race-loser naming; formal/**/*.tla (+ .cfg) is TLC-checkable for last-unit exclusivity and non-negative available stock"
+    }
+  ],
+  "open_questions": [
+    "Exact in-process synchronization mechanism (mutex, compare-and-swap, single-threaded queue, etc.): deferred to implement / ApplicationPlan — non-blocking for Brief scope",
+    "Bound parameters for the TLA+ model (process counts, stock sizes): deferred to solidsdd-apply-formal / formal cfg — non-blocking; must remain TLC-checkable"
+  ],
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Demand (concurrent last-unit safety; non-negative available stock; race-loser InsufficientStockError; OpenAPI + OCL + bounded TLA+/TLC; POL-OPAQUE-PRINCIPAL-AUTHZ; additive non-breaking; concrete out-of-scope) was settled in Change Context and the user instruction; Change Context gate required false; open_questions are non-blocking deferrals. Formal apply remains a later Phase 3 human gate, not this Brief."
+  }
+}

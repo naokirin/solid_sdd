@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec (integration)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 14ms; Woohoo! Your API description is valid. Additive POST /reservations documents named InsufficientStockError (shared channel for sequential insufficient stock and concurrent race losers) and UnauthorizedError; prior reserve/release/expire/lookup surfaces retained. Covers acceptance_of_whole / SC5 OpenAPI portion and W1–W2 API surface.",
+      "covers": ["W1", "W2", "R3", "R5", "SC3", "SC5"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest, integration)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test → tests/contracts/reservation.test.ts: 49 passed (49). Suite covers InsufficientStockError race-loser / insufficient-stock naming with no extra hold; inv AvailableStockNonNegative and related postconditions (stock stays >= 0 on success, deplete-to-zero, InsufficientStockError, race-loser path); UnauthorizedErrorOnReserve with no mutation (POL-OPAQUE-PRINCIPAL-AUTHZ). Prior reserve/release/expire/lookup coverage remains. True interleaving last-unit exclusivity is formal-owned (see formal check).",
+      "covers": ["W1", "W2", "R1", "R3", "R4", "R6", "SC1", "SC3", "SC4", "SC5"]
+    },
+    {
+      "name": "formal ConcurrentReserve.tla/.cfg via ./verify-formal.sh (integration)",
+      "kind": "formal",
+      "result": "pass",
+      "detail": "./verify-formal.sh → tools/tla/tlc.sh formal/ConcurrentReserve.tla -config formal/ConcurrentReserve.cfg. TLC2 Model checking completed. No error has been found. 11 states generated, 9 distinct states found, depth 5. Bounded model checkable for last-unit exclusivity and non-negative available stock (SC1, SC2, R1, R2, R7).",
+      "covers": ["W2", "R1", "R2", "R7", "SC1", "SC2", "SC5"]
+    },
+    {
+      "name": "acceptance_of_whole / SC1–SC5 artifact presence",
+      "kind": "other",
+      "result": "pass",
+      "detail": "requirements/reservation-concurrent-safety.feature present with both WorkPlan scenarios; openapi/openapi.yaml, contracts/Reservation.ocl, tests/contracts/reservation.test.ts, formal/ConcurrentReserve.tla (+ .cfg), and verify-formal.sh exist. WorkPlan items W1–W2 status=done. acceptance_of_whole checkable end-to-end via OpenAPI lint + OCL vitest + TLC. Out-of-scope themes (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable shared DB productization, Alloy, TTL extend, list-by-SKU aggregates) are not required by this verify.",
+      "covers": ["W1", "W2", "SC1", "SC2", "SC3", "SC4", "SC5", "R1", "R2", "R3", "R4", "R5", "R6", "R7"]
+    }
+  ]
+}

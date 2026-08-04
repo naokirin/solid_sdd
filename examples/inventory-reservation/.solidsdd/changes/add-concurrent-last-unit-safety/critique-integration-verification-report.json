@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "Integration verification-report.json is not soft: OpenAPI Redocly pass, 49 OCL-derived Vitest passes, and TLC ConcurrentReserve (11/9 states) all pass with concrete detail. acceptance_of_whole / SC1–SC5 are backed end-to-end (API lint + contract suite + formal Inv/FinalOK); out-of-scope themes correctly excluded. solidsdd-lint pass with Brief/WorkPlan ambiguity lexicon minors only (InsufficientStockError false positives). No checkability hole for this subject.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "integration-verification-report.json#checks/ocl_tests.covers",
+      "detail": "ocl_tests lists covers including SC1/R1 while detail correctly states true interleaving exclusivity is formal-owned (sequential race-loser stand-in in Vitest). Adequacy remains: formal check passes TLC with Inv (available >= 0, holds bound, conservation) and FinalOK. covers on the contract suite can be read as slightly stronger than the sequential evidence; not a soft-verify hole."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "integration-verification-report.json#checks/acceptance_of_whole",
+      "detail": "kind=other presence check for Feature/OpenAPI/OCL/tests/formal/verify-formal.sh and W1–W2 done is supplementary; machine evidence for acceptance_of_whole / SC1–SC5 comes from the openapi, ocl_tests, and formal checks. Acceptable as an integration inventory pass, not a substitute for those runs."
+    }
+  ]
+}

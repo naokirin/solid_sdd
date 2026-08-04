@@ -23,10 +23,31 @@
 --     reserve-time snapshot); retain ResultIsHoldDetails hold fields and
 --     AvailableStockUnchanged / HoldsUnchanged; UnauthorizedError /
 --     PreconditionError failure posts unchanged (no mutation).
+-- add-concurrent-last-unit-safety W1: InsufficientStockError is the shared
+--     named channel for sequential insufficient stock and concurrent race
+--     losers on contract-testable paths; AvailableStockNonNegative is a
+--     checkable module invariant (sequential posts reinforce the operated
+--     SKU). UnauthorizedErrorOnReserve posts unchanged.
+-- add-concurrent-last-unit-safety W2 (thin SoT bridge): no new pre/post/inv.
+--     W2 Vitest/impl sequential stand-ins reuse W1 reserve posts —
+--     PrincipalAuthorized / UnauthorizedErrorOnReserve (+ no-mutation),
+--     InsufficientStockError / NoHoldCreatedOnInsufficientStock /
+--     AvailableStockUnchangedOnInsufficientStock, AvailableStockNonNegative
+--     and AvailableStockNonNegativeAfterReserve. True concurrent last-unit
+--     exclusivity and interleaving never-negative stock are formal-owned
+--     (TLA+/TLC); do not encode interleaving in OCL.
 -- Named error vocabulary shared with OpenAPI.
 
 -- Default TTL when caller omits ttlSeconds (seconds).
 -- Sample convention: DEFAULT_TTL_SECONDS = 300
+
+-- Non-negative available stock for every tracked SKU (W1 foundation;
+-- W2 sequential/contract-testable SoT bridge — no additive inv).
+-- Concurrent interleaving exclusivity is formal-owned (W2 formal/).
+context Reservation
+inv AvailableStockNonNegative:
+  self.holds()->collect(h | h.sku)->asSet()->forAll(s |
+    self.availableStock(s) >= 0)
 
 context Reservation::reserve(principal: String, sku: String, quantity: Integer, ttlSeconds: Integer): Hold
 pre PrincipalAuthorized: principal.isAuthorized()
@@ -35,8 +56,12 @@ pre SufficientAvailableStock: self.availableStock(sku) >= quantity
 post HoldCreatedWithTtl: result.oclIsNew() and result.sku = sku and result.quantity = quantity
   and result.expiresAt = self.now() + ttlSeconds
 post AvailableStockReduced: self.availableStock(sku) = self.availableStock(sku)@pre - quantity
--- W2: SufficientAvailableStock violation → named domain error InsufficientStockError
---     (not a language builtin); no soft-hold; available stock unchanged.
+-- SufficientAvailableStock violation (sequential insufficient stock OR
+-- concurrent race loser observing availableStock@pre < quantity) → named
+-- domain error InsufficientStockError (same channel; not a language
+-- builtin / not a concurrent-only error type); no extra soft-hold for the
+-- failing attempt; available stock unchanged by that attempt.
+-- W2 reuses these posts as the sequential/Vitest SoT stand-in (no new OCL).
 post InsufficientStockError:
   (self.availableStock(sku)@pre < quantity) implies result.oclIsInvalid()
 post NoHoldCreatedOnInsufficientStock:
@@ -44,8 +69,14 @@ post NoHoldCreatedOnInsufficientStock:
 post AvailableStockUnchangedOnInsufficientStock:
   (self.availableStock(sku)@pre < quantity) implies
     self.availableStock(sku) = self.availableStock(sku)@pre
+-- Sequential/contract-testable reinforcement of AvailableStockNonNegative
+-- for the operated SKU (success and insufficient-stock / race-loser paths).
+-- W2 SoT bridge: same post; interleaving never-negative is formal-owned.
+post AvailableStockNonNegativeAfterReserve:
+  self.availableStock(sku) >= 0
 -- W3: PrincipalAuthorized violation → named domain error UnauthorizedError
 --     (not a language builtin); no soft-hold; stock and holds unchanged.
+-- W2 SoT bridge: AuthZ unchanged — opaque-principal UnauthorizedError posts.
 post UnauthorizedErrorOnReserve:
   (not principal.isAuthorized()) implies result.oclIsInvalid()
 post NoHoldCreatedOnUnauthorizedReserve:

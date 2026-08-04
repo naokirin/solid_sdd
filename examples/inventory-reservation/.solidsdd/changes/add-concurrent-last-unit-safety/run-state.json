@@ -1,0 +1,57 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "phase": "done",
+  "run_retry": {
+    "remaining": 3,
+    "max": 3
+  },
+  "host_toolchain": {
+    "ready": true,
+    "missing": [],
+    "source": ".solidsdd/host-toolchain.json"
+  },
+  "isolation_notes": [
+    "knowledge consult Task",
+    "intake Task",
+    "critique(change_context) pass Task",
+    "brief Task",
+    "critique(change_brief) pass Task",
+    "decompose Task (W1 foundation\u2192W2 depends_on)",
+    "critique(work_plan) pass Task",
+    "critique(cross_change_consistency) pass Task",
+    "wave1: W1 loop start",
+    "fixed run-state: W2 omit loop_phase; WorkPlan W1 stays ready (not running)",
+    "W1 loop done (judge/critique/apply-api/critique-api/apply-dbc/critique-dbc/derive/critique-derived/implement-noop/verify/critique-vr); promote W2 ready",
+    "W2 judge+critique(application_plan) pass; STOP before apply for formal human_gate",
+    "gate-approval application_plan+formal_apply approve 2026-08-04T00:06:15Z; resume W2 apply",
+    "W2 loop done after gate: apply-dbc/critique; apply-formal/critique; derive-noop/critique; implement-noop; verify+critique; verify-formal+critique",
+    "integration verify+critique pass Task",
+    "knowledge harvest Task (3 candidates); critique(knowledge_harvest) pass; STOP for knowledge_harvest gate",
+    "knowledge_harvest gate reject-all 2026-08-04T00:49:18Z; candidates rejected; no knowledge apply; status done",
+    "post-done: filled nfr.json verified_by for in_scope NFRs (lint scope_gap)"
+  ],
+  "wave_index": 2,
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_phase": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1"
+    },
+    "W2": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W2",
+      "loop_phase": "done"
+    }
+  }
+}

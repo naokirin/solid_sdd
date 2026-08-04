@@ -1,0 +1,62 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml POST /reservations (operationId reserve) elevates InsufficientStockError as the shared named channel for sequential insufficient stock and authorized concurrent same-SKU race losers, with additive wording on operation description, 400 response, InsufficientStockError example, ErrorResponse.errorType description, and components.responses.InsufficientStockError. UnauthorizedError remains on 403; prior 200 success and other named error surfaces are not removed or renamed. Matches W1 ApplicationPlan api target and W1 acceptance (OpenAPI portion) at standard density—not happy-path-only. solidsdd-lint pass with minors only (ambiguity lexicon on 'sufficient'; overlapping W1/W2 touches). No checkability hole for this foundation API apply.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text (InsufficientStockError wording) — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#in_scope/R6",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; Brief scope remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC3",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "change-brief.json#success_criteria/SC5",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' in scope text — false positive; success criteria remain checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W1/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W1 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "unverifiable_acceptance",
+      "location": "work-plan.json#items/W2/acceptance_criterion",
+      "detail": "Lint ambiguity lexicon hit: ambiguous phrase 'sufficient' — false positive; W2 Scenario remains checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items. Acceptable foundation→property with W2.depends_on=[W1]; not an API-contract checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/post/responses/400/examples/InsufficientStockError",
+      "detail": "Race-loser and sequential insufficient stock share one example payload (same errorType), which matches Brief intent to reuse InsufficientStockError rather than invent a concurrent-only type. Optional polish: a second example id that labels the race-loser case explicitly while keeping identical errorType."
+    }
+  ]
+}

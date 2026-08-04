@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 15ms; Woohoo! Your API description is valid. W1 checked: POST /reservations documents named InsufficientStockError as the shared channel for sequential insufficient stock and concurrent race losers (400 example InsufficientStockError); UnauthorizedError remains on 403; ErrorResponse.errorType enum retains InsufficientStockError and UnauthorizedError; prior success (200 ReserveResponse) and other error surfaces (PreconditionError example, lookup/release/expire) remain — additive elevation only.",
+      "covers": ["W1", "R3", "R5", "R6", "SC3", "SC5"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test / vitest run → tests/contracts/reservation.test.ts: 49 passed (0 failed). W1 OCL vocabulary checkable: inv AvailableStockNonNegative; post InsufficientStockError (sequential + race-loser contract path sharing same named channel); post AvailableStockNonNegativeAfterReserve (stock >= 0 on success, insufficient-stock, and last-unit race-loser paths); UnauthorizedErrorOnReserve preserved. Full concurrent interleaving exclusivity deferred to W2 / formal.",
+      "covers": ["W1", "R3", "R5", "R6", "SC3", "SC5"]
+    }
+  ]
+}

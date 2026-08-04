@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "approved_at": "2026-08-04T00:49:18Z",
+  "approver": "naoki (user)",
+  "scope": "knowledge_harvest",
+  "decision": "reject",
+  "note": "Reject all three harvest candidates (INV-AVAILABLE-STOCK-NEVER-NEGATIVE, POL-INSUFFICIENT-STOCK-SHARED-CHANNEL, PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING). Do not write knowledge/; proceed to change done.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-concurrent-last-unit-safety/knowledge-harvest.json",
+    ".solidsdd/changes/add-concurrent-last-unit-safety/knowledge-harvest-report.html"
+  ]
+}

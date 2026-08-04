@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "summary": "Change Context for add-concurrent-last-unit-safety is checkable at intake density: all eight required headings are present; nfr.json covers the six qualities with thresholds/measurement for every in_scope item and §4 projects it without contradiction; §5 inherits TypeScript/OpenAPI/OCL/Vitest as repo_existing/user and elevates bounded TLA+/TLC under formal/ with alternatives and rationale (user + repo_existing, not opaque agent_default); §2/§8 list prior changes, Features, and out_of_scope themes still in force while intentionally lifting prior formal-concurrency deferral; §7 deferrals are non-blocking; human_gate.required false matches user-settled concurrent last-unit / InsufficientStockError / formal path framing (security NFR continues opaque-principal AuthZ only; formal apply remains a later Phase 3 gate). Lint’s missing change-brief.json is expected pre-brief and out of scope for this subject. Remaining note is polish (explicit Feature path for availableStock).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-brief.json",
+      "detail": "solidsdd-lint reports major scope_gap: change-brief.json missing for active change. Expected at change_context phase (Brief is produced by solidsdd-brief next); not a framing/NFR checkability hole for this subject."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": ".solidsdd/changes/add-concurrent-last-unit-safety/change-context.md#2",
+      "detail": "§2 lists prior Features in force as requirements/reservation.feature and requirements/reservation-lookup.feature but omits requirements/reservation-lookup-available-stock.feature from done change add-lookup-available-stock. §8 links that prior change dir, so premise checkability remains; Brief should cite the availableStock Feature explicitly so concurrent reserve work does not silently contradict additive lookup behavior."
+    }
+  ]
+}

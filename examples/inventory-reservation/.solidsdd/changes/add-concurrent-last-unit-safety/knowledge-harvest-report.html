@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Knowledge Harvest 確認 — add-concurrent-last-unit-safety</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121a2b;
+    --panel-2: #182338;
+    --border: #2a3a55;
+    --text: #f4f7fb;
+    --muted: #a8b3c7;
+    --accent: #7eb6ff;
+    --ok: #7dcea0;
+    --warn: #f0c674;
+    --type-inv: #9b8cff;
+    --type-pol: #7eb6ff;
+    --type-pat: #7dcea0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #15243d 0%, var(--bg) 55%);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+  h1 { font-size: 1.55rem; margin: 0 0 0.35rem; font-weight: 650; }
+  h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+  h3 { font-size: 1.05rem; margin: 0 0 0.5rem; }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  .meta {
+    display: grid;
+    gap: 0.35rem 1.25rem;
+    grid-template-columns: auto 1fr;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin: 1rem 0 1.5rem;
+    font-size: 0.95rem;
+  }
+  .meta dt { color: var(--muted); }
+  .meta dd { margin: 0; }
+  .gate {
+    background: linear-gradient(180deg, #24314a, var(--panel));
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  .gate strong { color: var(--warn); }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem 1.2rem;
+    margin: 1rem 0;
+  }
+  .card header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .id {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--muted);
+  }
+  .badge.type-invariant { color: var(--type-inv); border-color: #4a3f8a; }
+  .badge.type-policy { color: var(--type-pol); border-color: #3a5a8a; }
+  .badge.type-pattern { color: var(--type-pat); border-color: #3a6a55; }
+  .badge.status { color: var(--warn); }
+  .section-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0.85rem 0 0.25rem;
+    text-transform: none;
+  }
+  .body-box, .rationale-box {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 0.9rem;
+  }
+  ul.refs {
+    margin: 0.35rem 0 0;
+    padding-left: 1.2rem;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .orig {
+    margin-top: 0.85rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .orig summary { cursor: pointer; color: var(--accent); }
+  .decisions {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+  .decisions code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+  footer {
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Knowledge Harvest 確認レポート</h1>
+  <p class="muted">durable knowledge 候補のレビュー用（SoT ではない）。承認後に <code>knowledge/</code> へ apply します。</p>
+
+  <dl class="meta">
+    <dt>change_id</dt>
+    <dd><code>add-concurrent-last-unit-safety</code></dd>
+    <dt>ソース</dt>
+    <dd><code>knowledge-harvest.json</code></dd>
+    <dt>候補数</dt>
+    <dd>3（すべて <code>proposed</code>）</dd>
+    <dt>既存 knowledge（重複提案なし）</dt>
+    <dd><code>POL-OPAQUE-PRINCIPAL-AUTHZ</code>（opaque principal AuthZ）</dd>
+  </dl>
+
+  <div class="gate">
+    <p><strong>Human gate: required = true</strong></p>
+    <p style="margin:0.4rem 0 0">在庫不変条件・InsufficientStockError 共有チャネル・bounded TLA+ パターンの 3 候補があります。<code>gate-approval.json</code>（scope: <code>knowledge_harvest</code>）の承認なしでは <code>knowledge/</code> に書き込みません。change もまだ <code>done</code> ではありません。</p>
+  </div>
+
+  <h2>1. 候補一覧</h2>
+
+  <article class="card" id="INV-AVAILABLE-STOCK-NEVER-NEGATIVE">
+    <header>
+      <span class="id">INV-AVAILABLE-STOCK-NEVER-NEGATIVE</span>
+      <span class="badge type-invariant">invariant</span>
+      <span class="badge status">proposed</span>
+      <span class="badge">scope: product.inventory_reservation</span>
+    </header>
+    <h3>利用可能在庫は負にならない／最終 1 個は soft-hold 高々 1 件</h3>
+    <p class="section-label">本文（日本語訳）</p>
+    <div class="body-box">
+      同一 SKU に対する認可済み soft-hold 予約（並行・逐次を問わず）では、利用可能在庫が負になってはならない。利用可能在庫が 1 のときは、その単位に対して soft-hold を作成できる予約は高々 1 件とする。この不変条件は単一 change の受入文言を超え、共有在庫に触れる将来の予約操作にも適用する。
+    </div>
+    <p class="section-label">採用理由（日本語訳）</p>
+    <div class="rationale-box">
+      以前 formal 並行性として先送りされていた在庫安全規範を、OpenAPI / OCL / TLA+ で検査可能な横断ルールとして定着させる。後続エージェントが予約パスを拡張する際、非負・最終単位の排他を黙って弱めてはならない。
+    </div>
+    <p class="section-label">出典</p>
+    <ul class="refs">
+      <li>add-concurrent-last-unit-safety/R1, R2, SC1, SC2</li>
+      <li>requirements/reservation-concurrent-safety.feature</li>
+      <li>formal/ConcurrentReserve.tla</li>
+    </ul>
+    <details class="orig">
+      <summary>原文（英語）</summary>
+      <p><strong>Title:</strong> Available stock never negative; last unit at most one soft-hold</p>
+      <p><strong>Body:</strong> Under concurrent or sequential authorized soft-hold reserves against the same SKU, available stock must never go negative. When only one unit of available stock remains, at most one reserve may create a soft-hold for that unit. This invariant outlives any single change's acceptance wording and applies to future reservation mutations that touch shared stock.</p>
+      <p><strong>Rationale:</strong> Cross-cutting stock-safety norm elevated from deferred formal-concurrency scope into checkable OpenAPI/OCL/TLA+. Later agents must not silently weaken non-negative or last-unit exclusivity when extending reserve paths.</p>
+    </details>
+  </article>
+
+  <article class="card" id="POL-INSUFFICIENT-STOCK-SHARED-CHANNEL">
+    <header>
+      <span class="id">POL-INSUFFICIENT-STOCK-SHARED-CHANNEL</span>
+      <span class="badge type-policy">policy</span>
+      <span class="badge status">proposed</span>
+      <span class="badge">scope: product.inventory_reservation</span>
+    </header>
+    <h3>InsufficientStockError は race-loser と共通のエラーチャネル</h3>
+    <p class="section-label">本文（日本語訳）</p>
+    <div class="body-box">
+      認可済み reserve が在庫不足で失敗する場合（最終 1 個をめぐる並行競合の敗者を含む）は、逐次の在庫不足と同じ named <code>InsufficientStockError</code> で失敗しなければならない。並行専用のエラー型を新設してはならない。敗者は追加の hold を作らず、予約成功にはならない。
+    </div>
+    <p class="section-label">採用理由（日本語訳）</p>
+    <div class="rationale-box">
+      クライアントと契約の安定したエラーチャネル契約。逐次・並行の不足結果を 1 つの named domain error に揃える。将来の Brief が並行専用エラーを増やして OpenAPI / OCL を分断するのを防ぐ。
+    </div>
+    <p class="section-label">出典</p>
+    <ul class="refs">
+      <li>add-concurrent-last-unit-safety/R3, R5, SC3</li>
+      <li>requirements/reservation-concurrent-safety.feature</li>
+    </ul>
+    <details class="orig">
+      <summary>原文（英語）</summary>
+      <p><strong>Title:</strong> InsufficientStockError is the shared race-loser channel</p>
+      <p><strong>Body:</strong> When an authorized reserve fails because stock is insufficient—including concurrent race losers for the last unit—the service MUST fail with the same named InsufficientStockError used for sequential insufficient stock. Do not invent a concurrent-only error type. Losers create no extra hold and leave without a successful reservation.</p>
+      <p><strong>Rationale:</strong> Stable error-channel contract for clients and contracts: sequential and concurrent insufficient outcomes share one named domain error. Prevents future briefs from introducing parallel race-loser types that fragment OpenAPI/OCL surfaces.</p>
+    </details>
+  </article>
+
+  <article class="card" id="PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING">
+    <header>
+      <span class="id">PAT-BOUNDED-TLA-SOFT-HOLD-INTERLEAVING</span>
+      <span class="badge type-pattern">pattern</span>
+      <span class="badge status">proposed</span>
+      <span class="badge">scope: product.inventory_reservation</span>
+    </header>
+    <h3>soft-hold 並行インターリーブには bounded TLA+/TLC</h3>
+    <p class="section-label">本文（日本語訳）</p>
+    <div class="body-box">
+      soft-hold 予約の性質がインターリーブに依存する場合（最終単位の排他、認可済みクライアント並行時の非負在庫）は、<code>formal/</code> 配下の bounded TLA+ モデルと <code>.cfg</code> を優先し、TLC（solid_sdd <code>tools/tla/</code>）で検査可能にする。境界は TLC 検査可能な範囲に保つ。明示的な後続決定がない限り、このプロダクトサンプルの SoT として Alloy 等に置き換えない。
+    </div>
+    <p class="section-label">採用理由（日本語訳）</p>
+    <div class="rationale-box">
+      ADR 相当の検証プラクティス。先行 Brief は formal 並行性を先送りしていたが、本 change で <code>formal/</code> + TLC を soft-hold 競合の耐久チェック経路として確立した。将来の並行性強化は言語選択を再論争せず、このパターンを再利用する。
+    </div>
+    <p class="section-label">出典</p>
+    <ul class="refs">
+      <li>add-concurrent-last-unit-safety/R7, SC5</li>
+      <li>formal/ConcurrentReserve.tla</li>
+      <li>formal/ConcurrentReserve.cfg</li>
+    </ul>
+    <details class="orig">
+      <summary>原文（英語）</summary>
+      <p><strong>Title:</strong> Bounded TLA+/TLC for soft-hold concurrency interleaving</p>
+      <p><strong>Body:</strong> When soft-hold reserve properties depend on interleaving (last-unit exclusivity, non-negative available stock under concurrent authorized clients), prefer a bounded TLA+ model plus .cfg under formal/, checkable via TLC (solid_sdd tools/tla/). Keep bounds TLC-checkable. Do not substitute Alloy or other formal languages as SoT for this product sample unless an explicit later decision supersedes this pattern.</p>
+      <p><strong>Rationale:</strong> ADR-worthy verification practice: prior briefs deferred formal concurrency; this change established formal/ + TLC as the durable check path for soft-hold races. Future concurrency elevations should reuse the pattern rather than re-litigating formal language choice.</p>
+    </details>
+  </article>
+
+  <h2>2. 意図的にスキップしたもの</h2>
+  <div class="card">
+    <ul>
+      <li><code>POL-OPAQUE-PRINCIPAL-AUTHZ</code> は既存。並行 reserve でも新 AuthZ 角度はなく重複提案しない。</li>
+      <li>プロセス内同期機構（mutex / CAS / queue）は ApplicationPlan / implement 詳細であり、durable knowledge ではない。</li>
+      <li>TLA+ の境界パラメータ（プロセス数・在庫サイズ）は cfg ローカルで、普遍ポリシーではない。</li>
+      <li>OpenAPI / OCL / Vitest / Feature 文言は adapter または requirement SoT。丸ごと harvest しない。</li>
+      <li>Brief の in_scope / out_of_scope や acceptance_of_whole は change ローカル。living PRD として昇格しない。</li>
+      <li>CLI の duplicate_title ヒント（先行 change の R1 同士）は本 harvest の knowledge ノードではない。</li>
+    </ul>
+  </div>
+
+  <h2>3. 判断の目安</h2>
+  <div class="decisions">
+    <ul>
+      <li><strong>全部承認</strong> — 3 候補を <code>knowledge/</code> に apply し、change を <code>done</code> にする</li>
+      <li><strong>一部承認</strong> — 例: 不変条件とポリシーのみ（pattern は deferred）→ <code>approve_partial</code></li>
+      <li><strong>全部スキップ / 却下</strong> — knowledge は書かず、change を <code>done</code> にする</li>
+    </ul>
+    <p class="muted" style="margin-bottom:0">チャットで方針を指示するか、<code>gate-approval.json</code>（scope: <code>knowledge_harvest</code>）を置いて再開してください。</p>
+  </div>
+
+  <footer>
+    生成元: <code>.solidsdd/changes/add-concurrent-last-unit-safety/knowledge-harvest.json</code><br/>
+    本 HTML はレビュー用ビューであり、knowledge SoT ではありません。
+  </footer>
+</main>
+</body>
+</html>

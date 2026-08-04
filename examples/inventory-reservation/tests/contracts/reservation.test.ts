@@ -29,6 +29,12 @@
  *     result.availableStock = ReservationService.availableStock(hold.sku)
  *     at lookup time (current stock, not a reserve-time snapshot);
  *     AvailableStockUnchanged / HoldsUnchanged / error channels retained.
+ * add-concurrent-last-unit-safety W1: InsufficientStockError is the shared
+ *     named channel for sequential insufficient stock and contract-testable
+ *     race-loser paths (availableStock@pre < quantity); inv
+ *     AvailableStockNonNegative and post AvailableStockNonNegativeAfterReserve
+ *     keep operated-SKU stock >= 0 on success and insufficient-stock paths.
+ *     Full concurrent interleaving exclusivity is deferred to W2 / formal.
  */
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -183,6 +189,67 @@ describe("OCL Reservation::reserve", () => {
 
     expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
     expect(ReservationService.availableStock("SKU-1")).toBe(7);
+  });
+
+  it("post InsufficientStockError (race-loser contract path): after last unit is held, further reserve yields same named InsufficientStockError", () => {
+    // Sequential stand-in for a concurrent race loser observing availableStock@pre < quantity
+    // (W1 contract-testable path; full interleaving exclusivity is W2 / formal).
+    ReservationService.seedStock("SKU-1", 1);
+    const winner = ReservationService.reserve(AUTHORIZED, "SKU-1", 1, 300);
+    expect(ReservationService.availableStock("SKU-1")).toBe(0);
+
+    let caught: unknown;
+    try {
+      ReservationService.reserve(AUTHORIZED, "SKU-1", 1, 300);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(InsufficientStockError);
+    expect(caught).not.toBeInstanceOf(PreconditionError);
+    expect(caught).not.toBeInstanceOf(TypeError);
+    expect(caught).not.toBeInstanceOf(RangeError);
+    expect((caught as InsufficientStockError).errorType).toBe(
+      "InsufficientStockError",
+    );
+    expect((caught as InsufficientStockError).name).toBe(
+      "InsufficientStockError",
+    );
+    expect(ReservationService.holds()).toHaveLength(1);
+    expect(ReservationService.holds()[0]?.holdId).toBe(winner.holdId);
+    expect(ReservationService.availableStock("SKU-1")).toBe(0);
+  });
+
+  it("inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve: stock stays >= 0 after successful reserve", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    expect(ReservationService.availableStock("SKU-1")).toBeGreaterThanOrEqual(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(6);
+  });
+
+  it("inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve: stock stays >= 0 when reserve depletes to zero", () => {
+    ReservationService.seedStock("SKU-1", 5);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 5, 300);
+    expect(ReservationService.availableStock("SKU-1")).toBeGreaterThanOrEqual(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(0);
+  });
+
+  it("inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve: stock stays >= 0 after InsufficientStockError", () => {
+    ReservationService.seedStock("SKU-1", 2);
+    expect(() =>
+      ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300),
+    ).toThrow(InsufficientStockError);
+    expect(ReservationService.availableStock("SKU-1")).toBeGreaterThanOrEqual(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(2);
+  });
+
+  it("inv AvailableStockNonNegative / post AvailableStockNonNegativeAfterReserve: stock stays >= 0 on last-unit race-loser contract path", () => {
+    ReservationService.seedStock("SKU-1", 1);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 1, 300);
+    expect(() =>
+      ReservationService.reserve(AUTHORIZED, "SKU-1", 1, 300),
+    ).toThrow(InsufficientStockError);
+    expect(ReservationService.availableStock("SKU-1")).toBeGreaterThanOrEqual(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(0);
   });
 
   it("post UnauthorizedErrorOnReserve: unauthorized yields named UnauthorizedError (not a language builtin)", () => {

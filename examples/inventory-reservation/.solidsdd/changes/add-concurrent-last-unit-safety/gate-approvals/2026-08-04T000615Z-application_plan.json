@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "change_id": "add-concurrent-last-unit-safety",
+  "approved_at": "2026-08-04T00:06:15Z",
+  "approver": "naoki (user)",
+  "scope": "application_plan",
+  "decision": "approve",
+  "note": "Approve formal apply (TLA+/TLC under formal/) and thin DbC for W2; proceed apply-dbc \u2192 apply-formal \u2192 derive/implement/verify.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-concurrent-last-unit-safety/items/W2/application-plan.json"
+  ]
+}
