@@ -76,7 +76,7 @@
         },
         "rationale": {
           "type": "string",
-          "description": "Why this survives the change: universality / reuse, and what is non-obvious (choice, exception, or boundary). Do not use rationale only to restate a tautology."
+          "description": "Why this is a knowledge candidate: (1) extraction provenance from this change (Grill Q, Brief Means, Context section, existing POL extension, etc.), (2) universality / reuse across changes, and (3) what is non-obvious (choice, exception, or boundary). Do not use rationale only to restate a tautology or universality without candidacy provenance."
         },
         "source_refs": {
           "type": "array",

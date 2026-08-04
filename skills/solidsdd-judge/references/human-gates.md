@@ -103,6 +103,19 @@ When the human approves:
 8. After approval + `gate-approval.json`, resume from `run-state.json` `phase` with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
 9. After successful integration verify (+ critique): **Task** `solidsdd-knowledge` (`mode: harvest`) → write `knowledge-harvest.json`; set `phase: knowledge_harvest`. Optionally **Task** `solidsdd-critique` (`subject: knowledge_harvest`). If `human_gate.required` → **stop before `done`** until `gate-approval.json` with `scope: knowledge_harvest`; on approve apply selected candidates (CLI promote / hand-authored files + links), then mark change `done`. On reject/skip with empty apply set, still mark `done` after recording decisions on candidates.
 
+### Knowledge harvest gate presentation (required)
+
+When stopping for `scope: knowledge_harvest`, the orchestrator’s final message (chat or equivalent human-readable summary) **must** list every `proposed` candidate with enough detail for approve / reject / partial decisions. For each candidate include:
+
+| Field | Rule |
+|-------|------|
+| `id` / `type` / `title` | Always show |
+| **`rationale`** | **Always show in full** — why this was harvested as a knowledge candidate (extraction provenance from this change), universality / reuse, and the non-obvious choice / exception / boundary. Do **not** omit or paraphrase away the candidacy reason |
+| `body` | Show when present (shorten only if the full body is long; never drop `rationale` to make room) |
+| `source_refs` | Show when present |
+
+**Not sufficient:** pointing only at `knowledge-harvest.json` (“see the JSON”), or listing id/title alone without `rationale`. This mirrors Change Context’s `decisions_to_confirm`: the human must see the decision material in the stop message, not dig for it.
+
 ## Optional human-readable report
 
 When stopping for a gate (or after intake / Brief for confirmation), the orchestrator or agent **may suggest** running manual `solidsdd-report` so humans can review demand / NFR / tech / design so far as Markdown (optional HTML). This is **not** a required gate and does not change SoT artifacts. See [change-report.md](change-report.md).

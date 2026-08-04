@@ -58,7 +58,7 @@ lifecycle の `status`（`draft` / `active` / …）とは別。認識論的確�
 | 後続が分岐しがちなエラー／検証チャネルの固定 | 契約や Feature が既に機械検査しているだけの再掲 |
 | 例外が稀な推奨慣行で、代替を黙って採るとドリフトする ADR／pattern | 「正しく実装せよ」級の一般論 |
 
-非自明性は `knowledge-harvest.json` の各候補 `rationale` に明示する（普遍性・再利用に加え、何が自明でないかを書く）。
+非自明性は `knowledge-harvest.json` の各候補 `rationale` に明示する（**なぜこの change から harvest したか**の候補化理由・抽出根拠に加え、普遍性・再利用と、何が自明でないかを書く）。
 
 ## 載せないもの
 

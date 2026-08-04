@@ -88,7 +88,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 20. On successful integration verify (+ critique):
    - **Task subagent** `solidsdd-knowledge` with `mode: harvest` → write `knowledge-harvest.json`; set `phase: knowledge_harvest`
    - When candidates exist (or harvest requests critique): **Task** `solidsdd-critique` (`subject: knowledge_harvest`); set `phase: critique_knowledge_harvest`
-   - If `knowledge-harvest.json` has `human_gate.required: true` → **stop** until `gate-approval.json` with `scope: knowledge_harvest` ([human-gates.md](references/human-gates.md) / [knowledge.md](references/knowledge.md)); do **not** mark `done` yet
+   - If `knowledge-harvest.json` has `human_gate.required: true` → **stop** until `gate-approval.json` with `scope: knowledge_harvest` ([human-gates.md](references/human-gates.md) / [knowledge.md](references/knowledge.md)); do **not** mark `done` yet. In the stop message, present every `proposed` candidate with `id` / `type` / `title` / **full `rationale`** (why harvested: provenance + universality + non-obvious bound) and `body` / `source_refs` when present — never id/title-only or “see the JSON”
    - On approve / approve_partial: **Task** `solidsdd-knowledge` with `mode: harvest` and `apply: true` (or instruct apply of allowed candidates only)
    - On reject / skip-all: record candidate statuses; proceed without writing knowledge
    - Then set `.solidsdd/changes/<change_id>/status.json` to `"status": "done"` and `run-state.phase` to `done`

@@ -83,4 +83,5 @@ Close the SDD gap where durable knowledge is buried inside volatile requirements
 
 - Path to `knowledge-harvest.json`
 - Whether `human_gate.required`
+- When candidates exist: a **human-facing candidate summary** listing each proposed candidate with `id` / `type` / `title` and its **full `rationale`** (candidacy provenance + universality + non-obvious bound); include `body` / `source_refs` when present. Do not return id/title alone — the parent uses this summary at the knowledge gate and must not thin it
 - If applied: created paths + `check` summary

@@ -48,7 +48,7 @@ Optional frontmatter `facets`: array of `vocabulary` | `invariant` | `decider` |
 
 1. Read Change Context, Brief, WorkPlan, notable critiques, and run `solidsdd-kg promote suggest --json` when available.
 2. Propose only candidates that pass **universality + non-triviality + low churn** (Means over one-off tech). Put obvious restatements and §5-only stack picks in `skipped_reasons` (do not invent nodes “for completeness”).
-3. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say why the node is reusable **and** what is non-obvious. Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
+3. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say **(1)** why this change yielded the candidate (extraction provenance: Grill Q, Brief Means, Context §6, existing POL extension, critique finding, etc.), **(2)** why the node is reusable across changes, **and** **(3)** what is non-obvious (choice, exception, or boundary). Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
 4. Set `human_gate.required: true` when `candidates.length >= 1` **or** when the agent judges durable knowledge was discovered but needs human framing. Empty candidates with `required: false` is OK.
 5. **Never apply** candidates without `gate-approval.json` `scope: knowledge_harvest` and `decision` `approve` or `approve_partial`.
 6. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
@@ -60,4 +60,4 @@ See [human-gates.md](human-gates.md). Orchestrators must not mark the change `do
 
 ## Critique
 
-Optional but recommended: `solidsdd-critique` with `subject: knowledge_harvest` after harvest emit, before the gate. Fail on living-PRD leakage, one-off §5 tech selection harvested as policy, duplicate of existing knowledge without `supersedes`, missing universality rationale, or **trivial / tautological** candidates (no non-obvious choice, exception, or boundary).
+Optional but recommended: `solidsdd-critique` with `subject: knowledge_harvest` after harvest emit, before the gate. Fail on living-PRD leakage, one-off §5 tech selection harvested as policy, duplicate of existing knowledge without `supersedes`, missing universality rationale, **missing candidacy reason** (no extraction provenance / why-harvested in `rationale`), or **trivial / tautological** candidates (no non-obvious choice, exception, or boundary).
