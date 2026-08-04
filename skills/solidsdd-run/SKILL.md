@@ -18,7 +18,7 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 
 ## References
 
-- [execution-model.md](references/execution-model.md) — orchestrator / subagent / critique rules
+- [execution-model.md](references/execution-model.md) — orchestrator / subagent / critique / context-pack rules
 - [change-context.md](references/change-context.md) — demand / NFR / tech selection (fixed Markdown)
 - [change-brief.md](references/change-brief.md) — scope premise (return point)
 - [change-lifecycle.md](references/change-lifecycle.md) — active change paths / additional requirements
@@ -34,7 +34,7 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 - [contract-layout.md](references/contract-layout.md)
 - [run-state.md](references/run-state.md) — **persist phase / retries / item artifacts (required)**
 - [run-state.schema.json](references/run-state.schema.json)
-- [run-cost.md](references/run-cost.md) — wall-clock cost model; greenfield mitigations; do not whole-loop Task; **host toolchain thrash vs orchestration cost**
+- [run-cost.md](references/run-cost.md) — wall-clock cost model; **B1–B5 cost skips**; context packs; greenfield/follow-on mitigations; host toolchain thrash vs orchestration cost
 - [knowledge.md](references/knowledge.md) — durable knowledge consult / harvest in the run
 - [clarifications.md](references/clarifications.md) — durable framing Q/A (Grill)
 - [solidsdd-next.md](references/solidsdd-next.md) — deterministic next / validate
@@ -82,10 +82,11 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
    - Then form the next wave from newly unblocked items
    - **Serialize when `touches` intersect**: if two+ ready items list overlapping paths in `touches` (set intersection non-empty), run those contending items sequentially within the wave; still parallelize non-contending ready items. If `touches` is missing, fall back to the legacy heuristic (“clearly contend on the same primary edit paths”) and prefer adding `touches` on re-decompose. If many items share touches with empty `depends_on`, record the smell in `isolation_notes` and prefer re-decompose (foundation `depends_on`) on critique fail / next change — see [work-decomposition.md](references/work-decomposition.md)
 19. After all items `done` (or single-item plan finished its one loop):
-   - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole` (and Brief `success_criteria` when relevant); write `integration-verification-report.json`
+   - **Integration verify:** if **B4** (exactly one WorkPlan item whose item `verification-report.json` already covers `acceptance_of_whole` / relevant `success_criteria` with pass) → skip duplicate integration verify+critique; record `cost_skip:B4` and reuse that report path. Else:
+   - **Task subagent** `solidsdd-verify` over the whole workspace / `acceptance_of_whole` (and Brief `success_criteria` when relevant); write `integration-verification-report.json` (or `verification-report.json` at change root per layout)
    - **Separate Task subagent** `solidsdd-critique` (`subject: verification_report`); persist critique — never the same Task as verify
    - If formal artifacts were applied across slices → **Task** `solidsdd-verify-formal` then critique as in loop
-20. On successful integration verify (+ critique):
+20. On successful integration verify (+ critique), or B4 reuse of a covering item verify:
    - **Task subagent** `solidsdd-knowledge` with `mode: harvest` → write `knowledge-harvest.json`; set `phase: knowledge_harvest`
    - When candidates exist (or harvest requests critique): **Task** `solidsdd-critique` (`subject: knowledge_harvest`); set `phase: critique_knowledge_harvest`
    - If `knowledge-harvest.json` has `human_gate.required: true` → **stop** until `gate-approval.json` with `scope: knowledge_harvest` ([human-gates.md](references/human-gates.md) / [knowledge.md](references/knowledge.md)); do **not** mark `done` yet. In the stop message, present every `proposed` candidate with `id` / `type` / `title` / **full `rationale`** (why harvested: provenance + universality + non-obvious bound) and `body` / `source_refs` when present — never id/title-only or “see the JSON”
@@ -97,7 +98,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Isolation checklist (required in final summary)
 
-List: `toolchain(ready|gap)`, `knowledge(consult)`, `[grill if run]`, `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, `[critique(knowledge_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention), `verify` (integration), `critique(verification_report)`, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes` (including `toolchain_rediscovery:<tool>:<reason>` when a Subagent had to re-resolve host tools; `next_deviation:<action>:<reason>` when ignoring `solidsdd-next`).
+List: `toolchain(ready|gap)`, `knowledge(consult)`, `[grill if run]`, `intake`, `critique(change_context)`, `[gate if required]`, `brief`, `critique(change_brief)`, `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, `[critique(knowledge_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention / `cost_skip:B*`), `verify` (integration) **or** `cost_skip:B4`, `critique(verification_report)` when verify ran, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes` (including `toolchain_rediscovery:<tool>:<reason>` when a Subagent had to re-resolve host tools; `next_deviation:<action>:<reason>` when ignoring `solidsdd-next`; `cost_skip:B*`).
 
 ## Subagent / loop prompt requirements
 
@@ -115,6 +116,7 @@ When starting `solidsdd-loop` for an item, provide:
 - Working directory (consuming project root)
 - **Change intent** = that item’s `intent`
 - **`item_id`** and artifact directory `.solidsdd/changes/<change_id>/items/<item_id>/`
+- Instruction to write/refresh **`items/<id>/context-pack.md`** and pass it into every Task ([execution-model.md](references/execution-model.md))
 - The item’s `acceptance_criterion` (Gherkin Scenario; for verify focus) and `covers`
 - Optional `feature_path` / `scenario_name` when present
 - Change Context path/excerpt (§4 NFR / §5 tech when relevant)
@@ -122,17 +124,18 @@ When starting `solidsdd-loop` for an item, provide:
 - Context summary and WorkPlan excerpt (item id + depends)
 - **Toolchain commands** from context / `host-toolchain.json` (required)
 - Instruction to read/write that item’s `loop_retry` via parent-updated `run-state.json`
+- Note [allowed cost skips B1–B5](references/run-cost.md#allowed-cost-skips-b1b5)
 - Note that sibling loops in the **same wave** may run concurrently; keep edits scoped to this item’s intent
 
 ## Success criteria
 
-- Subagent-required steps were not run inline in the parent (or were re-run via Task and counted)
-- `run-state.json` reflects phase, waves, and retry remaining after each step
+- Subagent-required steps were not run inline in the parent (or were re-run via Task and counted), except documented mechanical cost skips
+- `run-state.json` reflects phase, waves, retry remaining, and `cost_skip:B*` notes after each step
 - Change Context came from intake without parent thinning; `critique(change_context)` ran; Change Context gate honored when `required`
 - ChangeBrief came from brief without parent thinning; `critique(change_brief)` ran
 - WorkPlan came from decompose without parent thinning; `critique(work_plan)` ran
-- Each done item had a `solidsdd-loop` run scoped to its intent with persisted plans under `items/<id>/`
+- Each done item had a `solidsdd-loop` run scoped to its intent with persisted plans / context-pack under `items/<id>/`
 - Independent `ready` items in a wave were started **in parallel** (or serialized only with an explicit contention reason)
-- Integration `solidsdd-verify` (+ critique) ran after all items (or after the single item)
-- `solidsdd-knowledge` harvest ran after successful integration; knowledge human gate honored when `required`; change not marked `done` while that gate is pending
-- Human gates honored; final summary includes the isolation checklist, wave grouping, and any blocked items
+- Integration `solidsdd-verify` (+ critique) ran after all items **or** B4 reused a covering single-item verify
+- `solidsdd-knowledge` harvest ran after successful integration (or B4-equivalent success); knowledge human gate honored when `required`; change not marked `done` while that gate is pending
+- Human gates honored; final summary includes the isolation checklist, wave grouping, cost skips, and any blocked items

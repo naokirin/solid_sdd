@@ -16,13 +16,35 @@ So wall-clock scales closer to **O(N × loop steps)** than to lines of applicati
 ## Required mitigations (orchestration)
 
 1. **Keep `solidsdd-loop` on the outer parent session.** Do **not** launch one Task whose prompt is “run the entire loop for Wn”. That collapses producer and critique into one agent (or forces fake “separate write passes”) and violates [execution-model.md](execution-model.md).
-2. **Each producer → its own `solidsdd-critique` Task.** Never combine `solidsdd-verify` and `critique(verification_report)` in one Task.
+2. **Each producer that ran → its own `solidsdd-critique` Task** (unless a [cost skip](#allowed-cost-skips-b1b5) applies). Never combine a producer and its matching critique in one Task; never combine `solidsdd-verify` and `critique(verification_report)` in one Task.
 3. If the host cannot nest Task from a loop helper agent, **the run parent must drive loop steps itself** (Task per skill). Do not fall back to same-agent produce+critique except as an explicit isolation violation that is re-run or gated.
 4. **Serialize only on real contention** (`touches` intersection or recorded heuristic). Prefer greenfield WorkPlans that use `depends_on` so serialization is intentional ([work-decomposition.md](../reference-src/work-decomposition.md)).
+5. **Pass a context pack** into each Task ([execution-model.md](execution-model.md) — context pack): prefer pack paths/excerpts over re-reading full Brief/OpenAPI/OCL on every cold start.
+
+## Allowed cost skips (B1–B5)
+
+These are **explicit product rules**, not silent parent thinning. When used, record `cost_skip:B<n>` in `run-state.isolation_notes` and in any substitute artifact summary.
+
+| Id | When | May skip / substitute | Must still do |
+|----|------|------------------------|---------------|
+| **B1** | ApplicationPlan targets are all `skip` and/or `defer` (no `apply`) | LLM Task `critique(application_plan)` → **mechanical** pass: parent runs `solidsdd-lint` (or equivalent) and writes `critique-application-plan.json` with `result: pass`, noting `cost_skip:B1` + lint summary | Persist the ApplicationPlan |
+| **B2** | This item did not run `apply-api` / `apply-dbc` / `derive-tests` | The matching `critique(api_contracts)` / `critique(dbc_contracts)` / `critique(derived_tests)` | — |
+| **B3** | Item `touches` has no implementation paths (`src/`, app package, etc.) **and** no `apply` target implies implement | `solidsdd-implement` Task | Contract apply/derive/verify as otherwise required |
+| **B4** | WorkPlan has **exactly one** item **and** that item’s `verification-report.json` already covers `acceptance_of_whole` (and relevant Brief `success_criteria`) with pass | Duplicate **integration** `solidsdd-verify` + its critique | Keep the item verify + `critique(verification_report)`; note `cost_skip:B4` and path to the reused report |
+| **B5** | Prior item verify on this change used the **same** toolchain commands / same test suite and passed, **and** this item made **no code or contract-test edits** (skip-plan / docs-only) | Re-running the full suite inside `solidsdd-verify` | Still write `verification-report.json` that **cites** the prior report (command, timestamp/path, pass); run cheap existence/diff checks for OpenAPI/OCL if those are in scope; then normal `critique(verification_report)` unless B1-style mechanical rules also apply |
+
+**Never skip under these ids:** `critique(change_context|change_brief|work_plan)`, critique after a real `apply` / `derive-tests` / `implement` that edited artifacts, `critique(knowledge_harvest)` when candidates exist, or merging producer+critique into one Task.
 
 ## Required mitigations (decomposition)
 
-See **Greenfield / shared-contract changes** in [work-decomposition.md](../reference-src/work-decomposition.md): foundation item first, narrow `touches`, do not stamp identical shared paths on every `ready` item.
+See **Greenfield / shared-contract changes** and **Follow-on / co-delivered slices** in [work-decomposition.md](../reference-src/work-decomposition.md):
+
+- Greenfield: foundation item first, narrow `touches`, do not stamp identical shared paths on every `ready` item.
+- Follow-on: do **not** emit vocabulary-only foundation items; keep success+failure of the **same** operation in **one** item when they share an implementation path; merge items whose verify would be vacuous once a sibling implement is green.
+
+### Evaluation sample — `add-list-holds` (2026-08)
+
+Live replay used **N = 3** (OpenAPI/OCL vocabulary → authorized list → unauthorized list) ≈ **38** Task launches. A **N = 1** co-delivered plan (contracts + authorized + unauthorized in one Scenario/item) estimates ≈ **29** Tasks (**−24%** overall; **−45%** on loop-only steps) with the same outer framing/harvest. The gap was mostly redundant loops (vocabulary-only W1; W3 verify-only after W2 implement), not implementation size.
 
 ## Evaluation sample kinds
 
@@ -48,4 +70,4 @@ Probe: `scripts/solidsdd-host-toolchain.sh --project-root .` (see [host-toolchai
 
 ## Relation to hardening
 
-Mechanical lint / `covers` / `run-state` reduce LLM-only hardness. They do **not** remove per-phase Task cost. Further speed-ups (skipping critique on additive no-ops, batch apply) would be explicit product changes — not silent parent thinning.
+Mechanical lint / `covers` / `run-state` reduce LLM-only hardness. Per-phase Task cost remains for real producers. **Allowed cost skips (B1–B5)** and **context packs** are the explicit product speed-ups — do not invent additional skips in the parent without updating this doc and [execution-model.md](execution-model.md).

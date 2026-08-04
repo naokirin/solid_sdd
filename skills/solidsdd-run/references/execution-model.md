@@ -113,23 +113,41 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 3. Accept only the subagent’s outputs (diffs, reports, ApplicationPlan, CritiqueReport) and pass them to the next phase
 4. Do not thin contracts or findings by rewriting `ApplicationPlan` / CritiqueReport in the parent (if wrong, re-launch the relevant skill as a Subagent)
 5. If `human_gate.required`, do not apply until approved (including early formal rollout)
-6. **Do not skip** the matching `solidsdd.critique` immediately after a producer step
+6. **Do not skip** the matching `solidsdd.critique` after a producer step **unless** an [allowed cost skip (B1–B5)](run-cost.md#allowed-cost-skips-b1b5) applies; record `cost_skip:B<n>` in `isolation_notes`
 7. If `solidsdd.verify` / `solidsdd.verify.formal` / `solidsdd.critique` fails, follow `loop_action` and suggested skills and **re-launch as a subagent** (or gate / stop)
 8. Stop at a human gate when the auto-retry cap is exceeded
-9. Leave a final summary listing that each subagent-required step and critique subject was launched via Task (isolation checklist)
+9. Leave a final summary listing each required Task / mechanical substitute and critique subject (isolation checklist), including any `cost_skip:B*`
 10. When contracts already exist for this change, prefer ApplicationPlans that **extend** shared OpenAPI/OCL rather than re-scaffolding the package on every item
+11. Before the first producer Task of a slice (and when pack would go stale after large edits), write **`items/<id>/context-pack.md`** (see [Context pack](#context-pack)) and pass its path in every Task prompt for that item
 
 ## Parent obligations (`solidsdd.run`)
 
-1. Do not inline `solidsdd.intake` / `critique(change_context)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify`
+1. Do not inline `solidsdd.intake` / `critique(change_context)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify` (except B4 reuse of a covering item verify)
 2. Each item follows the **`solidsdd.loop` skill on this parent session** (run parent must not directly run judge/apply/implement, and must **not** delegate the whole loop to a single Task)
 3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
 4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices
-5. Pass Change Context and ChangeBrief paths/excerpts into decompose and into each loop prompt when scope or tech questions may arise
+5. Pass Change Context and ChangeBrief paths/excerpts **and context-pack paths** into decompose and into each loop prompt when scope or tech questions may arise
 6. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention). If many ready items share `touches`, prefer a WorkPlan that used foundation `depends_on` ([work-decomposition.md](../reference-src/work-decomposition.md)); record serialize reason in `run-state.isolation_notes`
-7. Do not skip integration `solidsdd.verify` (+ **separate** critique Task) after all items complete
-8. Honor run-level retry budget; leave isolation checklist, wave shape, and blocked items in the final summary
-9. Read [run-cost.md](run-cost.md) before large greenfield runs; budget time for O(N × loop steps)
+7. After all items complete: run integration `solidsdd.verify` (+ **separate** critique Task) **unless B4** applies (single item whose verify already covers `acceptance_of_whole`); then record `cost_skip:B4`
+8. Honor run-level retry budget; leave isolation checklist, wave shape, cost skips, and blocked items in the final summary
+9. Read [run-cost.md](run-cost.md) before large greenfield runs; budget time for O(N × loop steps); apply [allowed cost skips](run-cost.md#allowed-cost-skips-b1b5) and context packs
+
+## Context pack
+
+Cold-start re-reads of full Brief / OpenAPI / OCL dominate wall-clock. The **parent** builds a short pack once per slice (and refreshes when the pack’s listed files change materially):
+
+**Path:** `.solidsdd/changes/<change_id>/items/<item_id>/context-pack.md` (optional change-level pack for outer intake/brief Tasks: `context-pack-framing.md`)
+
+**Include (keep short):**
+
+- Absolute WD; `change_id` / `item_id`; working language
+- Paths (+ 10–40 line excerpts only when needed) to Change Context, ChangeBrief, WorkPlan item block, Feature Scenario
+- Host-toolchain `commands` block (paste verbatim)
+- Cited knowledge policy ids + one-line each (not full files)
+- After judge: ApplicationPlan path + target kind/status table
+- Instruction: **prefer this pack**; do **not** re-Read full OpenAPI/OCL/Brief/tests unless you must edit that file or the pack is marked stale
+
+**Do not** put full contract bodies or entire test files in the pack.
 
 ## Prompt template for subagents
 
@@ -137,6 +155,7 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 You are executing the solid_sdd skill: <skill-name>
 Read and follow: skills/<skill-dir>/SKILL.md
 Working directory: <consuming project root>
+Context pack: <path to context-pack.md> — prefer it; avoid re-reading full SoT files unless editing them or pack is stale
 Inputs:
   - ...
 Constraints:

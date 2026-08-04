@@ -117,5 +117,5 @@ Borrow maturity, conditional Grill, Means vs tech, clarifications, facets / know
 2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
 3. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)
 4. Optional: mechanical EARS pattern detection in lint (Workstream G follow-on)
-5. Honor [run-cost.md](run-cost.md) on future live replays (greenfield WorkPlan + strict Task isolation)
+5. Honor [run-cost.md](run-cost.md) on future live replays (follow-on co-delivered slices, **B1–B5** cost skips, context packs, strict Task isolation where producers still run)
 6. Live replay with `scripts/solidsdd-next.sh` on a sample change (resume smoke)
