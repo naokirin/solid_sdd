@@ -45,6 +45,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
+| 2026-08-04 | knowledge harvest criteria | Trivial/tautological nodes have low info value and raise staleness maintenance cost | Applied — non-triviality required in [POL-KG-PERSISTENCE](../knowledge/policies/POL-KG-PERSISTENCE.md), [knowledge.md](../reference-src/knowledge.md), harvest critique |
 | 2026-08-04 | host toolchain thrash | Subagent shells miss mise PATH; users cannot tell run cost vs env rediscovery | Applied — `scripts/solidsdd-host-toolchain.sh`, `host-toolchain.json`, context/run/loop paste rules, [run-cost.md](run-cost.md) thrash section |
 | 2026-08-03 | run-cost mitigations | After inventory E2E: greenfield WorkPlan (`depends_on`/narrow `touches`), forbid whole-loop Task & verify+critique same Task, lint smell, `docs/run-cost.md` | Applied — [run-cost.md](run-cost.md) |
 | 2026-08-03 | inventory-reservation E2E | Fresh solidsdd-run sample: soft-hold + authZ + TTL; OpenAPI/OCL/Vitest green (32 tests) | Applied — `examples/inventory-reservation` |

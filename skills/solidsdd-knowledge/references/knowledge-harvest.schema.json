@@ -30,7 +30,7 @@
     "skipped_reasons": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Why change-local facts were not proposed (ephemeral, already covered, living-PRD risk)."
+      "description": "Why change-local facts were not proposed (ephemeral, trivial/tautological, already covered, living-PRD risk)."
     },
     "cli_suggest": {
       "type": "array",
@@ -76,7 +76,7 @@
         },
         "rationale": {
           "type": "string",
-          "description": "Why this survives the change (universality / reuse)."
+          "description": "Why this survives the change: universality / reuse, and what is non-obvious (choice, exception, or boundary). Do not use rationale only to restate a tautology."
         },
         "source_refs": {
           "type": "array",

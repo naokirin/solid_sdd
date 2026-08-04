@@ -62,7 +62,7 @@ Close the SDD gap where durable knowledge is buried inside volatile requirements
 
 1. Resolve active `change_id`. Require integration verify success (or explicit user harvest-only request).
 2. Read Change Context, Brief, WorkPlan (optional critiques). When CLI available: `scripts/solidsdd-kg.sh promote suggest --root . --json`.
-3. Propose only **durable** candidates per [knowledge.md](references/knowledge.md). Fill `knowledge-harvest.json` validating against [knowledge-harvest.schema.json](references/knowledge-harvest.schema.json).
+3. Propose only **durable and non-trivial** candidates per [knowledge.md](references/knowledge.md) (universality + non-obvious choice/boundary + low churn). Fill `knowledge-harvest.json` validating against [knowledge-harvest.schema.json](references/knowledge-harvest.schema.json).
 4. Set `human_gate.required: true` when `candidates.length >= 1` (or durable knowledge needs human framing). Empty list → `required: false`.
 5. Set `run-state.json` `phase` to `knowledge_harvest` when called from run.
 6. **Stop for gate** when required: do not apply. Parent obtains `gate-approval.json` (`scope: knowledge_harvest`).

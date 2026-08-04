@@ -21,7 +21,7 @@ solid_sdd complements—not replaces—natural-language Spec-Driven Development 
 
 Machine-checkable outputs are for **gap reduction and mechanical verification during a change**, not everlasting living docs. History of “what was specified then” is fine; requiring perpetual human editorial ownership of every past contract is not.
 
-**Exception (narrow):** `knowledge/` stores **rarely updated, high-universality** policies/concepts/decisions/lessons built **inside** the SDD run (`solidsdd-knowledge`). It must not become a living PRD of change scope—Brief / Gherkin remain requirement SoT.
+**Exception (narrow):** `knowledge/` stores **rarely updated, high-universality, non-trivial** policies/concepts/decisions/lessons built **inside** the SDD run (`solidsdd-knowledge`). Skip tautologies and domain axioms with no choice boundary—they add maintenance cost without information value. It must not become a living PRD of change scope—Brief / Gherkin remain requirement SoT.
 
 **Reuse**: keeping contracts from continuous active development is healthy. Reusing stale contracts from dormant / poorly maintained work is usually unsafe. Fitness is **situational**—not a single toolkit default.
 

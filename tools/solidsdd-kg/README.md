@@ -2,7 +2,7 @@
 
 solid_sdd 内の知識グラフ基盤（Phase 1）。
 
-テキスト正本（`knowledge/` + ChangeBrief / Gherkin 由来 ID）をパースし、派生 SQLite インデックスを構築する。要求の正本は ChangeBrief / Gherkin であり、知識層は普遍性の高い横断知見専用。
+テキスト正本（`knowledge/` + ChangeBrief / Gherkin 由来 ID）をパースし、派生 SQLite インデックスを構築する。要求の正本は ChangeBrief / Gherkin であり、知識層は普遍性が高く**非自明な**横断知見専用。
 
 ## Phase status
 
