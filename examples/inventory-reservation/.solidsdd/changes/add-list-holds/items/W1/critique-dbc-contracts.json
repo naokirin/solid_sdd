@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "dbc_contracts",
+  "result": "pass",
+  "summary": "contracts/Reservation.ocl#list meets W1 ApplicationPlan dbc apply at standard density: pre PrincipalAuthorized; posts ResultIsFullDumpOfVisibleHolds (sku/quantity/expiresAt/availableStock vs self.holds()@pre), EmptyCollectionWhenNoneVisible, HoldsUnchanged, AvailableStockUnchanged; live UnauthorizedErrorOnList plus no-mutation failure posts. Aligns with OpenAPI listReservations success array and 403 UnauthorizedError. Not vacuous; authorized full-dump (including empty) and UnauthorizedError channels are checkable. solidsdd-lint pass with overlapping-touches minors only. Remaining gaps are holdId symmetry and empty-set stock coverage polish.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "contracts/Reservation.ocl#list/ResultIsFullDumpOfVisibleHolds",
+      "detail": "ResultIsFullDumpOfVisibleHolds matches sku, quantity, expiresAt, and current availableStock to self.holds()@pre but does not assert holdId/id equality required by OpenAPI LookupResponse and Brief R2/SC2. Full-dump size and field coverage remain checkable at standard density; holdId binding would strengthen API/OCL symmetry (same polish as lookup ResultIsHoldDetails)."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "contracts/Reservation.ocl#list/AvailableStockUnchanged",
+      "detail": "AvailableStockUnchanged (and the unauthorized twin) quantify only over SKUs present in holds@pre; when the visible set is empty the stock-side post is vacuously true. HoldsUnchanged still anchors no-mutation for W1 vocabulary; an explicit forAll over tracked SKUs would be stronger polish, not a missing-pre hole."
+    }
+  ]
+}

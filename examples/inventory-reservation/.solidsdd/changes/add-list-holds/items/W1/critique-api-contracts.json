@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "api_contracts",
+  "result": "pass",
+  "summary": "openapi/openapi.yaml documents additive GET /reservations (operationId listReservations) at standard density against W1 ApplicationPlan and Brief R4/SC4: authorized full-dump success as a bare JSON array of LookupResponse items (including empty), OpaquePrincipal AuthZ, named 403 UnauthorizedError and 400 PreconditionError with no-mutation semantics, and no filter/paging dimensions. Prior POST /reservations and GET /reservations/{holdId} (plus release/expire/concurrent) remain. Not happy-path-only; solidsdd-lint passed with only work-plan touches minors. No API retry.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "openapi/openapi.yaml#/components/schemas/ErrorResponse/properties/errorType",
+      "detail": "PreconditionError prose in the shared errorType description still names lookup/release/expire cases and does not mention invalid list preconditions (e.g. missing principal). The list operation's 400 response already documents PreconditionError with no-mutation; polish only — checkability intact."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "derived_tests",
+  "result": "pass",
+  "summary": "Derived Vitest for Reservation::list covers every live OCL pre/post at standard density: PrincipalAuthorized violation → named UnauthorizedError; ResultIsFullDumpOfVisibleHolds (LookupResponse-equivalent including current availableStock; shared holds()/lookup visibility); EmptyCollectionWhenNoneVisible; HoldsUnchanged / AvailableStockUnchanged on success; UnauthorizedErrorOnList plus HoldsUnchangedOnUnauthorizedList / AvailableStockUnchangedOnUnauthorizedList (including empty-state unauthorized). Not happy-path-only or “does not throw” only. Prior reserve/release/expire/lookup suites remain. solidsdd-lint pass (overlapping touches minor only).",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "tests/contracts/reservation.test.ts#ResultIsFullDumpOfVisibleHolds",
+      "detail": "Tests assert result holdId and field equality with lookup(), which is stronger than OCL ResultIsFullDumpOfVisibleHolds (sku/quantity/expiresAt/availableStock match without holdId). Fine as extra checkability aligned with OpenAPI LookupResponse; optional OCL holdId equality remains polish."
+    }
+  ]
+}

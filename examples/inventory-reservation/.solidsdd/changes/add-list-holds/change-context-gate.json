@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "Grill Q1–Q3 settled Means (visibility, no filters, full dump LookupResponse-equivalent including availableStock, UnauthorizedError, no mutation). Stack is repo_existing (TypeScript/Node, OpenAPI, OCL, Vitest). HTTP GET /reservations is agent_default for non-blocking Grill Q4 with no repo conflict (POST already on /reservations; collection GET is additive). Security NFR only extends canonical POL-OPAQUE-PRINCIPAL-AUTHZ per explicit user ask. §7 items are non-blocking deferrals (envelope shape, policy wording harvest)."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

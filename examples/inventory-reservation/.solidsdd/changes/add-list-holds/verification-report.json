@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "host-toolchain openapi_lint: mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 14ms; Woohoo! Your API description is valid.",
+      "covers": ["W1", "W2", "W3", "R4", "R5", "SC4"]
+    },
+    {
+      "name": "OpenAPI additive GET /reservations; prior ops remain; no filters/paging",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "acceptance_of_whole spot-check: paths./reservations.get (operationId listReservations) documents authorized full-dump 200 (array of LookupResponse, empty OK) and UnauthorizedError 403; description states no paging and no sku/status/time filters; sole list parameter is OpaquePrincipal. Prior surfaces remain: POST /reservations (reserve), GET /reservations/{holdId} (getReservation), POST .../release, POST .../expire.",
+      "covers": ["W1", "R4", "R5", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — full suite",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "host-toolchain npm_test: mise exec -- npm test → vitest run tests/contracts/reservation.test.ts: 61 passed (61), 0 failed. Duration ~344ms. Includes OCL Reservation::list authorized full-dump (empty+nonempty, visibility, no mutation) and unauthorized UnauthorizedError + no-mutation posts, plus prior reserve/release/expire/lookup regressions.",
+      "covers": ["W1", "W2", "W3", "R1", "R2", "R3", "SC1", "SC2", "SC3"]
+    },
+    {
+      "name": "OpenAPI / OCL / impl alignment (list)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "contracts/Reservation.ocl Reservation::list: PrincipalAuthorized; ResultIsFullDumpOfVisibleHolds; EmptyCollectionWhenNoneVisible; HoldsUnchanged; AvailableStockUnchanged; UnauthorizedErrorOnList; HoldsUnchangedOnUnauthorizedList; AvailableStockUnchangedOnUnauthorizedList. src/reservation.ts list() AuthZ then map-only dump with current availableStock (no writes). src/server.ts GET /reservations before /{holdId}: missing principal → UnauthorizedError JSON; else list → 200 LookupResponse-equivalent array. Aligns with acceptance_of_whole.",
+      "covers": ["W1", "W2", "W3"]
+    }
+  ]
+}

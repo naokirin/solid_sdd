@@ -1,0 +1,72 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "phase": "done",
+  "wave_index": 3,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1",
+      "loop_phase": "done"
+    },
+    "W2": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W2",
+      "loop_phase": "done"
+    },
+    "W3": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W3",
+      "loop_phase": "done"
+    }
+  },
+  "isolation_notes": [
+    "ready_for_intake",
+    "intake_written",
+    "critique_change_context_pass",
+    "brief_written",
+    "critique_change_brief_pass",
+    "decompose_written",
+    "critique_work_plan_pass",
+    "critique_cross_change_consistency_pass",
+    "W1_done_openapi_ocl_vocabulary",
+    "critique_verification_report_W1_pass",
+    "serialize_W2_then_W3_overlapping_touches",
+    "W2_done_authorized_list",
+    "critique_verification_report_W2_pass",
+    "W3_done_unauthorized_list",
+    "all_waves_done",
+    "knowledge_harvest_written_awaiting_gate",
+    "integration_verify_pass",
+    "critique_verification_report_integration_pass",
+    "knowledge_harvest_gate_approve_apply_all_3_candidates",
+    "knowledge_applied_POL_OPAQUE_list_wording_POL_SOFT_HOLD_SHARED_READ_DEC_LIST_FULL_DUMP_kg_check_ok"
+  ],
+  "host_toolchain": {
+    "ready": true,
+    "source": ".solidsdd/host-toolchain.json",
+    "missing": [],
+    "resolved_at": "2026-08-04T14:20:15Z"
+  },
+  "updated_at": "2026-08-04T15:35:29Z"
+}

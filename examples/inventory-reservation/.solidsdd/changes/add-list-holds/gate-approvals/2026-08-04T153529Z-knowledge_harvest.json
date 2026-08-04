@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "approved_at": "2026-08-04T15:35:29Z",
+  "approver": "naoki.guest (chat: apply all 3 harvest candidates)",
+  "scope": "knowledge_harvest",
+  "decision": "approve",
+  "note": "Approve apply of POL-OPAQUE-PRINCIPAL-AUTHZ (in-place list wording), POL-SOFT-HOLD-SHARED-READ-VISIBILITY, DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-list-holds/knowledge-harvest.json",
+    ".solidsdd/changes/add-list-holds/critique-knowledge-harvest.json"
+  ]
+}

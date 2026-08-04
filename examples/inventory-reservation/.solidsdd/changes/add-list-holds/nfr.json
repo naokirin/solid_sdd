@@ -1,0 +1,58 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "An authorized opaque principal can list all currently visible soft-holds (same visibility universe as get-by-id). Success is a full dump with no paging; each item includes LookupResponse-equivalent fields (holdId, sku, quantity, expiresAt, availableStock). Empty collection when none are visible. No stock or hold mutation on any path.",
+      "rationale": "List correctness and a checkable success shape (including empty) are the core delta; callers and contract tests need machine-checkable read semantics without inventing filters or paging.",
+      "threshold": "Authorized list always returns the full currently visible set with LookupResponse-equivalent items including availableStock; empty collection when none visible; never mutates stock or holds.",
+      "measurement": "OCL-derived Vitest contract tests plus OpenAPI success-schema exercises for full-dump list (including empty) and non-mutation."
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "in_scope",
+      "requirement": "Only an authorized opaque principal may list soft-holds (POL-OPAQUE-PRINCIPAL-AUTHZ: opaque allow/deny only; not full IAM). Unauthorized callers fail with named UnauthorizedError; stock and holds are unchanged.",
+      "rationale": "Extends the canonical opaque-principal AuthZ Means to the additive list operation; user keeps the same Means as reserve/release/lookup.",
+      "threshold": "Unauthorized list always fails with UnauthorizedError and never mutates stock or holds; authorized opaque principal receives the shared visibility universe.",
+      "measurement": "Contract tests and OpenAPI UnauthorizedError channel; OCL preconditions on list; cite POL-OPAQUE-PRINCIPAL-AUTHZ."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no latency or throughput targets for this evaluation sample.",
+      "rationale": "Process-local full dump of the visible set; no SLI or paging Means asked."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "List soft-holds is checkable via HTTP/API (OpenAPI) and module DbC (UML OCL) with Vitest contract tests; do not rely on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires machine-checkable surfaces for the delta as for prior reserve/release/expire/lookup.",
+      "threshold": "openapi/openapi.yaml documents list; contracts/**/*.ocl and tests/contracts/** cover authorized full-dump success (including empty) and UnauthorizedError and pass.",
+      "measurement": "Presence of OpenAPI + OCL + passing Vitest under tests/contracts/** for list success and unauthorized failure."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Additive OpenAPI change: add collection list without breaking existing POST /reservations, GET /reservations/{holdId}, release, expire, or concurrent last-unit surfaces.",
+      "rationale": "Follow-on change; prior HTTP surfaces must remain; list is an additive read operation.",
+      "threshold": "openapi/openapi.yaml remains structurally valid; prior operations remain documented; list is added without removing or renaming prior operations.",
+      "measurement": "solidsdd-verify OpenAPI lint check (or skipped with tooling reason); review that prior paths remain."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL under contracts/**/*.ocl remains the DbC source of truth; Vitest under tests/contracts/** covers authorized list success (LookupResponse-equivalent items including availableStock; empty OK) and UnauthorizedError.",
+      "rationale": "Matches solid_sdd adapter policy and inherited contract/test layout from the repo.",
+      "threshold": "contracts/**/*.ocl constrain list pre/post or equivalent invariants; derived Vitest tests exercise full-dump success and named unauthorized failure.",
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "knowledge_harvest",
+  "result": "pass",
+  "summary": "knowledge-harvest.json is adequate for human gate: solidsdd-lint pass with zero findings. Three candidates (POL-OPAQUE-PRINCIPAL-AUTHZ wording to name list; POL-SOFT-HOLD-SHARED-READ-VISIBILITY; DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP) are durable Means/ADR with non-obvious choice boundaries and Brief id citations—not living-PRD dumps of in_scope or Scenarios, not §5 wire picks (GET /reservations correctly skipped). Existing POL-OPAQUE-PRINCIPAL-AUTHZ is an in-place wording merge (same id + source_refs to knowledge/policies/…), not a silent parallel duplicate. New POL/DEC ids do not collide with active knowledge/. human_gate.required true matches candidates.length >= 1; not applied. No knowledge_harvest major.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "knowledge-harvest.json#candidates/POL-OPAQUE-PRINCIPAL-AUTHZ",
+      "detail": "Candidate reuses canonical id POL-OPAQUE-PRINCIPAL-AUTHZ to extend the operation list with list. On gate apply, treat as in-place edit of knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md (same id), not a forked second AuthZ policy. Polish for apply path only; merge intent is already clear via source_refs and rationale."
+    }
+  ]
+}

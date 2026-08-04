@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "summary": "Cross-change consistency for add-list-holds holds: prior Features (reservation, lookup, availableStock, concurrent-safety) remain untouched and in force; the delta lives only in requirements/reservation-list-holds.feature as additive collection-list acceptance. Prior Brief out_of_scope themes that must stay out (payments, multi-warehouse, full IAM, UI, notifications, backorders, durable DB productization, TTL extend, list-by-SKU/filters/paging) remain excluded in this Brief's X1–X13 and in WorkPlan Scenario wording (no filter dimensions, no paging, opaque-principal AuthZ only). Prior multi-hold-query deferral is intentionally narrowed into an unfiltered full-dump GET /reservations—Context §2/§6 and Brief assumptions state that elevation explicitly, so it is not a silent reopen of X10 filters/paging or full IAM. Active covers/tags are R1–R5 and SC1–SC4 only—no X* coverage. solidsdd-lint for this change passed with only minor overlapping-touches notes.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "requirements/*.feature#@R*@SC*",
+      "detail": "R1–R5 / SC* tag ids are reused across Feature files with change-local Brief namespaces (initial-reservation, add-reservation-lookup, add-lookup-available-stock, add-concurrent-last-unit-safety, add-list-holds). Prior Scenario text is unchanged and lint is change-scoped, so checkability is intact; readers comparing Features without the active change pointer may need the change_id to disambiguate tags."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "prior change-brief.json#out_of_scope vs add-list-holds/change-brief.json#in_scope",
+      "detail": "Prior done Briefs (add-reservation-lookup, add-lookup-available-stock, add-concurrent-last-unit-safety) excluded 'List-by-SKU, aggregates, or other multi-hold query surfaces beyond get-by-id'. This change deliberately opens only the unfiltered full-dump collection list at GET /reservations while keeping list-by-SKU/filters/paging (X10) and full IAM (X3) out. Documented in Context §2/§6 and Brief assumptions—compatible intentional scope elevation, not silent drift."
+    }
+  ]
+}

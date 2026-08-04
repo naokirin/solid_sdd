@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "knowledge_consistency",
+  "result": "pass",
+  "summary": "Context and Brief for add-list-holds do not contradict consulted canonical POL-OPAQUE-PRINCIPAL-AUTHZ. Both cite the policy (opaque-principal allow/deny only; full IAM out of scope; unauthorized → UnauthorizedError; no stock/hold mutation), apply those Means to list, and keep ownership/roles/tenant visibility out of scope (Grill Q1 A; Brief X3/X11). Shared get-by-id visibility is an explicit confirmed Grill Means, not a silent AuthZ override. Policy body still names reserve/release/expire/lookup but not list; Context §7 / Brief assumptions and open_questions defer wording harvest without inventing conflicting Means. solidsdd-lint --project-root . passed with zero findings. No WorkPlan/contracts yet to drift from the invariant.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md",
+      "detail": "Canonical policy prose enumerates reserve/release/expire/lookup but not list. Context §2/§6/§7 and Brief assumptions/open_questions correctly apply the same opaque AuthZ Means to list and defer harvest of wording; this is not a silent override and does not fail checkability."
+    }
+  ]
+}

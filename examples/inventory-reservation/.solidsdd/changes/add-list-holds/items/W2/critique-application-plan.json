@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W2 ApplicationPlan correctly skips re-applying OpenAPI and OCL (W1 already elevated listReservations / Reservation::list and RED authorized-success Vitest), defers formal with Brief X8 rationale, and routes delivery to implement+verify of ReservationService.list and GET /reservations wiring without expanding into W3 UnauthorizedError ownership. Lint pass with W2/W3 touches-overlap minor only. No density thinning, silent formal drop, or Brief scope drift; checkability for R1/R2/SC1/SC2 remains via existing SoT and contract tests.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "Lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items. Plan already notes W3 UnauthorizedError-only ownership—acceptable serialization smell, not a checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W2/application-plan.json#targets/api,dbc",
+      "detail": "api and dbc status=skip while WorkPlan W2 still lists contracts/Reservation.ocl in touches. Justified: W1 already applied SoT and derived authorized empty+nonempty/no-mutation tests; skip avoids duplicate elevation and does not thin density (standard retained). Remaining delivery is implement making existing success tests green."
+    }
+  ]
+}

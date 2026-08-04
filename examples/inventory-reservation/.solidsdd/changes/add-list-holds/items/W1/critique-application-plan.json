@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W1 ApplicationPlan applies standard OpenAPI GET /reservations and UML OCL list vocabulary for authorized full-dump success (including empty) and UnauthorizedError, defers formal with Brief X8 / no list concurrency_safety rationale, and correctly leaves human_gate false for additive work. Lint pass with WorkPlan touches-overlap minors only. No plan thinning, density bias, silent formal drop, or Brief/WorkPlan scope drift; property delivery of empty/nonempty success and unauthorized failure remains intentionally on W2/W3 after vocabulary elevation.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items. Acceptable with W2.depends_on=[W1]; not a checkability hole for this ApplicationPlan."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "Lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items. Downstream of W1; does not weaken W1 api/dbc apply targets."
+    },
+    {
+      "severity": "minor",
+      "category": "thin_contract",
+      "location": "items/W1/application-plan.json#targets/api,dbc",
+      "detail": "API and DbC targets elevate list vocabulary (success shape including empty, UnauthorizedError channel) for W1; property-level empty/nonempty authorized success and unauthorized failure delivery remain W2/W3 after this elevation. Intentional foundation→property slice isolation matching WorkPlan W1 intent and Brief R4/R5/SC4 vocabulary half—not density bias or thinning (both targets stay density standard with authz_boundary cited)."
+    }
+  ]
+}

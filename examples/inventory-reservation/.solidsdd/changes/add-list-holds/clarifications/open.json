@@ -1,0 +1,77 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "human_gate": {
+    "required": false,
+    "reason": "All blocking framing items (Q1–Q3) resolved; Q4 settled by intake §5 as GET /reservations (agent_default, no repo conflict)."
+  },
+  "items": [
+    {
+      "id": "Q1",
+      "question": "For list soft-holds, what may an opaque principal see while keeping POL-OPAQUE-PRINCIPAL-AUTHZ (allow/deny only, no full IAM)?",
+      "options": [
+        "A: Any authorized opaque principal lists all currently visible soft-holds (same visibility universe as get-by-id lookup); unauthorized → named UnauthorizedError; no stock/hold mutation",
+        "B: Introduce principal-scoped / self-only listing (each principal sees only holds they created or own)",
+        "C: Keep opaque allow/deny for the operation, but invent richer visibility rules (roles, tenants, or cross-principal admin views) inside this change",
+        "D: Defer visibility Means entirely and only define list wire shape (filters/paging/DTO) first"
+      ],
+      "recommended_answer": "A",
+      "evidence": "POL-OPAQUE-PRINCIPAL-AUTHZ (canonical) is opaque-principal allow/deny only; full IAM out of scope. Existing lookup/reserve treat authorized principals against holds present in the service (sample: a hold in self.holds() is visible) without per-owner scoping. User asked to keep opaque-principal AuthZ. B invents ownership not present in current Means; C contradicts the policy; D puts wire tech before visibility Means.",
+      "status": "resolved",
+      "blocking": true,
+      "decision": "A: Any authorized opaque principal lists all currently visible soft-holds (same visibility universe as get-by-id lookup); unauthorized → named UnauthorizedError; no stock/hold mutation",
+      "rationale": "Human selected A. Aligns list visibility with existing get-by-id universe under POL-OPAQUE-PRINCIPAL-AUTHZ (opaque allow/deny only); unauthorized → UnauthorizedError; read-only (no stock/hold mutation). Does not invent ownership, roles, or tenant visibility.",
+      "maturity": "confirmed"
+    },
+    {
+      "id": "Q2",
+      "question": "Given Q1's shared visibility universe, which filter dimensions (if any) may authorized list soft-holds apply in this change?",
+      "options": [
+        "A: Unfiltered list only — return all currently visible soft-holds; no sku / status / time query dimensions in this change",
+        "B: Optional filter by sku only — subset of the same visible universe for one SKU; no other filter dimensions",
+        "C: Richer filter set in this change (e.g. sku plus status / TTL window / expiresAt range)",
+        "D: Defer filter Means and define paging / list response envelope first"
+      ],
+      "recommended_answer": "A",
+      "evidence": "Q1 fixed the list universe to the same currently visible soft-holds as get-by-id. OpenAPI today has GET /reservations/{holdId} only (no collection route, no query filters). OCL sample visibility is presence in self.holds(); ReservationService.holds() returns the in-process map values with no filter API. Prior add-reservation-lookup Change Context explicitly left list-by-SKU aggregates out of that change. Sample bound is process-local / in-memory (README), so unfiltered listing of the visible set is the minimal Means that matches Q1 without inventing sku/status/time dimensions. B reintroduces list-by-SKU Means previously deferred; C invents dimensions absent from contracts; D puts paging/wire before filter Means that most constrain OpenAPI params and Gherkin.",
+      "status": "resolved",
+      "blocking": true,
+      "decision": "A: Unfiltered list only — return all currently visible soft-holds; no sku / status / time query dimensions in this change",
+      "rationale": "Human selected A. This change returns all currently visible soft-holds with no sku/status/time query dimensions, matching the Q1 shared visibility universe without inventing filter Means previously deferred (list-by-SKU) or absent from contracts.",
+      "maturity": "confirmed"
+    },
+    {
+      "id": "Q3",
+      "question": "Given Q1–Q2 (authorized unfiltered list of all currently visible soft-holds), how should this change deliver the success response — paging vs full dump, and item/envelope shape?",
+      "options": [
+        "A: Full dump, no paging — one response with all currently visible soft-holds as an array (bare JSON array or single wrapper with items[]); each item matches LookupResponse fields (holdId, sku, quantity, expiresAt, availableStock); empty collection when none visible; unauthorized → UnauthorizedError; no stock/hold mutation",
+        "B: Full dump, no paging — same delivery, but thinner item DTO without availableStock (holdId, sku, quantity, expiresAt only)",
+        "C: Introduce paging Means in this change (limit/offset or cursor/next) for the unfiltered visible set",
+        "D: Defer paging and response item/envelope shape; only decide HTTP method/path first"
+      ],
+      "recommended_answer": "A",
+      "evidence": "Q2 already requires returning all currently visible soft-holds with no filter params. OpenAPI has no collection GET and no limit/cursor/offset parameters anywhere; LookupResponse already requires holdId, sku, quantity, expiresAt, availableStock (elevated in add-lookup-available-stock). ReservationService.holds() returns the full in-process Hold[] (same fields including availableStock). README bounds stock/holds to in-process memory, so a single full dump is checkable without inventing paging Means. B invents a second hold shape that diverges from LookupResponse/Hold. C invents paging dimensions absent from OpenAPI/OCL/Features. D leaves Brief success assertions (fields + empty-list vs error) unverifiable.",
+      "status": "resolved",
+      "blocking": true,
+      "decision": "A: Full dump, no paging — one response with all currently visible soft-holds as an array (bare JSON array or single wrapper with items[]); each item matches LookupResponse fields (holdId, sku, quantity, expiresAt, availableStock); empty collection when none visible; unauthorized → UnauthorizedError; no stock/hold mutation",
+      "rationale": "Human selected A. Success path is a single full dump of the visible set with LookupResponse-equivalent items including availableStock; empty collection when none; unauthorized → UnauthorizedError; read-only. No paging Means and no thinner DTO in this change.",
+      "maturity": "confirmed"
+    },
+    {
+      "id": "Q4",
+      "question": "What HTTP method and path should expose the list soft-holds collection wire?",
+      "options": [
+        "A: GET /reservations (collection alongside existing GET /reservations/{holdId})",
+        "B: Different path or method (to be chosen in intake §5)",
+        "C: Defer entirely to intake §5 / agent_default"
+      ],
+      "recommended_answer": "C",
+      "evidence": "Q1–Q3 already fix visibility, filters, and success response shape for a checkable Brief. Existing OpenAPI has GET /reservations/{holdId} only; GET /reservations is the natural collection sibling but is wire tech for Change Context §5 / intake agent_default, not a blocking Means gap.",
+      "status": "resolved",
+      "blocking": false,
+      "decision": "A: GET /reservations (collection alongside existing GET /reservations/{holdId})",
+      "rationale": "Intake §5 agent_default. OpenAPI already has POST /reservations and GET /reservations/{holdId}; adding GET on the collection path is the natural sibling with no method/path conflict. Different path/method not needed.",
+      "maturity": "confirmed"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "summary": "W1 foundation: apply standard OpenAPI GET /reservations and UML OCL list vocabulary for authorized full-dump success (including empty) and UnauthorizedError; keep prior reserve/release/expire/lookup/concurrent surfaces; defer formal (list read path; X8).",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive non-breaking collection GET and OCL vocabulary elevation; no money_boundary, breaking_change, low_confidence, or formal apply. AuthZ reuses POL-OPAQUE-PRINCIPAL-AUTHZ at standard density; exact success JSON envelope deferred to OpenAPI apply (Brief open_question)."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/get",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary + additive_change: W1 requires additive OpenAPI GET /reservations so clients/tests can observe collection list alongside existing POST /reservations and GET /reservations/{holdId} without removing or renaming prior reserve/release/expire/lookup/concurrent operations (R4/SC4; Change Context §5). Document authorized full-dump success shape (LookupResponse-equivalent items including availableStock; empty OK) and UnauthorizedError failure channel. Not breaking_change. Exact success JSON envelope (bare array vs { items: [] }) deferred to OpenAPI apply.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "New additive GET /reservations on existing OpenAPI SoT; no breaking change or money boundary."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#list",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary + additive_change: W1 requires UML OCL vocabulary so authorized full-dump list success (including empty) and UnauthorizedError on list are checkable (R5/SC4). Extend contracts/Reservation.ocl for list pre/post (opaque-principal AuthZ via POL-OPAQUE-PRINCIPAL-AUTHZ, shared visibility with get-by-id, LookupResponse-equivalent items including availableStock, no mutation); derived Vitest under tests/contracts/** follows apply. Not breaking_change. Property delivery of empty/nonempty success and unauthorized failure remains W2/W3 after this vocabulary elevation.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Standard DbC vocabulary elevation for list success and UnauthorizedError; no money or formal apply."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety for the list read path is out of demand (Change Context §5; Brief X8 — concurrent safety already owns formal/). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W1"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "summary": "WorkPlan add-list-holds is checkable at standard density: three property-level Gherkin items map 1:1 to requirements/reservation-list-holds.feature Scenarios and cover all Brief in_scope R1–R5 and success_criteria SC1–SC4; Scenario tags match each item's covers; no out_of_scope X* ids appear in covers or tags. W1 is foundation OpenAPI+OCL vocabulary; W2/W3 depend_on W1 for authorized full-dump success (empty+nonempty, no filters/paging) and UnauthorizedError without mutation—no dependency cycle, no unverifiable acceptance, no Brief scope drift into X10 filters/paging or full IAM. solidsdd-lint --project-root . --change-id add-list-holds passed with only minor overlapping-touches serialization notes.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "Overlapping touches on contracts/Reservation.ocl; solidsdd-run must serialize W1 then W2 (W2 already depends_on W1). Scenarios remain independently checkable."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "Overlapping touches on src/reservation.ts, src/server.ts, and tests/contracts/reservation.test.ts; solidsdd-run must serialize W2 and W3 (both depend_on W1 only). Not a checkability hole."
+    }
+  ]
+}

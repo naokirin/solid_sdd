@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft for W2: OpenAPI Redocly --extends=spec passed (W1 listReservations surface retained); ocl_tests ran a non-empty suite (61 passed) with authorized Reservation::list success posts covering empty+nonempty full dump, get-by-id visibility, no filters/paging, and no mutation (R1/R2/SC1/SC2). Unauthorized list checks are labeled soft/info and deferred to W3 ownership—not a required-check skip without reason or pass-with-zero-coverage hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W2/verification-report.json#checks (unauthorized path)",
+      "detail": "UnauthorizedErrorOnList / no-mutation-on-unauthorized posts are recorded as result pass with soft/info and covers W3. Acceptable observation that shared impl did not leave W3 red; ownership remains W3—not a soft-verify hole for W2."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W2/verification-report.json",
+      "detail": "Contract suite exercises ReservationService.list (domain OCL), not HTTP GET /reservations wire. Matches W2 WorkPlan acceptance (principal lists soft-holds); OpenAPI↔HTTP mapping remains for integration verify."
+    }
+  ]
+}

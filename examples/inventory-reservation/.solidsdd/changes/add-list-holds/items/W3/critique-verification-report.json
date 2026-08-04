@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft for W3: OpenAPI Redocly --extends=spec passed (W1 UnauthorizedError 403 channel retained); ocl_tests ran a non-empty suite (61 passed) with Reservation::list unauthorized posts covering PrincipalAuthorized rejection, named UnauthorizedErrorOnList, HoldsUnchangedOnUnauthorizedList, and AvailableStockUnchangedOnUnauthorizedList (R3/SC3). AuthZ spot-check confirms list throws before mutation. No required-check skip without reason and no pass-with-zero-coverage hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W3/verification-report.json",
+      "detail": "Contract suite and AuthZ spot-check exercise ReservationService.list (domain OCL), not HTTP GET /reservations wire. Matches W3 WorkPlan acceptance (unauthorized list → UnauthorizedError; stock/holds unchanged); OpenAPI↔HTTP mapping remains for integration verify."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W3/verification-report.json#checks (AuthZ spot-check)",
+      "detail": "POL-OPAQUE-PRINCIPAL-AUTHZ check is source inspection (kind other), not a separate automated harness. Acceptable: dedicated ocl_tests already lock UnauthorizedError + no-mutation for W3 acceptance; spot-check is corroboration of W2-delivered impl."
+    }
+  ]
+}

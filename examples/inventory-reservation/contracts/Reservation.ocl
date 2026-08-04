@@ -36,6 +36,11 @@
 --     and AvailableStockNonNegativeAfterReserve. True concurrent last-unit
 --     exclusivity and interleaving never-negative stock are formal-owned
 --     (TLA+/TLC); do not encode interleaving in OCL.
+-- add-list-holds W1: authorized full-dump list of currently visible
+--     soft-holds (same visibility universe as get-by-id / self.holds());
+--     LookupResponse-equivalent items including availableStock; empty
+--     collection when none visible; no mutation. Unauthorized → named
+--     UnauthorizedError; stock and holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
 -- Named error vocabulary shared with OpenAPI.
 
 -- Default TTL when caller omits ttlSeconds (seconds).
@@ -169,3 +174,36 @@ post AvailableStockUnchangedOnUnauthorizedLookup:
   (not principal.isAuthorized() and self.hold(holdId)@pre->notEmpty()) implies
     self.availableStock(self.hold(holdId)@pre.sku) =
       self.availableStock(self.hold(holdId)@pre.sku)@pre
+
+-- add-list-holds W1: authorized full-dump list of currently visible
+-- soft-holds (same visibility as get-by-id: a hold in self.holds() is
+-- visible); one dump with no filter dimensions; each item
+-- LookupResponse-equivalent (sku, quantity, expiresAt, availableStock
+-- = self.availableStock(item.sku) now); empty when none visible;
+-- stock and holds unchanged. No paging / sku/status/time filters in OCL.
+-- PrincipalAuthorized violation → named UnauthorizedError; no mutation
+-- (aligns with lookup/reserve/release UnauthorizedError posts).
+context Reservation::list(principal: String): Sequence(Hold)
+pre PrincipalAuthorized: principal.isAuthorized()
+post ResultIsFullDumpOfVisibleHolds:
+  result->size() = self.holds()@pre->size() and
+  self.holds()@pre->forAll(h |
+    result->exists(r |
+      r.sku = h.sku and
+      r.quantity = h.quantity and
+      r.expiresAt = h.expiresAt and
+      r.availableStock = self.availableStock(h.sku)))
+post EmptyCollectionWhenNoneVisible:
+  self.holds()@pre->isEmpty() implies result->isEmpty()
+post HoldsUnchanged: self.holds() = self.holds()@pre
+post AvailableStockUnchanged:
+  self.holds()@pre->collect(h | h.sku)->asSet()->forAll(s |
+    self.availableStock(s) = self.availableStock(s)@pre)
+post UnauthorizedErrorOnList:
+  (not principal.isAuthorized()) implies result.oclIsInvalid()
+post HoldsUnchangedOnUnauthorizedList:
+  (not principal.isAuthorized()) implies self.holds() = self.holds()@pre
+post AvailableStockUnchangedOnUnauthorizedList:
+  (not principal.isAuthorized()) implies
+    self.holds()@pre->collect(h | h.sku)->asSet()->forAll(s |
+      self.availableStock(s) = self.availableStock(s)@pre)

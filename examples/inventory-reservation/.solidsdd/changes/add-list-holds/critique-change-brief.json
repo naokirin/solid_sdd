@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "summary": "ChangeBrief for add-list-holds is checkable at brief density: non-empty {id,text} in_scope (R1–R5) and out_of_scope (X1–X13) with no in/out contradictions; success_criteria SC1–SC4 are observable (authorized unfiltered full-dump list with LookupResponse-equivalent items including availableStock and empty OK; UnauthorizedError + no mutation; additive GET /reservations + OCL/Vitest). open_questions are explicitly non-blocking deferrals; confidence high and human_gate.required false match settled Change Context / Grill Q1–Q4. Aligns with Context §1–§5, clarifications (shared visibility, no filters, full dump, GET /reservations), nfr.json, and POL-OPAQUE-PRINCIPAL-AUTHZ (opaque allow/deny; full IAM out; UnauthorizedError; no mutation). Prior out_of_scope themes retained except intentional elevation of unfiltered collection list; list-by-SKU / filters / paging stay in X10. solidsdd-lint --project-root . --change-id add-list-holds passed with zero findings.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-holds/work-plan.json",
+      "detail": "work-plan.json is absent. Expected at change_brief phase (WorkPlan is produced by solidsdd-decompose next); lint did not flag it and this is not a Brief checkability hole."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md",
+      "detail": "Canonical policy body enumerates reserve/release/expire/lookup but not list. Brief assumptions/constraints correctly cite POL-OPAQUE-PRINCIPAL-AUTHZ Means for list AuthZ and defer wording harvest; AuthZ checkability does not depend on that harvest."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-holds/change-brief.json#open_questions|assumptions",
+      "detail": "Exact success JSON envelope (bare array vs { items: [] }) remains deferred to OpenAPI apply. Acceptable for Brief; item fields are fixed and either envelope stays checkable at apply."
+    }
+  ]
+}

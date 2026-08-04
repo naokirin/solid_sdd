@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "summary": "W2 authorized list success (R1/R2/SC1/SC2): skip OpenAPI and skip OCL (W1 already elevated GET /reservations bare LookupResponse[] and Reservation::list vocabulary; derived Vitest empty+nonempty full-dump + no-mutation already present and RED). Defer formal (X8). Remaining delivery is solidsdd-implement of ReservationService.list (mirror lookup AuthZ + holds() dump with current availableStock) and GET /reservations HTTP wiring in src/server.ts before /{holdId}; then verify. Serialize note: W3 shares src/ and tests/contracts/reservation.test.ts — this plan covers only W2 authorized success; do not expand into W3-owned UnauthorizedError-only edits.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Additive authorized full-dump list success after W1 vocabulary; no money_boundary, breaking_change, low_confidence, or formal apply. AuthZ reuses POL-OPAQUE-PRINCIPAL-AUTHZ at standard density already elevated; OpenAPI/OCL SoT and RED derived tests exist — no re-apply gate."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/get",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary + additive_change: W1 already applied additive GET /reservations (operationId listReservations) with authorized full-dump 200 bare JSON array of LookupResponse (empty OK), UnauthorizedError 403, and no-mutation wording (R4/SC4 foundation). W2 WorkPlan delivers authorized success via src/reservation.ts, src/server.ts, and existing tests — not OpenAPI. Skip re-applying OpenAPI; do not remove or thin the W1 collection GET. Not breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "skip",
+      "covers": ["W2"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "API surface already applied in W1; skip avoids duplicate OpenAPI edits."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#list",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary + additive_change: W1 already elevated Reservation::list (PrincipalAuthorized; ResultIsFullDumpOfVisibleHolds; EmptyCollectionWhenNoneVisible; HoldsUnchanged; AvailableStockUnchanged; UnauthorizedError posts). Derived Vitest under describe('OCL Reservation::list') already covers authorized empty+nonempty LookupResponse-equivalent dump, shared visibility with get-by-id, and no mutation (RED until ReservationService.list exists). W2 needs no further OCL SoT elevation; skip apply-dbc. Any remaining test refine is optional in derive-tests only if implement/verify finds a gap — prefer implement making existing success tests green. UnauthorizedError-focused ownership stays with W3 when serializing shared tests/src. density standard retained as the elevated SoT density (do not thin).",
+      "adapter_hint": "ocl",
+      "status": "skip",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "DbC vocabulary and derived authorized-success tests already elevated in W1; skip avoids duplicate OCL edits."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety for the list read path is out of demand (Change Context §5; Brief X8 — concurrent safety already owns formal/). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W2"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

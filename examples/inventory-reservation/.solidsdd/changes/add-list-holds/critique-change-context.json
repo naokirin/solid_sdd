@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "summary": "Change Context for add-list-holds is checkable at intake density: all eight required headings are present; nfr.json covers the six qualities with thresholds/measurement for every in_scope item and §4 projects it without contradiction; §5 inherits TypeScript/OpenAPI/OCL/Vitest as repo_existing and records GET /reservations as agent_default with alternatives and no OpenAPI conflict; Grill Q1–Q3 Means (shared visibility, unfiltered full dump LookupResponse-equivalent including availableStock, UnauthorizedError, no mutation) and Q4 wire path are reflected consistently in Context, nfr.json, clarifications, and gate; POL-OPAQUE-PRINCIPAL-AUTHZ is cited as canonical Means for list without inventing ownership/IAM, with policy wording harvest deferred. human_gate.required false is appropriate (user/Grill settled Means; security NFR extends explicit AuthZ ask; §7 non-blocking). Lint’s missing change-brief.json is expected pre-brief and out of scope for this subject.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-list-holds/change-brief.json",
+      "detail": "solidsdd-lint reports major scope_gap: change-brief.json missing for active change. Expected at change_context phase (Brief is produced by solidsdd-brief next); not a framing/NFR checkability hole for this subject."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md",
+      "detail": "Canonical policy body enumerates reserve/release/expire/lookup but not list. Context §2/§6 correctly apply the same opaque-principal Means to list and defer wording harvest; Brief assumptions should keep citing POL-OPAQUE-PRINCIPAL-AUTHZ so AuthZ checkability does not depend on a harvest that has not run yet."
+    }
+  ]
+}

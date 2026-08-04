@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "VerificationReport is not soft for W1 foundation: OpenAPI Redocly --extends=spec passed; additive GET /reservations (listReservations) with UnauthorizedError and prior ops inspected; Reservation::list OCL vocabulary is non-vacuous (PrincipalAuthorized, full-dump/empty/no-mutation posts, UnauthorizedErrorOnList). ocl_tests ran a non-empty regression suite (49 passed). Soft-skip of red Reservation::list property tests is documented honestly as deferred_to W2/W3 and matches WorkPlan/ApplicationPlan foundation vs property split—not a required-check skip without reason or pass-with-zero-coverage hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W1,W2/touches",
+      "detail": "lint: overlapping touches ['contracts/Reservation.ocl']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "work-plan.json#items/W2,W3/touches",
+      "detail": "lint: overlapping touches ['src/reservation.ts', 'src/server.ts', 'tests/contracts/reservation.test.ts']; solidsdd-run must serialize these items"
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json#checks/ocl_tests (Reservation::list)",
+      "detail": "12 OCL Reservation::list derived tests are soft-skipped while list() is unimplemented. Acceptable for W1: WorkPlan acceptance is OpenAPI/OCL vocabulary elevation only; property delivery is W2 (authorized success) / W3 (UnauthorizedError). Skip detail names deferred_to W2/W3—not a soft-verify hole."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "items/W1/verification-report.json",
+      "detail": "HTTP server path for GET /reservations is not exercised by contract tests (OpenAPI + domain OCL/regression only); OpenAPI↔wire mapping relies on W2/W3 implement and later integration verify."
+    }
+  ]
+}

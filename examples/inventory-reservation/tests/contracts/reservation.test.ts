@@ -35,6 +35,15 @@
  *     AvailableStockNonNegative and post AvailableStockNonNegativeAfterReserve
  *     keep operated-SKU stock >= 0 on success and insufficient-stock paths.
  *     Full concurrent interleaving exclusivity is deferred to W2 / formal.
+ * add-list-holds W1: Reservation::list PrincipalAuthorized (pre);
+ *     ResultIsFullDumpOfVisibleHolds (LookupResponse-equivalent items
+ *     including availableStock; same visibility as get-by-id / holds());
+ *     EmptyCollectionWhenNoneVisible; HoldsUnchanged /
+ *     AvailableStockUnchanged (authorized read-only full dump);
+ *     UnauthorizedErrorOnList / HoldsUnchangedOnUnauthorizedList /
+ *     AvailableStockUnchangedOnUnauthorizedList (UnauthorizedError; no
+ *     mutation). Aligns with OpenAPI GET /reservations bare array of
+ *     LookupResponse (empty OK).
  */
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -796,5 +805,212 @@ describe("OCL Reservation::lookup", () => {
 
     expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
     expect(ReservationService.availableStock("SKU-1")).toBe(7);
+  });
+});
+
+describe("OCL Reservation::list", () => {
+  afterEach(() => {
+    ReservationService.reset();
+  });
+
+  it("post EmptyCollectionWhenNoneVisible: authorized list returns empty array when no holds are visible", () => {
+    ReservationService.seedStock("SKU-1", 10);
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result).toHaveLength(0);
+    expect(result).toEqual([]);
+  });
+
+  it("post ResultIsFullDumpOfVisibleHolds: authorized list returns all visible holds as LookupResponse-equivalent items including availableStock", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.seedStock("SKU-2", 5);
+    const hold1 = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    const hold2 = ReservationService.reserve(AUTHORIZED, "SKU-2", 2, 300);
+    const stock1 = ReservationService.availableStock("SKU-1");
+    const stock2 = ReservationService.availableStock("SKU-2");
+    expect(stock1).toBe(6);
+    expect(stock2).toBe(3);
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result).toHaveLength(2);
+    const byId = new Map(result.map((r) => [r.holdId, r]));
+    expect(byId.size).toBe(2);
+
+    const item1 = byId.get(hold1.holdId);
+    expect(item1).toBeDefined();
+    expect(item1?.holdId).toBe(hold1.holdId);
+    expect(item1?.sku).toBe(hold1.sku);
+    expect(item1?.quantity).toBe(hold1.quantity);
+    expect(item1?.expiresAt).toBe(hold1.expiresAt);
+    expect(item1?.availableStock).toBe(stock1);
+    expect(item1?.availableStock).toBe(
+      ReservationService.availableStock(hold1.sku),
+    );
+
+    const item2 = byId.get(hold2.holdId);
+    expect(item2).toBeDefined();
+    expect(item2?.holdId).toBe(hold2.holdId);
+    expect(item2?.sku).toBe(hold2.sku);
+    expect(item2?.quantity).toBe(hold2.quantity);
+    expect(item2?.expiresAt).toBe(hold2.expiresAt);
+    expect(item2?.availableStock).toBe(stock2);
+    expect(item2?.availableStock).toBe(
+      ReservationService.availableStock(hold2.sku),
+    );
+  });
+
+  it("post ResultIsFullDumpOfVisibleHolds: availableStock is current stock, not a reserve-time snapshot", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    expect(hold.availableStock).toBe(6);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 2, 300);
+    const currentStock = ReservationService.availableStock("SKU-1");
+    expect(currentStock).toBe(4);
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    const item = result.find((r) => r.holdId === hold.holdId);
+    expect(item).toBeDefined();
+    expect(item?.availableStock).toBe(currentStock);
+    expect(item?.availableStock).toBe(
+      ReservationService.availableStock("SKU-1"),
+    );
+    expect(item?.availableStock).not.toBe(hold.availableStock);
+  });
+
+  it("post ResultIsFullDumpOfVisibleHolds: list visibility matches get-by-id (same holds() universe)", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.seedStock("SKU-2", 5);
+    const hold1 = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const hold2 = ReservationService.reserve(AUTHORIZED, "SKU-2", 2, 300);
+
+    const listed = ReservationService.list(AUTHORIZED);
+    const listedIds = new Set(listed.map((r) => r.holdId));
+    expect(listedIds).toEqual(new Set([hold1.holdId, hold2.holdId]));
+
+    for (const hold of [hold1, hold2]) {
+      const lookedUp = ReservationService.lookup(AUTHORIZED, hold.holdId);
+      const listedItem = listed.find((r) => r.holdId === hold.holdId);
+      expect(listedItem).toBeDefined();
+      expect(listedItem?.sku).toBe(lookedUp.sku);
+      expect(listedItem?.quantity).toBe(lookedUp.quantity);
+      expect(listedItem?.expiresAt).toBe(lookedUp.expiresAt);
+      expect(listedItem?.availableStock).toBe(lookedUp.availableStock);
+    }
+  });
+
+  it("post HoldsUnchanged: authorized list leaves holds() equal to holds()@pre", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    const holdsBefore = ReservationService.holds().map((h) => ({ ...h }));
+
+    ReservationService.list(AUTHORIZED);
+
+    const holdsAfter = ReservationService.holds();
+    expect(holdsAfter).toHaveLength(1);
+    expect(holdsAfter[0]?.holdId).toBe(hold.holdId);
+    expect(holdsAfter[0]?.sku).toBe(holdsBefore[0]?.sku);
+    expect(holdsAfter[0]?.quantity).toBe(holdsBefore[0]?.quantity);
+    expect(holdsAfter[0]?.expiresAt).toBe(holdsBefore[0]?.expiresAt);
+  });
+
+  it("post AvailableStockUnchanged: authorized list leaves availableStock equal to @pre", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.seedStock("SKU-2", 5);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 4, 300);
+    ReservationService.reserve(AUTHORIZED, "SKU-2", 2, 300);
+    const stock1Before = ReservationService.availableStock("SKU-1");
+    const stock2Before = ReservationService.availableStock("SKU-2");
+    expect(stock1Before).toBe(6);
+    expect(stock2Before).toBe(3);
+
+    ReservationService.list(AUTHORIZED);
+
+    expect(ReservationService.availableStock("SKU-1")).toBe(stock1Before);
+    expect(ReservationService.availableStock("SKU-2")).toBe(stock2Before);
+  });
+
+  it("post EmptyCollectionWhenNoneVisible + HoldsUnchanged + AvailableStockUnchanged: empty list does not mutate", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+
+    const result = ReservationService.list(AUTHORIZED);
+
+    expect(result).toEqual([]);
+    expect(ReservationService.holds()).toHaveLength(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+  });
+
+  it("pre PrincipalAuthorized: unauthorized principal is rejected", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+
+    expect(() => ReservationService.list(UNAUTHORIZED)).toThrow(
+      UnauthorizedError,
+    );
+  });
+
+  it("post UnauthorizedErrorOnList: unauthorized yields named UnauthorizedError (not a language builtin)", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    let caught: unknown;
+    try {
+      ReservationService.list(UNAUTHORIZED);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(UnauthorizedError);
+    expect(caught).not.toBeInstanceOf(PreconditionError);
+    expect(caught).not.toBeInstanceOf(InsufficientStockError);
+    expect(caught).not.toBeInstanceOf(TypeError);
+    expect((caught as UnauthorizedError).errorType).toBe("UnauthorizedError");
+    expect((caught as UnauthorizedError).name).toBe("UnauthorizedError");
+  });
+
+  it("post HoldsUnchangedOnUnauthorizedList: holds() equals holds()@pre when unauthorized", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const hold = ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const holdsBefore = ReservationService.holds().map((h) => ({ ...h }));
+
+    expect(() => ReservationService.list(UNAUTHORIZED)).toThrow(
+      UnauthorizedError,
+    );
+
+    const holdsAfter = ReservationService.holds();
+    expect(holdsAfter).toHaveLength(1);
+    expect(holdsAfter[0]?.holdId).toBe(hold.holdId);
+    expect(holdsAfter[0]?.sku).toBe(holdsBefore[0]?.sku);
+    expect(holdsAfter[0]?.quantity).toBe(holdsBefore[0]?.quantity);
+    expect(holdsAfter[0]?.expiresAt).toBe(holdsBefore[0]?.expiresAt);
+  });
+
+  it("post AvailableStockUnchangedOnUnauthorizedList: availableStock equals @pre when unauthorized", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    ReservationService.reserve(AUTHORIZED, "SKU-1", 3, 300);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+    expect(stockBefore).toBe(7);
+
+    expect(() => ReservationService.list(UNAUTHORIZED)).toThrow(
+      UnauthorizedError,
+    );
+
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
+    expect(ReservationService.availableStock("SKU-1")).toBe(7);
+  });
+
+  it("post HoldsUnchangedOnUnauthorizedList + AvailableStockUnchangedOnUnauthorizedList: no mutation when none existed before unauthorized list", () => {
+    ReservationService.seedStock("SKU-1", 10);
+    const stockBefore = ReservationService.availableStock("SKU-1");
+
+    expect(() => ReservationService.list(UNAUTHORIZED)).toThrow(
+      UnauthorizedError,
+    );
+
+    expect(ReservationService.holds()).toHaveLength(0);
+    expect(ReservationService.availableStock("SKU-1")).toBe(stockBefore);
   });
 });

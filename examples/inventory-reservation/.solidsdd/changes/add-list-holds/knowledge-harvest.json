@@ -1,0 +1,105 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "candidates": [
+    {
+      "id": "POL-OPAQUE-PRINCIPAL-AUTHZ",
+      "type": "policy",
+      "title": "Opaque principal authorize/deny only (not full IAM)",
+      "scope": "product.inventory_reservation",
+      "body": "AuthZ for reserve, release, expire, lookup, and list is opaque-principal allow/deny only. Full IAM (SSO, OAuth UI, role admin) is out of scope for this sample product. Unauthorized callers fail with a named UnauthorizedError (or equivalent named domain error) and must not mutate stock or holds.",
+      "rationale": "Canonical AuthZ Means already cited for list; policy text still names only reserve/release/expire/lookup. Extending the operation list to include list keeps a single durable AuthZ node and prevents later agents from inventing a parallel AuthZ policy for collection reads. Non-obvious bound: opaque allow/deny only (not ownership/IAM), UnauthorizedError, no mutation on deny.",
+      "source_refs": [
+        "add-list-holds/R3",
+        "add-list-holds/SC3",
+        "knowledge/policies/POL-OPAQUE-PRINCIPAL-AUTHZ.md",
+        ".solidsdd/changes/add-list-holds/change-context.md"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-list-holds/R3",
+          "to": "POL-OPAQUE-PRINCIPAL-AUTHZ"
+        }
+      ],
+      "status": "applied",
+      "maturity": "hypothesized",
+      "facets": ["decider"]
+    },
+    {
+      "id": "POL-SOFT-HOLD-SHARED-READ-VISIBILITY",
+      "type": "policy",
+      "title": "Soft-hold reads share one visibility universe (list = get-by-id)",
+      "scope": "product.inventory_reservation",
+      "body": "Authorized soft-hold reads—get-by-id and collection list—share one visibility universe: any authorized opaque principal sees all currently visible soft-holds. Do not introduce principal-scoped ownership, self-only listing, roles, tenants, or cross-principal admin views unless an explicit later change elevates them.",
+      "rationale": "Grill Q1 confirmed a reusable Means that later list/filter elevations must not silently reverse. Non-obvious choice/boundary: shared full visibility vs the common default of self-only or ownership-scoped collection reads. Universality: applies to current list and any future read that claims the same soft-hold visibility model.",
+      "source_refs": [
+        "add-list-holds/R1",
+        "add-list-holds/SC1",
+        "add-list-holds/X11",
+        "requirements/reservation-list-holds.feature",
+        ".solidsdd/changes/add-list-holds/change-context.md"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-list-holds/R1",
+          "to": "POL-SOFT-HOLD-SHARED-READ-VISIBILITY"
+        }
+      ],
+      "status": "applied",
+      "maturity": "hypothesized",
+      "facets": ["decider", "invariant"]
+    },
+    {
+      "id": "DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP",
+      "type": "decision",
+      "title": "Soft-hold list is an unfiltered full dump of LookupResponse-equivalent items",
+      "scope": "product.inventory_reservation",
+      "body": "Until an explicit change elevates filter dimensions or paging, soft-hold collection list returns one unfiltered full dump (no sku/status/time filters, no paging/cursor/limit-offset) whose items are LookupResponse-equivalent (holdId, sku, quantity, expiresAt, availableStock). Empty collection when none are visible is success. List-by-SKU aggregates and thinner DTOs without availableStock remain deferred.",
+      "rationale": "Grill Q2–Q3 settled ADR-worthy Means: full dump + LookupResponse parity including availableStock, not paging or a thinner list DTO. Non-obvious boundary: correctness sample prefers complete visible-set dump over premature list UX (filters/paging). Low churn until X10-style elevation; later agents must not silently add filters/paging or drop availableStock without a new decision.",
+      "source_refs": [
+        "add-list-holds/R2",
+        "add-list-holds/SC2",
+        "add-list-holds/X10",
+        "requirements/reservation-list-holds.feature",
+        ".solidsdd/changes/add-list-holds/change-context.md"
+      ],
+      "link_edges": [
+        {
+          "type": "derives_from",
+          "from": "add-list-holds/R2",
+          "to": "DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP"
+        }
+      ],
+      "status": "applied",
+      "maturity": "hypothesized",
+      "facets": ["decider", "acceptance-property"]
+    }
+  ],
+  "skipped_reasons": [
+    "GET /reservations path/method is Change Context §5 agent_default wire choice for this change—not a durable cross-cutting Means.",
+    "Exact success JSON envelope (bare array vs { items: [] }) was deferred to OpenAPI apply; keep adapter SoT, do not harvest.",
+    "OpenAPI / OCL / Vitest / Feature Scenario wording stay adapter or requirement SoT; not harvested wholesale.",
+    "Brief in_scope / out_of_scope lists and acceptance_of_whole prose are change-local; not promoted as living PRD.",
+    "cli promote suggest duplicate_title (add-lookup-available-stock/R1 vs add-reservation-lookup/R1) is a prior-change title collision hint, not a knowledge node for this harvest."
+  ],
+  "cli_suggest": [
+    {
+      "kind": "duplicate_title",
+      "ids": [
+        "add-lookup-available-stock/R1",
+        "add-reservation-lookup/R1"
+      ],
+      "summary": "normalized title/alias collision among add-lookup-available-stock/R1, add-reservation-lookup/R1",
+      "paths": [
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-lookup-available-stock/change-brief.json",
+        "/home/naoki.guest/repos/github.com/naokirin/solid_sdd/examples/inventory-reservation/.solidsdd/changes/add-reservation-lookup/change-brief.json"
+      ]
+    }
+  ],
+  "human_gate": {
+    "required": false,
+    "reason": "All 3 candidates applied after gate-approval.json scope knowledge_harvest (approve)."
+  }
+}

@@ -98,6 +98,31 @@ createServer(async (req, res) => {
 
     const pathOnly = req.url?.split("?")[0] ?? "";
 
+    // OpenAPI: GET /reservations — authorized full-dump list (before /{holdId})
+    if (req.method === "GET" && pathOnly === "/reservations") {
+      const principal = principalFrom(req);
+      if (!principal) {
+        sendJson(res, 403, {
+          error: "X-Principal-Id header is required",
+          errorType: "UnauthorizedError",
+        });
+        return;
+      }
+      const holds = ReservationService.list(principal);
+      sendJson(
+        res,
+        200,
+        holds.map((hold) => ({
+          holdId: hold.holdId,
+          sku: hold.sku,
+          quantity: hold.quantity,
+          expiresAt: hold.expiresAt,
+          availableStock: hold.availableStock,
+        })),
+      );
+      return;
+    }
+
     // OpenAPI: GET /reservations/{holdId} — authorized lookup (read-only)
     const lookupMatch =
       req.method === "GET" ? lookupPath.exec(pathOnly) : null;

@@ -19,10 +19,94 @@ info:
     Concurrent last-unit safety elevates that concurrent race losers on reserve
     use the same named InsufficientStockError channel as sequential
     insufficient stock (additive; prior success and error surfaces remain).
+    Additive collection list (GET /reservations) returns a full dump of
+    currently visible soft-holds as a JSON array of LookupResponse items
+    (including empty); unauthorized list fails as named UnauthorizedError
+    with stock and holds unchanged.
 servers:
   - url: http://localhost:3000
 paths:
   /reservations:
+    get:
+      operationId: listReservations
+      summary: List currently visible soft-holds (authorized opaque principal)
+      description: >-
+        Returns one full dump of all currently visible soft-holds in the same
+        visibility universe as get-by-id when the caller is an authorized
+        opaque principal. No paging and no sku, status, or time filter
+        dimensions. Success body is a bare JSON array of LookupResponse
+        objects (holdId, sku, quantity, expiresAt, availableStock) — chosen
+        over an { items } envelope because this document has no prior
+        collection wrapper pattern and items are exactly LookupResponse.
+        Empty array when none are visible. Read-only: stock and holds are
+        unchanged. When the caller is unauthorized, the operation fails with
+        named domain error UnauthorizedError and leaves available stock and
+        existing holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
+      parameters:
+        - $ref: '#/components/parameters/OpaquePrincipal'
+      responses:
+        '200':
+          description: >-
+            Authorized list success. Clients and tests MUST observe a JSON
+            array (possibly empty) whose elements are LookupResponse-
+            equivalent (holdId, sku, quantity, expiresAt, availableStock)
+            covering all currently visible soft-holds. The operation remains
+            non-mutating: clients and tests MUST treat it as leaving available
+            stock and existing holds unchanged.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LookupResponse'
+              examples:
+                nonempty:
+                  summary: One or more visible soft-holds
+                  value:
+                    - holdId: hold-1
+                      sku: SKU-1
+                      quantity: 2
+                      expiresAt: '2026-08-04T15:00:00.000Z'
+                      availableStock: 8
+                empty:
+                  summary: No visible soft-holds
+                  value: []
+        '403':
+          description: >-
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to list: available stock and existing holds are
+            unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UnauthorizedError:
+                  summary: Caller not authorized to list
+                  description: >-
+                    First-class failure channel for unauthorized list.
+                    Clients and tests MUST observe errorType UnauthorizedError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged.
+                  value:
+                    error: Principal is not authorized to list
+                    errorType: UnauthorizedError
+        '400':
+          description: >-
+            Invalid request / PreconditionError (e.g. missing opaque
+            principal): available stock and existing holds are unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                PreconditionError:
+                  summary: Invalid list precondition
+                  description: >-
+                    Invalid request precondition. Stock and holds unchanged.
+                  value:
+                    error: principal is required
+                    errorType: PreconditionError
     post:
       operationId: reserve
       summary: Soft-hold SKU quantity for a TTL (authorized opaque principal)
@@ -406,9 +490,9 @@ components:
             as sequential insufficient stock); response implies no soft-hold
             created for the failing attempt and available stock unchanged by
             that attempt.
-            UnauthorizedError: caller not authorized for reserve, release, or
-            lookup; no hold created by the failed attempt (reserve/release);
-            available stock and existing holds unchanged.
+            UnauthorizedError: caller not authorized for reserve, release,
+            lookup, or list; no hold created by the failed attempt
+            (reserve/release); available stock and existing holds unchanged.
             PreconditionError: invalid request precondition (including missing
             or not-visible hold on lookup/release/expire, or expire when TTL
             has not elapsed); no unintended stock or hold mutation.
@@ -433,9 +517,9 @@ components:
     UnauthorizedError:
       description: >-
         Named domain failure UnauthorizedError when the caller is not
-        authorized to reserve, release, or look up. No soft-hold is created by
-        the failed attempt (reserve/release); available stock and existing
-        holds are unchanged.
+        authorized to reserve, release, look up, or list. No soft-hold is
+        created by the failed attempt (reserve/release); available stock and
+        existing holds are unchanged.
       content:
         application/json:
           schema:

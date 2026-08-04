@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 16ms; Woohoo! Your API description is valid. GET /reservations (listReservations) remains present from W1; no OpenAPI re-apply in W2.",
+      "covers": ["W2", "R1", "R2", "SC1", "SC2"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — full suite",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "mise exec -- npm test (vitest run) → tests/contracts/reservation.test.ts: 61 passed (61), 0 failed. Duration ~336ms. Confirms implementer-reported green suite.",
+      "covers": ["W2"]
+    },
+    {
+      "name": "OCL Reservation::list — authorized full-dump success (W2 acceptance)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "describe('OCL Reservation::list') authorized-success posts all green: EmptyCollectionWhenNoneVisible (empty dump); ResultIsFullDumpOfVisibleHolds (LookupResponse-equivalent items with availableStock; current stock not reserve-time snapshot; list visibility matches get-by-id / same holds() universe); HoldsUnchanged; AvailableStockUnchanged; empty list does not mutate. Covers W2 acceptance: authorized full dump empty+nonempty, same visibility as get-by-id, no filters/paging, no mutation. ReservationService.list + GET /reservations implementation delivers these properties.",
+      "covers": ["W2", "R1", "R2", "SC1", "SC2"]
+    },
+    {
+      "name": "OCL Reservation::list — unauthorized path (W3-owned; observed green)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "soft/info: UnauthorizedErrorOnList and no-mutation-on-unauthorized posts also pass in the same suite (PrincipalAuthorized rejection, UnauthorizedError, HoldsUnchangedOnUnauthorizedList, AvailableStockUnchangedOnUnauthorizedList). Ownership remains W3; recorded as non-blocking observation that shared impl did not leave unauthorized list red.",
+      "covers": ["W3"]
+    }
+  ]
+}

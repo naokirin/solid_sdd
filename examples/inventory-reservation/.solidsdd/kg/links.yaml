@@ -7,3 +7,12 @@ edges:
   - type: derives_from
     from: add-lookup-available-stock/R3
     to: POL-OPAQUE-PRINCIPAL-AUTHZ
+  - type: derives_from
+    from: add-list-holds/R3
+    to: POL-OPAQUE-PRINCIPAL-AUTHZ
+  - type: derives_from
+    from: add-list-holds/R1
+    to: POL-SOFT-HOLD-SHARED-READ-VISIBILITY
+  - type: derives_from
+    from: add-list-holds/R2
+    to: DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP

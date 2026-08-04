@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "application_plan",
+  "result": "pass",
+  "summary": "W3 ApplicationPlan correctly skips re-applying OpenAPI and OCL (W1 already elevated GET /reservations UnauthorizedError 403 and Reservation::list UnauthorizedError + no-mutation posts; derived Vitest and W2 AuthZ delivery already cover unauthorized rejection), defers formal with Brief X8 rationale, and routes remaining work to solidsdd-verify against W3 acceptance (UnauthorizedError, stock/holds unchanged) without expanding into W2 authorized-success ownership. solidsdd-lint pass with zero findings. No density thinning, silent formal drop, or Brief scope drift; R3/SC3 checkability remains via existing SoT and contract tests.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "items/W3/application-plan.json#targets/api,dbc",
+      "detail": "api and dbc status=skip while targets retain density standard and authz_boundary signals. Justified: W1 already applied UnauthorizedError list vocabulary and derived unauthorized/no-mutation tests; skip avoids duplicate SoT elevation and does not thin density. Remaining delivery is verify that existing unauthorized-list cases stay green for R3/SC3."
+    }
+  ]
+}

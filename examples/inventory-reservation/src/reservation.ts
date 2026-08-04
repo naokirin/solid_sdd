@@ -169,6 +169,26 @@ export const ReservationService = {
   },
 
   /**
+   * Full dump of currently visible soft-holds. Read-only: stock and holds
+   * unchanged. Unauthorized → UnauthorizedError; empty array when none.
+   * Each item uses current availableStock (LookupResponse-equivalent).
+   * OCL: Reservation::list
+   */
+  list(principal: string): Hold[] {
+    // pre PrincipalAuthorized
+    if (!isAuthorized(principal)) {
+      throw new UnauthorizedError("principal is not authorized");
+    }
+
+    // post ResultIsFullDumpOfVisibleHolds / EmptyCollectionWhenNoneVisible;
+    // HoldsUnchanged; AvailableStockUnchanged
+    return [...holdsById.values()].map((hold) => ({
+      ...hold,
+      availableStock: ReservationService.availableStock(hold.sku),
+    }));
+  },
+
+  /**
    * Release a soft-hold. Unauthorized callers fail with named UnauthorizedError
    * and leave stock/holds unchanged (W3). Authorized success restores held
    * quantity to available stock and removes the hold (W4: HoldExists,

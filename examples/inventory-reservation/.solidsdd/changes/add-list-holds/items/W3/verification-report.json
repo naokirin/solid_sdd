@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 37ms; Woohoo! Your API description is valid. GET /reservations UnauthorizedError (403) channel remains from W1; no OpenAPI re-apply required for W3.",
+      "covers": ["W3", "R3", "SC3"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — full suite",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "mise exec -- npm test (vitest run) → tests/contracts/reservation.test.ts: 61 passed (61), 0 failed. Duration ~385ms.",
+      "covers": ["W3"]
+    },
+    {
+      "name": "OCL Reservation::list — unauthorized UnauthorizedError + no mutation (W3 acceptance)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "describe('OCL Reservation::list') unauthorized posts all green: PrincipalAuthorized rejection; UnauthorizedErrorOnList (named UnauthorizedError with errorType, not language builtin); HoldsUnchangedOnUnauthorizedList; AvailableStockUnchangedOnUnauthorizedList; no mutation when none existed. Covers W3 acceptance: unauthorized list → UnauthorizedError; stock and holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).",
+      "covers": ["W3", "R3", "SC3"]
+    },
+    {
+      "name": "ReservationService.list AuthZ spot-check (POL-OPAQUE-PRINCIPAL-AUTHZ)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "src/reservation.ts list(principal): pre PrincipalAuthorized via isAuthorized (AUTHORIZED_PRINCIPALS / opaque principal-authorized); unauthorized throws UnauthorizedError before any hold/stock read-mutation path; return is map-only full dump (no writes). src/server.ts GET /reservations: missing x-principal-id → UnauthorizedError JSON; otherwise ReservationService.list(principal) with UnauthorizedError catch. Matches W2-delivered impl; W3 property confirmed.",
+      "covers": ["W3", "R3", "SC3"]
+    }
+  ]
+}

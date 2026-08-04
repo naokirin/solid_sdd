@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "verification_report",
+  "result": "pass",
+  "summary": "Integration VerificationReport is not soft against work-plan acceptance_of_whole: solidsdd-lint passed with no findings; OpenAPI Redocly --extends=spec passed; additive GET /reservations spot-check covers authorized full-dump + UnauthorizedError 403 and prior ops retained; ocl_tests ran a non-empty suite (61 passed) covering authorized empty+nonempty list, visibility/no-mutation, and UnauthorizedErrorOnList + no-mutation; OpenAPI/OCL/impl alignment records server GET /reservations wiring. No required-check skip without reason and no pass-with-zero-coverage hole.",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "verification-report.json#checks (OpenAPI / OCL / impl alignment)",
+      "detail": "HTTP GET /reservations wire is corroborated by OpenAPI lint/spot-check plus source inspection of src/server.ts, not by an automated HTTP client harness. Domain ocl_tests already lock ReservationService.list success and UnauthorizedError paths that acceptance_of_whole requires; remaining gap is polish, not lost checkability."
+    }
+  ]
+}

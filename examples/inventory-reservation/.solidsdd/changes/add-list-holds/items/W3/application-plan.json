@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "summary": "W3 unauthorized list (R3/SC3): skip OpenAPI and skip OCL (W1 already elevated GET /reservations UnauthorizedError 403 and Reservation::list UnauthorizedError + no-mutation posts; W2 delivered ReservationService.list AuthZ mirroring lookup and GET /reservations wiring — unauthorized list cases already green). Defer formal (X8). Delivery may already be present; remaining work is solidsdd-verify against W3 acceptance (UnauthorizedError, stock/holds unchanged) without re-applying SoT or expanding into W2-owned authorized-success edits.",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Unauthorized list UnauthorizedError and no-mutation reuse POL-OPAQUE-PRINCIPAL-AUTHZ already elevated in W1 and delivered with W2 AuthZ; no money_boundary, breaking_change, low_confidence, or formal apply. OpenAPI/OCL SoT and unauthorized-list derived tests exist — no re-apply gate."
+  },
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/paths/~1reservations/get",
+      "density": "standard",
+      "rationale": "http_boundary + authz_boundary + additive_change: W1 already applied additive GET /reservations (operationId listReservations) documenting UnauthorizedError 403 failure channel for unauthorized callers alongside authorized full-dump 200 (R4/SC4 foundation; POL-OPAQUE-PRINCIPAL-AUTHZ). W3 WorkPlan owns unauthorized failure acceptance via existing tests and impl — not OpenAPI. Skip re-applying OpenAPI; do not remove or thin the W1 collection GET. Not breaking_change.",
+      "adapter_hint": "openapi",
+      "status": "skip",
+      "covers": ["W3"],
+      "signals": ["http_boundary", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "API UnauthorizedError channel already applied in W1; skip avoids duplicate OpenAPI edits."
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Reservation.ocl#list",
+      "density": "standard",
+      "rationale": "domain_contract + authz_boundary + additive_change: W1 already elevated Reservation::list UnauthorizedError posts (UnauthorizedErrorOnList; HoldsUnchangedOnUnauthorizedList; AvailableStockUnchangedOnUnauthorizedList) with PrincipalAuthorized pre via POL-OPAQUE-PRINCIPAL-AUTHZ. Derived Vitest under describe('OCL Reservation::list') already covers unauthorized rejection and no-mutation; W2 implement made list AuthZ green including those cases. W3 needs no further OCL SoT elevation; skip apply-dbc. Remaining is verify against W3 acceptance — prefer confirm existing unauthorized tests stay green over re-deriving. density standard retained as the elevated SoT density (do not thin).",
+      "adapter_hint": "ocl",
+      "status": "skip",
+      "covers": ["W3"],
+      "signals": ["domain_contract", "authz_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "DbC UnauthorizedError vocabulary and derived tests already elevated in W1 and satisfied by W2 delivery; skip avoids duplicate OCL edits."
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/",
+      "density": "thin",
+      "rationale": "concurrency_safety for the list read path is out of demand (Change Context §5; Brief X8 — concurrent safety already owns formal/). No Phase 3 formal apply conditions; defer rather than silently omit.",
+      "adapter_hint": "defer-formal",
+      "status": "defer",
+      "covers": ["W3"],
+      "signals": [],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Formal deferred; no Phase 3 apply conditions met."
+      }
+    }
+  ]
+}

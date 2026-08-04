@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "change_id": "add-list-holds",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 15ms; Woohoo! Your API description is valid.",
+      "covers": ["W1", "R4", "R5", "SC4"]
+    },
+    {
+      "name": "OpenAPI additive GET /reservations; prior ops remain",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "W1 acceptance inspected: paths./reservations.get (operationId listReservations) documents authorized full-dump success (200 array of LookupResponse, including empty) and UnauthorizedError (403). Prior surfaces remain: POST /reservations (reserve), GET /reservations/{holdId} (getReservation), POST /reservations/{holdId}/release, POST /reservations/{holdId}/expire, and concurrent last-unit InsufficientStockError channel on reserve (additive; not removed).",
+      "covers": ["W1", "R4", "R5", "SC4"]
+    },
+    {
+      "name": "UML OCL Reservation::list vocabulary (non-vacuous)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "contracts/Reservation.ocl elevates context Reservation::list(principal: String): Sequence(Hold) with pre PrincipalAuthorized; posts ResultIsFullDumpOfVisibleHolds, EmptyCollectionWhenNoneVisible, HoldsUnchanged, AvailableStockUnchanged (authorized full-dump including empty, no mutation); posts UnauthorizedErrorOnList, HoldsUnchangedOnUnauthorizedList, AvailableStockUnchangedOnUnauthorizedList (named UnauthorizedError + no mutation). Not vacuous — checkable vocabulary for W2/W3 property delivery.",
+      "covers": ["W1", "R4", "R5", "SC4"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — non-list regression",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "vitest run tests/contracts/reservation.test.ts --testNamePattern='OCL Reservation::(reserve|release|expire|lookup)' → 49 passed | 12 skipped (0 failed). Prior reserve/release/expire/lookup suites green after additive OpenAPI/OCL elevation.",
+      "covers": ["W1"]
+    },
+    {
+      "name": "OCL-derived contract tests (vitest) — Reservation::list property delivery",
+      "kind": "ocl_tests",
+      "result": "skipped",
+      "detail": "soft/info: 12 describe('OCL Reservation::list') tests intentionally red until list() is implemented (ReservationService.list is not a function). Property delivery (authorized full-dump success including empty; UnauthorizedError without mutation) is out of W1 foundation scope — deferred_to W2 (authorized list success) and W3 (unauthorized UnauthorizedError). Do not treat these reds as W1 verify fail.",
+      "covers": ["W2", "W3"]
+    }
+  ]
+}
