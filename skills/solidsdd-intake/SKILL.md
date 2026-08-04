@@ -27,6 +27,7 @@ Emit `change-context.md` so later skills (and humans) can see **why** NFRs and t
 - [nfr.schema.json](references/nfr.schema.json) — NFR SoT
 - [change-context-gate.schema.json](references/change-context-gate.schema.json)
 - [change-lifecycle.md](references/change-lifecycle.md) — **paths, change_id, next-change flow (required)**
+- [clarifications.md](references/clarifications.md) — durable Q/A from Grill
 - [active-change.schema.json](references/active-change.schema.json)
 - [change-status.schema.json](references/change-status.schema.json)
 - [human-gates.md](references/human-gates.md)
@@ -46,7 +47,7 @@ Emit `change-context.md` so later skills (and humans) can see **why** NFRs and t
 
 ## Steps
 
-1. Read change request / user intent and context (`solidsdd-context` output if available). If `knowledge-consult.md` exists for this change (or a draft from `solidsdd-knowledge` consult), treat applicable policies/decisions as framing inputs for § Drivers / Constraints / Links—**cite ids**, do not paste full living docs.
+1. Read change request / user intent and context (`solidsdd-context` output if available). If `knowledge-consult.md` exists for this change (or a draft from `solidsdd-knowledge` consult), treat applicable policies/decisions as framing inputs for § Drivers / Constraints / Links—**cite ids**, do not paste full living docs. If `clarifications/open.json` exists, fold resolved decisions into §5/§6 and list remaining opens in §7 ([clarifications.md](references/clarifications.md)).
 2. Resolve **working language** per [working-language.md](references/working-language.md) (project rule → user request → `en`).
 3. If only legacy flat Brief exists, migrate per [change-lifecycle.md](references/change-lifecycle.md) first when paths collide; otherwise proceed.
 4. Decide `change_id`: use caller-supplied id when valid; otherwise derive meaningful kebab-case from goal; on collision under `changes/`, append `-2`, `-3`, …

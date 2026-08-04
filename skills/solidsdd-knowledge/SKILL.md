@@ -53,8 +53,8 @@ Close the SDD gap where durable knowledge is buried inside volatile requirements
    - `context <node-id> --budget 8k` for top policies/decisions (e.g. from `knowledge/policies`, `knowledge/decisions`)
    - `impact` on relevant ids when Brief R* already exist (`<change_id>/R*`)
 4. Write `.solidsdd/changes/<change_id>/knowledge-consult.md` with:
-   - Applicable policies / concepts / decisions (or **None**)
-   - Suggested ids for Brief `assumptions` / `constraints` citations
+   - Applicable policies / concepts / decisions (or **None**), noting `maturity` when present (prefer `canonical` / `confirmed` over `hypothesized`)
+   - Suggested ids for Brief `assumptions` / `constraints` citations (`hypothesized` → assumptions)
    - Gaps (missing `.solidsdd/kg/`, CLI unavailable)
 5. Return path + short summary for intake/brief.
 

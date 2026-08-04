@@ -104,6 +104,19 @@
           "type": "string",
           "enum": ["proposed", "approved", "rejected", "applied", "skipped"],
           "description": "proposed until gate; applied after promote/file write."
+        },
+        "maturity": {
+          "type": "string",
+          "enum": ["hypothesized", "confirmed", "canonical"],
+          "description": "Epistemic certainty. Prefer hypothesized until human confirms; apply after gate defaults to canonical."
+        },
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["vocabulary", "invariant", "decider", "acceptance-property"]
+          },
+          "description": "Optional semantic facets (complements type)."
         }
       }
     }

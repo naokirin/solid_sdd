@@ -17,6 +17,8 @@ Requirement authority remains **ChangeBrief / Gherkin**. Graph `requirement` nod
 
 Every candidate must be **universal**, **non-trivial**, and **rarely updated** ([POL-KG-PERSISTENCE](../knowledge/policies/POL-KG-PERSISTENCE.md)). Non-trivial means a competent domain engineer would not call it obvious, or later agents would likely err on a **choice / exception / boundary**.
 
+Prefer **Means** (reusable decision criteria from Change Context §6) over **tech selection** (Change Context §5 stack picks for this change). Do not harvest one-off language/API/persistence choices that belong only in Context.
+
 | Type | Put here when… |
 |------|----------------|
 | `concept` | Stable ubiquitous-language term (non-obvious naming or scope) |
@@ -25,7 +27,15 @@ Every candidate must be **universal**, **non-trivial**, and **rarely updated** (
 | `decision` | ADR-worthy choice that later agents must not silently reverse |
 | `lesson` | Incident / failed approach that should inform future Briefs |
 
-**Do not harvest:** ephemeral acceptance wording, one-off sample paths, full OpenAPI/OCL bodies, tautologies / domain axioms restated without a choice boundary, or anything that would turn Brief into a living PRD. Trivial nodes have low information value and raise maintenance cost (staleness checks, graph noise).
+**Do not harvest:** ephemeral acceptance wording, one-off sample paths, full OpenAPI/OCL bodies, tautologies / domain axioms restated without a choice boundary, one-off §5 stack selections, or anything that would turn Brief into a living PRD. Trivial nodes have low information value and raise maintenance cost (staleness checks, graph noise).
+
+### Maturity (epistemic; not lifecycle `status`)
+
+Optional frontmatter `maturity`: `hypothesized` | `confirmed` | `canonical`. Missing → treat as `confirmed`. Human-gated harvest **apply** defaults new nodes to `canonical`. Consult / `solidsdd-kg context` ranks canonical above confirmed above hypothesized.
+
+### Facets (optional)
+
+Optional frontmatter `facets`: array of `vocabulary` | `invariant` | `decider` | `acceptance-property`. Complements `type` for consult sectioning and lint. Unknown facet values fail `solidsdd-kg check` / lint.
 
 ## Consult (consume)
 
@@ -37,11 +47,11 @@ Every candidate must be **universal**, **non-trivial**, and **rarely updated** (
 ## Harvest (produce)
 
 1. Read Change Context, Brief, WorkPlan, notable critiques, and run `solidsdd-kg promote suggest --json` when available.
-2. Propose only candidates that pass **universality + non-triviality + low churn**. Put obvious restatements in `skipped_reasons` (do not invent nodes “for completeness”).
-3. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say why the node is reusable **and** what is non-obvious.
+2. Propose only candidates that pass **universality + non-triviality + low churn** (Means over one-off tech). Put obvious restatements and §5-only stack picks in `skipped_reasons` (do not invent nodes “for completeness”).
+3. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say why the node is reusable **and** what is non-obvious. Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
 4. Set `human_gate.required: true` when `candidates.length >= 1` **or** when the agent judges durable knowledge was discovered but needs human framing. Empty candidates with `required: false` is OK.
 5. **Never apply** candidates without `gate-approval.json` `scope: knowledge_harvest` and `decision` `approve` or `approve_partial`.
-6. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown; add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
+6. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
 7. On reject / skip: mark candidates `rejected` / `skipped` and proceed to `done`.
 
 ## Human gate
@@ -50,4 +60,4 @@ See [human-gates.md](human-gates.md). Orchestrators must not mark the change `do
 
 ## Critique
 
-Optional but recommended: `solidsdd-critique` with `subject: knowledge_harvest` after harvest emit, before the gate. Fail on living-PRD leakage, duplicate of existing knowledge without `supersedes`, missing universality rationale, or **trivial / tautological** candidates (no non-obvious choice, exception, or boundary).
+Optional but recommended: `solidsdd-critique` with `subject: knowledge_harvest` after harvest emit, before the gate. Fail on living-PRD leakage, one-off §5 tech selection harvested as policy, duplicate of existing knowledge without `supersedes`, missing universality rationale, or **trivial / tautological** candidates (no non-obvious choice, exception, or boundary).

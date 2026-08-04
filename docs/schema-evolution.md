@@ -19,6 +19,20 @@ When additive changes are insufficient:
 4. Migrate all in-repo examples and eval fixtures in the same PR.
 5. Cut a release note listing removed/renamed fields.
 
+## Shipped additive fields (v1, intent-inspired stream)
+
+See [intent-inspired-improvements.md](intent-inspired-improvements.md). Prefer optional properties / enum values; do not reinterpret KG lifecycle `status`.
+
+| Artifact / surface | Additive |
+|--------------------|----------|
+| Knowledge frontmatter | optional `maturity` (`hypothesized` \| `confirmed` \| `canonical`); optional `facets` (`vocabulary` \| `invariant` \| `decider` \| `acceptance-property`) |
+| `knowledge-harvest.json` | optional candidate `maturity` / `facets` |
+| `clarifications/open.json` | new schema (change-scoped Q/A queue) |
+| `run-state.json` `phase` | additive enum value `grill` |
+| CritiqueReport `subject` | additive `knowledge_consistency` |
+| GateApproval `scope` | additive `clarifications` |
+| `run-next` output | new schema for `solidsdd-next` (not a change artifact version bump) |
+
 ## Current notable breaks (v1 era)
 
 | Date | Artifact | Break |

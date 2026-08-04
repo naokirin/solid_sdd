@@ -105,6 +105,12 @@ Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 4. Structured NFRs (`nfr.json`) + critique regression corpus — P1 — **done**
 5. CI, approval records, cross-change checks, richer examples; optional EARS entry — P1–P3 — **done** (EARS pattern lint deferred)
 
+## Phase 5b: Intent-inspired improvements
+
+**Status: I1–I4 shipped** ([intent-inspired-improvements.md](intent-inspired-improvements.md)).
+
+Borrow maturity, conditional Grill, Means vs tech, clarifications, facets / knowledge consistency, and deterministic `next`+validate from Intent-Driven Development tooling — without making Change Context / Brief a living intent-tree. GitHub four-thread loops remain out of scope.
+
 ## Near-term next actions
 
 1. `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (distribution)
@@ -112,3 +118,4 @@ Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 3. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)
 4. Optional: mechanical EARS pattern detection in lint (Workstream G follow-on)
 5. Honor [run-cost.md](run-cost.md) on future live replays (greenfield WorkPlan + strict Task isolation)
+6. Live replay with `scripts/solidsdd-next.sh` on a sample change (resume smoke)

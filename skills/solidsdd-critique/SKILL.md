@@ -3,7 +3,8 @@ name: solidsdd-critique
 description: >-
   Adversarial, read-only critique of a prior solid_sdd phase artifact (change
   context, change brief, work plan, application plan, contracts, derived tests,
-  formal specs, verification, knowledge harvest, or cross-change consistency).
+  formal specs, verification, knowledge harvest, knowledge consistency, or
+  cross-change consistency).
   When called from solidsdd-loop or solidsdd-run, must run as an explicit Task
   subagent. Runs deterministic solidsdd-lint first, then LLM adequacy review.
   Emits CritiqueReport; does not edit artifacts. Calibrated so only

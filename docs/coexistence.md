@@ -15,7 +15,9 @@ solid_sdd complements—not replaces—natural-language Spec-Driven Development 
 | Concurrency / safety properties | Rare | **Optional formal** (TLA+/TLC), human-gated |
 | “Make the feature work” coding loop | Primary implementer | `solidsdd-implement` only after contracts exist |
 | Apply density (where to put contracts) | Human judgment | **`solidsdd-judge` + axes** (guided by Brief) |
-| Durable cross-cutting knowledge (terms, policies, ADRs) | Buried in NL specs / chat | **`solidsdd-knowledge`** + `knowledge/` (consult in run; harvest before done; human-gated) |
+| Durable cross-cutting knowledge (terms, policies, ADRs) | Buried in NL specs / chat | **`solidsdd-knowledge`** + `knowledge/` (consult in run; harvest before done; human-gated; `maturity` / optional `facets`) |
+| Ambiguous framing interview | Chat-only | Conditional **`solidsdd-grill`** → `clarifications/open.json` |
+| Orchestrator “what next?” | Agent memory of skill prose | **`scripts/solidsdd-next.sh`** (`next` / `validate`; read-only) |
 
 ## Artifact stance
 

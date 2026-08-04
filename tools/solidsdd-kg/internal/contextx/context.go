@@ -98,6 +98,10 @@ func Extract(g *model.Graph, start string, opts Options) (string, error) {
 		if pi != pj {
 			return pi < pj
 		}
+		mi, mj := model.MaturityRank(items[i].n), model.MaturityRank(items[j].n)
+		if mi != mj {
+			return mi < mj
+		}
 		if items[i].hops != items[j].hops {
 			return items[i].hops < items[j].hops
 		}
@@ -144,6 +148,11 @@ func Extract(g *model.Graph, start string, opts Options) (string, error) {
 			out = render(false)
 		}
 	}
+	var facetNodes []*model.Node
+	for _, it := range items {
+		facetNodes = append(facetNodes, it.n)
+	}
+	out += FacetSections(facetNodes)
 	return out, nil
 }
 
@@ -168,6 +177,10 @@ func renderNode(n *model.Node, full bool) string {
 	fmt.Fprintf(&b, "## %s `%s`\n\n", n.Type, n.ID)
 	fmt.Fprintf(&b, "- title: %s\n", n.Title)
 	fmt.Fprintf(&b, "- status: %s\n", n.Status)
+	fmt.Fprintf(&b, "- maturity: %s\n", model.EffectiveMaturity(n))
+	if len(n.Facets) > 0 {
+		fmt.Fprintf(&b, "- facets: %s\n", strings.Join(n.Facets, ", "))
+	}
 	if n.Scope != "" {
 		fmt.Fprintf(&b, "- scope: %s\n", n.Scope)
 	}
@@ -181,6 +194,37 @@ func renderNode(n *model.Node, full bool) string {
 		b.WriteString(body)
 		b.WriteString("\n")
 	} else {
+		b.WriteString("\n")
+	}
+	return b.String()
+}
+
+// FacetSections appends optional Markdown grouping by facet when any node has facets.
+func FacetSections(nodes []*model.Node) string {
+	by := map[string][]*model.Node{}
+	for _, n := range nodes {
+		if n == nil {
+			continue
+		}
+		for _, f := range n.Facets {
+			by[f] = append(by[f], n)
+		}
+	}
+	if len(by) == 0 {
+		return ""
+	}
+	order := model.AllowedFacets
+	var b strings.Builder
+	b.WriteString("\n# Facet index\n\n")
+	for _, f := range order {
+		ns := by[f]
+		if len(ns) == 0 {
+			continue
+		}
+		fmt.Fprintf(&b, "## %s\n\n", f)
+		for _, n := range ns {
+			fmt.Fprintf(&b, "- `%s` (%s, maturity=%s)\n", n.ID, n.Type, model.EffectiveMaturity(n))
+		}
 		b.WriteString("\n")
 	}
 	return b.String()

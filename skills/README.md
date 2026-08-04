@@ -11,6 +11,8 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 | [solidsdd-run](solidsdd-run/SKILL.md) | `solidsdd.run` | Outer orchestration (Context → Brief → WorkPlan → loops → integration verify) | orchestrator only |
 | [solidsdd-loop](solidsdd-loop/SKILL.md) | `solidsdd.loop` | Slice orchestration (one intent) | orchestrator only |
 | [solidsdd-context](solidsdd-context/SKILL.md) | `solidsdd.context` | Stack / contract discovery | orchestrator |
+| [solidsdd-knowledge](solidsdd-knowledge/SKILL.md) | `solidsdd.knowledge` | Consult / harvest durable `knowledge/` | **subagent required** |
+| [solidsdd-grill](solidsdd-grill/SKILL.md) | `solidsdd.grill` | Conditional structured interview → clarifications | **subagent required** |
 | [solidsdd-intake](solidsdd-intake/SKILL.md) | `solidsdd.intake` | Change Context (demand / NFR / tech selection) | **subagent required** |
 | [solidsdd-report](solidsdd-report/SKILL.md) | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) |
 | [solidsdd-brief](solidsdd-brief/SKILL.md) | `solidsdd.brief` | ChangeBrief (scope premise / return point) | **subagent required** |
@@ -26,7 +28,7 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 | [solidsdd-verify-formal](solidsdd-verify-formal/SKILL.md) | `solidsdd.verify.formal` | Formal VerificationReport | **subagent required** |
 
 - Manual: user may run one skill in the current agent.
-- Automatic (`solidsdd-run`): parent runs intake → brief → decompose, then **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify; never inline subagent-required skills.
+- Automatic (`solidsdd-run`): parent runs consult → [optional grill] → intake → brief → decompose, then **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify → harvest; never inline subagent-required skills. Prefer `scripts/solidsdd-next.sh` for sequencing.
 - Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
 
 ## Maintainer: keep `references/` in sync

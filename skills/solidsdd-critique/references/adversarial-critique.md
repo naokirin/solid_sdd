@@ -76,14 +76,26 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `isolation` | Parent detects inline execution of a subagent-required skill | — | loop or run |
 | `cross_change_consistency` | After `work_plan` critique when prior Features / prior changes exist | — | `solidsdd-run` (optional but recommended on follow-on changes) |
 | `knowledge_harvest` | `solidsdd-knowledge` harvest (before human gate / done) | knowledge | `solidsdd-run` (recommended when candidates exist) |
+| `knowledge_consistency` | After consult + Context/Brief exist when consult cites confirmed/canonical knowledge | — | `solidsdd-run` (recommended when consult is non-empty) |
 
 Skip a subject only when that producer step did not run in this orchestrator iteration.
+
+### `knowledge_consistency` (major examples)
+
+| Check | `major` | Not major |
+|-------|---------|-----------|
+| Context/Brief contradicts a **confirmed** or **canonical** consulted policy without assumption/gate | Silent override of AuthZ / Means / ADR | Explicit Brief assumption + gate; `hypothesized` knowledge treated as soft |
+| Contracts / WorkPlan implement the opposite of a cited canonical invariant | Drift from durable knowledge | Rename / restate that still obeys the norm |
+| Consult pack ignored while inventing conflicting Means in §6 | Framing reinvents settled policy | Citing policy ids and refining scope |
+
+Prefer **Task** critique with this subject after Brief (or after work_plan) when `knowledge-consult.md` lists applicable confirmed/canonical nodes.
 
 ### `knowledge_harvest` (major examples)
 
 | Check | `major` | Not major |
 |-------|---------|-----------|
 | Living-PRD leakage | Candidate body is essentially a Brief `in_scope` item or full Scenario pasted as “policy” | Short restatement that points at Brief ids |
+| One-off tech as policy | Candidate is a Change Context §5 stack pick (language/API/persistence for this repo) with no reusable Means | Means/criterion from §6 (e.g. authz stance) correctly harvested |
 | Missing universality | Candidate is clearly change-ephemeral (sample path, one-off id) with no rationale for reuse | Conservative empty candidate list |
 | Trivial / tautological | Candidate restates a domain axiom or “do it correctly” with **no** non-obvious choice, exception, or boundary (and `rationale` does not explain non-triviality) | Skip via `skipped_reasons`; policy that fixes a repeated AuthZ/error/verification boundary |
 | Duplicate without linkage | Same concept/policy already exists and candidate does not `supersedes` / merge / skip | Near-duplicate flagged for human merge |

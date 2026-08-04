@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/clarifications.schema.json",
+  "title": "Clarifications",
+  "description": "Durable open-question queue for a change (Grill / intake framing). Path: .solidsdd/changes/<change_id>/clarifications/open.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "change_id", "items"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "True when any blocking item is still open."
+        },
+        "reason": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "question", "status", "blocking"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable id within the change (e.g. Q1)."
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Design-blocking or framing question answerable outside the agent thread."
+        },
+        "recommended_answer": {
+          "type": "string",
+          "description": "Agent recommendation when known."
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Repository or stakeholder facts supporting the recommendation."
+        },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Concrete options offered during Grill (2–4 typical)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "resolved"]
+        },
+        "blocking": {
+          "type": "boolean",
+          "description": "If true and open, orchestrator must stop before brief (or before intake completes framing)."
+        },
+        "decision": {
+          "type": "string",
+          "description": "Resolved value (required when status is resolved)."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why the decision was taken."
+        },
+        "maturity": {
+          "type": "string",
+          "enum": ["hypothesized", "confirmed", "canonical"],
+          "description": "Epistemic maturity of the resolved Means/judgment."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "resolved" } },
+            "required": ["status"]
+          },
+          "then": { "required": ["decision"] }
+        }
+      ]
+    }
+  }
+}

@@ -56,9 +56,12 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 | [docs/phase3-evaluation.md](docs/phase3-evaluation.md) | TLC sample evaluation |
 | [docs/phase3-gate-dryrun.md](docs/phase3-gate-dryrun.md) | Formal human_gate dry run |
 | [docs/phase4.md](docs/phase4.md) | Operations and ecosystem |
+| [docs/intent-inspired-improvements.md](docs/intent-inspired-improvements.md) | Maturity, Grill, Means, clarifications, facets, `solidsdd-next` |
 | [tools/solidsdd-kg](tools/solidsdd-kg) | Knowledge graph CLI (engine for `solidsdd-knowledge`) |
 | [scripts/solidsdd-host-toolchain.sh](scripts/solidsdd-host-toolchain.sh) | Host toolchain preflight (`.solidsdd/host-toolchain.json`; detect env thrash vs run cost) |
+| [scripts/solidsdd-next.sh](scripts/solidsdd-next.sh) | Deterministic next-action / declared-step validate (read-only) |
 | [skills/solidsdd-knowledge](skills/solidsdd-knowledge) | SDD consult / harvest of durable knowledge |
+| [skills/solidsdd-grill](skills/solidsdd-grill) | Conditional structured interview → clarifications |
 | [docs/coexistence.md](docs/coexistence.md) | Coexistence with other SDD tools |
 | [docs/project-template.md](docs/project-template.md) | Consuming-project layout |
 | [docs/feedback-tuning.md](docs/feedback-tuning.md) | Feedback and rule tuning |
@@ -72,9 +75,10 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 
 As with Kiro and similar tools, users can invoke phase skills manually, while an orchestrator can also run the same skill set automatically.
 
-- **`solidsdd-run`**: knowledge consult → Change Context → ChangeBrief → property-level Gherkin WorkPlan → parallel `solidsdd-loop` waves → integration verify → knowledge harvest (human-gated) → done
+- **`solidsdd-run`**: knowledge consult → [optional Grill] → Change Context → ChangeBrief → property-level Gherkin WorkPlan → parallel `solidsdd-loop` waves → integration verify → knowledge harvest (human-gated) → done (prefer `scripts/solidsdd-next.sh` for sequencing)
 - **`solidsdd-loop`**: Contract loop for one slice (one Scenario / change intent)
 - **`solidsdd-knowledge`**: Durable `knowledge/` consult / harvest (CLI: `tools/solidsdd-kg`)
+- **`solidsdd-grill`**: Conditional framing interview → `clarifications/open.json`
 
 See [docs/architecture.md](docs/architecture.md) and [docs/execution-model.md](docs/execution-model.md).
 

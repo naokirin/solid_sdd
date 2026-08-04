@@ -64,10 +64,11 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 
 | Skill | Responsibility | Execution policy | Main I/O |
 |-------|----------------|------------------|----------|
-| `solidsdd.run` | Outer orchestration (knowledge consult → intake → brief → decompose → **parallel** slice loops → integration verify → knowledge harvest) | orchestrator only | Loop log / final state |
+| `solidsdd.run` | Outer orchestration (consult → [grill?] → intake → brief → decompose → **parallel** loops → verify → harvest) | orchestrator only | Loop log / final state |
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
 | `solidsdd.knowledge` | Consult / harvest durable `knowledge/` (CLI: `solidsdd-kg`) | **subagent required** (from run) | `knowledge-consult.md` / `knowledge-harvest.json` |
+| `solidsdd.grill` | Conditional structured interview | **subagent required** | `clarifications/open.json` |
 | `solidsdd.intake` | Change framing (demand / NFR / tech) + optional gate | **subagent required** | `change-context.md`, `change-context-gate.json` |
 | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) | `report.md` / `report.html` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
@@ -126,7 +127,7 @@ WorkPlan:
 
 Requirements use property-level Gherkin ([../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)), guided by ChangeBrief. Optional EARS wording in Brief texts: [../reference-src/ears-requirements.md](../reference-src/ears-requirements.md). Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
-Deterministic coverage / NFR / gate checks: `scripts/solidsdd-lint.sh` (critique Step 0/1). Hardening plan: [hardening-plan.md](hardening-plan.md). Schema evolution: [schema-evolution.md](schema-evolution.md).
+Deterministic coverage / NFR / gate checks: `scripts/solidsdd-lint.sh` (critique Step 0/1). Deterministic **next** / declared-step check: `scripts/solidsdd-next.sh` (does not write run-state). Hardening plan: [hardening-plan.md](hardening-plan.md). Intent-inspired stream: [intent-inspired-improvements.md](intent-inspired-improvements.md). Schema evolution: [schema-evolution.md](schema-evolution.md).
 
 ## Application judgment (`solidsdd.judge`) output model
 

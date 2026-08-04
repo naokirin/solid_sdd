@@ -272,6 +272,52 @@ def lint_change(
             load_json(status_path), "change-status.schema.json", str(status_path), findings
         )
 
+    clar_path = change_dir / "clarifications" / "open.json"
+    if clar_path.is_file():
+        clar = load_json(clar_path)
+        validate_schema(clar, "clarifications.schema.json", str(clar_path), findings)
+        if clar.get("change_id") and clar["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "clarifications/open.json#change_id",
+                    f"change_id {clar['change_id']!r} != directory {change_id!r}",
+                )
+            )
+        blocking_open = [
+            it
+            for it in (clar.get("items") or [])
+            if isinstance(it, dict)
+            and it.get("blocking")
+            and it.get("status") == "open"
+        ]
+        if blocking_open and not (clar.get("human_gate") or {}).get("required"):
+            findings.append(
+                finding(
+                    "major",
+                    "consistency",
+                    "clarifications/open.json#human_gate",
+                    f"blocking open items {[it.get('id') for it in blocking_open]} but human_gate.required is not true",
+                )
+            )
+
+    harvest_path = change_dir / "knowledge-harvest.json"
+    if harvest_path.is_file():
+        harvest = load_json(harvest_path)
+        validate_schema(
+            harvest, "knowledge-harvest.schema.json", str(harvest_path), findings
+        )
+        if harvest.get("change_id") and harvest["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "knowledge-harvest.json#change_id",
+                    f"change_id {harvest['change_id']!r} != directory {change_id!r}",
+                )
+            )
+
     run_state_path = change_dir / "run-state.json"
     if run_state_path.is_file():
         rs = load_json(run_state_path)

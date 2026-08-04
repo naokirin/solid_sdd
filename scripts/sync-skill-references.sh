@@ -154,6 +154,17 @@ sync_one schemas/gate-approval.schema.json skills/solidsdd-knowledge/references/
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-knowledge/references/knowledge-harvest.schema.json
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-run/references/knowledge-harvest.schema.json
 sync_one schemas/knowledge-harvest.schema.json skills/solidsdd-critique/references/knowledge-harvest.schema.json
+sync_one schemas/clarifications.schema.json skills/solidsdd-grill/references/clarifications.schema.json
+sync_one schemas/clarifications.schema.json skills/solidsdd-run/references/clarifications.schema.json
+sync_one schemas/clarifications.schema.json skills/solidsdd-intake/references/clarifications.schema.json
+sync_one reference-src/clarifications.md skills/solidsdd-grill/references/clarifications.md
+sync_one reference-src/clarifications.md skills/solidsdd-run/references/clarifications.md
+sync_one reference-src/clarifications.md skills/solidsdd-intake/references/clarifications.md
+sync_one reference-src/change-context.md skills/solidsdd-grill/references/change-context.md
+sync_one reference-src/human-gates.md skills/solidsdd-grill/references/human-gates.md
+sync_one reference-src/working-language.md skills/solidsdd-grill/references/working-language.md
+sync_one reference-src/change-lifecycle.md skills/solidsdd-grill/references/change-lifecycle.md
+sync_one schemas/gate-approval.schema.json skills/solidsdd-grill/references/gate-approval.schema.json
 sync_one schemas/host-toolchain.schema.json skills/solidsdd-context/references/host-toolchain.schema.json
 sync_one schemas/host-toolchain.schema.json skills/solidsdd-run/references/host-toolchain.schema.json
 sync_one schemas/host-toolchain.schema.json skills/solidsdd-loop/references/host-toolchain.schema.json
@@ -181,6 +192,8 @@ sync_one reference-src/run-state.md skills/solidsdd-loop/references/run-state.md
 sync_one reference-src/run-state.md skills/solidsdd-run/references/run-state.md
 sync_one schemas/run-state.schema.json skills/solidsdd-loop/references/run-state.schema.json
 sync_one schemas/run-state.schema.json skills/solidsdd-run/references/run-state.schema.json
+sync_one scripts/solidsdd-next/README.md skills/solidsdd-run/references/solidsdd-next.md
+sync_one schemas/run-next.schema.json skills/solidsdd-run/references/run-next.schema.json
 sync_one reference-src/change-lifecycle.md skills/solidsdd-brief/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-run/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-decompose/references/change-lifecycle.md

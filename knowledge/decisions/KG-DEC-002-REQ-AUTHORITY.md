@@ -3,6 +3,7 @@ id: KG-DEC-002-REQ-AUTHORITY
 type: decision
 title: requirement ノードの正本は ChangeBrief / Gherkin とする
 status: active
+maturity: canonical
 scope: org.solid_sdd.kg
 aliases: []
 tags: [kg, phase1]

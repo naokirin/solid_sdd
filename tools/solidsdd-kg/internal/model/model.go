@@ -1,5 +1,11 @@
 package model
 
+// AllowedMaturity values for knowledge epistemic certainty (not lifecycle status).
+var AllowedMaturity = []string{"hypothesized", "confirmed", "canonical"}
+
+// AllowedFacets optional semantic facets (intent-inspired; complements Type).
+var AllowedFacets = []string{"vocabulary", "invariant", "decider", "acceptance-property"}
+
 // Node is a graph vertex loaded from text sources.
 type Node struct {
 	ID           string
@@ -12,12 +18,39 @@ type Node struct {
 	SupersededBy []string
 	VerifiedAt   string
 	Confidence   string
+	Maturity     string   // hypothesized | confirmed | canonical; empty → EffectiveMaturity = confirmed
+	Facets       []string // optional: vocabulary | invariant | decider | acceptance-property
 	Owner        string
 	Tags         []string
 	SourcePath   string
 	SourceLine   int
 	Body         string
 	Layer        string // knowledge | brief | feature | spec | links
+}
+
+// EffectiveMaturity returns n.Maturity or "confirmed" when unset/unknown.
+func EffectiveMaturity(n *Node) string {
+	if n == nil {
+		return "confirmed"
+	}
+	switch n.Maturity {
+	case "hypothesized", "confirmed", "canonical":
+		return n.Maturity
+	default:
+		return "confirmed"
+	}
+}
+
+// MaturityRank sorts canonical before confirmed before hypothesized (lower is better).
+func MaturityRank(n *Node) int {
+	switch EffectiveMaturity(n) {
+	case "canonical":
+		return 0
+	case "confirmed":
+		return 1
+	default:
+		return 2
+	}
 }
 
 // Edge is a directed typed relation.

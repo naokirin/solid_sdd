@@ -25,7 +25,8 @@
         "verification_report",
         "isolation",
         "cross_change_consistency",
-        "knowledge_harvest"
+        "knowledge_harvest",
+        "knowledge_consistency"
       ],
       "description": "Which prior-phase artifact was critiqued."
     },

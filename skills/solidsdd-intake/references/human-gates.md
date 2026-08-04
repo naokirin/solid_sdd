@@ -14,6 +14,7 @@ Set `human_gate.required: true` (plan-level and/or per target **or** Change Cont
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **brief** has blocking `open_questions`; **decompose** cannot form checkable Gherkin Scenarios |
 | **Knowledge harvest** | Non-empty `knowledge-harvest.json` candidates, or agent-judged durable knowledge needing confirmation before writing `knowledge/` — see [knowledge.md](knowledge.md). **Always** gate before applying promote / writing knowledge files |
+| **Clarifications** | Any `blocking: true` item still `open` in `clarifications/open.json` — see [clarifications.md](clarifications.md). Resume after resolutions or `gate-approval` `scope: clarifications` |
 | `formal` | Always gate in early Phase 3 rollout when `status` would be `apply` |
 
 ## Plan / Brief / WorkPlan fields

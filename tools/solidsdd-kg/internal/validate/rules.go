@@ -160,6 +160,22 @@ func Structural(g *model.Graph, sch schema.Schema) []Violation {
 				Path: n.SourcePath, Line: n.SourceLine, Node: n.ID,
 			})
 		}
+		if n.Maturity != "" && !contains(model.AllowedMaturity, n.Maturity) {
+			out = append(out, Violation{
+				Rule: "INVALID_MATURITY", Severity: "error",
+				Message: fmt.Sprintf("node %s has invalid maturity %q (want hypothesized|confirmed|canonical)", n.ID, n.Maturity),
+				Path: n.SourcePath, Line: n.SourceLine, Node: n.ID,
+			})
+		}
+		for _, f := range n.Facets {
+			if !contains(model.AllowedFacets, f) {
+				out = append(out, Violation{
+					Rule: "INVALID_FACET", Severity: "error",
+					Message: fmt.Sprintf("node %s has invalid facet %q", n.ID, f),
+					Path: n.SourcePath, Line: n.SourceLine, Node: n.ID,
+				})
+			}
+		}
 	}
 	for _, e := range g.Edges {
 		et, ok := sch.EdgeType(e.Type)

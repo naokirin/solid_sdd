@@ -214,6 +214,7 @@ func ApplyNode(cfgRoot, knowledgeDir, nodeType, id, title, scope, sourceBody str
 	fmt.Fprintf(&b, "type: %s\n", nodeType)
 	fmt.Fprintf(&b, "title: %s\n", title)
 	b.WriteString("status: active\n")
+	b.WriteString("maturity: canonical\n")
 	if scope != "" || nodeType == "policy" || nodeType == "invariant" {
 		if scope == "" {
 			scope = "org"

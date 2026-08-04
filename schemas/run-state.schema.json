@@ -21,6 +21,7 @@
       "type": "string",
       "enum": [
         "context",
+        "grill",
         "knowledge_consult",
         "intake",
         "critique_change_context",
@@ -36,7 +37,7 @@
         "done",
         "stopped"
       ],
-      "description": "Highest-level solidsdd-run phase last completed or currently in progress."
+      "description": "Highest-level solidsdd-run phase last completed or currently in progress. grill is optional (conditional interview before intake)."
     },
     "wave_index": {
       "type": "integer",

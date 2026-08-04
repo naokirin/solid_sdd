@@ -4,6 +4,8 @@ solid_sdd 内の知識グラフ基盤（Phase 1）。
 
 テキスト正本（`knowledge/` + ChangeBrief / Gherkin 由来 ID）をパースし、派生 SQLite インデックスを構築する。要求の正本は ChangeBrief / Gherkin であり、知識層は普遍性が高く**非自明な**横断知見専用。
 
+Optional frontmatter: `maturity` (`hypothesized` \| `confirmed` \| `canonical`; missing → confirmed) and `facets` (`vocabulary` \| `invariant` \| `decider` \| `acceptance-property`). `context` ranks by type then maturity; promote apply writes `maturity: canonical`.
+
 ## Phase status
 
 | Phase | 内容 | 状態 |

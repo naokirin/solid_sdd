@@ -91,9 +91,11 @@ func KnowledgeFile(path string) (model.Node, []model.Edge, *model.ParseIssue) {
 	n.Scope = getString("scope")
 	n.VerifiedAt = getString("verified_at")
 	n.Confidence = getString("confidence")
+	n.Maturity = getString("maturity")
 	n.Owner = getString("owner")
 	n.Aliases = getStrings("aliases")
 	n.Tags = getStrings("tags")
+	n.Facets = getStrings("facets")
 	n.Supersedes = getStrings("supersedes")
 	n.SupersededBy = getStrings("superseded_by")
 

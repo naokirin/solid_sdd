@@ -3,6 +3,7 @@ id: KG-DEC-001-IMPL-LANG
 type: decision
 title: solidsdd-kg は Go + SQLite で実装する
 status: active
+maturity: canonical
 scope: org.solid_sdd.kg
 aliases: []
 tags: [kg, phase1]

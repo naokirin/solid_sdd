@@ -1,8 +1,10 @@
 # Run state and per-item artifacts (solidsdd.run / solidsdd.loop)
 
-Orchestrators **persist** progress so retries, human gates, and mid-run crashes do not rely on chat memory. Source of truth for budgets and phase is `run-state.json`; ApplicationPlan / Critique / Verification JSON for each WorkPlan item live under `items/<item_id>/`.
+Orchestrators **persist** progress so retries, human gates, and mid-run crashes do not rely on chat memory. Source of truth for budgets and phase is `run-state.json`; ApplicationPlan / Critique / Verification JSON for each WorkPlan item live under `items/<item_id>/`. Optional Grill clarifications live under `clarifications/open.json` ([clarifications.md](clarifications.md)).
 
 Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `references/` as `run-state.schema.json`). Layout: [contract-layout.md](contract-layout.md).
+
+**Deterministic next:** when available, run `scripts/solidsdd-next.sh next --change <id>` at step start and `validate --declared …` before launching a producer Task ([intent-inspired-improvements.md](../docs/intent-inspired-improvements.md) I4). Do not rely on chat memory for phase sequencing when next succeeds.
 
 ## Paths
 

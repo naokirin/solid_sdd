@@ -45,6 +45,8 @@ func ResetSchema(db *sql.DB) error {
 			superseded_by TEXT,
 			verified_at TEXT,
 			confidence TEXT,
+			maturity TEXT,
+			facets TEXT,
 			owner TEXT,
 			tags TEXT,
 			source_path TEXT,
@@ -91,8 +93,8 @@ func WriteGraph(db *sql.DB, g *model.Graph) error {
 
 	nodeStmt, err := tx.Prepare(`INSERT INTO nodes (
 		id, type, title, status, aliases, scope, supersedes, superseded_by,
-		verified_at, confidence, owner, tags, source_path, source_line, layer, body
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		verified_at, confidence, maturity, facets, owner, tags, source_path, source_line, layer, body
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return err
 	}
@@ -108,7 +110,7 @@ func WriteGraph(db *sql.DB, g *model.Graph) error {
 		if _, err := nodeStmt.Exec(
 			n.ID, n.Type, n.Title, n.Status,
 			joinCSV(n.Aliases), n.Scope, joinCSV(n.Supersedes), joinCSV(n.SupersededBy),
-			n.VerifiedAt, n.Confidence, n.Owner, joinCSV(n.Tags),
+			n.VerifiedAt, n.Confidence, n.Maturity, joinCSV(n.Facets), n.Owner, joinCSV(n.Tags),
 			n.SourcePath, n.SourceLine, n.Layer, n.Body,
 		); err != nil {
 			return fmt.Errorf("insert node %s: %w", n.ID, err)
@@ -144,17 +146,17 @@ func WriteGraph(db *sql.DB, g *model.Graph) error {
 func LoadGraph(db *sql.DB) (*model.Graph, error) {
 	g := &model.Graph{}
 	rows, err := db.Query(`SELECT id, type, title, status, aliases, scope, supersedes, superseded_by,
-		verified_at, confidence, owner, tags, source_path, source_line, layer, body FROM nodes`)
+		verified_at, confidence, maturity, facets, owner, tags, source_path, source_line, layer, body FROM nodes`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var n model.Node
-		var aliases, supersedes, supersededBy, tags string
+		var aliases, supersedes, supersededBy, tags, facets string
 		if err := rows.Scan(
 			&n.ID, &n.Type, &n.Title, &n.Status, &aliases, &n.Scope, &supersedes, &supersededBy,
-			&n.VerifiedAt, &n.Confidence, &n.Owner, &tags, &n.SourcePath, &n.SourceLine, &n.Layer, &n.Body,
+			&n.VerifiedAt, &n.Confidence, &n.Maturity, &facets, &n.Owner, &tags, &n.SourcePath, &n.SourceLine, &n.Layer, &n.Body,
 		); err != nil {
 			return nil, err
 		}
@@ -162,6 +164,7 @@ func LoadGraph(db *sql.DB) (*model.Graph, error) {
 		n.Supersedes = splitCSV(supersedes)
 		n.SupersededBy = splitCSV(supersededBy)
 		n.Tags = splitCSV(tags)
+		n.Facets = splitCSV(facets)
 		g.Nodes = append(g.Nodes, n)
 	}
 	erows, err := db.Query(`SELECT type, "from", "to", source_path, source_line, reason FROM edges`)

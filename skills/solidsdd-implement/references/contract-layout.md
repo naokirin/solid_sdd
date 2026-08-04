@@ -6,6 +6,7 @@
 | Change Context | `.solidsdd/changes/<change_id>/change-context.md` | Demand / NFR / tech selection (`solidsdd-intake`) |
 | NFR SoT | `.solidsdd/changes/<change_id>/nfr.json` | Structured NFRs; Context §4 is a projection |
 | Change Context gate | `.solidsdd/changes/<change_id>/change-context-gate.json` | Optional human pause before Brief |
+| Clarifications | `.solidsdd/changes/<change_id>/clarifications/open.json` | Durable framing Q/A ([clarifications.md](clarifications.md); Grill / intake) |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |
 | Run state | `.solidsdd/changes/<change_id>/run-state.json` | Orchestrator phase, waves, retry budgets ([run-state.md](run-state.md)) |

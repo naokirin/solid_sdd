@@ -3,8 +3,11 @@ id: POL-OPAQUE-PRINCIPAL-AUTHZ
 type: policy
 title: Opaque principal authorize/deny only (not full IAM)
 status: active
+maturity: canonical
 scope: product.inventory_reservation
 aliases: []
+facets:
+  - decider
 verified_at: "2026-08-03"
 ---
 

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/run-next.schema.json",
+  "title": "RunNext",
+  "description": "Deterministic next-action hint from solidsdd-next (read-only; does not mutate run-state).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "change_id", "action", "reason"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "phase": {
+      "type": "string",
+      "description": "Current run-state.phase when known."
+    },
+    "action": {
+      "type": "string",
+      "description": "Canonical next action id (e.g. critique_change_brief, loop_wave, human_gate, done)."
+    },
+    "skill": {
+      "type": "string",
+      "description": "Skill id to invoke when applicable (e.g. solidsdd-critique)."
+    },
+    "subject": {
+      "type": "string",
+      "description": "Critique subject when skill is solidsdd-critique."
+    },
+    "item_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "WorkPlan item ids for wave actions."
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relative paths the parent should pass into the next Task."
+    },
+    "legal_actions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Actions accepted by validate --declared for this state (includes primary action)."
+    }
+  }
+}
