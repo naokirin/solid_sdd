@@ -6,6 +6,8 @@ Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `referen
 
 **Deterministic next:** when available, run `scripts/solidsdd-next.sh next --change <id>` at step start and `validate --declared …` before launching a producer Task ([intent-inspired-improvements.md](../docs/intent-inspired-improvements.md) I4). Do not rely on chat memory for phase sequencing when next succeeds.
 
+**Constrained state writes:** mutate `run-state.json` (and optionally WorkPlan item `status` / `status.json`) only via `scripts/solidsdd-run-state.sh` — see [Constrained mutations](#constrained-mutations-solidsdd-run-state) below. Do **not** use free-form `python -c` / open-ended heredoc scripts for these files (host allowlists treat unbounded Python as high risk and force repeated “may I run this?” prompts that are not product human gates).
+
 ## Paths
 
 ```text
@@ -34,11 +36,42 @@ Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `referen
 
 ## Read / write convention
 
-1. **Start of each orchestrator step:** read `run-state.json` if present (create with defaults on first write after intake).
-2. **End of each step** (including after critique/verify fail handling): write `run-state.json` with updated `phase`, `wave_index`, `run_retry` / `items.*.loop_retry`, item statuses, and paths under `integration` when relevant.
-3. **After each producer / critique Task:** write the JSON artifact to the paths above (do not leave ApplicationPlan / CritiqueReport / VerificationReport only in chat).
+1. **Start of each orchestrator step:** read `run-state.json` if present (create with defaults on first write after intake via `solidsdd-run-state init`).
+2. **End of each step** (including after critique/verify fail handling): update `run-state.json` with `phase`, `wave_index`, `run_retry` / `items.*.loop_retry`, item statuses, and paths under `integration` when relevant — prefer **`scripts/solidsdd-run-state.sh`** for these fields.
+3. **After each producer / critique Task:** write the JSON artifact to the paths above with the **Write / StrReplace** file tools (or the producer Task). Do not leave ApplicationPlan / CritiqueReport / VerificationReport only in chat.
 4. **Decrement retry `remaining`** when consuming an auto-retry (verify-fail or critique-fail or isolation re-run). Never invent a higher remaining than `max`.
 5. **Resume:** if `phase` is not `done` and `status.json` is still `active`, continue from `phase` / item `loop_phase` using persisted plans—do not re-judge density from memory when `items/<id>/application-plan.json` exists unless critique failed and a producer re-run is required.
+
+## Constrained mutations (`solidsdd-run-state`)
+
+Wrapper: `scripts/solidsdd-run-state.sh` (impl: `scripts/solidsdd-run-state/run_state.py`). Writes are schema-validated against `schemas/run-state.schema.json`. `solidsdd-next` remains **read-only**.
+
+| Command | Purpose |
+|---------|---------|
+| `init [--force]` | Create defaults (`phase: intake`, empty `items`) |
+| `set-phase --phase <enum>` | Set top-level `phase` |
+| `set-wave --index <n>` | Set `wave_index` |
+| `note --append <text>` | Append deduped `isolation_notes` (e.g. `cost_skip:B4`) |
+| `sync-items` | Populate/refresh `items` from `work-plan.json` |
+| `set-item --id W1 [--status …] [--loop-phase …] [--sync-work-plan]` | Update one item; optional WorkPlan status sync |
+| `set-host-toolchain` | Snapshot `.solidsdd/host-toolchain.json` into `host_toolchain` |
+| `mark-change-done` | `status.json` → `done` and `phase: done` |
+
+Common flags: `--project-root` (default `.`), `--change-id` (default active change).
+
+**Allowed for state files:** this CLI, or **Write/StrReplace** on a single JSON file when the edit is visible in the tool diff.
+
+**Forbidden:** free-form `python -c`, unbounded `python3 <<'PY'` heredocs, or other shell one-liners that can write arbitrary paths when updating `run-state.json` / WorkPlan item `status` / change `status.json`.
+
+Example:
+
+```bash
+./scripts/solidsdd-run-state.sh --project-root . --change-id my-change init
+./scripts/solidsdd-run-state.sh --project-root . sync-items
+./scripts/solidsdd-run-state.sh --project-root . set-item --id W1 --status done --loop-phase done --sync-work-plan
+./scripts/solidsdd-run-state.sh --project-root . note --append 'cost_skip:B4'
+./scripts/solidsdd-run-state.sh --project-root . mark-change-done
+```
 
 ## Defaults on create
 
@@ -58,7 +91,13 @@ After decompose, populate `items` from the WorkPlan (`pending` / `ready` mirrori
 
 ## Host toolchain
 
-After `solidsdd-context` (or at run start), copy readiness from `.solidsdd/host-toolchain.json` into optional `host_toolchain`:
+After `solidsdd-context` (or at run start), copy readiness from `.solidsdd/host-toolchain.json` into optional `host_toolchain` via:
+
+```bash
+./scripts/solidsdd-run-state.sh --project-root . set-host-toolchain
+```
+
+Result shape:
 
 ```json
 "host_toolchain": {
@@ -69,7 +108,7 @@ After `solidsdd-context` (or at run start), copy readiness from `.solidsdd/host-
 }
 ```
 
-If a Subagent must rediscover tools despite that file, append `isolation_notes` with `toolchain_rediscovery:<tool>:<reason>`. Policy: [host-toolchain.md](host-toolchain.md).
+If a Subagent must rediscover tools despite that file, append `isolation_notes` with `toolchain_rediscovery:<tool>:<reason>` using `note --append`. Policy: [host-toolchain.md](host-toolchain.md).
 
 ## Retry budgets (state machine)
 

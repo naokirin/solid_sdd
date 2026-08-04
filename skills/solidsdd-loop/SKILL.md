@@ -24,7 +24,7 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 - [human-gates.md](references/human-gates.md) — when to stop for a person
 - [loop-retry.md](references/loop-retry.md) — verify/critique failure → retry / gate / stop
 - [contract-layout.md](references/contract-layout.md) — default artifact paths
-- [run-state.md](references/run-state.md) — **persist plans / critiques / retry budget (required)**
+- [run-state.md](references/run-state.md) — **persist plans / critiques / retry budget (required)**; use `solidsdd-run-state` CLI (no free-form Python)
 - [run-state.schema.json](references/run-state.schema.json)
 - [run-cost.md](references/run-cost.md) — isolation; **allowed cost skips B1–B5**; context pack; host toolchain thrash vs cost
 - [project-rule.mdc](references/project-rule.mdc) — copy into `.cursor/rules/` (or equivalent) once per project
@@ -42,7 +42,7 @@ Never execute a subagent-required skill's procedure in the parent **except** doc
 
 **Do not** ask a single Task agent to “run this entire loop.” This skill’s parent session launches **one Task per** judge / critique / apply / derive / implement / verify step (skipped steps listed in isolation notes). If nested Task is unavailable inside a helper agent, return control to the `solidsdd-run` parent to drive steps — do not substitute same-agent produce+critique (“separate write passes”).
 
-**Persist** under `.solidsdd/changes/<change_id>/items/<item_id>/` (caller supplies `item_id`; default `ad-hoc` only for solo loops). Update the parent `run-state.json` item entry (`loop_phase`, `loop_retry`, `status`) at each step boundary.
+**Persist** under `.solidsdd/changes/<change_id>/items/<item_id>/` (caller supplies `item_id`; default `ad-hoc` only for solo loops). Update the parent `run-state.json` item entry (`loop_phase`, `loop_retry`, `status`) at each step boundary via **`scripts/solidsdd-run-state.sh`** (e.g. `set-item`, `set-phase`, `note`). Do **not** use free-form `python -c` / unbounded heredoc for run-state.
 
 ## Sequence
 
@@ -69,7 +69,7 @@ Never execute a subagent-required skill's procedure in the parent **except** doc
     - Same suggested skill twice with no progress → escalate to human gate
     - Retry budget exhausted (`remaining` 0) → human gate (no infinite loop)
 14. If the parent discovers it ran a subagent-required skill inline → treat as isolation violation: feedback via critique/`isolation`, **re-run that skill as Task**, consume retry budget
-15. On success set item `status: done`, `loop_phase: done` in `run-state.json`. Leave `formal`/`defer` and unmet human gates visible in the final summary—do not hide them
+15. On success set item `status: done`, `loop_phase: done` in `run-state.json` (prefer `solidsdd-run-state set-item --id <id> --status done --loop-phase done [--sync-work-plan]`). Leave `formal`/`defer` and unmet human gates visible in the final summary—do not hide them
 
 ## Isolation checklist (required in final summary)
 

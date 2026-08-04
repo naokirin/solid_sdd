@@ -32,7 +32,7 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 - [human-gates.md](references/human-gates.md)
 - [loop-retry.md](references/loop-retry.md) — verify/critique failure → retry / gate / stop
 - [contract-layout.md](references/contract-layout.md)
-- [run-state.md](references/run-state.md) — **persist phase / retries / item artifacts (required)**
+- [run-state.md](references/run-state.md) — **persist phase / retries / item artifacts (required)**; prefer `scripts/solidsdd-run-state.sh`
 - [run-state.schema.json](references/run-state.schema.json)
 - [run-cost.md](references/run-cost.md) — wall-clock cost model; **B1–B5 cost skips**; context packs; greenfield/follow-on mitigations; host toolchain thrash vs orchestration cost
 - [knowledge.md](references/knowledge.md) — durable knowledge consult / harvest in the run
@@ -51,7 +51,7 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 
 Never execute a subagent-required skill’s procedure in the parent. Do not rewrite Change Context / `ChangeBrief` / `WorkPlan` / `knowledge-harvest.json` / `clarifications/open.json` or thin a `CritiqueReport`—re-run the owning skill as a subagent if wrong.
 
-**Persist:** maintain `.solidsdd/changes/<change_id>/run-state.json` (read at step start, write at step end). Prefer `scripts/solidsdd-next.sh next` / `validate --declared` when available ([run-state.md](references/run-state.md)). Outer critique/verify JSON may live under the change directory; per-item plans/reports under `items/<item_id>/`.
+**Persist:** maintain `.solidsdd/changes/<change_id>/run-state.json` via **`scripts/solidsdd-run-state.sh`** (read at step start, write at step end). Prefer `scripts/solidsdd-next.sh next` / `validate --declared` when available ([run-state.md](references/run-state.md)). Do **not** mutate run-state with free-form `python -c` / unbounded heredoc. Outer critique/verify JSON may live under the change directory; per-item plans/reports under `items/<item_id>/`.
 
 ## Sequence
 
@@ -59,7 +59,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 2. If `run-state.json` exists with `phase` not `done` and `status.json` is `active` → **resume** from that phase (skip completed outer steps; do not re-invent Brief/WorkPlan unless critique failed). Honor open blocking clarifications before advancing past Grill/intake.
 3. **Task subagent** `solidsdd-knowledge` with `mode: consult` when starting a change (or when `knowledge/` / `.solidsdd/kg/` exists). Prefer after intake has created the change directory so `knowledge-consult.md` lands under `.solidsdd/changes/<change_id>/`; if consulting before intake, re-run or move the pack after the dir exists. Set `phase: knowledge_consult` when persisting run-state.
 4. **Conditional Task** `solidsdd-grill` when framing is ambiguous, the user asks to grill, or `solidsdd-next` recommends `grill` ([clarifications.md](references/clarifications.md)). Skip when the initial instruction already settled framing. Set `phase: grill`. If `clarifications/open.json` has blocking opens → **stop** until resolved or `gate-approval` `scope: clarifications`; then resume.
-5. **Task subagent** `solidsdd-intake` → `change-context.md` + `change-context-gate.json` under `.solidsdd/changes/<change_id>/` (pass optional user `change_id`; creates lifecycle paths — [change-lifecycle.md](references/change-lifecycle.md)). Pass `knowledge-consult.md` and `clarifications/open.json` when present. Create initial `run-state.json` (`phase: intake`, `run_retry` remaining 3) if not already created. After the change dir exists, ensure consult output is under that dir (Task re-consult if needed).
+5. **Task subagent** `solidsdd-intake` → `change-context.md` + `change-context-gate.json` under `.solidsdd/changes/<change_id>/` (pass optional user `change_id`; creates lifecycle paths — [change-lifecycle.md](references/change-lifecycle.md)). Pass `knowledge-consult.md` and `clarifications/open.json` when present. Create initial `run-state.json` with `scripts/solidsdd-run-state.sh --change-id <id> init` (`phase: intake`, `run_retry` remaining 3) if not already created. After the change dir exists, ensure consult output is under that dir (Task re-consult if needed).
 6. **Task subagent** `solidsdd-critique` with `subject: change_context`; persist critique; update `phase` / `run_retry` as needed
 7. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-intake as Task, then critique again); decrement `run_retry.remaining`
 8. If `change-context-gate.json` has `human_gate.required: true` → **stop** until humans approve (or amend + re-intake); write `stopped_reason`; then resume without thinning Change Context — [human-gates.md](references/human-gates.md). Optionally suggest manual `solidsdd-report` for a readable snapshot (not a required gate).

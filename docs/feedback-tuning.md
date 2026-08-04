@@ -45,6 +45,7 @@ When an external project contributes feedback, append a row under [Intake log](#
 
 | Date | Project | Summary | Decision |
 |------|---------|---------|----------|
+| 2026-08-05 | orchestrator run-state writes | Free-form `python <<PY` for run-state triggers host “may I run?” prompts every time; not a product human gate | Applied — constrained [`scripts/solidsdd-run-state.sh`](../scripts/solidsdd-run-state.sh); forbid unbounded Python for state in [run-state.md](../reference-src/run-state.md) / execution-model |
 | 2026-08-05 | inventory-reservation `add-list-holds` run-cost | Full solidsdd-run ~38 Tasks for ~5‑min `list` impl; N=3 over-split (vocab foundation + AuthZ success/fail) | Applied (1–3/3) — co-delivered slice rules; **B1–B5 cost skips** + **context packs** in [run-cost.md](run-cost.md) / [execution-model.md](execution-model.md) / loop+run skills |
 | 2026-08-04 | intent-cli / IDD survey | Upstream intent maturity, Grill, Means, clarify, facets, deterministic next are useful; GitHub four-thread loops are not | Applied as stream — [intent-inspired-improvements.md](intent-inspired-improvements.md) (I1–I4); exclude Issue-contract multi-agent |
 | 2026-08-04 | knowledge harvest criteria | Trivial/tautological nodes have low info value and raise staleness maintenance cost | Applied — non-triviality required in [POL-KG-PERSISTENCE](../knowledge/policies/POL-KG-PERSISTENCE.md), [knowledge.md](../reference-src/knowledge.md), harvest critique |

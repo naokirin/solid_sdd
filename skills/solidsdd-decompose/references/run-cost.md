@@ -20,6 +20,7 @@ So wall-clock scales closer to **O(N × loop steps)** than to lines of applicati
 3. If the host cannot nest Task from a loop helper agent, **the run parent must drive loop steps itself** (Task per skill). Do not fall back to same-agent produce+critique except as an explicit isolation violation that is re-run or gated.
 4. **Serialize only on real contention** (`touches` intersection or recorded heuristic). Prefer greenfield WorkPlans that use `depends_on` so serialization is intentional ([work-decomposition.md](../reference-src/work-decomposition.md)).
 5. **Pass a context pack** into each Task ([execution-model.md](execution-model.md) — context pack): prefer pack paths/excerpts over re-reading full Brief/OpenAPI/OCL on every cold start.
+6. **Mutate run-state only via `scripts/solidsdd-run-state.sh`** (or visible Write/StrReplace). Free-form Python for `run-state.json` causes host allowlist prompts that are not product gates.
 
 ## Allowed cost skips (B1–B5)
 

@@ -109,7 +109,7 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 ## Parent obligations (`solidsdd.loop`)
 
 1. Do not collapse subagent-required skills into “I’ll follow the skill steps myself” via the parent’s tools
-2. Include in each Task prompt: path to that skill’s `SKILL.md`, artifact paths, and prior outputs (context summary, ApplicationPlan, critique subject, etc.)
+2. Include in each Task prompt: path to that skill’s `SKILL.md`, artifact paths, **context-pack** path, and prior outputs (ApplicationPlan, critique subject, etc.)
 3. Accept only the subagent’s outputs (diffs, reports, ApplicationPlan, CritiqueReport) and pass them to the next phase
 4. Do not thin contracts or findings by rewriting `ApplicationPlan` / CritiqueReport in the parent (if wrong, re-launch the relevant skill as a Subagent)
 5. If `human_gate.required`, do not apply until approved (including early formal rollout)
@@ -119,6 +119,7 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 9. Leave a final summary listing each required Task / mechanical substitute and critique subject (isolation checklist), including any `cost_skip:B*`
 10. When contracts already exist for this change, prefer ApplicationPlans that **extend** shared OpenAPI/OCL rather than re-scaffolding the package on every item
 11. Before the first producer Task of a slice (and when pack would go stale after large edits), write **`items/<id>/context-pack.md`** (see [Context pack](#context-pack)) and pass its path in every Task prompt for that item
+12. Persist `run-state.json` via **`scripts/solidsdd-run-state.sh`** (or Write/StrReplace on that file). Do **not** use free-form `python -c` / unbounded heredoc to mutate run-state / WorkPlan item status / change `status.json` ([run-state.md](../reference-src/run-state.md))
 
 ## Parent obligations (`solidsdd.run`)
 
@@ -131,6 +132,7 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 7. After all items complete: run integration `solidsdd.verify` (+ **separate** critique Task) **unless B4** applies (single item whose verify already covers `acceptance_of_whole`); then record `cost_skip:B4`
 8. Honor run-level retry budget; leave isolation checklist, wave shape, cost skips, and blocked items in the final summary
 9. Read [run-cost.md](run-cost.md) before large greenfield runs; budget time for O(N × loop steps); apply [allowed cost skips](run-cost.md#allowed-cost-skips-b1b5) and context packs
+10. Update orchestrator state with **`scripts/solidsdd-run-state.sh`** (keep `solidsdd-next` read-only). Forbidden: free-form Python one-liners for `run-state.json` mutations
 
 ## Context pack
 
