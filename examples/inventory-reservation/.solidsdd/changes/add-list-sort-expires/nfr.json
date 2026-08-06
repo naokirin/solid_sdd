@@ -9,7 +9,12 @@
       "requirement": "Authorized soft-hold collection list (GET /reservations / Reservation::list) returns the full dump of currently visible soft-holds sorted by expiresAt ascending (earlier expiry first). Equal expiresAt may use any stable order. No stock or hold mutation on any path. Filters, paging, and DTO shape remain unchanged.",
       "rationale": "Sort order is the sole functional delta on an existing list surface; callers need a deterministic earlier-expiry-first dump without redefining the collection contract.",
       "threshold": "Authorized list always returns the same visible full dump as today, ordered by expiresAt ascending; ties use any stable order; never mutates stock or holds; no new filters, paging, or DTO fields.",
-      "measurement": "OCL-derived Vitest contract tests plus OpenAPI exercises asserting expiresAt non-decreasing order on authorized list success (including empty and ties)."
+      "measurement": "OCL-derived Vitest contract tests plus OpenAPI exercises asserting expiresAt non-decreasing order on authorized list success (including empty and ties).",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
     },
     {
       "id": "NFR2",
@@ -18,7 +23,12 @@
       "requirement": "Reuse existing opaque-principal AuthZ Means (POL-OPAQUE-PRINCIPAL-AUTHZ). Unauthorized list still fails with named UnauthorizedError; stock and holds are unchanged.",
       "rationale": "User ask keeps AuthZ unchanged; only sort order is added to the authorized success path.",
       "threshold": "Unauthorized list always fails with UnauthorizedError and never mutates; authorized opaque principal receives the shared visibility universe sorted by expiresAt ascending.",
-      "measurement": "Existing UnauthorizedError contract tests remain green; cite POL-OPAQUE-PRINCIPAL-AUTHZ; no AuthZ surface rewrite."
+      "measurement": "Existing UnauthorizedError contract tests remain green; cite POL-OPAQUE-PRINCIPAL-AUTHZ; no AuthZ surface rewrite.",
+      "verified_by": [
+        "tests/contracts/reservation.test.ts",
+        "contracts/Reservation.ocl",
+        "openapi/openapi.yaml"
+      ]
     },
     {
       "id": "NFR3",
@@ -34,7 +44,12 @@
       "requirement": "expiresAt-ascending list order is checkable via HTTP/API (OpenAPI) and/or module DbC (UML OCL) with Vitest contract tests; do not rely on opaque internals alone.",
       "rationale": "solid_sdd evaluation path requires machine-checkable surfaces for the delta.",
       "threshold": "openapi/openapi.yaml and/or contracts/**/*.ocl plus tests/contracts/** make authorized sorted full-dump success and UnauthorizedError checkable and pass.",
-      "measurement": "Presence of OpenAPI and/or OCL constraints plus passing Vitest under tests/contracts/** for sorted list success and unauthorized failure."
+      "measurement": "Presence of OpenAPI and/or OCL constraints plus passing Vitest under tests/contracts/** for sorted list success and unauthorized failure.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
     },
     {
       "id": "NFR5",
@@ -43,7 +58,12 @@
       "requirement": "Additive behavior on existing GET /reservations / Reservation::list only: do not break prior reserve, release, expire, lookup, concurrent, or list AuthZ/visibility/DTO surfaces; no filters, paging, or DTO changes.",
       "rationale": "LIGHT follow-on; prior clients and Features stay in force except the new sort obligation on list success.",
       "threshold": "Prior operations and list AuthZ/visibility/item shape remain; only success ordering by expiresAt ascending is added.",
-      "measurement": "solidsdd-verify OpenAPI lint (or skip with tooling reason); prior Features/tests remain; new sort assertions on list success."
+      "measurement": "solidsdd-verify OpenAPI lint (or skip with tooling reason); prior Features/tests remain; new sort assertions on list success.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "tests/contracts/reservation.test.ts",
+        ".solidsdd/changes/add-list-sort-expires/verification-report.json"
+      ]
     },
     {
       "id": "NFR6",
@@ -52,7 +72,11 @@
       "requirement": "UML OCL under contracts/**/*.ocl remains the DbC source of truth where list is constrained; Vitest under tests/contracts/** covers expiresAt-ascending authorized list success and UnauthorizedError.",
       "rationale": "Matches solid_sdd adapter policy and inherited contract/test layout.",
       "threshold": "contracts/**/*.ocl and/or derived Vitest exercise sorted full-dump success and named unauthorized failure without inventing a parallel SoT.",
-      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes."
+      "measurement": "Inspect contracts/ and tests/contracts/; regenerate via solidsdd-derive-tests when OCL changes.",
+      "verified_by": [
+        "contracts/Reservation.ocl",
+        "tests/contracts/reservation.test.ts"
+      ]
     }
   ]
 }

@@ -16,7 +16,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python deps
-        run: pip install jsonschema
+        run: pip install -r scripts/requirements.txt
 
       - name: Skill references in sync
         run: scripts/sync-skill-references.sh --check

@@ -73,7 +73,5 @@
         "acceptance_of_whole"
       ]
     }
-  ],
-  "cost_skip": "B4",
-  "reused_from": "items/W1/verification-report.json"
+  ]
 }
