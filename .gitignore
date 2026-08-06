@@ -12,6 +12,7 @@ vendor/bundle/
 # Python
 __pycache__/
 *.py[cod]
+.venv/
 
 # Logs / secrets
 *.log
@@ -30,4 +31,7 @@ bin/
 # Machine-local host toolchain probe (absolute paths; do not commit)
 .solidsdd/host-toolchain.json
 **/.solidsdd/host-toolchain.json
+
+# solid_sdd consumer vendor tooling (re-run install-into-project.sh to refresh)
+**/.solidsdd/vendor/**/.venv/
 

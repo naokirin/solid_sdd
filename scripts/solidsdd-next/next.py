@@ -20,6 +20,15 @@ except ImportError:  # pragma: no cover
     print("solidsdd-next requires the jsonschema package", file=sys.stderr)
     sys.exit(2)
 
+_SCRIPTS = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from solidsdd_lib.paths import (  # noqa: E402
+    Layout,
+    load_layout,
+    resolve_change_dir as _resolve_change_dir,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
 
@@ -30,15 +39,7 @@ def load_json(path: Path) -> Any:
 
 
 def resolve_change_dir(project: Path, change_id: str | None) -> tuple[str, Path]:
-    active = project / ".solidsdd" / "active-change.json"
-    if change_id is None:
-        if not active.is_file():
-            raise SystemExit("no --change-id and no .solidsdd/active-change.json")
-        change_id = load_json(active)["change_id"]
-    change_dir = project / ".solidsdd" / "changes" / change_id
-    if not change_dir.is_dir():
-        raise SystemExit(f"change directory missing: {change_dir}")
-    return change_id, change_dir
+    return _resolve_change_dir(project, change_id)
 
 
 def exists(change_dir: Path, rel: str) -> bool:
@@ -173,7 +174,9 @@ def hint(
     return out
 
 
-def compute_next(change_id: str, change_dir: Path) -> dict[str, Any]:
+def compute_next(
+    change_id: str, change_dir: Path, layout: Layout | None = None
+) -> dict[str, Any]:
     rs = load_optional(change_dir, "run-state.json") or {}
     phase = rs.get("phase")
     work = load_optional(change_dir, "work-plan.json")
@@ -201,9 +204,10 @@ def compute_next(change_id: str, change_dir: Path) -> dict[str, Any]:
     # No run-state yet → start path
     if not phase:
         if not exists(change_dir, "change-context.md"):
-            if exists(change_dir, "knowledge-consult.md") or (
-                change_dir.parent.parent / "knowledge"
-            ).is_dir():
+            knowledge_present = False
+            if layout is not None:
+                knowledge_present = any(d.is_dir() for d in layout.knowledge_dirs())
+            if exists(change_dir, "knowledge-consult.md") or knowledge_present:
                 # Prefer grill only when clarifications already started; else intake or consult
                 if exists(change_dir, "clarifications/open.json"):
                     return hint(
@@ -586,8 +590,9 @@ def main() -> int:
     args = parser.parse_args()
 
     project = args.project_root.resolve()
-    change_id, change_dir = resolve_change_dir(project, args.change_id)
-    nxt = compute_next(change_id, change_dir)
+    layout = load_layout(project)
+    change_id, change_dir = _resolve_change_dir(project, args.change_id, layout=layout)
+    nxt = compute_next(change_id, change_dir, layout=layout)
     try:
         validate_hint(nxt)
     except jsonschema.ValidationError as e:

@@ -11,7 +11,7 @@ HTTP API boundaries as OpenAPI 3.x documents.
 | OpenAPI document | `openapi/openapi.yaml` |
 | Optional overlays / examples | `openapi/examples/` |
 
-Projects may override paths via rules.
+Override via `.solidsdd/config.yaml` → `paths.openapi` (see contract-layout / `schemas/project-config.schema.json`).
 
 ## Responsibilities
 

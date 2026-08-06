@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/project-config.schema.json",
+  "title": "ProjectConfig",
+  "description": "Project-wide path layout for solid_sdd. File: .solidsdd/config.yaml (YAML whose shape matches this schema). Missing file means built-in defaults. Meta root discovery is SOLIDSDD_DIR env or .solidsdd/; paths are project-root relative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Override any subset; omitted keys keep defaults.",
+      "properties": {
+        "solidsdd": {
+          "type": "string",
+          "description": "Meta root directory; must match discovery dir (SOLIDSDD_DIR or .solidsdd)."
+        },
+        "active_change": {
+          "type": "string",
+          "description": "Path to active-change.json"
+        },
+        "changes": {
+          "type": "string",
+          "description": "Directory containing <change_id>/ trees"
+        },
+        "host_toolchain": {
+          "type": "string",
+          "description": "Path to host-toolchain.json"
+        },
+        "kg": {
+          "type": "string",
+          "description": "Knowledge-graph meta directory (schema/config/links)"
+        },
+        "cache": {
+          "type": "string",
+          "description": "Derived cache directory (e.g. kg.db)"
+        },
+        "knowledge": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Durable knowledge markdown roots"
+        },
+        "requirements": {
+          "type": "string",
+          "description": "Gherkin requirements directory"
+        },
+        "requirements_glob": {
+          "type": "string",
+          "description": "Glob for feature files (project-root relative)"
+        },
+        "openapi": {
+          "type": "string",
+          "description": "OpenAPI document path"
+        },
+        "graphql": {
+          "type": "string",
+          "description": "GraphQL SDL path"
+        },
+        "contracts": {
+          "type": "string",
+          "description": "OCL / DbC contracts directory"
+        },
+        "formal": {
+          "type": "string",
+          "description": "Formal specs directory"
+        },
+        "contract_tests_ts": {
+          "type": "string",
+          "description": "Vitest contract tests directory"
+        },
+        "contract_tests_ruby": {
+          "type": "string",
+          "description": "RSpec contract specs directory"
+        }
+      }
+    }
+  }
+}

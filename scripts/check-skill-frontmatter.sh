@@ -46,7 +46,7 @@ for path in skills:
     if name != expected_dir and name.replace(".", "-") != expected_dir:
         # allow solidsdd.brief vs solidsdd-brief mismatch? Our names use solidsdd-brief style
         if name != expected_dir:
-            # frontmatter name should match directory for gh skill
+            # frontmatter name should match directory for Agent Skills install
             if name != expected_dir:
                 errors.append(f"{path}: name {name!r} != dir {expected_dir!r}")
 

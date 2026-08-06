@@ -15,14 +15,14 @@ Formal specs are valuable but heavy to adopt and tend to narrow scope, so they a
 - [x] Evaluation scenario: TypeScript arithmetic API ([../examples/arithmetic-api](../examples/arithmetic-api))
 - [x] Skill I/O schemas (`ApplicationPlan`, etc.)
 - [x] Skill definition skeletons (`skills/`)
-- [x] Consumer install guide ([install.md](install.md) — self-contained `gh skill` skills)
+- [x] Consumer install guide ([install.md](install.md) — `install-into-project.sh`; skills + mechanical tooling)
 - [x] `skills/*/references/` sync script (`scripts/sync-skill-references.sh`)
 - [x] Cursor / Claude Code hooks + git pre-commit (error + fix command on drift)
-- [ ] `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (release / `agent-skills` topic)
+- [x] Drop skill-only CLI as consumer channel; installer is the sole install path
 
 ## Phase 1: MVP (minimal connected system)
 
-**Status: evaluation complete** (see [mvp-evaluation.md](mvp-evaluation.md)). Distribution (`gh skill publish`) deferred.
+**Status: evaluation complete** (see [mvp-evaluation.md](mvp-evaluation.md)). Consumer distribution is via `install-into-project.sh`.
 
 **In scope**
 
@@ -113,7 +113,7 @@ Borrow maturity, conditional Grill, Means vs tech, clarifications, facets / know
 
 ## Near-term next actions
 
-1. `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) (distribution)
+1. GitHub Release / tag workflow for `install-into-project.sh --repo/--ref` (optional packaging of install-manifest payload)
 2. External project adoption → intake in [feedback-tuning.md](feedback-tuning.md), or opt-in design for language-native DbC
 3. Optional Markdown/HTML projection skills for human-readable views of contracts (without changing loop authority)
 4. Optional: mechanical EARS pattern detection in lint (Workstream G follow-on)

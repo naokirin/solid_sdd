@@ -33,7 +33,7 @@ Working tree returned to a green contract state after repair.
 
 ## Remaining (deferred)
 
-- `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd)
 - Phase 2 adapter eval: [phase2-evaluation.md](phase2-evaluation.md)
 - Phase 3 formal design: [phase3.md](phase3.md); TLC sample: [phase3-evaluation.md](phase3-evaluation.md)
 - Language-native DbC (opt-in)
+- Consumer distribution now: [install.md](install.md) (`install-into-project.sh`; skill-only CLI publish cancelled)

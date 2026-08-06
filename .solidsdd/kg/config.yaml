@@ -1,4 +1,6 @@
 # solidsdd-kg project config
+# Path layout prefers ../config.yaml (project SoT). Fields here overlay that
+# for kg-specific settings and optional glob overrides.
 root: .
 
 knowledge_dirs:

@@ -20,13 +20,15 @@ Optional frontmatter: `maturity` (`hypothesized` \| `confirmed` \| `canonical`; 
 
 | パス | 役割 |
 |------|------|
+| `.solidsdd/config.yaml` | **プロジェクト全体のパス SoT**（`paths.*`）。未配置時は下表のデフォルト |
 | `.solidsdd/kg/schema.yaml` | ノード／エッジ型／検証ルール |
-| `.solidsdd/kg/config.yaml` | 走査パス |
+| `.solidsdd/kg/config.yaml` | kg 固有設定（`freshness_days` 等）と走査パスの **上書き** |
 | `.solidsdd/kg/links.yaml` | アノテーション不可領域のエッジ |
 | `.solidsdd/kg/baseline.json` | 既知違反（`--baseline` / `--update-baseline`） |
 | `knowledge/**` | 知識ノード（1 ファイル = 1 ノード） |
 | `.solidsdd-cache/kg.db` | 派生物（gitignore） |
 
+走査パス（`knowledge_dirs` / `brief_glob` / `feature_glob` / `cache_dir` / `schema_path` / `links_files`）は、まず `.solidsdd/config.yaml` の `paths` から既定値を取り、その後 `kg/config.yaml` で overlay する。パス変更はプロジェクト config を推奨し、kg config は kg 固有項目と明示上書き用。
 ## ビルド
 
 ```bash

@@ -159,7 +159,7 @@ func cmdCheck(args []string) int {
 	})
 	bp := *baselinePath
 	if bp == "" {
-		bp = baseline.Path(cfg.ProjectRoot)
+		bp = cfg.BaselineFile()
 	}
 
 	if *updateBaseline {

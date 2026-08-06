@@ -20,7 +20,7 @@ Phase 4 packages solid_sdd for day-to-day use alongside other SDD tools and make
 ## Still open
 
 - External production-project feedback → further threshold tuning ([feedback-tuning.md](feedback-tuning.md) intake log)
-- `gh skill publish` for [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd) + template repository
+- Template repository + tagged releases for `install-into-project.sh --ref`
 - Optional language-native DbC (opt-in design; still deferred)
 - Optional human-readable projection skills (Markdown / HTML from contracts) — readability without changing loop authority
 

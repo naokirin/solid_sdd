@@ -20,6 +20,14 @@ except ImportError:  # pragma: no cover
     print("solidsdd-lint requires the jsonschema package", file=sys.stderr)
     sys.exit(2)
 
+_SCRIPTS = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from solidsdd_lib.paths import (  # noqa: E402
+    load_layout,
+    resolve_change_dir as _resolve_change_dir,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
 LEXICON_PATH = Path(__file__).resolve().parent / "ambiguity-lexicon.json"
@@ -70,15 +78,7 @@ def validate_schema(
 
 
 def resolve_change_dir(project: Path, change_id: str | None) -> tuple[str, Path]:
-    active = project / ".solidsdd" / "active-change.json"
-    if change_id is None:
-        if not active.is_file():
-            raise SystemExit("no --change-id and no .solidsdd/active-change.json")
-        change_id = load_json(active)["change_id"]
-    change_dir = project / ".solidsdd" / "changes" / change_id
-    if not change_dir.is_dir():
-        raise SystemExit(f"change directory missing: {change_dir}")
-    return change_id, change_dir
+    return _resolve_change_dir(project, change_id)
 
 
 def check_change_id_match(
@@ -174,9 +174,11 @@ def depends_on_cycles(items: list[dict[str, Any]]) -> list[list[str]]:
     return cycles
 
 
-def parse_feature_tags(project: Path) -> dict[str, set[str]]:
+def parse_feature_tags(
+    project: Path, requirements_dir: Path | None = None
+) -> dict[str, set[str]]:
     """Map scenario_name -> set of @R1-style cover tags (without @)."""
-    req = project / "requirements"
+    req = requirements_dir if requirements_dir is not None else project / "requirements"
     mapping: dict[str, set[str]] = defaultdict(set)
     if not req.is_dir():
         return mapping
@@ -222,10 +224,14 @@ def ambiguity_hits(text: str, lexicon: dict[str, Any]) -> list[str]:
 
 
 def lint_change(
-    project: Path, change_id: str, change_dir: Path
+    project: Path,
+    change_id: str,
+    change_dir: Path,
+    layout: Any | None = None,
 ) -> list[dict[str, str]]:
     findings: list[dict[str, str]] = []
     lexicon = load_json(LEXICON_PATH)
+    lay = layout if layout is not None else load_layout(project)
 
     brief_path = change_dir / "change-brief.json"
     plan_path = change_dir / "work-plan.json"
@@ -572,7 +578,7 @@ def lint_change(
                 )
 
             # Scenario tags vs item covers
-            feature_tags = parse_feature_tags(project)
+            feature_tags = parse_feature_tags(project, lay.requirements_dir())
             for it in items:
                 if not isinstance(it, dict):
                     continue
@@ -586,7 +592,7 @@ def lint_change(
                         finding(
                             "major",
                             "scope_gap",
-                            it.get("feature_path") or "requirements/**/*.feature",
+                            it.get("feature_path") or lay.requirements_glob,
                             f"Scenario {name!r} has no @R*/@SC* tags but WorkPlan item {it.get('id')} covers {sorted(covers)}",
                         )
                     )
@@ -641,7 +647,7 @@ def lint_change(
         ("critique*.json", "critique-report.schema.json"),
     ):
         for path in list(change_dir.glob(pattern)) + list(
-            (project / ".solidsdd").glob(pattern)
+            lay.solidsdd_dir().glob(pattern)
         ):
             if not path.is_file():
                 continue
@@ -677,8 +683,9 @@ def main() -> int:
     )
     args = parser.parse_args()
     project = args.project_root.resolve()
-    change_id, change_dir = resolve_change_dir(project, args.change_id)
-    findings = lint_change(project, change_id, change_dir)
+    layout = load_layout(project)
+    change_id, change_dir = _resolve_change_dir(project, args.change_id, layout=layout)
+    findings = lint_change(project, change_id, change_dir, layout=layout)
     fail = any(f["severity"] in ("blocker", "major") for f in findings)
     report = {
         "version": "1",

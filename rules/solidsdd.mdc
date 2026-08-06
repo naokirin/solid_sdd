@@ -6,9 +6,11 @@ alwaysApply: true
 # solid_sdd
 
 This project uses solid_sdd for machine-checkable Spec-Driven Development.
-Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`).
+Install via `scripts/install-into-project.sh` (skills under `.agents/skills/solidsdd-*` or the agent-specific dir; tooling via `.solidsdd/tooling.json`).
 
 ## Contract artifacts (defaults)
+
+Defaults below; **override via `.solidsdd/config.yaml`** (`paths.*`; schema `schemas/project-config.schema.json`). Meta root: `SOLIDSDD_DIR` or `.solidsdd/`. Mechanical CLIs: `.solidsdd/tooling.json` → `scripts_dir` after `install-into-project.sh`. Agents and scripts read config/tooling—do not rely on this rule alone for path overrides.
 
 - Active change: `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/`
 - Change Context: `.solidsdd/changes/<change_id>/change-context.md` (demand / NFR / tech selection — `solidsdd-intake`)

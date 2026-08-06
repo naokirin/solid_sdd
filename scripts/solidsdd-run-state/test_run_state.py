@@ -199,6 +199,33 @@ class RunStateCliTests(unittest.TestCase):
             data["host_toolchain"]["source"], ".solidsdd/host-toolchain.json"
         )
 
+    def test_changes_path_override(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        cid = "relocated-change"
+        cdir = root / "alt-changes" / cid
+        cdir.mkdir(parents=True)
+        sdd = root / ".solidsdd"
+        sdd.mkdir()
+        (sdd / "config.yaml").write_text(
+            'version: "1"\npaths:\n  changes: alt-changes\n',
+            encoding="utf-8",
+        )
+        (sdd / "active-change.json").write_text(
+            json.dumps({"version": "1", "change_id": cid}),
+            encoding="utf-8",
+        )
+        (cdir / "status.json").write_text(
+            json.dumps({"version": "1", "status": "active"}),
+            encoding="utf-8",
+        )
+        self.assertEqual(rs.main(["--project-root", str(root), "init"]), 0)
+        self.assertTrue((cdir / "run-state.json").is_file())
+        self.assertFalse(
+            (root / ".solidsdd" / "changes" / cid / "run-state.json").exists()
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

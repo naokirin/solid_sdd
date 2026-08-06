@@ -31,7 +31,7 @@ Produce a concise context summary so later skills do **not** rediscover the stac
    - `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` (+ `work-plan.json` / `status.json` when present)
    - Legacy flat `.solidsdd/change-brief.json` only → note that next brief/run must migrate ([change-lifecycle.md](references/change-lifecycle.md))
 3. Locate API contracts:
-   - OpenAPI: `openapi/openapi.yaml` (or project-rule overrides)
+   - OpenAPI: `openapi/openapi.yaml` (or `.solidsdd/config.yaml` `paths.openapi`)
    - GraphQL: `graphql/schema.graphql` if present → prefer `adapter_hint: graphql` later
 4. Locate requirements: `requirements/**/*.feature` (accumulate across changes)
 5. Locate OCL: `contracts/**/*.ocl`

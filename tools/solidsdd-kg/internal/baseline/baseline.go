@@ -18,9 +18,17 @@ type File struct {
 	Violations []string `json:"violations"` // fingerprints
 }
 
-// Path returns default baseline path under project root.
+// Path returns default baseline path under project root (.solidsdd/kg/baseline.json).
 func Path(projectRoot string) string {
 	return filepath.Join(projectRoot, ".solidsdd", "kg", "baseline.json")
+}
+
+// PathUnder returns baseline.json under a project-relative kg directory.
+func PathUnder(projectRoot, kgRel string) string {
+	if kgRel == "" {
+		return Path(projectRoot)
+	}
+	return filepath.Join(projectRoot, kgRel, "baseline.json")
 }
 
 // Load reads baseline; missing file yields empty baseline.

@@ -1,8 +1,8 @@
 # Skills index
 
-Agent Skills for solid_sdd ([agentskills.io](https://agentskills.io) / `gh skill`).
+Agent Skills for solid_sdd ([agentskills.io](https://agentskills.io)).
 
-Each skill is **self-contained**. Required adapter notes, schemas, and the execution model live under that skill’s `references/` (individual `gh skill` installs do not read other paths). Install: [docs/install.md](../docs/install.md).
+Each skill is **self-contained** (adapter notes, schemas, execution model under `references/`). **Consumer install:** [docs/install.md](../docs/install.md) via `scripts/install-into-project.sh` (skills + mechanical tooling).
 
 Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop/references/execution-model.md` (design notes in-repo: [../docs/execution-model.md](../docs/execution-model.md)).
 

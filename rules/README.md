@@ -13,4 +13,4 @@
 | Contract paths | `## Contract artifacts` | Override defaults when the repo layout differs |
 | Judgment / gates | `## Judgment defaults`, `## Human gates` | Tune thresholds from project feedback |
 
-Primary install path: [docs/install.md](../docs/install.md) (`gh skill install`).
+Primary install path: [docs/install.md](../docs/install.md) (`scripts/install-into-project.sh`).

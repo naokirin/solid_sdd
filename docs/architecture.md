@@ -201,7 +201,7 @@ solid_sdd/
   examples/             # evaluation samples
 ```
 
-Skills follow the Cursor / Agent Skills (`SKILL.md`) format as **self-contained packages including `references/`**. The main install path for consumers is `gh skill install` ([install.md](install.md)).
+Skills follow the Cursor / Agent Skills (`SKILL.md`) format as **self-contained packages including `references/`**. Consumers install via [`scripts/install-into-project.sh`](../scripts/install-into-project.sh) (skills **and** mechanical scripts/schemas; see [install.md](install.md)).
 
 ## Open questions
 

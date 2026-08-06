@@ -16,17 +16,20 @@ Artifacts prioritize **gap reduction and mechanical checks** for the active chan
 
 ## Status
 
-Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract tests), evaluation samples, and **self-contained skills for `gh skill`**.
+Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract tests), evaluation samples, Agent Skills packages, and **mechanical tooling** (lint / run-state / host-toolchain / optional kg) installed via `scripts/install-into-project.sh`.
 
 ## Install (summary)
 
 ```bash
-gh skill install naokirin/solid_sdd --all --agent cursor --scope project
-cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc  # path may vary by environment
-# Optional: set Working language in that rule (`Working language: ja` for Japanese .solidsdd prose)
+# From a solid_sdd checkout — installs skills + scripts/schemas into the project
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root /path/to/your-project \
+  --agent cursor
+# Optional: --agent cursor,claude-code | copilot | codex | devin
+# Optional: --vendor-dir .solidsdd/vendor/solid_sdd (default) | --with-kg | --ref vX.Y.Z
 ```
 
-Details: [docs/install.md](docs/install.md). Working language policy: [reference-src/working-language.md](reference-src/working-language.md).
+Details: [docs/install.md](docs/install.md). Working language: [reference-src/working-language.md](reference-src/working-language.md).
 
 After maintainers change `adapters/` and related sources:
 
@@ -42,7 +45,7 @@ In Cursor / Claude Code, hooks run sync automatically on source edits (`.cursor/
 
 | Doc | Contents |
 |-----|----------|
-| [docs/install.md](docs/install.md) | **Install guide (`gh skill` recommended)** |
+| [docs/install.md](docs/install.md) | **Install guide (`install-into-project.sh`)** |
 | [docs/vision.md](docs/vision.md) | Problem framing, goals, selection axes |
 | [docs/architecture.md](docs/architecture.md) | Rules, agents, and skill layout |
 | [docs/adapters.md](docs/adapters.md) | Adapter policy (OpenAPI / GraphQL / OCL) |

@@ -42,7 +42,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 
 When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/change-brief.json` unless the parent Task prompt gives an explicit path.
 
-**Lint tooling** lives in the solid_sdd repository: `scripts/solidsdd-lint.sh` (see that repo’s `scripts/solidsdd-lint/README.md`). Prefer the path from the installed solid_sdd checkout or parent Task prompt.
+**Lint tooling** is installed with the project via `scripts/install-into-project.sh` (see `.solidsdd/tooling.json` → `scripts_dir`, default `.solidsdd/vendor/solid_sdd/scripts/solidsdd-lint.sh`). Prefer that path; a solid_sdd checkout path is a fallback for maintainers.
 
 ## Constraints
 
@@ -57,14 +57,15 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 - `subject`: one of the CritiqueReport `subject` enum values
 - Paths / excerpts of the artifact under review
 - Optional: change intent, context summary, ApplicationPlan (for density vs signals)
-- Optional: absolute path to `scripts/solidsdd-lint.sh` or solid_sdd repo root
+- Optional: path to `solidsdd-lint.sh` from `.solidsdd/tooling.json` → `scripts_dir` (or absolute)
 
 ## Steps
 
 1. Resolve working language from project rule or Change Context §6 when present. Read [adversarial-critique.md](references/adversarial-critique.md), especially **Deterministic lint first** and **Severity calibration**.
 2. **Run lint** from the consuming project root:
    ```bash
-   /path/to/solid_sdd/scripts/solidsdd-lint.sh --project-root . --pretty
+   # Prefer vendored install (tooling.json → scripts_dir):
+   .solidsdd/vendor/solid_sdd/scripts/solidsdd-lint.sh --project-root . --pretty
    ```
    Capture JSON. Map each lint finding into CritiqueReport `findings` (severity unchanged; map `schema_violation` → category `consistency` or `other`; `scope_gap` / `unverifiable_acceptance` / `consistency` map when they match CritiqueReport enums, else `other`).
 3. Inspect the artifact with LLM review for **adequacy** (not re-deriving coverage existence). Draft additional findings; assign severity using the major vs not-major table.

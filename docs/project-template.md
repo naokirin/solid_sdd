@@ -5,6 +5,9 @@ Minimal layout a consuming repo can copy. Paths match skill defaults ([contract-
 ```text
 your-project/
   .solidsdd/
+    config.yaml                  # path layout SoT (optional; defaults if missing)
+    tooling.json                 # written by install-into-project.sh
+    vendor/solid_sdd/            # scripts + schemas + skill copies (installer)
     active-change.json           # { "version": "1", "change_id": "<id>" }
     changes/
       <change_id>/
@@ -35,19 +38,21 @@ your-project/
   formal/                        # optional Phase 3
     *.tla
     *.cfg
-  .agents/skills/solidsdd-*/     # gh skill install
-  .cursor/rules/solidsdd.mdc     # copy from solidsdd-loop/references/project-rule.mdc
+  .agents/skills/solidsdd-*/     # install-into-project.sh (--agent cursor|copilot|codex)
+  .cursor/rules/solidsdd.mdc     # installer copies for Cursor
 ```
 
 `change_id` is a meaningful kebab-case name (e.g. `initial-calculator`, `add-operation-history`). Additional requirements start a **new** change directory—do not enlarge an old Brief into a living PRD.
+
+Override any of the default directories/files with `.solidsdd/config.yaml` (`paths.*`; see [contract-layout](../reference-src/contract-layout.md) and `schemas/project-config.schema.json`). Relocate the meta root with env `SOLIDSDD_DIR`. Install mechanical CLIs with [install.md](install.md) (`--vendor-dir` if not using the default vendor path).
 
 `knowledge/` holds rarely changing cross-cutting policies/concepts/decisions. `solidsdd-run` **consults** it before framing and **harvests** candidates after integration verify (human-gated). It is not a second requirement SoT—see [knowledge.md](../reference-src/knowledge.md) and [tools/solidsdd-kg](../tools/solidsdd-kg).
 
 ## Bootstrap steps
 
-1. Install skills — [install.md](install.md)
-2. Copy project rule into `.cursor/rules/solidsdd.mdc` (from `skills/solidsdd-loop/references/project-rule.mdc` or repo `rules/solidsdd.mdc`)
-3. Set **Working language** in that rule — one line under `## Working language`:
+1. Install skills **and** tooling — [install.md](install.md) (`scripts/install-into-project.sh`)
+2. Confirm `.solidsdd/tooling.json` and agent skill dirs
+3. Set **Working language** in `.cursor/rules/solidsdd.mdc` (Cursor) — one line under `## Working language`:
    - English (default): `Working language: en`
    - Japanese prose under `.solidsdd/`: `Working language: ja`
    - Keep JSON keys, Change Context headings, and Gherkin keywords in English (see skill `references/working-language.md`)

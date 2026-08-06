@@ -24,9 +24,9 @@
 
 Resolve the active change via `active-change.json` → `changes/<change_id>/`. See [change-lifecycle.md](change-lifecycle.md). Per-item filenames and resume rules: [run-state.md](run-state.md).
 
-**Legacy:** flat `.solidsdd/change-brief.json` only — migrate on next intake/brief/run (do not keep a dual SoT). Ad-hoc `.solidsdd/application-plan*.json` at repo root is legacy; prefer `items/<id>/application-plan.json`.
+**Path overrides:** project SoT is `.solidsdd/config.yaml` (`paths.*`; schema `schemas/project-config.schema.json`). Missing file keeps the defaults above. Meta-root discovery is `SOLIDSDD_DIR` or `.solidsdd/` (config lives there). Agents, vendored `scripts/solidsdd_*.sh`, and `solidsdd-kg` all read this file. Resolve CLI paths from `.solidsdd/tooling.json` → `scripts_dir` after `install-into-project.sh` (default `.solidsdd/vendor/solid_sdd/scripts`). A project rule may still *mention* paths for humans, but machines must not rely on rule text alone.
 
-Projects may override paths via a project rule (commonly installed from the `solidsdd-loop` skill as `project-rule.mdc`).
+**Legacy:** flat `.solidsdd/change-brief.json` only — migrate on next intake/brief/run (do not keep a dual SoT). Ad-hoc `.solidsdd/application-plan*.json` at repo root is legacy; prefer `items/<id>/application-plan.json`.
 
 OCL-derived tests are dependents: regenerate from OCL rather than treating tests as the primary spec.
 

@@ -29,7 +29,7 @@ Concrete numeric examples belong in optional `Examples` tables, OCL-derived test
 |----------|------|
 | Feature files | `requirements/**/*.feature` |
 
-Projects may override via project rule. Decompose may **write or update** `.feature` files when normalizing from a ChangeBrief or incomplete Gherkin. Feature files **accumulate across changes**; each new Scenario must map to the **active** ChangeBrief’s `in_scope` / WorkPlan items. See [change-lifecycle.md](change-lifecycle.md).
+Override via `.solidsdd/config.yaml` (`paths.requirements` / `paths.requirements_glob`). Decompose may **write or update** `.feature` files when normalizing from a ChangeBrief or incomplete Gherkin. Feature files **accumulate across changes**; each new Scenario must map to the **active** ChangeBrief’s `in_scope` / WorkPlan items. See [change-lifecycle.md](change-lifecycle.md).
 
 ## Conventions (property-level)
 

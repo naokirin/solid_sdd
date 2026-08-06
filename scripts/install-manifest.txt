@@ -1,0 +1,29 @@
+# Paths copied into the consuming project's vendor tree (relative to solid_sdd root).
+# One path per line. Directories are copied recursively (tests / evals excluded below).
+# Comments and blank lines ignored.
+
+skills/
+schemas/
+rules/solidsdd.mdc
+
+scripts/requirements.txt
+scripts/solidsdd-lint.sh
+scripts/solidsdd-run-state.sh
+scripts/solidsdd-next.sh
+scripts/solidsdd-host-toolchain.sh
+scripts/solidsdd-kg.sh
+
+scripts/solidsdd_lib/__init__.py
+scripts/solidsdd_lib/paths.py
+
+scripts/solidsdd-lint/lint.py
+scripts/solidsdd-lint/ambiguity-lexicon.json
+scripts/solidsdd-lint/README.md
+
+scripts/solidsdd-run-state/run_state.py
+scripts/solidsdd-run-state/README.md
+
+scripts/solidsdd-next/next.py
+scripts/solidsdd-next/README.md
+
+scripts/solidsdd-host-toolchain/host_toolchain.py

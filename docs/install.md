@@ -1,168 +1,176 @@
 # Installing into a project
 
-solid_sdd skills are **self-contained**. Adapter summaries, schemas, and the execution model ship in each skill’s `references/`, so installing with `gh skill` is enough to run the MVP.
+**Supported path:** `scripts/install-into-project.sh` installs **skills + mechanical tooling** (lint / run-state / next / host-toolchain, schemas, optional kg) into the consuming project. This is the only supported consumer install.
+
+Agent Skills packages live under `skills/` for the installer to copy; do not use a separate skill-only install channel.
 
 ## Prerequisites
 
-- GitHub CLI **v2.90.0+** (`gh skill` command)
-- An Agent Skills host such as [Cursor](https://cursor.com/) (`--agent cursor`, etc.)
-- MVP: **OpenAPI 3.x + OCL → contract tests** (TypeScript / Vitest evaluation sample)
+- Bash, `git` (for remote install), Python 3 (`venv`)
+- Optional: Go (only with `--with-kg`)
+- An Agent Skills host: Cursor, Claude Code, Copilot, Codex, or Devin
 
-`gh skill` is a preview feature and may change.
+## Install
 
-## Recommended: install with `gh skill`
-
-Public repo: [naokirin/solid_sdd](https://github.com/naokirin/solid_sdd). Install from the default branch (or after `gh skill publish`):
+From a solid_sdd checkout (or after cloning this repo once):
 
 ```bash
-# at the consuming project root
-gh skill install naokirin/solid_sdd --all --agent cursor --scope project
+# at the consuming project — install for Cursor (skills → .agents/skills/)
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root . \
+  --agent cursor
+
+# Cursor + Claude Code (skills land in .agents/skills and .claude/skills)
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root . \
+  --agent cursor,claude-code \
+  --force
+
+# Pin a GitHub ref (sparse fetch; no full clone left behind)
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root . \
+  --agent copilot \
+  --repo naokirin/solid_sdd \
+  --ref v0.1.0 \
+  --force
 ```
 
-Per-skill example:
+### What gets installed
+
+| Piece | Default location |
+|-------|------------------|
+| Vendor tree (scripts, schemas, skill copies, rules) | `.solidsdd/vendor/solid_sdd/` (override with `--vendor-dir`) |
+| Install metadata | `.solidsdd/tooling.json` (`vendor_root`, `scripts_dir`, …) |
+| Path layout config | `.solidsdd/config.yaml` (created if missing) |
+| Skills for agent | see table below |
+| Cursor project rule | `.cursor/rules/solidsdd.mdc` (when `--agent` includes `cursor`) |
+| Python deps | `<vendor>/.venv` (`jsonschema`, `PyYAML`) |
+| Knowledge graph (optional) | `--with-kg` → `tools/solidsdd-kg` + `bin/solidsdd-kg` |
+
+### Agent skill directories (project scope)
+
+| `--agent` | Skills directory |
+|-----------|------------------|
+| `cursor`, `copilot`, `codex` | `.agents/skills/solidsdd-*` (shared) |
+| `claude-code` | `.claude/skills/solidsdd-*` |
+| `devin` | `.devin/skills/solidsdd-*` |
+
+Only paths listed in [`scripts/install-manifest.txt`](../scripts/install-manifest.txt) are vendored (not a full repo clone).
+
+### Custom vendor location
 
 ```bash
-gh skill install naokirin/solid_sdd solidsdd-loop --agent cursor --scope project
-gh skill preview naokirin/solid_sdd solidsdd-loop   # preview before install
+./scripts/install-into-project.sh \
+  --project-root /path/to/app \
+  --vendor-dir tools/solid_sdd \
+  --agent cursor \
+  --force
 ```
 
-Pinning:
+Agents and docs should resolve CLIs via `.solidsdd/tooling.json` → `scripts_dir` (default `.solidsdd/vendor/solid_sdd/scripts`).
 
-```bash
-gh skill install naokirin/solid_sdd --all --agent cursor --scope project --pin v0.1.0
-```
+## Contract layout
 
-### Install location
-
-For Cursor project scope, skills usually land under **`.agents/skills/solidsdd-*`** (shared with Copilot and others). That may differ from the older `.cursor/skills/`. Confirm the real path with `gh skill list`.
-
-### Project rule (optional but recommended)
-
-`gh skill` does not install Project Rules automatically. Once after install:
-
-```bash
-# path after install varies by environment
-cp .agents/skills/solidsdd-loop/references/project-rule.mdc .cursor/rules/solidsdd.mdc
-```
-
-If the path differs, find `solidsdd-loop/references/project-rule.mdc` via `gh skill list` or file search and copy it.
-
-## Local verification (clone)
-
-```bash
-gh skill install --from-local /path/to/solid_sdd --all --agent cursor --scope project
-gh skill publish --dry-run /path/to/solid_sdd   # validate before tagging a release
-```
-
-## Contract layout for consuming projects
-
-Defaults skills expect (overridable in rules):
+Defaults (overridable via `.solidsdd/config.yaml`):
 
 ```text
 your-project/
-  openapi/
-    openapi.yaml
-  contracts/
-    *.ocl
-  tests/
-    contracts/
-      *.test.ts
-  .agents/skills/solidsdd-*/   # placed by gh skill
-  .cursor/rules/solidsdd.mdc   # copied as above (recommended)
+  .solidsdd/
+    config.yaml
+    tooling.json
+    vendor/solid_sdd/          # installer output
+      scripts/
+      schemas/
+      skills/
+      rules/
+  .agents/skills/solidsdd-*/   # or .claude/skills / .devin/skills
+  .cursor/rules/solidsdd.mdc   # Cursor
+  openapi/ contracts/ …
 ```
-
-You can install without creating these yet. `solidsdd-context` → `solidsdd-judge` (or `solidsdd-loop` / `solidsdd-run`) is expected to detect and generate what is missing.
 
 ## Smoke check
 
-1. `gh skill list` shows `solidsdd-*`
-2. Ask the agent to run `solidsdd-context`, `solidsdd-loop` (one slice), or `solidsdd-run` (multiple acceptance criteria)
-3. Confirm skills read under `references/`
-4. (Optional) End-to-end check with this repo’s [examples/arithmetic-api](../examples/arithmetic-api)
-5. (Optional) From a solid_sdd checkout, run deterministic coverage lint:
+1. `.solidsdd/tooling.json` exists and `scripts_dir` points at vendored scripts
+2. Agent host lists `solidsdd-*` skills
+3. Run:
    ```bash
-   /path/to/solid_sdd/scripts/solidsdd-lint.sh --project-root /path/to/your-project --pretty
+   .solidsdd/vendor/solid_sdd/scripts/solidsdd-host-toolchain.sh --project-root .
+   .solidsdd/vendor/solid_sdd/scripts/solidsdd-lint.sh --project-root . --pretty   # needs an active change
    ```
-   Requires Python 3 + `jsonschema`. Critique runs this before LLM review when the script is available.
+4. Ask the agent to run `solidsdd-context`, then a small `solidsdd-loop` / `solidsdd-run`
+5. (Optional) `--with-kg` then `…/scripts/solidsdd-kg.sh build --root .`
 
 ### Breaking note (ChangeBrief)
 
-`in_scope` / `out_of_scope` / `success_criteria` are **`{ "id", "text" }` objects**, not bare strings. WorkPlan items require `covers` (Brief ids); Scenarios should carry matching `@R1` / `@SC1` tags. See [hardening-plan.md](hardening-plan.md).
+`in_scope` / `out_of_scope` / `success_criteria` are **`{ "id", "text" }` objects**. WorkPlan items require `covers`; Scenarios should carry matching `@R1` / `@SC1` tags. See [hardening-plan.md](hardening-plan.md).
 
 For automatic execution:
 
-- **One property-level Gherkin Scenario** (or equivalent single checkable slice) already known → `solidsdd-loop`
-- **Multiple / larger requirements** → `solidsdd-run` (intake → brief → decompose to property-level Scenarios → loop per item → integration verify)
+- **One property-level Gherkin Scenario** → `solidsdd-loop`
+- **Multiple / larger requirements** → `solidsdd-run`
 
-The parent must launch subagent-required skills (other than context) via Task (see each skill’s `references/execution-model.md`).
+The parent must launch subagent-required skills (other than context) via Task (see `references/execution-model.md`).
 
 ## Maintainers: distribution prep
 
-After changing skill bodies:
-
-```bash
-gh skill publish --dry-run
-# from https://github.com/naokirin/solid_sdd with auth:
-# gh skill publish --tag v0.1.0
-```
-
-- Repo topic should include `agent-skills` (guided at publish time)
-- Each `SKILL.md` already includes `license: MIT`
-- `adapters/`, `schemas/`, `docs/`, `rules/`, and `reference-src/` are edit sources. **Distributed truth is `skills/*/references/`**
-- After editing sources, always sync:
+After changing skill bodies / adapters:
 
 ```bash
 scripts/sync-skill-references.sh
-scripts/sync-skill-references.sh --check   # detect drift
+scripts/sync-skill-references.sh --check
+scripts/check-skill-frontmatter.sh
 ```
+
+Consumers install with `install-into-project.sh` (local checkout or `--repo` / `--ref`). Keep `scripts/install-manifest.txt` in sync with what the installer must ship.
+
+- `adapters/`, `schemas/`, `docs/`, `rules/`, and `reference-src/` are edit sources. **Distributed skill truth is `skills/*/references/`**
+- Installer payload is **`scripts/install-manifest.txt`**
 
 Edits via AI agents auto-sync:
 
 - Cursor: `.cursor/hooks.json` (`afterFileEdit`)
 - Claude Code: `.claude/settings.json` (`PostToolUse` / `Edit|Write|MultiEdit`)
 
-On commit, `scripts/git-hooks/pre-commit` runs `--check` and fails with the command to run if out of sync. Once:
-
 ```bash
-scripts/install-git-hooks.sh
+scripts/install-git-hooks.sh   # once (pre-commit drift check)
 ```
 
 ## Updates
 
+Re-run the installer with `--force` (same `--agent` / `--vendor-dir` / `--ref` as needed):
+
 ```bash
-gh skill update --all
-# or
-gh skill update solidsdd-loop
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root . --agent cursor --force
 ```
 
-If you customized `project-rule.mdc` locally, be careful when overwriting the copy.
+If you customized `.cursor/rules/solidsdd.mdc`, back it up before `--force` (rule file is overwritten for Cursor).
 
 ## Adoption checklist
 
-### Required (Change Context + ChangeBrief + OpenAPI + OCL + Gherkin intake)
+### Required
 
-- [ ] `gh skill install naokirin/solid_sdd --all --agent cursor` succeeded (or `--from-local`)
-- [ ] `gh skill list` shows `solidsdd-*` (run / loop / context / **intake** / **brief** / decompose / judge / **critique** / apply-api / apply-dbc / derive-tests / implement / verify, plus formal skills)
-- [ ] (Recommended) Copied `project-rule.mdc` into Project Rules
-- [ ] Set **Working language** in the project rule (`Working language: en` or `ja`) so Change Context / Brief / report prose match the team language — see skill `references/working-language.md`
-- [ ] Shared contract layout policy ([project-template.md](project-template.md)), including `.solidsdd/active-change.json`, `.solidsdd/changes/<change_id>/change-context.md`, `change-context-gate.json`, `change-brief.json`, and `requirements/**/*.feature`
-- [ ] Smoke of `solidsdd-context`, `solidsdd-loop`, or `solidsdd-run` passes (`solidsdd-critique` launched via Task right after producers; Change Context then Brief then WorkPlan with property-level Gherkin Scenarios)
-- [ ] Contract tests run via the project’s `npm test` / `bundle exec rspec` / etc.
+- [ ] `install-into-project.sh` succeeded for your agent(s)
+- [ ] `.solidsdd/tooling.json` present; lint/run-state scripts resolve under `scripts_dir`
+- [ ] Agent lists `solidsdd-*` (run / loop / context / intake / brief / decompose / judge / critique / apply-* / derive-tests / implement / verify, plus formal)
+- [ ] (Cursor) `.cursor/rules/solidsdd.mdc` installed; set **Working language** (`en` or `ja`)
+- [ ] Shared contract layout ([project-template.md](project-template.md)), including `.solidsdd/config.yaml` paths
+- [ ] Smoke of `solidsdd-context` + `solidsdd-loop` or `solidsdd-run` (critique via Task; lint runs when vendored scripts are available)
+- [ ] Contract tests via the project’s `npm test` / `bundle exec rspec` / etc.
 
-### Optional (by stack)
+### Optional
 
-- [ ] GraphQL: `graphql/schema.graphql` and `adapter_hint: graphql`
-- [ ] Ruby: `spec/contracts` + ruby-rspec generation target
-- [ ] Formal: JDK 17+, `tla2tools` fetch steps, team agreement on **human_gate** ([phase3-gate-dryrun.md](phase3-gate-dryrun.md))
+- [ ] `--with-kg` and knowledge consult/harvest path
+- [ ] GraphQL / Ruby / Formal stacks as needed
 
 ### Coexistence
 
-- [ ] Read role split with NL SDD tools ([coexistence.md](coexistence.md))
+- [ ] Role split with NL SDD tools ([coexistence.md](coexistence.md))
 
 ## Related docs
 
-- [adapters.md](adapters.md) — roles of OpenAPI / GraphQL / OCL / formal
-- [execution-model.md](execution-model.md) — execution model (also bundled in skills)
-- [architecture.md](architecture.md) — overall structure
-- [phase4.md](phase4.md) — operations and ecosystem
-- [../skills/README.md](../skills/README.md) — skill index
+- [adapters.md](adapters.md) — OpenAPI / GraphQL / OCL / formal
+- [execution-model.md](execution-model.md)
+- [architecture.md](architecture.md)
+- [phase4.md](phase4.md)
+- [../skills/README.md](../skills/README.md)

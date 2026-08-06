@@ -27,7 +27,7 @@ ChangeBrief is **not** a living product PRD and **not** a substitute for OCL/Ope
 | ChangeBrief JSON | `.solidsdd/changes/<change_id>/change-brief.json` |
 | Change status | `.solidsdd/changes/<change_id>/status.json` |
 
-Resolve via the active pointer. Projects may override via project rule. Do not write a flat `.solidsdd/change-brief.json` (legacy only).
+Resolve via the active pointer. Override layout paths via `.solidsdd/config.yaml`. Do not write a flat `.solidsdd/change-brief.json` (legacy only).
 
 `solidsdd-intake` creates `change_id` and `change-context.md`. `solidsdd-brief` writes `change-brief.json` for the **active** change (must not invent a conflicting id).
 

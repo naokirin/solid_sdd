@@ -6,9 +6,11 @@ alwaysApply: true
 # solid_sdd
 
 This project uses solid_sdd for machine-checkable Spec-Driven Development.
-Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`).
+Install via `scripts/install-into-project.sh` (skills under `.agents/skills/solidsdd-*` or the agent-specific dir; tooling via `.solidsdd/tooling.json`).
 
 ## Contract artifacts (defaults)
+
+Defaults below; **override via `.solidsdd/config.yaml`** (`paths.*`; schema `schemas/project-config.schema.json`). Meta root: `SOLIDSDD_DIR` or `.solidsdd/`. Mechanical CLIs: `.solidsdd/tooling.json` → `scripts_dir` after `install-into-project.sh`. Agents and scripts read config/tooling—do not rely on this rule alone for path overrides.
 
 - Active change: `.solidsdd/active-change.json` → `.solidsdd/changes/<change_id>/`
 - Change Context: `.solidsdd/changes/<change_id>/change-context.md` (demand / NFR / tech selection — `solidsdd-intake`)
@@ -23,6 +25,8 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 - OCL: `contracts/**/*.ocl`
 - Derived contract tests: `tests/contracts/**/*.test.ts` or `spec/contracts/**/*_spec.rb` (dependents of OCL; not source of truth)
 - Formal (optional): `formal/**/*.tla` (+ `.cfg`)
+- Knowledge (durable, cross-cutting): `knowledge/**` + `.solidsdd/kg/` — `solidsdd-knowledge` consult before framing, harvest before change `done` (human-gated; not a living Brief/PRD)
+- Knowledge snapshots (per change): `knowledge-consult.md`, `knowledge-harvest.json` under the change dir
 - Additional requirements → new meaningful `change_id` via intake + Brief (do not turn an old Brief into a living PRD); see skill `references/change-lifecycle.md`
 
 ## Working language
@@ -51,7 +55,7 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 ## Work decomposition
 
-- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-intake` → Change Context → [gate if required] → `solidsdd-brief` → ChangeBrief → `solidsdd-decompose` → WorkPlan (**one property-level Gherkin Scenario** per item) → **parallel** `solidsdd-loop` waves → integration `solidsdd-verify` → mark change `done`
+- Multi-criterion requirements → **`solidsdd-run`**: `solidsdd-context` → **`solidsdd-knowledge` (consult)** → `solidsdd-intake` → Change Context → [gate if required] → `solidsdd-brief` → ChangeBrief → `solidsdd-decompose` → WorkPlan (**one property-level Gherkin Scenario** per item) → **parallel** `solidsdd-loop` waves → integration `solidsdd-verify` → **`solidsdd-knowledge` (harvest)** → [knowledge gate if required] → mark change `done`
 - Change Context records demand / NFR / tech rationale; ChangeBrief is the scope return point; when later phases are unsure, re-read or re-run `solidsdd-intake` / `solidsdd-brief`
 - Requirements use property-level Gherkin under `requirements/**/*.feature` (see skill `references/gherkin-requirements.md`); not free-form prose alone; not Cucumber SoT
 - Single known slice → `solidsdd-loop` alone is enough (prefer passing a Scenario as the acceptance focus; pass Brief / Change Context excerpts when available)
@@ -78,13 +82,14 @@ Skills are installed via `gh skill` (typically under `.agents/skills/solidsdd-*`
 
 - If Change Context gate (`change-context-gate.json`) has `human_gate.required: true`, **stop before brief** until a person approves (do **not** gate when the initial instruction already settled framing)
 - If ChangeBrief / `ApplicationPlan` / `WorkPlan` has `human_gate.required: true`, **stop** (before decompose / before apply / before slice loops) until a person approves
+- If `knowledge-harvest.json` has `human_gate.required: true`, **stop before marking the change `done`** until a person approves (never auto-write `knowledge/`)
 - After approval, resume without thinning artifacts (see loop/run `references/human-gates.md`)
 
 ## Execution (orchestrator / subagent)
 
 - `solidsdd-run` and `solidsdd-loop` are parent-only
-- From an orchestrator, run intake / brief / decompose / judge / critique / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
-- Do not thin or rewrite Change Context, `ChangeBrief`, `WorkPlan`, `ApplicationPlan`, or `CritiqueReport` in the parent; re-run the owning skill as a subagent if needed
+- From an orchestrator, run intake / brief / decompose / knowledge / judge / critique / apply-* / derive-tests / implement / verify / apply-formal / verify-formal as **explicit Task subagents** — never inline in the parent
+- Do not thin or rewrite Change Context, `ChangeBrief`, `WorkPlan`, `ApplicationPlan`, `CritiqueReport`, or `knowledge-harvest.json` in the parent; re-run the owning skill as a subagent if needed
 - Isolation violation → feedback and Task re-run (consumes retry budget)
 - Details: `solidsdd-run/references/execution-model.md` or `solidsdd-loop/references/execution-model.md`
 

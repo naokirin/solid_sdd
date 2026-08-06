@@ -7,14 +7,14 @@ Deterministic checks run **before** LLM critique (`solidsdd-critique` Step 0/1).
 From a consuming project root (directory that contains `.solidsdd/`):
 
 ```bash
-# From solid_sdd checkout, pointing at a project:
-/path/to/solid_sdd/scripts/solidsdd-lint.sh --project-root /path/to/project [--change-id ID] [--pretty]
+# After install-into-project.sh (preferred — read scripts_dir from .solidsdd/tooling.json):
+.solidsdd/vendor/solid_sdd/scripts/solidsdd-lint.sh --project-root . [--change-id ID] [--pretty]
 
-# Or if the script is on PATH / installed alongside skills:
-scripts/solidsdd-lint.sh [--change-id ID] [--pretty]
+# Or from a solid_sdd checkout:
+/path/to/solid_sdd/scripts/solidsdd-lint.sh --project-root /path/to/project [--change-id ID] [--pretty]
 ```
 
-Requires Python 3 + [`jsonschema`](https://pypi.org/project/jsonschema/) (`pip install jsonschema`).
+Requires Python 3 + [`jsonschema`](https://pypi.org/project/jsonschema/) + [`PyYAML`](https://pypi.org/project/PyYAML/). The installer creates `<vendor>/.venv` and installs `scripts/requirements.txt` from the vendor tree.
 
 ## Output
 

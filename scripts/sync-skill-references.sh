@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sync editing sources into skills/*/references/ for gh skill self-containment.
+# Sync editing sources into skills/*/references/ so each skill package stays self-contained for install-into-project.sh.
 #
 # Usage:
 #   scripts/sync-skill-references.sh          # write copies

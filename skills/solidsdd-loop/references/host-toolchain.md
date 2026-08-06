@@ -11,9 +11,12 @@ solid_sdd launches many Task subagents. Each Subagent often starts a **non-inter
 | `scripts/solidsdd-host-toolchain.sh` | Deterministic probe (no LLM) |
 
 ```bash
-# From consuming project root (or pass --project-root):
+# Preferred after install-into-project.sh (see .solidsdd/tooling.json → scripts_dir):
+.solidsdd/vendor/solid_sdd/scripts/solidsdd-host-toolchain.sh --project-root .
+.solidsdd/vendor/solid_sdd/scripts/solidsdd-host-toolchain.sh --project-root . --check   # exit 1 if not ready
+
+# Or from a solid_sdd checkout:
 /path/to/solid_sdd/scripts/solidsdd-host-toolchain.sh --project-root .
-/path/to/solid_sdd/scripts/solidsdd-host-toolchain.sh --project-root . --check   # exit 1 if not ready
 ```
 
 ## Rules for agents

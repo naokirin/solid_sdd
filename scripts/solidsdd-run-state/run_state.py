@@ -33,6 +33,15 @@ except ImportError:  # pragma: no cover
     print("solidsdd-run-state requires the jsonschema package", file=sys.stderr)
     sys.exit(2)
 
+_SCRIPTS = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from solidsdd_lib.paths import (  # noqa: E402
+    host_toolchain_source,
+    load_layout,
+    resolve_change_dir as _resolve_change_dir,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
 CHANGE_ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -100,17 +109,7 @@ def emit(ok: bool, path: Path, changed: list[str], **extra: Any) -> None:
 
 
 def resolve_change_dir(project: Path, change_id: str | None) -> tuple[str, Path]:
-    active = project / ".solidsdd" / "active-change.json"
-    if change_id is None:
-        if not active.is_file():
-            raise SystemExit("no --change-id and no .solidsdd/active-change.json")
-        change_id = load_json(active)["change_id"]
-    if not isinstance(change_id, str) or not CHANGE_ID_RE.match(change_id):
-        raise SystemExit(f"invalid change_id: {change_id!r}")
-    change_dir = project / ".solidsdd" / "changes" / change_id
-    if not change_dir.is_dir():
-        raise SystemExit(f"change directory missing: {change_dir}")
-    return change_id, change_dir
+    return _resolve_change_dir(project, change_id, validate_change_id=True)
 
 
 def run_state_path(change_dir: Path) -> Path:
@@ -331,8 +330,9 @@ def cmd_set_item(
 
 
 def cmd_set_host_toolchain(project: Path, change_id: str | None) -> None:
+    layout = load_layout(project)
     _, change_dir = resolve_change_dir(project, change_id)
-    ht_path = project / ".solidsdd" / "host-toolchain.json"
+    ht_path = layout.host_toolchain_path()
     if not ht_path.is_file():
         raise SystemExit(f"host-toolchain.json missing: {ht_path}")
     ht = load_json(ht_path)
@@ -340,7 +340,7 @@ def cmd_set_host_toolchain(project: Path, change_id: str | None) -> None:
         raise SystemExit("host-toolchain.json must be an object")
     snap: dict[str, Any] = {
         "ready": bool(ht.get("ready")),
-        "source": ".solidsdd/host-toolchain.json",
+        "source": host_toolchain_source(layout),
         "missing": list(ht.get("missing") or []),
     }
     if isinstance(ht.get("resolved_at"), str):

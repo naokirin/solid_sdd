@@ -57,7 +57,7 @@ knowledge/                           # durable cross-cutting nodes (not living B
 4. WorkPlan (when present): `.solidsdd/changes/<change_id>/work-plan.json`.
 5. Run state (when present): `.solidsdd/changes/<change_id>/run-state.json` — resume phase / retries ([run-state.md](run-state.md)).
 
-Projects may override paths via a project rule. Do **not** keep a second SoT at `.solidsdd/change-brief.json` (legacy only; see migration below).
+Override layout paths via `.solidsdd/config.yaml` (`paths.*`; see [contract-layout.md](contract-layout.md)). Do **not** keep a second SoT at `.solidsdd/change-brief.json` (legacy only; see migration below).
 
 ## `change_id` rules
 

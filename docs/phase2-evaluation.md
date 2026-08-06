@@ -125,5 +125,5 @@ Full `solidsdd-loop` Task-subagent re-run of a *new* feature was not repeated he
 
 - Language-native DbC (opt-in design)
 - Full Rails app sample
-- `gh skill publish`
 - Phase 3 formal apply tooling ([phase3.md](phase3.md))
+- Consumer install: [install.md](install.md) (`install-into-project.sh`)

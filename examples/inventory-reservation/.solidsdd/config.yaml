@@ -1,0 +1,21 @@
+# solid_sdd project path layout (SoT for agents, scripts, solidsdd-kg).
+# Omit keys to keep defaults. Meta root discovery: SOLIDSDD_DIR or .solidsdd/
+# Schema: schemas/project-config.schema.json
+version: "1"
+paths:
+  solidsdd: .solidsdd
+  active_change: .solidsdd/active-change.json
+  changes: .solidsdd/changes
+  host_toolchain: .solidsdd/host-toolchain.json
+  kg: .solidsdd/kg
+  cache: .solidsdd-cache
+  knowledge:
+    - knowledge
+  requirements: requirements
+  requirements_glob: requirements/**/*.feature
+  openapi: openapi/openapi.yaml
+  graphql: graphql/schema.graphql
+  contracts: contracts
+  formal: formal
+  contract_tests_ts: tests/contracts
+  contract_tests_ruby: spec/contracts

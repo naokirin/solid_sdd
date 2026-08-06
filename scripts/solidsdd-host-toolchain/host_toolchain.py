@@ -12,6 +12,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+_SCRIPTS = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from solidsdd_lib.paths import load_layout  # noqa: E402
+
 
 TOOL_IDS = ("node", "npm", "npx", "bundle", "ruby", "go", "redocly", "mise")
 
@@ -94,7 +99,11 @@ def detect_stack(root: Path) -> dict:
 
 
 def preferred_commands(
-    root: Path, stack: dict, tools: dict, mise_bin: str | None
+    root: Path,
+    stack: dict,
+    tools: dict,
+    mise_bin: str | None,
+    openapi_rel: str = "openapi/openapi.yaml",
 ) -> dict[str, str]:
     cmds: dict[str, str] = {}
     mise_found = bool(mise_bin) or tools.get("mise", {}).get("found")
@@ -103,6 +112,7 @@ def preferred_commands(
     node_path = tools.get("node", {}).get("path")
     npm_path = tools.get("npm", {}).get("path")
     npx_via = tools.get("npx", {}).get("via")
+    openapi_arg = openapi_rel.replace("\\", "/")
 
     if stack["verify_sh"]:
         cmds["verify"] = "./verify.sh"
@@ -131,11 +141,11 @@ def preferred_commands(
             redocly_path = tools["redocly"].get("path")
             if redocly_path:
                 cmds["openapi_lint"] = (
-                    f'"{redocly_path}" lint openapi/openapi.yaml --extends=spec'
+                    f'"{redocly_path}" lint {openapi_arg} --extends=spec'
                 )
             else:
                 cmds["openapi_lint"] = (
-                    "redocly lint openapi/openapi.yaml --extends=spec"
+                    f"redocly lint {openapi_arg} --extends=spec"
                 )
         elif stack.get("package_json") or stack.get("node"):
             if mise_found:
@@ -149,7 +159,7 @@ def preferred_commands(
             if prefix:
                 cmds["openapi_lint"] = (
                     f"{prefix} @redocly/cli@latest lint "
-                    "openapi/openapi.yaml --extends=spec"
+                    f"{openapi_arg} --extends=spec"
                 )
 
     if stack["ruby"]:
@@ -245,6 +255,7 @@ def hints_for(missing: list[str], tools: dict, stack: dict) -> list[str]:
 
 def build_report(root: Path) -> dict:
     root = root.resolve()
+    layout = load_layout(root)
     stack = detect_stack(root)
     mise_bin = find_mise()
     tools = {tid: resolve_tool(tid, mise_bin) for tid in TOOL_IDS}
@@ -264,7 +275,9 @@ def build_report(root: Path) -> dict:
         missing = required_missing(stack, tools, mise_bin)
         ready = len(missing) == 0
 
-    commands = preferred_commands(root, stack, tools, mise_bin)
+    commands = preferred_commands(
+        root, stack, tools, mise_bin, openapi_rel=layout.openapi
+    )
 
     return {
         "version": "1",
@@ -310,10 +323,10 @@ def main() -> int:
         print(f"project root not found: {root}", file=sys.stderr)
         return 2
 
+    layout = load_layout(root)
     report = build_report(root)
-    out_dir = root / ".solidsdd"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "host-toolchain.json"
+    out_path = layout.host_toolchain_path()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(report, indent=2 if args.pretty else None) + "\n"
     if not args.pretty:
         text = json.dumps(report, indent=2) + "\n"
