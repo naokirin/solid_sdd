@@ -2,19 +2,37 @@
 # Install solid_sdd (skills + mechanical tooling) into a consuming project.
 # Does not use a skill-only CLI — one managed tree keeps skills and tooling in sync.
 #
-# Usage:
+# Usage (from a solid_sdd checkout):
 #   scripts/install-into-project.sh --project-root DIR --agent cursor
 #   scripts/install-into-project.sh --project-root DIR --agent cursor,claude-code \
 #       --from-local /path/to/solid_sdd
 #   scripts/install-into-project.sh --project-root DIR --agent copilot \
 #       --repo naokirin/solid_sdd --ref main
 #
+# Usage (no checkout — fetch script from GitHub):
+#   curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+#     bash -s -- --project-root DIR --agent cursor
+#
 # Default vendor: <project>/.solidsdd/vendor/solid_sdd
 # Override with --vendor-dir (project-relative or absolute).
 set -euo pipefail
 
-SOLIDSDD_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MANIFEST="${SOLIDSDD_SRC}/scripts/install-manifest.txt"
+# Resolve local solid_sdd root when this file lives in a checkout.
+# Empty for curl|bash / standalone download (no install-manifest beside the script).
+SOLIDSDD_SRC=""
+_SCRIPT="${BASH_SOURCE[0]:-}"
+if [[ -n "$_SCRIPT" && -f "$_SCRIPT" ]]; then
+  case "$_SCRIPT" in
+    /dev/fd/*|/proc/self/fd/*) ;;
+    *)
+      _candidate="$(cd "$(dirname "$_SCRIPT")/.." && pwd)"
+      if [[ -f "$_candidate/scripts/install-manifest.txt" ]]; then
+        SOLIDSDD_SRC="$_candidate"
+      fi
+      ;;
+  esac
+fi
+unset _SCRIPT _candidate
 
 PROJECT_ROOT=""
 VENDOR_DIR_REL=".solidsdd/vendor/solid_sdd"
@@ -30,8 +48,13 @@ SKIP_SKILLS=0
 SKIP_RULE=0
 
 usage() {
-  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
   cat <<'EOF'
+Install solid_sdd (skills + mechanical tooling) into a consuming project.
+
+Usage:
+  scripts/install-into-project.sh --project-root DIR --agent cursor
+  curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+    bash -s -- --project-root DIR --agent cursor
 
 Options:
   --project-root DIR   Consuming project root (required)
@@ -39,9 +62,10 @@ Options:
   --agent LIST         Comma-separated: cursor, claude-code, copilot, codex, devin
                        (repeatable; at least one required unless --skip-skills)
   --from-local DIR     Copy from a local solid_sdd checkout
-                       (default: this repository when --repo/--ref omitted)
+                       (default: this repository when run from a checkout)
   --repo OWNER/REPO    Fetch from GitHub instead of local (default: naokirin/solid_sdd)
-  --ref REF            Git ref/tag/SHA for remote install (implies remote fetch)
+  --ref REF            Git ref/tag/SHA for remote install (implies remote fetch;
+                       default: main when remote / no local checkout)
   --with-kg            Also vendor tools/solidsdd-kg and build bin/solidsdd-kg if Go present
   --skip-pip           Do not create vendor .venv / install PyYAML+jsonschema
   --skip-skills        Do not copy skills into agent directories
@@ -122,19 +146,21 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# No local checkout (curl|bash / standalone) → remote fetch with --ref defaulting to main
+if [[ -z "$FROM_LOCAL" && -z "$SOLIDSDD_SRC" ]]; then
+  USE_REMOTE=1
+fi
+
 if [[ -n "$FROM_LOCAL" ]]; then
   SOURCE_ROOT="$(cd "$FROM_LOCAL" && pwd)"
   SOURCE_KIND="local:${SOURCE_ROOT}"
 elif [[ $USE_REMOTE -eq 1 ]]; then
-  REF_EFF="${REF:-}"
+  REF_EFF="${REF:-main}"
   TMP_SRC="$(mktemp -d "${TMPDIR:-/tmp}/solidsdd-install.XXXXXX")"
-  echo "Fetching ${REPO}@${REF_EFF:-HEAD} (sparse)…" >&2
+  echo "Fetching ${REPO}@${REF_EFF} (sparse)…" >&2
   command -v git >/dev/null 2>&1 || die "git is required for remote install (or pass --from-local)"
-  CLONE_ARGS=(--depth 1 --filter=blob:none --sparse)
-  if [[ -n "$REF_EFF" ]]; then
-    CLONE_ARGS+=(--branch "$REF_EFF")
-  fi
-  git clone "${CLONE_ARGS[@]}" "https://github.com/${REPO}.git" "$TMP_SRC/repo" >&2
+  git clone --depth 1 --filter=blob:none --sparse --branch "$REF_EFF" \
+    "https://github.com/${REPO}.git" "$TMP_SRC/repo" >&2
   git -C "$TMP_SRC/repo" sparse-checkout set skills schemas rules scripts tools/solidsdd-kg >&2 || \
     git -C "$TMP_SRC/repo" sparse-checkout set skills schemas rules scripts >&2
   SOURCE_ROOT="$(cd "$TMP_SRC/repo" && pwd)"

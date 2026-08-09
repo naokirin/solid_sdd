@@ -12,7 +12,21 @@ Agent Skills packages live under `skills/` for the installer to copy; do not use
 
 ## Install
 
-From a solid_sdd checkout (or after cloning this repo once):
+### Without cloning this repo
+
+Fetch the installer from GitHub and run it (sparse-fetches the install payload; `--ref` defaults to `main`):
+
+```bash
+# at the consuming project
+curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+  bash -s -- --project-root . --agent cursor
+
+# pin a tag / other ref
+curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+  bash -s -- --project-root . --agent cursor --ref v0.1.0 --force
+```
+
+### From a solid_sdd checkout
 
 ```bash
 # at the consuming project — install for Cursor (skills → .agents/skills/)
@@ -121,7 +135,7 @@ scripts/sync-skill-references.sh --check
 scripts/check-skill-frontmatter.sh
 ```
 
-Consumers install with `install-into-project.sh` (local checkout or `--repo` / `--ref`). Keep `scripts/install-manifest.txt` in sync with what the installer must ship.
+Consumers install with `install-into-project.sh` (curl from GitHub, local checkout, or `--repo` / `--ref`). Keep `scripts/install-manifest.txt` in sync with what the installer must ship.
 
 - `adapters/`, `schemas/`, `docs/`, `rules/`, and `reference-src/` are edit sources. **Distributed skill truth is `skills/*/references/`**
 - Installer payload is **`scripts/install-manifest.txt`**
@@ -140,6 +154,10 @@ scripts/install-git-hooks.sh   # once (pre-commit drift check)
 Re-run the installer with `--force` (same `--agent` / `--vendor-dir` / `--ref` as needed):
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+  bash -s -- --project-root . --agent cursor --force
+
+# or from a checkout
 /path/to/solid_sdd/scripts/install-into-project.sh \
   --project-root . --agent cursor --force
 ```

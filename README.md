@@ -21,6 +21,10 @@ Vision and design are in place, plus MVP adapters (OpenAPI + OCL→contract test
 ## Install (summary)
 
 ```bash
+# No checkout — fetch installer from GitHub (ref defaults to main)
+curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/install-into-project.sh | \
+  bash -s -- --project-root /path/to/your-project --agent cursor
+
 # From a solid_sdd checkout — installs skills + scripts/schemas into the project
 /path/to/solid_sdd/scripts/install-into-project.sh \
   --project-root /path/to/your-project \
