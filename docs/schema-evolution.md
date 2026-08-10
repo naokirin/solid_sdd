@@ -32,6 +32,7 @@ See [intent-inspired-improvements.md](intent-inspired-improvements.md). Prefer o
 | CritiqueReport `subject` | additive `knowledge_consistency` |
 | GateApproval `scope` | additive `clarifications` |
 | `run-next` output | new schema for `solidsdd-next` (not a change artifact version bump) |
+| KG `derives_from` edge | `to` may include `concept` (requirement → ubiquitous-language link) |
 
 ## Current notable breaks (v1 era)
 

@@ -420,7 +420,7 @@ func cmdPromoteSuggest(args []string) int {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
-	cands := promote.AllCandidates(res.Graph)
+	cands := promote.AllCandidatesWithContracts(cfg.ProjectRoot, res.Graph)
 	if jsonOut {
 		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{"candidates": cands})
 		return 0

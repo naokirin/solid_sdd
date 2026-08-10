@@ -14,7 +14,7 @@ Optional frontmatter: `maturity` (`hypothesized` \| `confirmed` \| `canonical`; 
 | 2 | schema ルール・カバレッジ・impact・baseline | ✅ |
 | 3 | 知識層検査・scope 解決 | ✅ |
 | 4 | context 抽出・増分ビルド | ✅ |
-| 5 | 昇格候補・重複検出（自動実行なし） | ✅ |
+| 5 | 昇格候補・重複検出（自動実行なし） | ✅ (`contract_vocabulary` from OCL/OpenAPI) |
 
 ## 配置
 
@@ -48,6 +48,8 @@ go build -o ../../bin/solidsdd-kg ./cmd/solidsdd-kg
 ./scripts/solidsdd-kg.sh scope org.solid_sdd.kg
 ./scripts/solidsdd-kg.sh context POL-KG-PERSISTENCE --hops 2 --budget 8k
 ./scripts/solidsdd-kg.sh promote suggest --root .
+# JSON includes contract_vocabulary hints for OCL/OpenAPI terms without concept nodes
+./scripts/solidsdd-kg.sh promote suggest --root . --json
 ./scripts/solidsdd-kg.sh promote apply --approve --type decision --id DEC-X --title "…"
 ./scripts/solidsdd-kg.sh build --root .          # skips when unchanged
 ./scripts/solidsdd-kg.sh build --root . --force

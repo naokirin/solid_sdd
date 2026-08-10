@@ -2,6 +2,7 @@ package promote_test
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -35,5 +36,51 @@ func TestApplyNodeTypes(t *testing.T) {
 	}
 	if !strings.Contains(res.CreatedPath, "decisions") {
 		t.Fatalf("path=%s", res.CreatedPath)
+	}
+}
+
+func TestContractVocabulary(t *testing.T) {
+	root := t.TempDir()
+	_ = os.MkdirAll(filepath.Join(root, "contracts"), 0o755)
+	ocl := `-- sample
+context Reservation
+context Reservation::reserve(principal: String, sku: String, quantity: Integer, ttlSeconds: Integer): Hold
+post UnauthorizedError:
+  true
+post InsufficientStockError:
+  true
+`
+	if err := os.WriteFile(filepath.Join(root, "contracts", "R.ocl"), []byte(ocl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	_ = os.MkdirAll(filepath.Join(root, ".solidsdd", "kg"), 0o755)
+	cfg := "version: \"1\"\npaths:\n  contracts: contracts\n  openapi: openapi/openapi.yaml\n"
+	if err := os.WriteFile(filepath.Join(root, ".solidsdd", "config.yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g := &model.Graph{Nodes: []model.Node{
+		{ID: "CON-NAMED-DOMAIN-ERROR", Type: "concept", Title: "named domain error", Body: "UnauthorizedError InsufficientStockError PreconditionError"},
+	}}
+	cands := promote.ContractVocabulary(root, g)
+	for _, c := range cands {
+		if c.Kind != "contract_vocabulary" {
+			t.Fatalf("kind=%q", c.Kind)
+		}
+		for _, id := range c.IDs {
+			if id == "UnauthorizedError" || id == "InsufficientStockError" {
+				t.Fatalf("should be covered by concept body: %s", id)
+			}
+		}
+	}
+	foundHold := false
+	for _, c := range cands {
+		for _, id := range c.IDs {
+			if id == "Hold" {
+				foundHold = true
+			}
+		}
+	}
+	if !foundHold {
+		t.Fatalf("expected Hold suggestion, got %+v", cands)
 	}
 }

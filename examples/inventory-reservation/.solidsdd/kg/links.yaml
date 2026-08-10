@@ -16,3 +16,18 @@ edges:
   - type: derives_from
     from: add-list-holds/R2
     to: DEC-SOFT-HOLD-LIST-UNFILTERED-FULL-DUMP
+  - type: derives_from
+    from: initial-reservation/R1
+    to: CON-SOFT-HOLD
+  - type: derives_from
+    from: initial-reservation/R1
+    to: CON-AVAILABLE-STOCK
+  - type: derives_from
+    from: add-reservation-lookup/R1
+    to: CON-HOLD-VISIBILITY
+  - type: derives_from
+    from: initial-reservation/R3
+    to: CON-NAMED-DOMAIN-ERROR
+  - type: derives_from
+    from: initial-reservation/R1
+    to: CON-OPAQUE-PRINCIPAL

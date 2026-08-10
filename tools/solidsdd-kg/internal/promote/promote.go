@@ -14,7 +14,7 @@ import (
 
 // Candidate is a human-reviewable promotion or merge suggestion (FR-501/502/212).
 type Candidate struct {
-	Kind    string   `json:"kind"` // duplicate_title | shared_phrase | inline_definition
+	Kind    string   `json:"kind"` // duplicate_title | shared_phrase | inline_definition | contract_vocabulary
 	IDs     []string `json:"ids"`
 	Summary string   `json:"summary"`
 	Paths   []string `json:"paths,omitempty"`
@@ -144,6 +144,13 @@ func AllCandidates(g *model.Graph) []Candidate {
 	out = append(out, DuplicateNodes(g)...)
 	out = append(out, SharedPhrases(g, 40)...)
 	out = append(out, InlineDefinitions(g)...)
+	return out
+}
+
+// AllCandidatesWithContracts merges graph heuristics with OCL/OpenAPI vocabulary hints.
+func AllCandidatesWithContracts(projectRoot string, g *model.Graph) []Candidate {
+	out := AllCandidates(g)
+	out = append(out, ContractVocabulary(projectRoot, g)...)
 	return out
 }
 

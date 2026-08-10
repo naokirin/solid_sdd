@@ -44,7 +44,7 @@ node_types:
 edge_types:
   derives_from:
     from: [requirement, acceptance_criterion, policy, design]
-    to: [policy, invariant, requirement, decision, lesson]
+    to: [policy, invariant, requirement, decision, lesson, concept]
     declared_by: downstream
   refines:
     from: [requirement, concept, acceptance_criterion]

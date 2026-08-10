@@ -40,6 +40,13 @@ solid_sdd は change 単位の要求・契約を living documentation として�
 - **Means（判断基準）** — 「サーバを権威とする」「opaque principal AuthZ のみ」など、迷ったときに戻る規範。Change Context §6 や ADR 由来で、`knowledge/` の主候補。
 - **Tech selection（今回のスタック選択）** — 言語・API スタイル・永続化など Change Context §5。**一回限り／リポジトリ継承の選択は Context に閉じ**、原則 harvest しない。
 
+### Concept（ユビキタス言語）
+
+- **`concept`** — 用語の意味・スコープ・近縁語との対比。`facets: vocabulary` を付与。OpenAPI/OCL の**本文写しは載せない**（契約 SoT は adapter 側）。
+- **非自明性の目安（concept）** — 「後続が近縁語と混同しやすい」＝載せる（例: soft-hold vs 確定予約、visible vs exists、availableStock vs 物理在庫）。ドメイン公理の言い換えだけ＝載せない。
+- **Means との分担** — 「list は full dump である」→ `decision`；「soft-hold とは何か」→ `concept`。両方必要なら両方 harvest 可。
+- **初回 change** — コア用語 3–8 件の `concept` seed を推奨（policy/decision だけに偏らない）。
+
 ### 成熟度（`maturity`）
 
 lifecycle の `status`（`draft` / `active` / …）とは別。認識論的確度:

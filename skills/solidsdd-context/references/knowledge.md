@@ -21,13 +21,46 @@ Prefer **Means** (reusable decision criteria from Change Context §6) over **tec
 
 | Type | Put here when… |
 |------|----------------|
-| `concept` | Stable ubiquitous-language term (non-obvious naming or scope) |
+| `concept` | Stable ubiquitous-language term (non-obvious naming or scope) — see **Ubiquitous language** below |
 | `policy` / `invariant` | Norm that multiple changes must obey **and** encodes a non-obvious bound |
 | `pattern` | Preferred design/impl practice with rare exceptions |
 | `decision` | ADR-worthy choice that later agents must not silently reverse |
 | `lesson` | Incident / failed approach that should inform future Briefs |
 
 **Do not harvest:** ephemeral acceptance wording, one-off sample paths, full OpenAPI/OCL bodies, tautologies / domain axioms restated without a choice boundary, one-off §5 stack selections, or anything that would turn Brief into a living PRD. Trivial nodes have low information value and raise maintenance cost (staleness checks, graph noise).
+
+### Ubiquitous language (`concept`)
+
+**Problem:** Without durable terms, later agents infer vocabulary from scattered OpenAPI / OCL / Gherkin / code — drift and reinvention follow.
+
+**Role split:**
+
+| Kind | Answers | Example |
+|------|---------|---------|
+| `concept` | **What** does this term mean? Scope, aliases, contrast with near-neighbors | `soft-hold` vs confirmed order; `visible` vs `exists` |
+| `policy` / `decision` | **How** must we decide or behave? | opaque-principal AuthZ only; list is unfiltered full dump |
+
+`concept` nodes are **short definitions + pointers** to contract SoT (OpenAPI schema name, OCL type, named error). They are **not** a second copy of OpenAPI/OCL bodies.
+
+**When to harvest `concept` (all must hold):**
+
+1. **Stability** — term recurs across multiple changes or contracts
+2. **Scope risk** — competent engineers confuse it with a neighbor (`hold` vs `reservation`, `availableStock` vs on-hand inventory, `visible` vs `exists`)
+3. **Low churn** — definition changes rarely; contract details may evolve but the term’s meaning stays
+
+Set **`facets: [vocabulary]`** on every `concept` (and on policy/decision nodes that primarily define a term’s meaning).
+
+**When to skip (put in `skipped_reasons`):**
+
+- Pure OpenAPI field rename or wire shape with no semantic ambiguity
+- Tautology with no contrast (“a hold is a hold”)
+- One-off sample id / path name
+
+**Greenfield:** the first meaningful change should seed **core domain concepts** (typically 3–8) alongside Means policies — not only ADR-style policy/decision nodes.
+
+**Consult output:** include a dedicated **Ubiquitous language** section (table: id, term, one-line definition, contract pointers). List vocabulary **gaps** when Brief/Gherkin use domain terms with no `concept` node. Prefer `solidsdd-kg context` facet index when nodes carry `facets: vocabulary`.
+
+**Harvest provenance for concepts:** `rationale` must cite **(1)** where the term was settled (Grill Q, Brief Means, contract elevation, critique), **(2)** why reuse matters, **(3)** what is confused without the node (neighbor term, scope, or named-error channel).
 
 ### Maturity (epistemic; not lifecycle `status`)
 
@@ -41,18 +74,23 @@ Optional frontmatter `facets`: array of `vocabulary` | `invariant` | `decider` |
 
 1. Ensure `.solidsdd/kg/` exists (or note gap). Run `scripts/solidsdd-kg.sh build --root .` when the CLI is available.
 2. Prefer `solidsdd-kg context <id> --budget 8k` / `scope <dotted>` / `impact` for relevant policies and decisions.
-3. Write a short Markdown pack for intake/brief: applicable policies, concepts, decisions, and explicit “none found”.
-4. Intake reflects hits under Change Context Drivers / Constraints / Links; Brief may cite policy ids in `assumptions` / `constraints` without restating full policy text as authority.
+3. Write a short Markdown pack for intake/brief with these sections:
+   - **Policies / decisions / invariants** (Means)
+   - **Ubiquitous language** — table of applicable `concept` nodes (`facets: vocabulary`) or **None**
+   - **Suggested citations** for Brief `assumptions` / `constraints`
+   - **Gaps** — missing kg, CLI gap, **undefined domain terms** used in prior contracts/Brief
+4. Intake reflects hits under Change Context Drivers / Constraints / Links; Brief may cite policy **and concept** ids in `assumptions` / `constraints` without restating full text as authority.
 
 ## Harvest (produce)
 
-1. Read Change Context, Brief, WorkPlan, notable critiques, and run `solidsdd-kg promote suggest --json` when available.
-2. Propose only candidates that pass **universality + non-triviality + low churn** (Means over one-off tech). Put obvious restatements and §5-only stack picks in `skipped_reasons` (do not invent nodes “for completeness”).
-3. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say **(1)** why this change yielded the candidate (extraction provenance: Grill Q, Brief Means, Context §6, existing POL extension, critique finding, etc.), **(2)** why the node is reusable across changes, **and** **(3)** what is non-obvious (choice, exception, or boundary). Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
-4. Set `human_gate.required: true` when `candidates.length >= 1` **or** when the agent judges durable knowledge was discovered but needs human framing. Empty candidates with `required: false` is OK.
-5. **Never apply** candidates without `gate-approval.json` `scope: knowledge_harvest` and `decision` `approve` or `approve_partial`.
-6. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
-7. On reject / skip: mark candidates `rejected` / `skipped` and proceed to `done`.
+1. Read Change Context, Brief, WorkPlan, notable critiques, and run `solidsdd-kg promote suggest --json` when available (includes `contract_vocabulary` hints for named errors / schema types not yet covered by `concept` nodes).
+2. Propose candidates that pass **universality + non-triviality + low churn** (Means **and** ubiquitous-language `concept` where scope risk exists). Put obvious restatements and §5-only stack picks in `skipped_reasons` (do not invent nodes “for completeness”).
+3. For each `concept` candidate: set `facets: ["vocabulary"]`; keep `body` to 1–3 sentences + contract pointers; prefer `id` prefix `CON-`.
+4. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say **(1)** why this change yielded the candidate (extraction provenance: Grill Q, Brief Means, Context §6, existing POL extension, critique finding, etc.), **(2)** why the node is reusable across changes, **and** **(3)** what is non-obvious (choice, exception, or boundary). Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
+5. Set `human_gate.required: true` when `candidates.length >= 1` **or** when the agent judges durable knowledge was discovered but needs human framing. Empty candidates with `required: false` is OK.
+6. **Never apply** candidates without `gate-approval.json` `scope: knowledge_harvest` and `decision` `approve` or `approve_partial`.
+7. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
+8. On reject / skip: mark candidates `rejected` / `skipped` and proceed to `done`.
 
 ## Human gate
 

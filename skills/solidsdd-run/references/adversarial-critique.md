@@ -87,6 +87,8 @@ Skip a subject only when that producer step did not run in this orchestrator ite
 | Context/Brief contradicts a **confirmed** or **canonical** consulted policy without assumption/gate | Silent override of AuthZ / Means / ADR | Explicit Brief assumption + gate; `hypothesized` knowledge treated as soft |
 | Contracts / WorkPlan implement the opposite of a cited canonical invariant | Drift from durable knowledge | Rename / restate that still obeys the norm |
 | Consult pack ignored while inventing conflicting Means in §6 | Framing reinvents settled policy | Citing policy ids and refining scope |
+| Brief/Gherkin uses domain terms with no consulted `concept` / vocabulary gap unlisted | Silent vocabulary reinvention when canonical concepts exist | Explicit gap in consult; `hypothesized` concept as Brief assumption |
+| Concept body duplicates OpenAPI/OCL paragraph | Living contract copy in knowledge | Short definition + schema/type pointer only |
 
 Prefer **Task** critique with this subject after Brief (or after work_plan) when `knowledge-consult.md` lists applicable confirmed/canonical nodes.
 
@@ -100,6 +102,8 @@ Prefer **Task** critique with this subject after Brief (or after work_plan) when
 | Missing candidacy reason | `rationale` restates universality alone (or is empty/hand-wavy) with **no** extraction provenance from this change and **no** non-obvious bound — human cannot tell why it was proposed | Rationale cites Grill Q / Brief Means / Context §6 / existing POL extension (or similar) plus reuse and non-obvious boundary |
 | Trivial / tautological | Candidate restates a domain axiom or “do it correctly” with **no** non-obvious choice, exception, or boundary (and `rationale` does not explain non-triviality) | Skip via `skipped_reasons`; policy that fixes a repeated AuthZ/error/verification boundary |
 | Duplicate without linkage | Same concept/policy already exists and candidate does not `supersedes` / merge / skip | Near-duplicate flagged for human merge |
+| Concept without vocabulary facet | `type: concept` candidate omits `facets: ["vocabulary"]` | Policy/decision with incidental term mention |
+| Means as concept | Candidate is ADR/AuthZ bound but typed `concept` with no term-definition role | Correct `policy` / `decision` / `invariant` typing |
 | Gate omitted | `candidates.length >= 1` but `human_gate.required: false` | Empty candidates, `required: false` |
 
 Prefer **Task** critique with this subject after harvest emit and **before** the knowledge human gate.
