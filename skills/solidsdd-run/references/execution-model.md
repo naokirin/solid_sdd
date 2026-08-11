@@ -31,7 +31,10 @@ User or solidsdd.run (outer parent)
   ├─ wave: all currently ready items (depends_on satisfied)
   │     ├─ solidsdd.loop (item A)     … same wave: parallel by default
   │     └─ solidsdd.loop (item B)     … serialize only on path contention
-  │           └─ Task: judge / critique / apply-* / verify / …
+  │           ├─ Task: Plan Slice
+  │           ├─ Task: Implement Slice
+  │           └─ Task: Verify Slice
+  │                └─ (Failure-Driven Critique on failure)
   ├─ … next wave after dependents unlock …
   └─ Task: solidsdd.verify            ← integration (acceptance_of_whole)
        └─ Task: solidsdd.critique     ← verification_report
