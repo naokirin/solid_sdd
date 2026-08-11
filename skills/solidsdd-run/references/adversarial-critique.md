@@ -14,6 +14,15 @@ If the same agent (or the same unbroken context) both produces and accepts a pha
 - Derived tests ignore existing `pre` clauses
 - Green VerificationReports hide zero coverage
 
+## Checkpoint Reviews & Failure-Driven Critique (cost-reduction-plan.md)
+
+Per [cost-reduction-plan.md](../docs/cost-reduction-plan.md), critique is shifted from per-artifact micro-evaluations to **checkpoint reviews** and **failure-driven diagnosis**:
+1. **Checkpoint Reviews**: Critique is executed at major quality boundaries:
+   - **Specification Review** (`change_context`, `change_brief`)
+   - **WorkPlan Review** (`work_plan`)
+   - **Integration Review** (`verification_report` after whole-system verify)
+2. **Failure-Driven Critique**: Intermediate artifact critiques (e.g. `critique(application_plan)`, `critique(api_contracts)`, `critique(dbc_contracts)`) are omitted in normal green paths. Full Critique / Diagnosis subagents are launched **when a verification failure or isolation retry occurs** to identify the root cause and guide recovery.
+
 Critique must run as an **explicit Task subagent**, separate from the producer. Finding `detail` / rationale strings use the project **working language** ([working-language.md](working-language.md)); JSON keys and enum tokens stay English.
 
 ## Deterministic lint first (required)

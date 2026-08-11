@@ -36,13 +36,19 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 |------|-----|
 | `solidsdd-context` | Parent agent (this conversation) |
 | Context pack write / B1 mechanical critique / B3 skip implement | Parent (per [run-cost.md](references/run-cost.md)); record `cost_skip:B*` |
-| `solidsdd-judge`, `solidsdd-critique`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify`, `solidsdd-apply-formal`, `solidsdd-verify-formal` | **Required subagent** via Task tool (or equivalent), except when a documented cost skip removes that step |
+| `solidsdd-judge`, `solidsdd-critique`, `solidsdd-apply-api`, `solidsdd-apply-dbc`, `solidsdd-derive-tests`, `solidsdd-implement`, `solidsdd-verify`, `solidsdd-apply-formal`, `solidsdd-verify-formal` | **Required subagent** via Task tool (or equivalent), except when a documented cost skip or Consolidated Slice Execution applies |
+
+### Consolidated Slice Mode (Preferred per cost-reduction-plan.md)
+
+Orchestrators may execute the slice loop using the **Consolidated Slice Model** to reduce Task launch count and overhead:
+1. **Plan Slice Task**: Combines `solidsdd-judge`, `apply-api`/`apply-dbc` contract design, and `derive-tests` into one Task.
+2. **Implement Slice Task**: Applies implementation code updates.
+3. **Verify Slice Task**: Runs verification checks.
+4. **Checkpoint & Failure-Driven Critique**: Runs Critique at major Specification/WorkPlan/Integration boundaries, or on Verification failure.
 
 Never execute a subagent-required skill's procedure in the parent **except** documented mechanical substitutes (B1 lint→critique JSON). Do not rewrite an `ApplicationPlan` or thin a producer’s LLM `CritiqueReport`—re-run the owning skill as a subagent if wrong.
 
-**Do not** ask a single Task agent to “run this entire loop.” This skill’s parent session launches **one Task per** judge / critique / apply / derive / implement / verify step (skipped steps listed in isolation notes). If nested Task is unavailable inside a helper agent, return control to the `solidsdd-run` parent to drive steps — do not substitute same-agent produce+critique (“separate write passes”).
-
-**Persist** under `.solidsdd/changes/<change_id>/items/<item_id>/` (caller supplies `item_id`; default `ad-hoc` only for solo loops). Update the parent `run-state.json` item entry (`loop_phase`, `loop_retry`, `status`) at each step boundary via **`scripts/solidsdd-run-state.sh`** (e.g. `set-item`, `set-phase`, `note`). Do **not** use free-form `python -c` / unbounded heredoc for run-state.
+**Persist** under `.solidsdd/changes/<change_id>/items/<item_id>/` (caller supplies `item_id`; default `ad-hoc` only for solo loops). Update the parent `run-state.json` item entry (`loop_phase`, `loop_retry`, `status`) at each step boundary via **`scripts/solidsdd-run-state.sh`** (e.g. `set-item`, `set-phase`, `note`, `record-metrics`). Do **not** use free-form `python -c` / unbounded heredoc for run-state.
 
 ## Sequence
 

@@ -6,14 +6,16 @@ Requirements are expressed in **property-level Gherkin**. See [gherkin-requireme
 
 ## Slice rule (required)
 
-- **One item = exactly one verifiable acceptance criterion**
-- That criterion **must** be a Gherkin **Scenario** (or one independently checkable **Scenario Outline** slice)—Given / When / Then (And / But as needed)—not free-form prose alone
-- Prefer **property-level** Scenarios that cover ChangeBrief `in_scope` / `success_criteria` **ids** via required `covers: ["R1", "SC1", …]` (not example-only text as the sole acceptance)
-- Tag the matching Scenario in `requirements/**/*.feature` with the same ids (`@R1 @SC1`)
-- “Verifiable” means a later `solidsdd-verify` (and formal verify when in scope) can **pass or fail** the criterion without human interpretation of vague prose
-- If the requirement is already a single Scenario → emit a WorkPlan with **one** item (no special skip path)
-- Prefer aligning items with `requirements/**/*.feature`; set optional `feature_path` / `scenario_name` when files exist or are written
-- Recommended: set WorkPlan `change_id` to the active change id
+- **Scenario vs Slice separation**: A Scenario is a "behavior to verify"; a Slice (WorkPlan item) is a "unit of coherent implementation change".
+- Multiple Scenarios sharing the same implementation boundary, related files, or domain **must be grouped into a single Slice** (one WorkPlan item).
+- **Prohibit micro-items**: Do **not** emit `vocabulary-only`, `schema-only`, `test-only`, or `verify-only` WorkPlan items. Contract additions and verify criteria must be co-delivered inside the Slice that implements the change.
+- That criterion **must** be property-level Gherkin Scenario(s) — Given / When / Then (And / But as needed) — covering ChangeBrief `in_scope` / `success_criteria` **ids** via required `covers: ["R1", "SC1", …]`.
+- Tag the matching Scenario in `requirements/**/*.feature` with the same ids (`@R1 @SC1`).
+- “Verifiable” means a later `solidsdd-verify` (and formal verify when in scope) can **pass or fail** the criterion without human interpretation of vague prose.
+- If the requirement is already expressed in a single coherent change → emit a WorkPlan with **one** item (no special skip path).
+- Prefer aligning items with `requirements/**/*.feature`; set optional `feature_path` / `scenario_name` when files exist or are written.
+- Recommended: set WorkPlan `change_id` to the active change id.
+- See [docs/cost-reduction-plan.md](../docs/cost-reduction-plan.md) for overall execution efficiency goals.
 
 ## Do
 

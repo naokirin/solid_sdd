@@ -199,6 +199,51 @@ class RunStateCliTests(unittest.TestCase):
             data["host_toolchain"]["source"], ".solidsdd/host-toolchain.json"
         )
 
+    def test_record_metrics(self) -> None:
+        root, _, cdir = self._project(with_work_plan=False)
+        rs.main(["--project-root", str(root), "init"])
+        self.assertEqual(
+            rs.main(
+                [
+                    "--project-root",
+                    str(root),
+                    "record-metrics",
+                    "--inc-task-launches",
+                    "2",
+                    "--inc-critiques",
+                    "1",
+                    "--set-slices",
+                    "3",
+                ]
+            ),
+            0,
+        )
+        data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["metrics"]["task_launch_count"], 2)
+        self.assertEqual(data["metrics"]["critique_count"], 1)
+        self.assertEqual(data["metrics"]["slice_count"], 3)
+        self.assertIn("started_at", data["metrics"])
+
+        # Second increment
+        self.assertEqual(
+            rs.main(
+                [
+                    "--project-root",
+                    str(root),
+                    "record-metrics",
+                    "--inc-task-launches",
+                    "1",
+                    "--inc-critiques",
+                    "2",
+                ]
+            ),
+            0,
+        )
+        data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["metrics"]["task_launch_count"], 3)
+        self.assertEqual(data["metrics"]["critique_count"], 3)
+        rs.validate_run_state(data)
+
     def test_changes_path_override(self) -> None:
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)

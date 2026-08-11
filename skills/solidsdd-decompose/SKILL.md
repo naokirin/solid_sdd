@@ -36,7 +36,8 @@ Emit a `WorkPlan` so `solidsdd-run` can drive one `solidsdd-loop` per item. Norm
 - Write WorkPlan to `.solidsdd/changes/<change_id>/work-plan.json` for the active change
 - No ChangeBrief overwrite, OpenAPI / OCL / formal / implementation / contract-test edits
 - Do **not** emit an ApplicationPlan or choose contract kinds/densities
-- Exactly **one** Gherkin Scenario (checkable slice) per item in `acceptance_criterion`
+- Exactly **one** Gherkin Scenario (or coherent group of related Scenarios sharing the same implementation boundary) per Slice/item in `acceptance_criterion`
+- Do **not** create micro-items (`vocabulary-only`, `schema-only`, `test-only`, `verify-only`). Group Scenarios by coherent implementation boundary (Slice) per [work-decomposition.md](references/work-decomposition.md)
 - Prefer property-level Scenarios; each item must set `covers` to Brief `in_scope` / `success_criteria` ids; do not cover `out_of_scope` ids; tag Scenarios with matching `@R*` / `@SC*`
 - On greenfield / shared OpenAPI+OCL paths, follow **Greenfield / shared-contract** in [work-decomposition.md](references/work-decomposition.md) (foundation `depends_on`, narrow `touches`)
 - Do **not** treat Gherkin as Cucumber executable SoT

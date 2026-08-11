@@ -2,6 +2,8 @@
 
 solid_sdd trades wall-clock agent time for **isolation and checkability**. Small domains can still be expensive if decomposition and orchestration multiply work. This note records cost drivers and required mitigations after the `inventory-reservation` end-to-end run (2026-08).
 
+For the broader structural improvement plan to reduce Task counts and transition to Slice/Checkpoint-based orchestration, see [cost-reduction-plan.md](cost-reduction-plan.md).
+
 ## Cost model (order of magnitude)
 
 For a WorkPlan with **N** property items, expect roughly:

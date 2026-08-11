@@ -352,10 +352,37 @@ def cmd_set_host_toolchain(project: Path, change_id: str | None) -> None:
     write_run_state(change_dir, data, ["host_toolchain"])
 
 
+def cmd_record_metrics(
+    project: Path,
+    change_id: str | None,
+    inc_task_launches: int = 0,
+    inc_critiques: int = 0,
+    set_slices: int | None = None,
+    set_scenarios: int | None = None,
+) -> None:
+    _, change_dir = resolve_change_dir(project, change_id)
+    data = require_run_state(change_dir)
+    metrics = dict(data.get("metrics") or {})
+    if "started_at" not in metrics:
+        metrics["started_at"] = utc_now()
+    if inc_task_launches > 0:
+        metrics["task_launch_count"] = metrics.get("task_launch_count", 0) + inc_task_launches
+    if inc_critiques > 0:
+        metrics["critique_count"] = metrics.get("critique_count", 0) + inc_critiques
+    if set_slices is not None:
+        metrics["slice_count"] = set_slices
+    if set_scenarios is not None:
+        metrics["scenario_count"] = set_scenarios
+    data["metrics"] = metrics
+    write_run_state(change_dir, data, ["metrics"])
+
+
 def cmd_mark_change_done(project: Path, change_id: str | None) -> None:
     cid, change_dir = resolve_change_dir(project, change_id)
     data = require_run_state(change_dir)
     data["phase"] = "done"
+    if "metrics" in data and isinstance(data["metrics"], dict):
+        data["metrics"]["completed_at"] = utc_now()
     data["updated_at"] = utc_now()
     validate_run_state(data)
     rs_path = run_state_path(change_dir)
@@ -429,6 +456,12 @@ def build_parser() -> argparse.ArgumentParser:
         "set-host-toolchain",
         help="copy readiness from .solidsdd/host-toolchain.json",
     )
+    rm_p = sub.add_parser("record-metrics", help="record or increment run metrics")
+    rm_p.add_argument("--inc-task-launches", type=int, default=0, help="increment task launch count")
+    rm_p.add_argument("--inc-critiques", type=int, default=0, help="increment critique count")
+    rm_p.add_argument("--set-slices", type=int, default=None, help="set slice count")
+    rm_p.add_argument("--set-scenarios", type=int, default=None, help="set scenario count")
+
     sub.add_parser(
         "mark-change-done",
         help="set status.json and phase to done",
@@ -461,6 +494,15 @@ def main(argv: list[str] | None = None) -> int:
         )
     elif args.command == "set-host-toolchain":
         cmd_set_host_toolchain(project, args.change_id)
+    elif args.command == "record-metrics":
+        cmd_record_metrics(
+            project,
+            args.change_id,
+            args.inc_task_launches,
+            args.inc_critiques,
+            args.set_slices,
+            args.set_scenarios,
+        )
     elif args.command == "mark-change-done":
         cmd_mark_change_done(project, args.change_id)
     else:  # pragma: no cover
