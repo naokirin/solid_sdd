@@ -23,7 +23,7 @@ Per solid_sdd execution efficiency policy (see [run-cost.md](run-cost.md)), the 
    - **Integration Review** (`verification_report` after whole-system verify)
 2. **Failure-Driven Critique**: Intermediate artifact critiques (e.g. `critique(application_plan)`, `critique(api_contracts)`, `critique(dbc_contracts)`) are omitted in normal green paths. Full Critique / Diagnosis subagents are launched **when a verification failure or isolation retry occurs** to identify the root cause and guide recovery.
 
-Critique must run as an **explicit Task subagent**, separate from the producer. Finding `detail` / rationale strings use the project **working language** ([working-language.md](working-language.md)); JSON keys and enum tokens stay English.
+When invoked, Critique must run as an **explicit Task subagent**, separate from the producer. Finding `detail` / rationale strings use the project **working language** ([working-language.md](working-language.md)); JSON keys and enum tokens stay English.
 
 ## Deterministic lint first (required)
 
@@ -87,7 +87,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `knowledge_harvest` | `solidsdd-knowledge` harvest (before human gate / done) | knowledge | `solidsdd-run` (recommended when candidates exist) |
 | `knowledge_consistency` | After consult + Context/Brief exist when consult cites confirmed/canonical knowledge | — | `solidsdd-run` (recommended when consult is non-empty) |
 
-Skip a subject only when that producer step did not run in this orchestrator iteration.
+Evaluate a subject only when it is part of the requested review scope (e.g., a Checkpoint Review boundary or a verification failure).
 
 ### `knowledge_consistency` (major examples)
 

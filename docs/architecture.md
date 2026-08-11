@@ -31,14 +31,14 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
                    │
 ┌──────────────────▼──────────────────────┐
 │ Slice = solidsdd.loop / parent agent     │
-│   context on parent; judge+ must Subagent│
-│   critique after each producer           │
+│   context on parent; slices via Subagent │
+│   checkpoint/failure-driven critique     │
 └──────────────────┬──────────────────────┘
                    │ Task (explicit Subagent)
         ┌──────────┼──────────┐
         ▼          ▼          ▼
-   judge / apply.*   derive.tests   implement / verify
-        └──── critique (separate Task) ────┘
+   Plan Slice   Implement Slice  Verify Slice
+        └─(Failure/Checkpoint Critique)─┘
 ```
 
 Execution policy: [execution-model.md](execution-model.md). Run cost / greenfield mitigations: [run-cost.md](run-cost.md). Adversarial critique: [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md).
@@ -58,7 +58,7 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 6. **Enforce separation of concerns with Subagents**  
    Do not run judgment, apply, derive-tests, implement, and verify in one continuous agent context (avoids bias, self-grading, and watered-down contracts).
 7. **Producers do not grade their own phase artifacts**  
-   Like SpecKit clarify / analyze, `solidsdd.critique` is an independent command that adversarially evaluates (including weak contracts) in a separate Task.
+   When invoked by a checkpoint or failure, `solidsdd.critique` adversarially evaluates phase artifacts (including weak contracts) in a separate Task.
 
 ## Core skills (MVP)
 
@@ -183,8 +183,8 @@ Adapter responsibilities:
 
 | Mode | Behavior |
 |------|----------|
-| Manual | User names a skill. The conversation agent may run it. For chained skills, launch subagent-required skills via Task; recommend `critique` right after each producer |
-| Automatic | `solidsdd.run` (outer) runs intake → brief → decompose, then **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs context (optional), judge, critique, apply, derive, implement, verify **always via Subagent**. Failures also re-run via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
+| Manual | User names a skill. The conversation agent may run it. For chained skills, launch subagent-required skills via Task |
+| Automatic | `solidsdd.run` (outer) runs intake → brief → decompose, then **wave-parallel** slices for ready items, then integration verify. Each slice’s `solidsdd.loop` runs Plan Slice, Plan Review, Implement Slice, Verify Slice **always via Subagent**. Failures trigger Review/Fix via Subagent (with retry limits). A single slice may use `solidsdd.loop` alone |
 
 Both modes use the **same rules, skills, and artifact layout**. Automation has no private back door.
 

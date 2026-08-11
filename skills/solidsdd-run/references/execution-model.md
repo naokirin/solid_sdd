@@ -11,7 +11,7 @@ If skills run only as a continuous sequence in one agent, the following happens:
 
 Therefore, **when the caller is an orchestrator (`solidsdd.run` / `solidsdd.loop` or an equivalent parent agent)**, the parent must not execute “Subagent required” skills itself. In Cursor, launch an **explicit subagent** (e.g. Task tool) and pass only the skill name and I/O.
 
-Additionally, after major phases, **always launch `solidsdd.critique` (adversarial evaluation) as a separate Task**. Like SpecKit clarify / analyze, this keeps the quality gate as an independent command. Severity is **major/fail only when checkability is lost**; polishing at standard density stays minor (loop continues). Details: bundled `adversarial-critique.md` (edit source: `reference-src/adversarial-critique.md`).
+Critique is not automatically launched after every phase. `Plan Review` is the normal planning checkpoint. Additional adversarial critique (`solidsdd.critique`) is launched as a separate Task only when explicitly required by a quality checkpoint or when verification/diagnosis indicates it is necessary. Critique is checkpoint-driven and failure-driven, not producer-driven.
 
 When a user manually names a single skill, the conversation agent may run it (the user is the parent).
 
@@ -42,7 +42,7 @@ User or solidsdd.run (outer parent)
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
 - **Across changes**: Additional requirements start a new meaningful `change_id` under `.solidsdd/changes/` (see [../reference-src/change-lifecycle.md](../reference-src/change-lifecycle.md)). Features and contracts accumulate; Briefs do not become a living PRD.
-- **Cost**: Expect roughly **10+ Task steps per slice** plus outer intake/brief/decompose critiques. Greenfield WorkPlans must use foundation `depends_on` / narrow `touches` — see [run-cost.md](run-cost.md) and [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
+- **Cost**: Expect roughly **3–4 Task steps per slice** in the Canonical Consolidated Model (historically 10+ in fine-grained mode) plus outer framing and integration verification. Greenfield WorkPlans must use foundation `depends_on` / narrow `touches` — see [run-cost.md](run-cost.md) and [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
 ## Role split (slice = `solidsdd.loop`)
 
@@ -172,6 +172,6 @@ For critique, always include `subject` and the path/excerpt under evaluation.
 ## Manual execution
 
 If the user calls only `solidsdd-derive-tests`, the current agent may run it.  
-If **another skill continues in the same response** (e.g. implement right after judge), prefer Task for subagent-required skills to avoid crosstalk. In continuous chains, recommend inserting `solidsdd-critique` via Task right after each producer.
+If **another skill continues in the same response** (e.g. implement right after judge), prefer Task for subagent-required skills to avoid crosstalk.
 
 If a single verifiable acceptance criterion is already known, `solidsdd-loop` alone is enough. For multi-criterion or ambiguous requirements, use `solidsdd-run`.

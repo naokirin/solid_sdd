@@ -6,14 +6,25 @@ For the broader structural improvement plan to reduce Task counts and transition
 
 ## Cost model (order of magnitude)
 
-For a WorkPlan with **N** property items, expect roughly:
+### Canonical Consolidated Model (Current Standard)
+
+For a WorkPlan with **N** coherent property slices under the canonical consolidated slice model, expect roughly:
 
 | Layer | Task-class steps (typical) |
 |-------|----------------------------|
-| Outer (`solidsdd-run`) | intake + critique + brief + critique + decompose + critique (+ optional cross-change) + integration verify + critique ≈ **8–10** |
-| Each slice (`solidsdd-loop`) | judge + critique + (apply-api + critique) + (apply-dbc + critique) + (derive-tests + critique) + implement + verify + critique ≈ **10–12** when both API and DbC apply |
+| Outer (`solidsdd-run`) | intake + brief + decompose + critique(work_plan) + integration verify + critique(integration) ≈ **4–6** |
+| Each slice (`solidsdd-loop`) | Plan Slice Task + Plan Review (Checkpoint) + Implement Slice Task + Verify Slice Task ≈ **3–4** (normal green path) |
 
-So wall-clock scales closer to **O(N × loop steps)** than to lines of application code. Contract tests and `.solidsdd` JSON often dwarf `src/` in a sample repo — that is expected when every producer is critiqued.
+### Historical Baseline (Pre-Consolidation Fine-Grained Model)
+
+Prior to the consolidated slice model, each producer artifact launched a separate subagent Task and matching critique:
+
+| Layer | Task-class steps (historical fine-grained) |
+|-------|--------------------------------------------|
+| Outer (`solidsdd-run`) | intake + critique + brief + critique + decompose + critique (+ optional cross-change) + integration verify + critique ≈ **8–10** |
+| Each slice (`solidsdd-loop`) | judge + critique + (apply-api + critique) + (apply-dbc + critique) + (derive-tests + critique) + implement + verify + critique ≈ **10–12** |
+
+Wall-clock scales with **O(N × loop steps)**. Consolidated slice execution reduces loop steps per slice from ~10–12 down to ~3–4 while preserving verification and checkability boundaries.
 
 ## Required mitigations (orchestration)
 
@@ -36,7 +47,7 @@ These are **explicit product rules**, not silent parent thinning. When used, rec
 | **B4** | WorkPlan has **exactly one** item **and** that item’s `verification-report.json` already covers `acceptance_of_whole` (and relevant Brief `success_criteria`) with pass | Duplicate **integration** `solidsdd-verify` + its critique | Keep the item verify + `critique(verification_report)`; note `cost_skip:B4` and path to the reused report |
 | **B5** | Prior item verify on this change used the **same** toolchain commands / same test suite and passed, **and** this item made **no code or contract-test edits** (skip-plan / docs-only) | Re-running the full suite inside `solidsdd-verify` | Still write `verification-report.json` that **cites** the prior report (command, timestamp/path, pass); run cheap existence/diff checks for OpenAPI/OCL if those are in scope; then normal `critique(verification_report)` unless B1-style mechanical rules also apply |
 
-**Never skip under these ids:** `critique(change_context|change_brief|work_plan)`, critique after a real `apply` / `derive-tests` / `implement` that edited artifacts, `critique(knowledge_harvest)` when candidates exist, or merging producer+critique into one Task.
+**Never skip under these ids:** Checkpoint Reviews (e.g., Plan Review), or merging producer+review into one Task. Failure-driven Critique cannot be skipped if verification fails.
 
 ## Required mitigations (decomposition)
 
@@ -73,4 +84,4 @@ Probe: `scripts/solidsdd-host-toolchain.sh --project-root .` (see [host-toolchai
 
 ## Relation to hardening
 
-Mechanical lint / `covers` / `run-state` reduce LLM-only hardness. Per-phase Task cost remains for real producers. **Allowed cost skips (B1–B5)** and **context packs** are the explicit product speed-ups — do not invent additional skips in the parent without updating this doc and [execution-model.md](execution-model.md).
+Mechanical lint / `covers` / `run-state` reduce LLM-only hardness. Per-slice Task cost remains for real producers and reviewers. **Allowed cost skips (B1–B5)** and **context packs** are the explicit product speed-ups — do not invent additional skips in the parent without updating this doc and [execution-model.md](execution-model.md).
