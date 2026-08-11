@@ -39,7 +39,7 @@ Resolve via the active pointer. Override layout paths via `.solidsdd/config.yaml
 - Prefer short `text` values over essays
 - JSON **keys** stay English; string **values** (`text`, `goal`, …) use the project **working language** ([working-language.md](working-language.md))
 
-**Breaking:** older Briefs with `string[]` scope lists are invalid. Migrate to `{ id, text }` objects (solid_sdd `docs/hardening-plan.md` Workstream A / Phase 5).
+**Breaking:** older Briefs with `string[]` scope lists are invalid. Migrate to `{ id, text }` objects.
 
 Optional: `background`, `assumptions`, `constraints`, `open_questions`, `confidence`, `human_gate`.
 

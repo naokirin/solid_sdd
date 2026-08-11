@@ -4,7 +4,7 @@ Orchestrators **persist** progress so retries, human gates, and mid-run crashes 
 
 Schema: `schemas/run-state.schema.json` (copied into orchestrator skill `references/` as `run-state.schema.json`). Layout: [contract-layout.md](contract-layout.md).
 
-**Deterministic next:** when available, run `scripts/solidsdd-next.sh next --change <id>` at step start and `validate --declared …` before launching a producer Task ([intent-inspired-improvements.md](../docs/intent-inspired-improvements.md) I4). Do not rely on chat memory for phase sequencing when next succeeds.
+**Deterministic next:** when available, run `scripts/solidsdd-next.sh next --change <id>` at step start and `validate --declared …` before launching a producer Task. Do not rely on chat memory for phase sequencing when next succeeds.
 
 **Constrained state writes:** mutate `run-state.json` (and optionally WorkPlan item `status` / `status.json`) only via `scripts/solidsdd-run-state.sh` — see [Constrained mutations](#constrained-mutations-solidsdd-run-state) below. Do **not** use free-form `python -c` / open-ended heredoc scripts for these files (host allowlists treat unbounded Python as high risk and force repeated “may I run this?” prompts that are not product human gates).
 

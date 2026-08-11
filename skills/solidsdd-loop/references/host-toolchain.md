@@ -28,4 +28,4 @@ solid_sdd launches many Task subagents. Each Subagent often starts a **non-inter
 
 ## Distinguishing cost vs thrash
 
-See **Host toolchain thrash vs orchestration cost** in `docs/run-cost.md` (synced into orchestrator skill `references/run-cost.md`).
+See **Host toolchain thrash vs orchestration cost** in [run-cost.md](run-cost.md).

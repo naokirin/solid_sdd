@@ -51,24 +51,24 @@ User or solidsdd.loop (parent / orchestrator)
   │
   ├─ solidsdd.context              … parent OK (optional under run)
   │
-  ├─ [Consolidated Slice Flow — Preferred per cost-reduction-plan.md]
+  ├─ [Canonical Slice Execution]
   ├─ Task: Plan Slice              ← judge + API/DbC contract design + derive-tests in one context
   ├─ Task: Implement Slice         ← apply code edits against contracts
   ├─ Task: Verify Slice            ← run contract tests & verification
   │
-  └─ [Adversarial Checkpoint / Failure-driven Critique]
-       ├─ Specification Review / WorkPlan Review (at major quality boundaries)
-       └─ Failure-driven Critique (triggered on Verify failure / retry diagnosis)
+  └─ [Adversarial Checkpoints & Failure-driven Critique]
+       ├─ Checkpoint Review        (WorkPlan & Integration Review at major quality boundaries)
+       └─ Failure-driven Critique  (triggered on Verification failure / retry diagnosis)
 ```
 
-### Consolidated Slice Execution vs Strict Fine-Grained Tasks
+### Canonical Consolidated Slice Model
 
-Per [cost-reduction-plan.md](cost-reduction-plan.md), `solidsdd` supports a **consolidated slice model** to eliminate unnecessary Task launches and multi-pass Critique overhead while preserving checkability and quality boundaries.
+The **Consolidated Slice Model** is the canonical execution model for `solidsdd-loop`:
 
-- **Plan Slice**: Groups `solidsdd.judge`, `apply.api`, `apply.dbc`, and `derive.tests` into a coherent slice planning phase.
-- **Implement Slice**: Executes code edits matching the slice specification and contracts.
-- **Verify Slice**: Deterministically checks contract tests and verification requirements.
-- **Checkpoint & Failure-Driven Critique**: Replaces per-artifact micro-critiques with checkpoint reviews at major specification/plan/verification boundaries. Full Critique is invoked on **verification failure** or explicit isolation retry rather than after every intermediate file output.
+- **Plan Slice Task**: Combines contract density judgment (`solidsdd.judge`), API/DbC contract updates (`apply.api`, `apply.dbc`), and contract test derivation (`derive.tests`) into a single coherent planning pass for the slice.
+- **Implement Slice Task**: Applies source code implementation matching the slice specification and contracts.
+- **Verify Slice Task**: Deterministically runs contract test suites and verification checks.
+- **Checkpoint & Failure-Driven Critique**: Replaces per-artifact micro-critiques with checkpoint reviews at major quality boundaries (Specification, WorkPlan, Integration). Full Critique subagents are launched **on verification failure** or explicit isolation retry.
 
 ## Per-skill policy
 

@@ -14,9 +14,9 @@ If the same agent (or the same unbroken context) both produces and accepts a pha
 - Derived tests ignore existing `pre` clauses
 - Green VerificationReports hide zero coverage
 
-## Checkpoint Reviews & Failure-Driven Critique (cost-reduction-plan.md)
+## Canonical Checkpoint Reviews & Failure-Driven Critique Policy
 
-Per [cost-reduction-plan.md](../docs/cost-reduction-plan.md), critique is shifted from per-artifact micro-evaluations to **checkpoint reviews** and **failure-driven diagnosis**:
+Per solid_sdd execution efficiency policy (see [run-cost.md](run-cost.md)), the canonical critique policy shifts evaluation from per-artifact micro-passes to **checkpoint reviews** and **failure-driven diagnosis**:
 1. **Checkpoint Reviews**: Critique is executed at major quality boundaries:
    - **Specification Review** (`change_context`, `change_brief`)
    - **WorkPlan Review** (`work_plan`)

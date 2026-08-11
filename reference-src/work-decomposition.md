@@ -15,7 +15,7 @@ Requirements are expressed in **property-level Gherkin**. See [gherkin-requireme
 - If the requirement is already expressed in a single coherent change → emit a WorkPlan with **one** item (no special skip path).
 - Prefer aligning items with `requirements/**/*.feature`; set optional `feature_path` / `scenario_name` when files exist or are written.
 - Recommended: set WorkPlan `change_id` to the active change id.
-- See [docs/cost-reduction-plan.md](../docs/cost-reduction-plan.md) for overall execution efficiency goals.
+- See [run-cost.md](run-cost.md) for overall execution efficiency goals.
 
 ## Do
 
@@ -45,14 +45,14 @@ When the consuming project has **no** (or empty) OpenAPI / OCL / package scaffol
 
 ### Follow-on / co-delivered slices (cost; required when applicable)
 
-Wall-clock scales with **item count × loop steps** ([docs/run-cost.md](../docs/run-cost.md)). Extra items that cannot fail independently of another item’s implementation burn full loops without extra checkability.
+Wall-clock scales with **item count × loop steps** ([run-cost.md](run-cost.md)). Extra items that cannot fail independently of another item’s implementation burn full loops without extra checkability.
 
 1. **No vocabulary-only foundation on follow-on changes.** If OpenAPI / OCL (or equivalent) already exist and this change only **adds** an operation/channel, do **not** emit a separate item whose sole acceptance is “contracts document the new vocabulary.” Fold additive contract elevation into the property-delivery item that will `apply` + `derive-tests` + `implement` in one loop.
 2. **Co-delivered channels of the same operation → one item (usually one Scenario).** Success and failure of the **same** operation on a shared code path (e.g. authorized collection list **and** `UnauthorizedError` on that list; empty and nonempty success dumps) should be **one** verifiable Scenario (multiple Then / And) covering the related Brief ids—not N items that serialize on the same `src` / contract-test files. Split only when verify of A can pass while B’s implementation is still absent (true independence).
 3. **Merge when a sibling verify would be vacuous.** If item B’s acceptance cannot fail once item A’s implement is green (same function / same derived suite), merge B into A (or drop B) rather than running a judge→skip-plan→verify-only loop.
 4. Prefer **N = 1** WorkPlans for small additive follow-ons when union of `covers` still maps to one checkable Scenario and one primary touch set.
 
-Critique / lint may flag “all ready items share intersecting touches with no depends_on edges” as a **minor** decomposition smell, and may flag **follow-on vocabulary-only items** or **AuthZ success/failure split across items with identical `src` touches** similarly (solid_sdd [docs/run-cost.md](../docs/run-cost.md); skill copy: [run-cost.md](run-cost.md) when bundled).
+Critique / lint may flag “all ready items share intersecting touches with no depends_on edges” as a **minor** decomposition smell, and may flag **follow-on vocabulary-only items** or **AuthZ success/failure split across items with identical `src` touches** similarly (see [run-cost.md](run-cost.md)).
 
 ## Do not
 
