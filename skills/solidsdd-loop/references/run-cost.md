@@ -41,11 +41,10 @@ These are **explicit product rules**, not silent parent thinning. When used, rec
 
 | Id | When | May skip / substitute | Must still do |
 |----|------|------------------------|---------------|
-| **B1** | ApplicationPlan targets are all `skip` and/or `defer` (no `apply`) | LLM Task `critique(application_plan)` → **mechanical** pass: parent runs `solidsdd-lint` (or equivalent) and writes `critique-application-plan.json` with `result: pass`, noting `cost_skip:B1` + lint summary | Persist the ApplicationPlan |
-| **B2** | This item did not run `apply-api` / `apply-dbc` / `derive-tests` | The matching `critique(api_contracts)` / `critique(dbc_contracts)` / `critique(derived_tests)` | — |
-| **B3** | Item `touches` has no implementation paths (`src/`, app package, etc.) **and** no `apply` target implies implement | `solidsdd-implement` Task | Contract apply/derive/verify as otherwise required |
-| **B4** | WorkPlan has **exactly one** item **and** that item’s `verification-report.json` already covers `acceptance_of_whole` (and relevant Brief `success_criteria`) with pass | Duplicate **integration** `solidsdd-verify` + its critique | Keep the item verify + `critique(verification_report)`; note `cost_skip:B4` and path to the reused report |
-| **B5** | Prior item verify on this change used the **same** toolchain commands / same test suite and passed, **and** this item made **no code or contract-test edits** (skip-plan / docs-only) | Re-running the full suite inside `solidsdd-verify` | Still write `verification-report.json` that **cites** the prior report (command, timestamp/path, pass); run cheap existence/diff checks for OpenAPI/OCL if those are in scope; then normal `critique(verification_report)` unless B1-style mechanical rules also apply |
+| **B1** | ApplicationPlan targets are all `skip` and/or `defer` (no `apply`) | Additional adversarial Critique Task | Persist the ApplicationPlan (Plan Review / mechanical lint is still executed) |
+| **B3** | Item `touches` has no implementation paths (`src/`, app package, etc.) **and** no `apply` target implies implement | `Implement Slice Task` | Contract apply/derive/verify as otherwise required |
+| **B4** | WorkPlan has **exactly one** item **and** that item’s `verification-report.json` already covers `acceptance_of_whole` (and relevant Brief `success_criteria`) with pass | Duplicate **integration** `solidsdd-verify` | Keep the item verify; note `cost_skip:B4` and path to the reused report |
+| **B5** | Prior item verify on this change used the **same** toolchain commands / same test suite and passed, **and** this item made **no code or contract-test edits** (skip-plan / docs-only) | Re-running the full suite inside `solidsdd-verify` | Still write `verification-report.json` that **cites** the prior report (command, timestamp/path, pass); run cheap existence/diff checks for OpenAPI/OCL if those are in scope. Launch Failure-Driven Diagnosis / Critique only if verification fails. |
 
 **Never skip under these ids:** Checkpoint Reviews (e.g., Plan Review), or merging producer+review into one Task. Failure-driven Critique cannot be skipped if verification fails.
 

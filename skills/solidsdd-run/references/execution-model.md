@@ -90,6 +90,16 @@ The **Consolidated Slice Model** is the canonical execution model for `solidsdd-
 | `solidsdd.apply.formal` | **subagent required** | Stay within formal specs (Phase 3) |
 | `solidsdd.verify.formal` | **subagent required** | Avoid self-grading of model checking (Phase 3) |
 
+> **Note**: "subagent required" means that the operation must not be executed directly by the parent/orchestrator. It does NOT mean that every skill requires its own independent Task. When a skill belongs to a consolidated phase, it executes inside that phase's Task boundary.
+> 
+> For example:
+> ```text
+> Plan Slice Task
+>   ├── judge
+>   ├── apply.api
+>   ├── apply.dbc
+>   └── derive.tests
+> ```
 The parent accepts artifacts from `solidsdd.intake` / `solidsdd.brief` / `solidsdd.decompose` / `solidsdd.judge` and only drives loop branching. It does not re-run or overwrite the judgment itself. Critique outcomes are not softened by the parent.
 
 From Phase 2 onward, the parent also handles the following (see skill `references/human-gates.md` / `loop-retry.md`):
