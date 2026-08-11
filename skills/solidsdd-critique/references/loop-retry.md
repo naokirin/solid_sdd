@@ -43,7 +43,7 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 5. On `loop_action: human_gate` or `stop`, end the orchestrator; print report + reasons; update `run-state.json` (`phase` / item `status` / `stopped_reason`).
 6. If the same skill is suggested for consecutive retries without progress, escalate to `human_gate`.
 7. Never edit contracts or thin WorkPlan/ApplicationPlan in the parent to force a green verify or critique.
-8. After a producer step, **do not skip** the matching `solidsdd-critique` subject (see [adversarial-critique.md](adversarial-critique.md)); **persist** producer and critique JSON under `items/<id>/` (or change-dir for outer critiques).
+8. Follow **Canonical Checkpoint & Failure-Driven Critique Policy**: run Checkpoint Reviews at major quality boundaries and launch Failure-Driven Critique on verification failure. Persist plan, report, and critique JSON under `items/<id>/` (or change-dir for outer critiques).
 
 ## Mapping cheat sheet
 

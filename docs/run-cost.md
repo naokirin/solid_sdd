@@ -17,8 +17,8 @@ So wall-clock scales closer to **O(N × loop steps)** than to lines of applicati
 
 ## Required mitigations (orchestration)
 
-1. **Keep `solidsdd-loop` on the outer parent session.** Do **not** launch one Task whose prompt is “run the entire loop for Wn”. That collapses producer and critique into one agent (or forces fake “separate write passes”) and violates [execution-model.md](execution-model.md).
-2. **Each producer that ran → its own `solidsdd-critique` Task** (unless a [cost skip](#allowed-cost-skips-b1b5) applies). Never combine a producer and its matching critique in one Task; never combine `solidsdd-verify` and `critique(verification_report)` in one Task.
+1. **Keep `solidsdd-loop` orchestration structured across meaningful Phase boundaries.** Do **not** launch one Task whose prompt is "run the entire loop uncheckably". Maintain Subagent Task boundaries for `Plan Slice`, `Implement Slice`, `Verify Slice`, and `Failure-Driven Critique`.
+2. **Use Consolidated Slice Execution with Checkpoint Reviews & Failure-Driven Critique.** Combine planning steps into `Plan Slice Task` (`judge` + API/DbC contract planning + test derivation), `Implement Slice Task`, and `Verify Slice Task`. Checkpoint Reviews run at major quality boundaries and full Critique subagents trigger on verification failure.
 3. If the host cannot nest Task from a loop helper agent, **the run parent must drive loop steps itself** (Task per skill). Do not fall back to same-agent produce+critique except as an explicit isolation violation that is re-run or gated.
 4. **Serialize only on real contention** (`touches` intersection or recorded heuristic). Prefer greenfield WorkPlans that use `depends_on` so serialization is intentional ([work-decomposition.md](../reference-src/work-decomposition.md)).
 5. **Pass a context pack** into each Task ([execution-model.md](execution-model.md) — context pack): prefer pack paths/excerpts over re-reading full Brief/OpenAPI/OCL on every cold start.

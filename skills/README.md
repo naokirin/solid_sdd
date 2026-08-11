@@ -29,7 +29,7 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 
 - Manual: user may run one skill in the current agent.
 - Automatic (`solidsdd-run`): parent runs consult → [optional grill] → intake → brief → decompose, then **parallel** `solidsdd-loop` waves for ready items (serialize only on path contention), then integration verify → harvest; never inline subagent-required skills. Prefer `scripts/solidsdd-next.sh` for sequencing.
-- Automatic (`solidsdd-loop`): parent must launch **subagent required** skills via Task (or equivalent); never execute those skill bodies in the parent. After each producer step, launch `solidsdd-critique` as its own Task.
+- Automatic (`solidsdd-loop`): parent orchestrates slice execution across phase Subagent Tasks (`Plan Slice Task`, `Implement Slice Task`, `Verify Slice Task`). Checkpoint Reviews run at major quality boundaries and Failure-Driven Critique launches on verification failure.
 
 ## Maintainer: keep `references/` in sync
 

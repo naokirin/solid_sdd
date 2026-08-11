@@ -105,17 +105,17 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 2. Critique / verify `retry` → launch the suggested skill as a **new Task**, then re-run critique for that subject (and verify if needed)
 3. Auto-retry is **at most 3** (verify fail + critique fail + isolation re-run combined). No progress on the same skill repeatedly, or budget exhausted → `human_gate`
 4. No infinite loops: do not auto-retry after the budget is exceeded
-5. **Never** put a producer and its matching `solidsdd.critique` in the **same** Task (includes integration `verify` + `critique(verification_report)`)
-6. **Never** launch one Task whose job is “execute the entire `solidsdd.loop` for item Wn” (judge through verify). The **run parent** (or the human session following `solidsdd.loop`) must orchestrate; each subagent-required skill is its own Task. “Separate write passes” inside one agent are **not** a compliant substitute — treat as isolation violation and re-run via Task, or stop at `human_gate` if the host cannot launch Tasks
+5. **Maintain phase boundary isolation**: keep `Plan Slice`, `Implement Slice`, `Verify Slice`, and `Failure-Driven Critique` in separate Subagent Tasks (do not collapse an entire loop into a single uncheckable Task).
+6. **Checkpoint & Failure-Driven Critique**: Checkpoint Reviews are conducted at major quality boundaries (Specification, WorkPlan, Integration). Intermediate subagent critiques are omitted in green paths and triggered on verification failure or explicit retry diagnosis.
 
 ## Parent obligations (`solidsdd.loop`)
 
-1. Do not collapse subagent-required skills into “I’ll follow the skill steps myself” via the parent’s tools
+1. Do not collapse subagent-required phase tasks into “I’ll follow the skill steps myself” via the parent’s tools
 2. Include in each Task prompt: path to that skill’s `SKILL.md`, artifact paths, **context-pack** path, and prior outputs (ApplicationPlan, critique subject, etc.)
 3. Accept only the subagent’s outputs (diffs, reports, ApplicationPlan, CritiqueReport) and pass them to the next phase
 4. Do not thin contracts or findings by rewriting `ApplicationPlan` / CritiqueReport in the parent (if wrong, re-launch the relevant skill as a Subagent)
 5. If `human_gate.required`, do not apply until approved (including early formal rollout)
-6. **Do not skip** the matching `solidsdd.critique` after a producer step **unless** an [allowed cost skip (B1–B5)](run-cost.md#allowed-cost-skips-b1b5) applies; record `cost_skip:B<n>` in `isolation_notes`
+6. **Follow Canonical Critique Policy**: run Checkpoint Reviews at major quality boundaries and trigger Failure-Driven Critique on verification failure
 7. If `solidsdd.verify` / `solidsdd.verify.formal` / `solidsdd.critique` fails, follow `loop_action` and suggested skills and **re-launch as a subagent** (or gate / stop)
 8. Stop at a human gate when the auto-retry cap is exceeded
 9. Leave a final summary listing each required Task / mechanical substitute and critique subject (isolation checklist), including any `cost_skip:B*`
