@@ -143,6 +143,35 @@ def all_items_done(rs: dict[str, Any], work: dict[str, Any] | None) -> bool:
     return False
 
 
+def b4_skip(change_dir: Path, rs: dict[str, Any], work: dict[str, Any] | None) -> tuple[str, str] | None:
+    """Return (sole_item_id, report_path) when B4 (run-cost.md) is mechanically detectable.
+
+    B4: WorkPlan has exactly one item, and that item's own verification-report.json
+    already has result=pass with "acceptance_of_whole" tagged in some check's covers.
+    """
+    work_items = (work or {}).get("items") or []
+    if len(work_items) != 1:
+        return None
+    item = work_items[0]
+    item_id = item.get("id") if isinstance(item, dict) else None
+    if not item_id:
+        return None
+    state = (rs.get("items") or {}).get(item_id) or {}
+    artifact_dir = state.get("artifact_dir") or f"items/{item_id}"
+    report_rel = f"{artifact_dir}/verification-report.json"
+    report = load_optional(change_dir, report_rel)
+    if not isinstance(report, dict) or report.get("result") != "pass":
+        return None
+    checks = report.get("checks") or []
+    covers_whole = any(
+        isinstance(c, dict) and "acceptance_of_whole" in (c.get("covers") or [])
+        for c in checks
+    )
+    if not covers_whole:
+        return None
+    return item_id, report_rel
+
+
 def hint(
     *,
     change_id: str,
@@ -421,6 +450,21 @@ def compute_next(
                 item_ids=ready,
                 legal=["waves", "loop_wave"],
             )
+        skip = b4_skip(change_dir, rs, work)
+        if skip:
+            item_id, report_rel = skip
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="knowledge_harvest",
+                skill="solidsdd-knowledge",
+                reason=(
+                    f"cost_skip:B4 — sole item {item_id!r}'s {report_rel} already covers "
+                    "acceptance_of_whole with pass; skipping duplicate integration verify"
+                ),
+                inputs=[report_rel],
+                legal=["knowledge_harvest", "integration_verify"],
+            )
         return hint(
             change_id=change_id,
             phase=phase,
@@ -432,6 +476,21 @@ def compute_next(
 
     if phase == "waves":
         if all_items_done(rs, work):
+            skip = b4_skip(change_dir, rs, work)
+            if skip:
+                item_id, report_rel = skip
+                return hint(
+                    change_id=change_id,
+                    phase=phase,
+                    action="knowledge_harvest",
+                    skill="solidsdd-knowledge",
+                    reason=(
+                        f"cost_skip:B4 — sole item {item_id!r}'s {report_rel} already covers "
+                        "acceptance_of_whole with pass; skipping duplicate integration verify"
+                    ),
+                    inputs=[report_rel],
+                    legal=["knowledge_harvest", "integration_verify"],
+                )
             return hint(
                 change_id=change_id,
                 phase=phase,

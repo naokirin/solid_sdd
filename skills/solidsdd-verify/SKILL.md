@@ -68,7 +68,7 @@ OCL files have **no** dedicated structural CLI in MVP; rely on `ocl_tests` + cri
 2. For each present API SoT, run the Redocly lint procedure above; record one check per document (`kind: openapi` or `graphql`).
 3. Run OCL-derived contract tests (MVP: project test script focusing on `tests/contracts` or `spec/contracts`).
 4. Set overall `result` to `fail` if any **required** check fails (lint fail or test fail). Treat Redocly-unavailable as `skipped`, not fail.
-5. On failure, fill `suggested_next_skills`, `loop_action`, and `failure_class`. Prefer setting optional `change_id` and per-check `covers` (WorkPlan item ids) when verifying a known slice.
+5. On failure, fill `suggested_next_skills`, `loop_action`, and `failure_class`. Prefer setting optional `change_id` and per-check `covers` (WorkPlan item ids) when verifying a known slice. When this item is the WorkPlan's **only** item and this verify pass demonstrably covers the whole ChangeBrief (all relevant `success_criteria`, not just this item's own `covers`), also add `"acceptance_of_whole"` to at least one check's `covers` — this is what lets `scripts/solidsdd-next.sh` detect [cost-skip B4](../../docs/run-cost.md#allowed-cost-skips-b1b5) mechanically and skip a duplicate integration verify. Do not add this tag when the WorkPlan has more than one item, or when this verify only covers this item's own slice.
 6. Shape output per [verification-report.schema.json](references/verification-report.schema.json). When invoked from a slice loop, **write** to `items/<item_id>/verification-report.json` (or the integration path under the change dir for `solidsdd-run` final verify).
 7. Return the report unchanged for the parent's follow-up `solidsdd-critique` (`subject: verification_report`).
 

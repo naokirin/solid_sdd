@@ -105,6 +105,56 @@ class NextTests(unittest.TestCase):
         h = nxt.compute_next(cid, cdir)
         self.assertEqual(h["action"], "human_gate")
 
+    def _single_item_waves(self, item_report: dict[str, object] | None) -> tuple[str, Path]:
+        files: dict[str, object] = {
+            "run-state.json": {
+                "version": "1",
+                "change_id": "sample-change",
+                "phase": "waves",
+                "run_retry": {"remaining": 3, "max": 3},
+                "items": {"W1": {"status": "done", "artifact_dir": "items/W1"}},
+            },
+            "work-plan.json": {
+                "version": "1",
+                "change_id": "sample-change",
+                "items": [{"id": "W1", "intent": "i", "acceptance_criterion": "s", "covers": ["R1"]}],
+            },
+        }
+        if item_report is not None:
+            files["items/W1/verification-report.json"] = item_report
+        return self._change(files)
+
+    def test_b4_skip_when_sole_item_covers_acceptance_of_whole(self) -> None:
+        cid, cdir = self._single_item_waves(
+            {
+                "version": "1",
+                "change_id": "sample-change",
+                "result": "pass",
+                "checks": [{"name": "n", "kind": "other", "result": "pass", "covers": ["acceptance_of_whole", "W1"]}],
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "knowledge_harvest")
+        self.assertIn("cost_skip:B4", h["reason"])
+        self.assertIn("integration_verify", h["legal_actions"])
+
+    def test_no_b4_skip_without_acceptance_of_whole_tag(self) -> None:
+        cid, cdir = self._single_item_waves(
+            {
+                "version": "1",
+                "change_id": "sample-change",
+                "result": "pass",
+                "checks": [{"name": "n", "kind": "other", "result": "pass", "covers": ["W1"]}],
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "integration_verify")
+
+    def test_no_b4_skip_when_item_report_missing(self) -> None:
+        cid, cdir = self._single_item_waves(None)
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "integration_verify")
+
 
 if __name__ == "__main__":
     unittest.main()

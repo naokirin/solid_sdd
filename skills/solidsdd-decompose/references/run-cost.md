@@ -48,6 +48,10 @@ These are **explicit product rules**, not silent parent thinning. When used, rec
 
 **Never skip under these ids:** Checkpoint Reviews (e.g., Plan Review), or merging producer+review into one Task. Failure-driven Critique cannot be skipped if verification fails.
 
+### B4 mechanical detection
+
+`scripts/solidsdd-next.sh next` detects B4 automatically: when all WorkPlan items are `done`, the WorkPlan has **exactly one** item, and that item's `items/<id>/verification-report.json` has `result: pass` with `"acceptance_of_whole"` present in some check's `covers`, `next` recommends `action: knowledge_harvest` (skipping `integration_verify`) instead of the default `action: integration_verify`, with the reason spelled out. `integration_verify` stays in `legal_actions` so the orchestrator may still run it for extra rigor. For this to fire, the sole item's `solidsdd-verify` must actually tag `"acceptance_of_whole"` in `covers` when it demonstrably validates the whole Brief — see [solidsdd-verify](../skills/solidsdd-verify/SKILL.md) step 5. The orchestrator still records `cost_skip:B4` in `run-state.isolation_notes` and cites the reused report path per the table above.
+
 ## Required mitigations (decomposition)
 
 See **Greenfield / shared-contract changes** and **Follow-on / co-delivered slices** in [work-decomposition.md](../reference-src/work-decomposition.md):
