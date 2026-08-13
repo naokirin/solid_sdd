@@ -165,6 +165,7 @@ Cold-start re-reads of full Brief / OpenAPI / OCL dominate wall-clock. The **par
 - Host-toolchain `commands` block (paste verbatim)
 - Cited knowledge policy ids + one-line each (not full files)
 - After judge: ApplicationPlan path + target kind/status table
+- **Precedent to adapt** (when one exists — parent's visual judgment, not a mechanical match): before writing the pack, glance at other `items/*/application-plan.json` in this change (and recently `done` items from prior changes touching the same contract file). If one is clearly the **same shape** (same kind of operation/boundary, same density/gate outcome would obviously apply), name it directly — its `application-plan.json` path plus the specific OCL/test block or OpenAPI entry to mirror — instead of leaving the Task to rediscover it via a directory search or re-derive density from the judgment-axes table. A live diagnostic (2026-08) measured this cutting Plan Slice cost roughly in half again on top of the consolidated cheat sheet, concentrated in the judge sub-concern. Do **not** force a precedent that doesn't genuinely fit — a wrong-shape precedent invites copying a density/gate decision that doesn't hold; when unsure, omit this and let the Task reason from the judgment axes normally.
 - Instruction: **prefer this pack**; do **not** re-Read full OpenAPI/OCL/Brief/tests unless you must edit that file or the pack is marked stale
 
 **Do not** put full contract bodies or entire test files in the pack.

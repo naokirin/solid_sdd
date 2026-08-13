@@ -67,7 +67,7 @@ Do **not** launch separate subagent Tasks for every intermediate file write (`ap
 ## Canonical Sequence
 
 1. **Resolve Slice Context**: Read `change_id` / `item_id` / artifact dir. Check `run-state.json`; resume from recorded phase if interrupting state exists.
-2. **Context & Pack (Parent)**: Run `solidsdd-context` and snapshot host toolchain. Write `.solidsdd/changes/<change_id>/items/<item_id>/context-pack.md`.
+2. **Context & Pack (Parent)**: Run `solidsdd-context` and snapshot host toolchain. Write `.solidsdd/changes/<change_id>/items/<item_id>/context-pack.md`. When a clearly same-shape prior item exists, name it as a precedent to adapt — see [execution-model.md](references/execution-model.md) "Context pack".
 3. **Plan Slice (Task Subagent)**: Launch a single **Plan Slice** Task.
    - Outputs: `application-plan.json`, updated OpenAPI/OCL contracts, and derived contract test files.
    - Point the Task at **[plan-slice-cheatsheet.md](references/plan-slice-cheatsheet.md)** (a generated concatenation of `solidsdd-judge` + `solidsdd-apply-api` + `solidsdd-apply-dbc` + `solidsdd-derive-tests`'s SKILL.md + primary adapter reference) instead of naming all four skills' paths separately — a live diagnostic measurement (2026-08) found most of a Plan Slice Task's time going to re-reading those same four skills' worth of onboarding docs from scratch on every slice. The cheat sheet links to the full individual skills for edge cases (GraphQL, RSpec, exact schema validation, human-gate detail).
