@@ -70,7 +70,7 @@ curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/ins
 
 ### Project rule / Working language
 
-The installer writes the solid_sdd project rule (contract artifact paths, judgment defaults, …) for every `--agent` you pass, in that agent's own convention:
+The installer writes the solid_sdd project rule — a thin, always-loaded entry point that identifies the project as solid_sdd and routes to the right skill (`solidsdd-run` / `solidsdd-loop` / `solidsdd-grill` / `solidsdd-report`); procedure (contract artifact paths, judgment defaults, human gates, …) lives in each skill's own docs, loaded only when that skill runs — for every `--agent` you pass, in that agent's own convention:
 
 | `--agent` | Rule file | How it's written |
 |-----------|-----------|-------------------|

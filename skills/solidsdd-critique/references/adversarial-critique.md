@@ -72,7 +72,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | Change Context framing | Required headings missing; §4 NFR or §5 tech selection empty/hand-wavy when demand or repo stack implies choices; decisions with neither alternatives nor rationale; missing `change-context-gate.json`; gate triggers fire (material `agent_default` tech, stack conflict, new security/money NFR, blocking §7) but `human_gate.required: false` | Wording polish; extra background prose; gate `false` when initial instruction already settled decisions |
 | ChangeBrief scope | Empty/missing `in_scope` or `out_of_scope`; contradictory in vs out; `success_criteria` only slogans with no observable outcome; blocking `open_questions` with no `human_gate` / low confidence; bare `string[]` scope lists (schema/lint) | Brief wording polish; extra background prose |
 | Vacuous constraints | `pre: true` / empty `post` when density is `standard`+ and the operation has known failure or result meaning | Type-echo invariants (`oclIsTypeOf` on an already-typed attribute); missing IEEE/NaN guards |
-| Missing precondition | Known failure mode (div/mod by zero, empty required input) with **no** `pre` / no API error path at all | OCL that has `pre` but does not name `PreconditionError` in the `.ocl` text (error **class** is an implement/adapter concern; project rule covers runtime) |
+| Missing precondition | Known failure mode (div/mod by zero, empty required input) with **no** `pre` / no API error path at all | OCL that has `pre` but does not name `PreconditionError` in the `.ocl` text (error **class** is an implement/adapter concern; see loop-retry) |
 | Happy-path-only API | HTTP/GraphQL operation with documented failures but **no** 4xx / error channel whatsoever | Undifferentiated `{ error: string }`; GraphQL errors only in prose while tests/impl already lock a code; undeclared 404/500 catch-alls |
 | Weak derived tests | OCL/`pre` exists but tests never exercise violation; suite is only “does not throw” / empty | Few integer cases; language `%` as oracle when OCL maps to that operator; missing fractional edges |
 | Density vs signals | `money_boundary` / `breaking_change` / `concurrency_safety` with `thin` or silent `skip` (no `defer` rationale) | `standard` sample without money/authz signals |
@@ -88,7 +88,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 
 ### Named domain errors
 
-- **Runtime / tests / implement**: prefer named domain errors (e.g. `PreconditionError`) — see project rule and loop-retry.
+- **Runtime / tests / implement**: prefer named domain errors (e.g. `PreconditionError`) — see loop-retry and the OCL adapter reference.
 - **Critique of OCL text**: do **not** `fail` only because the `.ocl` file does not spell the exception type. Fail if the **`pre` itself is missing** while failures are in scope.
 
 ## Subjects and when orchestrators must call it
