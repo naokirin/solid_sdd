@@ -50,11 +50,11 @@ Override any of the default directories/files with `.solidsdd/config.yaml` (`pat
 
 ## Bootstrap steps
 
-1. Install skills **and** tooling — [install.md](install.md) (`scripts/install-into-project.sh`)
+1. Install skills **and** tooling — [install.md](install.md) (`scripts/install-into-project.sh --language <tag>`)
 2. Confirm `.solidsdd/tooling.json` and agent skill dirs
-3. Set **Working language** in `.cursor/rules/solidsdd.mdc` (Cursor) — one line under `## Working language`:
-   - English (default): `Working language: en`
-   - Japanese prose under `.solidsdd/`: `Working language: ja`
+3. Confirm **Working language** in `.solidsdd/config.yaml` → `working_language` (set by `--language` during install, or edit the key directly; every agent's rule reads this one shared value):
+   - English (default / missing key): `working_language: "en"`
+   - Japanese prose under `.solidsdd/`: `working_language: "ja"`
    - Keep JSON keys, Change Context headings, and Gherkin keywords in English (see skill `references/working-language.md`)
 4. Add empty dirs you need (or let apply skills create files)
 5. Smoke: `solidsdd-context` then a small `solidsdd-judge` on a known change

@@ -31,12 +31,9 @@ Defaults below; **override via `.solidsdd/config.yaml`** (`paths.*`; schema `sch
 
 ## Working language
 
-- Working language: en
-  # Set to `ja` (or another BCP 47-ish tag) so Change Context body,
-  # Brief/WorkPlan/Critique JSON string values, Gherkin step prose, and
-  # reports are written in that language.
-  # Keep JSON keys, Change Context top-level headings, and Gherkin keywords in English.
-  # Japanese teams: change the line above to `Working language: ja`.
+- Resolved from `.solidsdd/config.yaml` → `working_language` (missing key means `en`); see `reference-src/working-language.md` for the full resolution order.
+- That one shared file controls Change Context body, Brief/WorkPlan/Critique/Verification JSON string values, Gherkin step prose, and reports — set it once via `install-into-project.sh --language <tag>` (asks interactively if omitted) or by editing the key directly; every agent's rule reads the same value, so there is nothing to change here.
+- Keep JSON keys, Change Context top-level headings, and Gherkin keywords in English regardless of `working_language`.
 
 ## Adapters
 

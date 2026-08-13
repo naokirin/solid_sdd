@@ -89,7 +89,7 @@ Fixed-heading Markdown at `.solidsdd/changes/<change_id>/change-context.md` (dem
 
 ## Working language
 
-Prose under `.solidsdd/` (Context body, Brief/WorkPlan JSON string values, critique details, reports) follows the project rule line `Working language: en|ja|…`. JSON keys, Context top-level headings, and Gherkin keywords stay English. Policy: [../reference-src/working-language.md](../reference-src/working-language.md).
+Prose under `.solidsdd/` (Context body, Brief/WorkPlan JSON string values, critique details, reports) follows `.solidsdd/config.yaml` → `working_language` (missing key means `en`) — one shared value every agent's rule reads, not a per-agent literal. JSON keys, Context top-level headings, and Gherkin keywords stay English. Policy: [../reference-src/working-language.md](../reference-src/working-language.md).
 
 ## Change report (`solidsdd.report`) output
 

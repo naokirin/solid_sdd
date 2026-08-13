@@ -47,6 +47,13 @@ curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/ins
   --repo naokirin/solid_sdd \
   --ref v0.1.0 \
   --force
+
+# Set Working language explicitly (skips the interactive prompt)
+/path/to/solid_sdd/scripts/install-into-project.sh \
+  --project-root . \
+  --agent claude-code \
+  --language ja \
+  --force
 ```
 
 ### What gets installed
@@ -55,11 +62,29 @@ curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/ins
 |-------|------------------|
 | Vendor tree (scripts, schemas, skill copies, rules) | `.solidsdd/vendor/solid_sdd/` (override with `--vendor-dir`) |
 | Install metadata | `.solidsdd/tooling.json` (`vendor_root`, `scripts_dir`, …) |
-| Path layout config | `.solidsdd/config.yaml` (created if missing) |
+| Path layout config | `.solidsdd/config.yaml` (created if missing; also holds `working_language`) |
 | Skills for agent | see table below |
-| Cursor project rule | `.cursor/rules/solidsdd.mdc` (when `--agent` includes `cursor`) |
+| Project rule per agent | see table below (skip with `--skip-rule`) |
 | Python deps | `<vendor>/.venv` (`jsonschema`, `PyYAML`) |
 | Knowledge graph (optional) | `--with-kg` → `tools/solidsdd-kg` + `bin/solidsdd-kg` |
+
+### Project rule / Working language
+
+The installer writes the solid_sdd project rule (contract artifact paths, judgment defaults, …) for every `--agent` you pass, in that agent's own convention:
+
+| `--agent` | Rule file | How it's written |
+|-----------|-----------|-------------------|
+| `cursor` | `.cursor/rules/solidsdd.mdc` | Whole file (solid_sdd-only; overwritten each install) |
+| `devin` | `.devin/rules/solidsdd.md` | Whole file (solid_sdd-only; overwritten each install) |
+| `claude-code` | `CLAUDE.md` | Marked block upserted — your existing content is preserved |
+| `codex` | `AGENTS.md` | Marked block upserted — your existing content is preserved |
+| `copilot` | `.github/copilot-instructions.md` | Marked block upserted — your existing content is preserved |
+
+For `claude-code` / `codex` / `copilot`, the rule body is inserted between `<!-- solid_sdd:begin -->` / `<!-- solid_sdd:end -->` markers; re-running the installer replaces only that block, leaving the rest of the file untouched. Don't hand-edit inside the markers — edit `rules/solidsdd.mdc` in a solid_sdd checkout and re-run the installer instead.
+
+**Every one of those rule files reads `working_language` from `.solidsdd/config.yaml` — the value itself is never written into the rule text.** That's deliberate: with N agents installed, changing the language would otherwise mean editing N files. Instead there's one place to change: `.solidsdd/config.yaml`.
+
+`working_language` is resolved as: `--language TAG` (e.g. `--language ja`) → interactive prompt (asked once, via `/dev/tty`, so it works even under `curl | bash`) → default `en`. A **non-interactive** run without `--language` (no TTY, e.g. CI) leaves an already-configured `working_language` untouched — it only defaults to `en` on a brand-new `.solidsdd/config.yaml`, so re-running the installer in CI can never silently reset your language choice. Pass `--skip-rule` to skip rule / language install entirely.
 
 ### Agent skill directories (project scope)
 
@@ -99,6 +124,10 @@ your-project/
       rules/
   .agents/skills/solidsdd-*/   # or .claude/skills / .devin/skills
   .cursor/rules/solidsdd.mdc   # Cursor
+  .devin/rules/solidsdd.md     # Devin
+  CLAUDE.md                    # Claude Code (solid_sdd:begin/end block)
+  AGENTS.md                    # Codex (solid_sdd:begin/end block)
+  .github/copilot-instructions.md  # Copilot (solid_sdd:begin/end block)
   openapi/ contracts/ …
 ```
 
@@ -162,7 +191,7 @@ curl -fsSL https://raw.githubusercontent.com/naokirin/solid_sdd/main/scripts/ins
   --project-root . --agent cursor --force
 ```
 
-If you customized `.cursor/rules/solidsdd.mdc`, back it up before `--force` (rule file is overwritten for Cursor).
+`.cursor/rules/solidsdd.mdc` and `.devin/rules/solidsdd.md` are solid_sdd-only files and are fully overwritten on re-install — back them up first if you hand-edited them. `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md` only have their `solid_sdd:begin`/`solid_sdd:end` block replaced; content outside the markers is left alone. `working_language` in `.solidsdd/config.yaml` is never touched by a non-interactive re-install unless you pass `--language`, so re-installing is always safe for that setting.
 
 ## Adoption checklist
 
@@ -171,7 +200,7 @@ If you customized `.cursor/rules/solidsdd.mdc`, back it up before `--force` (rul
 - [ ] `install-into-project.sh` succeeded for your agent(s)
 - [ ] `.solidsdd/tooling.json` present; lint/run-state scripts resolve under `scripts_dir`
 - [ ] Agent lists `solidsdd-*` (run / loop / context / intake / brief / decompose / judge / critique / apply-* / derive-tests / implement / verify, plus formal)
-- [ ] (Cursor) `.cursor/rules/solidsdd.mdc` installed; set **Working language** (`en` or `ja`)
+- [ ] Project rule installed for your agent(s) (see table above); `.solidsdd/config.yaml` → `working_language` set as intended (`--language` flag, prompt answer, or edited by hand)
 - [ ] Shared contract layout ([project-template.md](project-template.md)), including `.solidsdd/config.yaml` paths
 - [ ] Smoke of `solidsdd-context` + `solidsdd-loop` or `solidsdd-run` (critique via Task; lint runs when vendored scripts are available)
 - [ ] Contract tests via the project’s `npm test` / `bundle exec rspec` / etc.

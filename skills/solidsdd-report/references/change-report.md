@@ -36,7 +36,7 @@ The report is a **view**, not a new source of truth. Do not feed the report back
 Follow [working-language.md](working-language.md):
 
 1. Caller `language` override wins (**report only** — do not rewrite SoT artifacts).
-2. Else project rule `Working language:`.
+2. Else `.solidsdd/config.yaml` → `working_language`.
 3. Else Change Context §6 recorded language / dominant language of `change-context.md` (and Brief prose if context missing).
 4. Else dominant language of the user request if clear; otherwise `en`.
 5. Mixed sources: follow Change Context; keep quoted Gherkin/Scenario text as in the Feature files.

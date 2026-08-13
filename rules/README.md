@@ -9,7 +9,7 @@
 
 | Setting | Where | Notes |
 |---------|-------|-------|
-| **Working language** | `## Working language` → `Working language: ja` (or `en`) | Prose under `.solidsdd/` and Gherkin step text; keys/headings/keywords stay English. Details: [../reference-src/working-language.md](../reference-src/working-language.md) |
+| **Working language** | `.solidsdd/config.yaml` → `working_language: "ja"` (or `"en"`) — shared by every agent's rule, not written in the rule text | Prose under `.solidsdd/` and Gherkin step text; keys/headings/keywords stay English. Details: [../reference-src/working-language.md](../reference-src/working-language.md) |
 | Contract paths | `## Contract artifacts` | Override defaults when the repo layout differs |
 | Judgment / gates | `## Judgment defaults`, `## Human gates` | Tune thresholds from project feedback |
 

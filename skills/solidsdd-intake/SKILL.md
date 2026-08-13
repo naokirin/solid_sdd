@@ -56,7 +56,7 @@ Emit `change-context.md` so later skills (and humans) can see **why** NFRs and t
 7. Apply section rules in [change-context.md](references/change-context.md). Especially:
    - §4 Non-functional requirements — **project from `nfr.json`** (do not invent rows)
    - §5 Technology selection — each decision with alternatives + rationale + source (`user` / `repo_existing` / `agent_default`)
-   - §6 Key judgments — include `Working language: <tag> (from project rule|user request|default)` 
+   - §6 Key judgments — include `Working language: <tag> (from config.yaml|user request|default)` 
 8. Decide Change Context gate per [change-context.md](references/change-context.md) §Human gate and [human-gates.md](references/human-gates.md):
    - Default **false** when instructions were clear or stack is inherited without conflict
    - **true** for material `agent_default` tech, stack conflicts, new security/money NFR, or blocking §7 questions

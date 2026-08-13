@@ -4,24 +4,30 @@ Prose under `.solidsdd/` (and related human-readable acceptance text) follows a 
 
 ## How to set it (humans)
 
-In the consuming project’s solid_sdd project rule (copy of `project-rule.mdc` / `rules/solidsdd.mdc`):
+The value lives in **one place**, `.solidsdd/config.yaml` → `working_language` (schema: `schemas/project-config.schema.json`) — not duplicated into each agent's rule file. Every installed rule (`.cursor/rules/solidsdd.mdc`, `.devin/rules/solidsdd.md`, the `solid_sdd:begin`/`solid_sdd:end` block in `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) just points at that key, so changing it later never means editing rule files per agent.
 
-```markdown
-## Working language
+Set it with:
 
-- Working language: ja
+```bash
+scripts/install-into-project.sh --language ja   # writes .solidsdd/config.yaml → working_language: "ja"
 ```
 
-Use `en` (default), `ja`, or another short language tag. **That one line is enough**—skills resolve language from the rule.
+(asks interactively if `--language` is omitted; see [install.md](../docs/install.md#project-rule--working-language)). To change it later, either re-run with a different `--language`, or edit the key directly:
+
+```yaml
+working_language: "ja"
+```
+
+Use `en` (default / missing key), `ja`, or another short language tag.
 
 ## Resolution order (agents)
 
 1. **Caller override** — e.g. `solidsdd-report` parameter `language` (`ja` / `en`). Affects **that report only**; does not rewrite Context / Brief / WorkPlan.
-2. **Project rule** — `Working language:` line in the project rule.
-3. **User request** — if the rule is unset and the request’s dominant language is clear, use that.
+2. **`.solidsdd/config.yaml`** — `working_language` key.
+3. **User request** — if the key is unset and the request’s dominant language is clear, use that.
 4. **Default** — `en`.
 
-After `solidsdd-intake`, later skills may also read the language recorded in Change Context §6 (see below) when the rule is unavailable in the subagent context.
+After `solidsdd-intake`, later skills may also read the language recorded in Change Context §6 (see below) when `.solidsdd/config.yaml` is not in the subagent context.
 
 ## In scope (write in the working language)
 
@@ -45,7 +51,7 @@ Do **not** invent localized heading titles or Japanese Gherkin keywords (`機能
 
 ## Intake recording
 
-`solidsdd-intake` resolves the working language, writes Context body in that language, and records a short bullet under **§6. Key judgments and trade-offs**, e.g. `Working language: ja (from project rule)`. Downstream skills treat that as a hint when the rule text is not in context.
+`solidsdd-intake` resolves the working language, writes Context body in that language, and records a short bullet under **§6. Key judgments and trade-offs**, e.g. `Working language: ja (from config.yaml)`. Downstream skills treat that as a hint when `.solidsdd/config.yaml` is not in context.
 
 ## Report override
 

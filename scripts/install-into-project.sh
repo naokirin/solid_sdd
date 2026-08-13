@@ -46,6 +46,7 @@ WITH_KG=0
 SKIP_PIP=0
 SKIP_SKILLS=0
 SKIP_RULE=0
+LANGUAGE=""
 
 usage() {
   cat <<'EOF'
@@ -69,7 +70,13 @@ Options:
   --with-kg            Also vendor tools/solidsdd-kg and build bin/solidsdd-kg if Go present
   --skip-pip           Do not create vendor .venv / install PyYAML+jsonschema
   --skip-skills        Do not copy skills into agent directories
-  --skip-rule          Do not install project rule for Cursor
+  --skip-rule          Do not install/update the project rule for any agent
+  --language TAG       Working language for solid_sdd artifacts (e.g. en, ja).
+                       Written to .solidsdd/config.yaml -> working_language
+                       (shared by every agent's rule). If omitted and a
+                       terminal is available, you'll be prompted; otherwise
+                       defaults to `en` (existing value is left untouched on
+                       a silent, non-interactive re-install).
   --force              Overwrite existing vendor / skills
   -h, --help           Show help
 EOF
@@ -93,6 +100,7 @@ while [[ $# -gt 0 ]]; do
     --skip-pip) SKIP_PIP=1; shift ;;
     --skip-skills) SKIP_SKILLS=1; shift ;;
     --skip-rule) SKIP_RULE=1; shift ;;
+    --language) LANGUAGE="${2:-}"; shift 2 ;;
     --force) FORCE=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
@@ -129,6 +137,37 @@ if [[ $SKIP_SKILLS -eq 0 && ${#NORMALIZED[@]} -eq 0 ]]; then
   die "specify at least one --agent (or pass --skip-skills)"
 fi
 
+# Resolve working language: --language > interactive prompt (/dev/tty, if
+# available) > default `en`. Asked up front so the (possibly slow) fetch
+# below doesn't leave the prompt stranded after a long wait.
+#
+# LANGUAGE_EXPLICIT distinguishes "user actually chose this" (flag, or had a
+# chance to answer the prompt) from "silently defaulted because no terminal
+# was available" — only the former is allowed to overwrite an already
+# configured `working_language` in an existing .solidsdd/config.yaml (see
+# below), so a non-interactive re-install (e.g. CI) can never quietly reset
+# a project's language back to `en`.
+LANGUAGE_EXPLICIT=0
+if [[ $SKIP_RULE -eq 0 ]]; then
+  if [[ -n "$LANGUAGE" ]]; then
+    LANGUAGE_EXPLICIT=1
+  else
+    # `test -r/-w /dev/tty` checks the special file's permission bits, which
+    # are typically world-readable regardless of whether this process has a
+    # controlling terminal — so it's not a reliable "are we interactive?"
+    # signal by itself. Instead, attempt the read and trust *its* exit
+    # status: opening /dev/tty for redirection fails outright (no controlling
+    # terminal → command never runs → nonzero) when there's nothing to
+    # prompt on, e.g. under CI or a non-pty tool sandbox.
+    if read -r -p "Working language for solid_sdd artifacts (BCP-47 tag, e.g. en, ja) [en]: " LANGUAGE < /dev/tty > /dev/tty 2>/dev/null; then
+      LANGUAGE="${LANGUAGE:-en}"
+      LANGUAGE_EXPLICIT=1
+    else
+      LANGUAGE="en"
+    fi
+  fi
+fi
+
 # Project-relative skill dir for agent (Agent Skills conventions)
 agent_skills_dir() {
   case "$1" in
@@ -139,9 +178,13 @@ agent_skills_dir() {
 }
 
 TMP_SRC=""
+RULE_TMP=""
 cleanup() {
   if [[ -n "${TMP_SRC}" && -d "${TMP_SRC}" ]]; then
     rm -rf "${TMP_SRC}"
+  fi
+  if [[ -n "${RULE_TMP}" && -f "${RULE_TMP}" ]]; then
+    rm -f "${RULE_TMP}"
   fi
 }
 trap cleanup EXIT
@@ -250,8 +293,10 @@ fi
 
 # Ensure config.yaml exists (defaults)
 CFG="$PROJECT_ROOT/.solidsdd/config.yaml"
+CFG_CREATED=0
 mkdir -p "$PROJECT_ROOT/.solidsdd"
 if [[ ! -f "$CFG" ]]; then
+  CFG_CREATED=1
   if [[ -f "$SOURCE_ROOT/.solidsdd/config.yaml" ]]; then
     cp "$SOURCE_ROOT/.solidsdd/config.yaml" "$CFG"
   else
@@ -277,6 +322,30 @@ paths:
 YAML
   fi
   echo "Wrote $CFG" >&2
+fi
+
+# Working language lives in config.yaml only (single SoT every agent's rule
+# points at) — set it on a fresh config.yaml, or when the caller explicitly
+# chose a language this run. Never touch it on a silent (no-flag, no-tty)
+# re-install of an existing config.yaml, so CI re-runs can't reset it.
+if [[ $SKIP_RULE -eq 0 && ( $CFG_CREATED -eq 1 || $LANGUAGE_EXPLICIT -eq 1 ) ]]; then
+  python3 - "$CFG" "$LANGUAGE" <<'PY'
+import re, sys, pathlib
+cfg, lang = sys.argv[1], sys.argv[2]
+p = pathlib.Path(cfg)
+text = p.read_text(encoding="utf-8")
+line = f'working_language: "{lang}"'
+if re.search(r"(?m)^working_language:.*$", text):
+    text = re.sub(r"(?m)^working_language:.*$", line, text, count=1)
+else:
+    m = re.search(r"(?m)^version:.*$", text)
+    if m:
+        text = text[: m.end()] + "\n" + line + text[m.end():]
+    else:
+        text = line + "\n" + text
+p.write_text(text, encoding="utf-8")
+PY
+  echo "Set .solidsdd/config.yaml -> working_language: \"${LANGUAGE}\"" >&2
 fi
 
 # tooling metadata
@@ -333,19 +402,95 @@ if [[ $SKIP_SKILLS -eq 0 ]]; then
   done
 fi
 
-# Cursor project rule
+# Project rule (per agent). The rule body is identical across every agent
+# and every install — it points at `.solidsdd/config.yaml` -> working_language
+# rather than embedding a literal language value, so there is nothing here
+# to template per install.
+#
+# Cursor / Devin get a dedicated solid_sdd-only file (safe to overwrite each
+# install). Claude Code / Codex / Copilot share a general-purpose project
+# instructions file the user likely already has content in, so we upsert a
+# marked block instead of overwriting the whole file.
 if [[ $SKIP_RULE -eq 0 ]]; then
-  for agent in "${NORMALIZED[@]+"${NORMALIZED[@]}"}"; do
-    if [[ "$agent" == "cursor" ]]; then
-      RULE_SRC="$VENDOR_ROOT/rules/solidsdd.mdc"
-      [[ -f "$RULE_SRC" ]] || RULE_SRC="$VENDOR_ROOT/skills/solidsdd-loop/references/project-rule.mdc"
-      if [[ -f "$RULE_SRC" ]]; then
-        mkdir -p "$PROJECT_ROOT/.cursor/rules"
-        cp "$RULE_SRC" "$PROJECT_ROOT/.cursor/rules/solidsdd.mdc"
-        echo "Installed .cursor/rules/solidsdd.mdc" >&2
-      fi
-    fi
-  done
+  RULE_SRC="$VENDOR_ROOT/rules/solidsdd.mdc"
+  [[ -f "$RULE_SRC" ]] || RULE_SRC="$VENDOR_ROOT/skills/solidsdd-loop/references/project-rule.mdc"
+
+  if [[ -f "$RULE_SRC" ]]; then
+    RULE_TMP="$(mktemp "${TMPDIR:-/tmp}/solidsdd-rule.XXXXXX")"
+
+    # Body without the Cursor-specific YAML frontmatter.
+    render_rule_body() {
+      awk '
+        NR == 1 && $0 == "---" { fm = 1; next }
+        fm == 1 && $0 == "---" { fm = 0; next }
+        fm == 1 { next }
+        { print }
+      ' "$RULE_SRC"
+    }
+    render_rule_body > "$RULE_TMP"
+
+    # Insert/replace a marked block in $1, preserving any surrounding
+    # user content. Creates the file if missing.
+    upsert_marked_block() {
+      local target="$1"
+      python3 - "$target" "$RULE_TMP" <<'PY'
+import sys, pathlib
+target, body_path = sys.argv[1], sys.argv[2]
+body = pathlib.Path(body_path).read_text(encoding="utf-8").rstrip("\n")
+begin = "<!-- solid_sdd:begin (auto-generated by install-into-project.sh; edit the source in your solid_sdd checkout, not here) -->"
+end = "<!-- solid_sdd:end -->"
+block = f"{begin}\n{body}\n{end}\n"
+p = pathlib.Path(target)
+if p.exists():
+    text = p.read_text(encoding="utf-8")
+    if begin in text and end in text:
+        pre, rest = text.split(begin, 1)
+        _, post = rest.split(end, 1)
+        new_text = pre + block + post
+    else:
+        sep = "\n" if text.endswith("\n") else "\n\n"
+        new_text = text + sep + block
+else:
+    new_text = block
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(new_text, encoding="utf-8")
+PY
+    }
+
+    install_rule_for_agent() {
+      local agent="$1"
+      case "$agent" in
+        cursor)
+          mkdir -p "$PROJECT_ROOT/.cursor/rules"
+          cp "$RULE_SRC" "$PROJECT_ROOT/.cursor/rules/solidsdd.mdc"
+          echo "Installed .cursor/rules/solidsdd.mdc" >&2
+          ;;
+        devin)
+          mkdir -p "$PROJECT_ROOT/.devin/rules"
+          cp "$RULE_TMP" "$PROJECT_ROOT/.devin/rules/solidsdd.md"
+          echo "Installed .devin/rules/solidsdd.md" >&2
+          ;;
+        claude-code)
+          upsert_marked_block "$PROJECT_ROOT/CLAUDE.md"
+          echo "Updated CLAUDE.md (solid_sdd block)" >&2
+          ;;
+        codex)
+          upsert_marked_block "$PROJECT_ROOT/AGENTS.md"
+          echo "Updated AGENTS.md (solid_sdd block)" >&2
+          ;;
+        copilot)
+          upsert_marked_block "$PROJECT_ROOT/.github/copilot-instructions.md"
+          echo "Updated .github/copilot-instructions.md (solid_sdd block)" >&2
+          ;;
+      esac
+    }
+
+    for agent in "${NORMALIZED[@]+"${NORMALIZED[@]}"}"; do
+      install_rule_for_agent "$agent"
+    done
+  else
+    echo "warning: rule source missing in vendor; skip project rule install" >&2
+  fi
 fi
 
 # Python venv inside vendor

@@ -42,7 +42,7 @@ Close the SDD gap where durable knowledge is buried inside volatile requirements
 - Do **not** move Brief `in_scope` / Scenarios wholesale into knowledge
 - Do **not** edit OpenAPI / OCL / Features / implementation as part of this skill
 - Prefer `scripts/solidsdd-kg.sh` when present; if Go/CLI unavailable, still emit consult/harvest artifacts from filesystem reading of `knowledge/**` and note the tooling gap
-- Working language for prose fields: project rule / Context §6 ([working-language.md](references/working-language.md))
+- Working language for prose fields: `.solidsdd/config.yaml` → `working_language` / Context §6 ([working-language.md](references/working-language.md))
 
 ## Steps — `mode: consult`
 

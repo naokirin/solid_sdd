@@ -11,6 +11,11 @@
       "type": "string",
       "const": "1"
     },
+    "working_language": {
+      "type": "string",
+      "minLength": 2,
+      "description": "BCP-47-ish tag (e.g. en, ja) for prose written under .solidsdd/: Change Context body, Brief/WorkPlan/ApplicationPlan/Critique/Verification JSON string values, Gherkin titles and step prose, change reports. Missing key means `en`. JSON keys, Change Context top-level headings, and Gherkin keywords always stay English. See reference-src/working-language.md. Set via `install-into-project.sh --language <tag>` or edit this key directly."
+    },
     "paths": {
       "type": "object",
       "additionalProperties": false,
