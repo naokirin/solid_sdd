@@ -12,6 +12,7 @@ Manual skill only. Not part of `solidsdd-run` / `solidsdd-loop` automation. Orch
 | Scope | `change-brief.json` | Functional requirements (scope lists) |
 | Acceptance | `requirements/**/*.feature` | Functional requirements (scenarios) |
 | Slice plan | `work-plan.json` | Design (work plan summary) |
+| Structural design | ArchitecturePlan JSON | Design (modules / dependencies / ownership / constraints) |
 | Apply judgment | ApplicationPlan JSON | Design (contract targets) |
 | Contracts | OpenAPI / GraphQL / OCL / formal | Design (links + raw embed in HTML) |
 
@@ -76,6 +77,7 @@ Rules:
 | Non-functional requirements | `nfr.json` and/or `change-context.md` §4 with content |
 | Technology selection | `change-context.md` §5 with content |
 | Design — WorkPlan | `work-plan.json` |
+| Design — ArchitecturePlan | `architecture-plan.json` for this change exists with `status: changed` (an existing file with `status: unchanged` is **Present** too, rendered as a one-line note, not Not performed) |
 | Design — ApplicationPlan | One or more ApplicationPlan JSON files for this change (see discovery below) |
 | Design — API contract | OpenAPI and/or GraphQL file exists at project defaults (or rule overrides) |
 | Design — DbC (OCL) | At least one `contracts/**/*.ocl` (or project override) |
@@ -95,6 +97,10 @@ Look for (first match set wins; include all that clearly belong to this change):
 Also cite `run-state.json` in §8 Source artifacts when present (phase / item statuses).
 
 If none found → Design — ApplicationPlan = **Not performed**.
+
+### ArchitecturePlan discovery
+
+Look for `.solidsdd/changes/<change_id>/architecture-plan.json` (change-level, not per-item — unlike ApplicationPlan). If missing → Design — ArchitecturePlan = **Not performed** (`solidsdd-architecture`). If present with `status: unchanged`, render as **Present** with a one-line "no structural change" note (do not treat it as Not performed — the judgment ran, it just found nothing to record) plus its `summary` when given.
 
 ## Required document shape (Markdown)
 
@@ -139,10 +145,11 @@ From Change Context §1–§2. Include drivers/constraints. If Context missing �
 Subsections (omit a subsection only when not applicable to the stack **and** no plan asked for it; otherwise mark Not performed):
 
 1. **WorkPlan** — item id, intent, `covers`, scenario name, status, depends_on (table). Link to `work-plan.json`.
-2. **ApplicationPlan** — targets: kind, location, density, status, `covers` (WorkPlan ids), rationale (table). Link to plan JSON path(s).
-3. **API contract** — natural-language summary of operations/types exposed; **Markdown: link only** to `openapi/openapi.yaml` or `graphql/schema.graphql` (no full YAML dump).
-4. **DbC (OCL)** — natural-language summary of types/invariants/preconditions covered; **one bullet (or nested bullet) per operation / invariant**—do not pack many ops into a single unbroken sentence. **Markdown: link only** to each `.ocl` file.
-5. **Formal** (optional) — summary + link to `formal/**`.
+2. **ArchitecturePlan** — `status`; when `changed`: modules (id, responsibility, `owns`, `public`), dependencies (from, to, reason, kind), constraints (type, from, to, reason) as tables; when `unchanged`: one-line note + `summary`. Link to `architecture-plan.json`.
+3. **ApplicationPlan** — targets: kind, location, density, status, `covers` (WorkPlan ids), rationale (table). Link to plan JSON path(s).
+4. **API contract** — natural-language summary of operations/types exposed; **Markdown: link only** to `openapi/openapi.yaml` or `graphql/schema.graphql` (no full YAML dump).
+5. **DbC (OCL)** — natural-language summary of types/invariants/preconditions covered; **one bullet (or nested bullet) per operation / invariant**—do not pack many ops into a single unbroken sentence. **Markdown: link only** to each `.ocl` file.
+6. **Formal** (optional) — summary + link to `formal/**`.
 
 Do not paste full OpenAPI/OCL into Markdown.
 

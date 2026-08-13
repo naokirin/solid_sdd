@@ -30,6 +30,9 @@ jobs:
       - name: solidsdd-lint (inventory-reservation)
         run: scripts/solidsdd-lint.sh --project-root examples/inventory-reservation
 
+      - name: solidsdd-lint (inventory-reservation architecture-plan example)
+        run: scripts/solidsdd-lint.sh --project-root examples/inventory-reservation --change-id structure-inventory-reservation-split
+
       - name: Critique / lint regression fixtures
         run: python3 scripts/solidsdd-critique-eval.py
 

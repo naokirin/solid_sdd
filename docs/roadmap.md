@@ -111,6 +111,26 @@ Ordered workstreams (see plan for schemas, acceptance, and open decisions):
 
 Borrow maturity, conditional Grill, Means vs tech, clarifications, facets / knowledge consistency, and deterministic `next`+validate from Intent-Driven Development tooling — without making Change Context / Brief a living intent-tree. GitHub four-thread loops remain out of scope.
 
+## Phase 6: Structural design (ArchitecturePlan)
+
+**Status: shipped.** Minimal, first-class representation of system structure
+(modules / dependencies / dependency direction / public boundaries / ownership /
+structural constraints), distinct from `ApplicationPlan` (which specification
+technique applies where) — see [architecture.md](architecture.md) "Architecture
+judgment" and [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md).
+Not a design methodology: no DDD / Clean / Hexagonal / Onion / MVC / CQRS / Event
+Sourcing requirement.
+
+- [x] `ArchitecturePlan` schema (`status: changed` / `unchanged` shortcut, `modules[]` / `dependencies[]` / `constraints[]`) — [../schemas/architecture-plan.schema.json](../schemas/architecture-plan.schema.json)
+- [x] `solidsdd-architecture` skill (judgment only; no contract/implementation edits) — [../skills/solidsdd-architecture/SKILL.md](../skills/solidsdd-architecture/SKILL.md)
+- [x] Architecture Review folded into `solidsdd-critique` (`subject: architecture_plan`, Checkpoint Review, skipped on `status: unchanged`) — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
+- [x] Mechanical Architecture Verification (dependency/module existence, forbidden dependency, declared-cycle detection) via `scripts/solidsdd-lint.sh`, reused for free by every `solidsdd-critique` call
+- [x] Minimal `solidsdd-run` integration (one conditional step between WorkPlan and the wave loops; `solidsdd-loop` / plan-slice-cheatsheet untouched)
+- [x] One existing example demonstrates the artifact — [../examples/inventory-reservation](../examples/inventory-reservation) `structure-inventory-reservation-split`
+- [x] Schema / verification / regression tests via the existing `evals/critique/cases` harness
+- [x] Documentation (this file, [architecture.md](architecture.md), [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md))
+- [ ] Per-language static import cross-check against the actual codebase (deliberately deferred — future per-language adapter, not required for the mechanical checks above)
+
 ## Near-term next actions
 
 1. GitHub Release / tag workflow for `install-into-project.sh --repo/--ref` (optional packaging of install-manifest payload)

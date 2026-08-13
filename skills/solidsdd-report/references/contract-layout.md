@@ -9,6 +9,7 @@
 | Clarifications | `.solidsdd/changes/<change_id>/clarifications/open.json` | Durable framing Q/A ([clarifications.md](clarifications.md); Grill / intake) |
 | ChangeBrief | `.solidsdd/changes/<change_id>/change-brief.json` | Scope premise for the active change (return point) |
 | WorkPlan | `.solidsdd/changes/<change_id>/work-plan.json` | Slice plan for this change (`solidsdd-decompose`) |
+| ArchitecturePlan | `.solidsdd/changes/<change_id>/architecture-plan.json` | Module/dependency/ownership/structural constraints for the active change (`solidsdd-architecture`); `status: unchanged` when this change doesn't affect structure |
 | Run state | `.solidsdd/changes/<change_id>/run-state.json` | Orchestrator phase, waves, retry budgets ([run-state.md](run-state.md)) |
 | Gate approval | `.solidsdd/changes/<change_id>/gate-approval.json` | Latest human gate approval ([human-gates.md](human-gates.md)) |
 | Per-item loop artifacts | `.solidsdd/changes/<change_id>/items/<item_id>/` | ApplicationPlan, CritiqueReports, VerificationReport for that slice |

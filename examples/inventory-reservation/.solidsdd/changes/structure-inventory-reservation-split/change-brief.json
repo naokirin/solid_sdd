@@ -1,0 +1,29 @@
+{
+  "version": "1",
+  "change_id": "structure-inventory-reservation-split",
+  "summary": "Design an inventory/reservation module split: inventory owns stock, reservation owns hold lifecycle, with an explicit dependency direction and a forbidden reverse dependency.",
+  "goal": "Make stock ownership independently reusable (e.g. for a future multi-warehouse module) without carrying hold/TTL/authZ concerns, before the reservation domain grows further.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Define inventory and reservation as separate modules with a directed dependency (reservation -> inventory) and a forbidden reverse dependency (inventory -> reservation)"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Implementing the split in src/ — this change stays a structural design artifact; the sample's implementation intentionally remains a single reservation.ts file"
+    },
+    {
+      "id": "X2",
+      "text": "Any behavior change, new endpoint, or new OCL/TLA+ contract"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ArchitecturePlan documents module responsibilities, the reservation -> inventory dependency, and the inventory -> reservation forbid_dependency constraint, and passes solidsdd-lint / critique(architecture_plan) cleanly"
+    }
+  ],
+  "confidence": "medium"
+}

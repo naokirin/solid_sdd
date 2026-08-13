@@ -1,0 +1,50 @@
+{
+  "version": "1",
+  "change_id": "structure-inventory-reservation-split",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior changes."
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No new boundary or authZ surface introduced."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No implementation change; nothing to measure yet."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No deployable artifact changes as part of this design-only change."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No API/contract change; out_of_scope X2."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Stock ownership (inventory) must stay structurally independent of hold/TTL/authZ concerns (reservation), so a future consumer (e.g. multi-warehouse) can depend on inventory alone.",
+      "rationale": "This is the whole motivation for the module split (see goal).",
+      "threshold": "Zero violations of the inventory -> reservation forbid_dependency constraint",
+      "measurement": "scripts/solidsdd-lint.sh structural checks on architecture-plan.json (dependency existence / forbidden dependency / cycle)"
+    }
+  ]
+}

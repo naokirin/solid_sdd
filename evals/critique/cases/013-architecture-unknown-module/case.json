@@ -1,0 +1,5 @@
+{
+  "id": "013-architecture-unknown-module",
+  "checker": "lint",
+  "description": "architecture-plan.json dependency references a module not declared in modules[]"
+}

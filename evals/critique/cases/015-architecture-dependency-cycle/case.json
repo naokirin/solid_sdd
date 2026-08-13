@@ -1,0 +1,5 @@
+{
+  "id": "015-architecture-dependency-cycle",
+  "checker": "lint",
+  "description": "architecture-plan.json has a no_cycles constraint and a module dependency cycle"
+}

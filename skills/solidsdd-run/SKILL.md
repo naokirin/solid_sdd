@@ -28,7 +28,9 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 - [work-decomposition.md](references/work-decomposition.md) — slice rules for WorkPlan
 - [gherkin-requirements.md](references/gherkin-requirements.md) — property-level Gherkin
 - [work-plan.schema.json](references/work-plan.schema.json)
-- [adversarial-critique.md](references/adversarial-critique.md) — including `subject: change_context` / `change_brief` / `work_plan`
+- [architecture-axes.md](references/architecture-axes.md) — when a change affects structure
+- [architecture-plan.schema.json](references/architecture-plan.schema.json)
+- [adversarial-critique.md](references/adversarial-critique.md) — including `subject: change_context` / `change_brief` / `work_plan` / `architecture_plan`
 - [human-gates.md](references/human-gates.md)
 - [loop-retry.md](references/loop-retry.md) — verify/critique failure → retry / gate / stop
 - [contract-layout.md](references/contract-layout.md)
@@ -46,7 +48,7 @@ Drive **requirement → [optional Grill] → Change Context → ChangeBrief → 
 | Step | How |
 |------|-----|
 | `solidsdd-context` | Parent agent (this conversation) |
-| `solidsdd-grill` (conditional), `solidsdd-knowledge` (consult / harvest), `solidsdd-intake`, `solidsdd-brief`, `solidsdd-decompose`, `solidsdd-critique`, `solidsdd-verify` (integration), `solidsdd-verify-formal` (if needed) | **Required subagent** via Task |
+| `solidsdd-grill` (conditional), `solidsdd-knowledge` (consult / harvest), `solidsdd-intake`, `solidsdd-brief`, `solidsdd-decompose`, `solidsdd-architecture`, `solidsdd-critique`, `solidsdd-verify` (integration), `solidsdd-verify-formal` (if needed) | **Required subagent** via Task |
 | Each WorkPlan item | Invoke **`solidsdd-loop`** as the slice orchestrator (same parent session following that skill — do not inline judge/apply/implement inside `solidsdd-run`) |
 
 Never execute a subagent-required skill’s procedure in the parent. Do not rewrite Change Context / `ChangeBrief` / `WorkPlan` / `knowledge-harvest.json` / `clarifications/open.json` or thin a `CritiqueReport`—re-run the owning skill as a subagent if wrong.
@@ -74,6 +76,7 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 13. When prior Features / prior `.solidsdd/changes/*/out_of_scope` exist → **Task subagent** `solidsdd-critique` with `subject: cross_change_consistency` (recommended); on fail → re-brief / re-decompose as suggested
 13b. When `knowledge-consult.md` cites confirmed/canonical policies → **Task** `solidsdd-critique` with `subject: knowledge_consistency` (recommended); on fail → re-intake / re-brief
 14. If WorkPlan or any item has `human_gate.required: true` → **stop** until humans approve (write `gate-approval.json` before resume — [human-gates.md](references/human-gates.md)); then resume without thinning the plan
+14b. **Task subagent** `solidsdd-architecture` → `ArchitecturePlan` at `.solidsdd/changes/<change_id>/architecture-plan.json` (reads Change Context, ChangeBrief, and WorkPlan `touches`; set `phase: architecture`). When it writes `status: changed`: **Task subagent** `solidsdd-critique` with `subject: architecture_plan` (Architecture Review checkpoint); persist both artifacts. On critique fail → follow [loop-retry.md](references/loop-retry.md) (usually re-run `solidsdd-architecture`). When it writes `status: unchanged`, skip the critique call entirely. If the ArchitecturePlan has `human_gate.required: true` → **stop** before launching waves until humans approve (write `gate-approval.json` `scope: architecture_plan` before resume — [human-gates.md](references/human-gates.md)); then resume without thinning the plan.
 15. While items remain, run **waves** of independent loops (`phase: waves`, bump `wave_index`):
    - Promote any `pending` → `ready` when all `depends_on` are `done` (update both WorkPlan and `run-state.items`)
    - Collect **all** currently `ready` items as the wave (empty → if `pending`/`blocked` remain, stop with dependency / gate report; else proceed to integration)
@@ -99,13 +102,13 @@ Never execute a subagent-required skill’s procedure in the parent. Do not rewr
 
 ## Isolation checklist (required in final summary)
 
-List: `toolchain(ready|gap)`, `knowledge(consult)`, `[grill if run]`, `intake`, `[critique(change_context) — only on the gate-required path]`, `[gate if required]`, `brief`, `critique(specification)` **or** `critique(change_brief)` (whichever path step 8 took), `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, `[critique(knowledge_consistency) when applicable]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention / `cost_skip:B*`), `verify` (integration) **or** `cost_skip:B4`, `critique(verification_report)` when verify ran, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes` (including `toolchain_rediscovery:<tool>:<reason>` when a Subagent had to re-resolve host tools; `next_deviation:<action>:<reason>` when ignoring `solidsdd-next`; `cost_skip:B*`).
+List: `toolchain(ready|gap)`, `knowledge(consult)`, `[grill if run]`, `intake`, `[critique(change_context) — only on the gate-required path]`, `[gate if required]`, `brief`, `critique(specification)` **or** `critique(change_brief)` (whichever path step 8 took), `decompose`, `critique(work_plan)`, `[critique(cross_change_consistency) when applicable]`, `[critique(knowledge_consistency) when applicable]`, `architecture` **and** `[critique(architecture_plan) — only when status:changed]` **and** `[gate if required]`, each wave with item ids → parallel `loop` (and note that each loop’s own isolation checklist applies; note any serialize-for-contention / `cost_skip:B*`), `verify` (integration) **or** `cost_skip:B4`, `critique(verification_report)` when verify ran, `knowledge(harvest)`, `[critique(knowledge_harvest)]`, `[knowledge gate if required]`, plus formal steps if any. Mark inline execution of subagent-required skills as violations. Persist notable notes on `run-state.isolation_notes` (including `toolchain_rediscovery:<tool>:<reason>` when a Subagent had to re-resolve host tools; `next_deviation:<action>:<reason>` when ignoring `solidsdd-next`; `cost_skip:B*`).
 
 ## Subagent / loop prompt requirements
 
-### Intake / brief / decompose / knowledge / grill / critique / integration verify
+### Intake / brief / decompose / architecture / knowledge / grill / critique / integration verify
 
-Each Task prompt must include skill id, `SKILL.md` path, working directory, inputs, constraints, expected return (same pattern as `solidsdd-loop`). For brief and later steps, include Change Context and ChangeBrief paths. For knowledge harvest, include Context/Brief paths and whether `apply` is allowed. For grill, include clarifications path. Tell critique/verify/knowledge where to **write** JSON when under this change. When re-invoking `solidsdd-critique` on a `subject` that just failed, include the prior `CritiqueReport` path (and the fix summary) so the Task can follow [adversarial-critique.md](references/adversarial-critique.md) "Retry critique" instead of re-deriving every check from scratch.
+Each Task prompt must include skill id, `SKILL.md` path, working directory, inputs, constraints, expected return (same pattern as `solidsdd-loop`). For brief and later steps, include Change Context and ChangeBrief paths. For architecture, additionally include the WorkPlan path (`touches` is the primary structural-change signal). For knowledge harvest, include Context/Brief paths and whether `apply` is allowed. For grill, include clarifications path. Tell critique/verify/knowledge where to **write** JSON when under this change. When re-invoking `solidsdd-critique` on a `subject` that just failed, include the prior `CritiqueReport` path (and the fix summary) so the Task can follow [adversarial-critique.md](references/adversarial-critique.md) "Retry critique" instead of re-deriving every check from scratch.
 
 **Toolchain (required for verify / implement / derive-tests / any shell that runs npm|node|bundle|npx):** paste the context **Toolchain** `commands` block (or `.solidsdd/host-toolchain.json` `commands`). Instruct the Subagent: use only those commands; **do not** `find` / multi-path search for npm/node; on failure report immediately. See [host-toolchain.md](references/host-toolchain.md).
 
@@ -135,6 +138,7 @@ When starting `solidsdd-loop` for an item, provide:
 - Change Context came from intake without parent thinning; Change Context gate honored when `required`
 - ChangeBrief came from brief without parent thinning; both Change Context and ChangeBrief were critiqued — either as a standalone `critique(change_context)` + `critique(change_brief)` pair (gate-required path) or as one `critique(specification)` covering both (gate-not-required path); never left uncritiqued
 - WorkPlan came from decompose without parent thinning; `critique(work_plan)` ran
+- `solidsdd-architecture` ran before the wave loops; when it wrote `status: changed`, `critique(architecture_plan)` ran and the ArchitecturePlan's human gate (if any) was honored before waves launched
 - Each done item had a `solidsdd-loop` run scoped to its intent with persisted plans / context-pack under `items/<id>/`
 - Independent `ready` items in a wave were started **in parallel** (or serialized only with an explicit contention reason)
 - Integration `solidsdd-verify` (+ critique) ran after all items **or** B4 reused a covering single-item verify

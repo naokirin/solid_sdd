@@ -51,6 +51,12 @@ This tree is a **live `solidsdd-run` replay** artifact (high cost). The first Wo
 
 Historical isolation notes in `run-state.json` record where whole-loop Tasks / combined verify+critique were used; those patterns are now **disallowed** by the execution model.
 
+## Architecture design (ArchitecturePlan)
+
+[`.solidsdd/changes/structure-inventory-reservation-split/`](.solidsdd/changes/structure-inventory-reservation-split/) is a **structural design artifact**, not an implemented refactor: it shows `solidsdd-architecture` proposing an `inventory` module (stock ownership) split out of `reservation` (hold lifecycle), with a `reservation -> inventory` dependency and a `forbid_dependency: inventory -> reservation` constraint. The change's `status.json` stays `"active"` — this sample's implementation intentionally remains a single `src/reservation.ts` file (see "Out of scope" below). It demonstrates that `ArchitecturePlan` records different information than Gherkin/OpenAPI/OCL/TLA+: module responsibilities, dependency direction, and structural constraints, not behavior or API shape. See [docs/architecture.md](../../docs/architecture.md) and [reference-src/architecture-axes.md](../../reference-src/architecture-axes.md).
+
+A human-readable `solidsdd-report` snapshot of this change (Brief, NFRs, and the ArchitecturePlan detail — Markdown + self-contained dark-theme HTML) is at [report.md](.solidsdd/changes/structure-inventory-reservation-split/report.md) / [report.html](.solidsdd/changes/structure-inventory-reservation-split/report.html).
+
 ## Knowledge layer
 
 `.solidsdd/kg/` + `knowledge/` hold **durable cross-cutting** policies/concepts (not a living ChangeBrief). `solidsdd-run` **consults** before framing and **harvests** candidates after integration verify (human-gated; no auto-promote). See [reference-src/knowledge.md](../../reference-src/knowledge.md).

@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Change report: structure-inventory-reservation-split</title>
+<style>
+:root {
+  --bg: #070b14;
+  --bg-panel: #0f1626;
+  --bg-panel-2: #131c30;
+  --border: #22304a;
+  --text: #ffffff;
+  --text-dim: #c7d0e0;
+  --accent: #7fb8ff;
+  --accent-2: #8fd6c4;
+  --badge-present-bg: #123a2c;
+  --badge-present-fg: #8fd6c4;
+  --badge-missing-bg: #3a1f22;
+  --badge-missing-fg: #ff9d9d;
+  --sev-blocker: #ff8a8a;
+  --sev-major: #ffc07a;
+  --sev-minor: #9fd6ff;
+  --tok-key: #7fd0ff;
+  --tok-string: #f2a97e;
+  --tok-number: #b7e08a;
+  --tok-bool: #d2a8ff;
+  --tok-null: #9aa7bd;
+  --tok-punct: #7f8db3;
+  --tok-comment: #6b7690;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  line-height: 1.7;
+  margin: 0;
+  padding: 2rem 1rem 6rem;
+}
+.container { max-width: 980px; margin: 0 auto; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; }
+h2 { font-size: 1.25rem; margin-top: 2.4rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { font-size: 1.05rem; margin-top: 1.6rem; color: var(--accent-2); }
+h4 { font-size: 0.95rem; margin-top: 1.2rem; color: var(--text-dim); }
+p { color: var(--text-dim); }
+p.stub { font-style: italic; }
+.meta { color: var(--text-dim); font-size: 0.92rem; }
+.meta ul { list-style: none; padding-left: 0; }
+.meta li { padding: 0.15rem 0; }
+table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.4rem; font-size: 0.92rem; overflow-x: auto; display: block; }
+table thead, table tbody { display: table; width: 100%; table-layout: fixed; }
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; word-break: break-word; }
+th { color: var(--accent); font-weight: 600; }
+tr.nfr-in-scope td { background: rgba(143, 214, 196, 0.06); }
+code { background: var(--bg-panel-2); padding: 0.08rem 0.35rem; border-radius: 4px; font-size: 0.88em; color: #ffe9b3; }
+a { color: var(--accent); }
+.links { font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-present { background: var(--badge-present-bg); color: var(--badge-present-fg); }
+.badge-missing { background: var(--badge-missing-bg); color: var(--badge-missing-fg); }
+.note { font-size: 0.8rem; color: var(--text-dim); font-weight: normal; }
+.sev { font-weight: 700; text-transform: uppercase; font-size: 0.75rem; padding: 0.05rem 0.4rem; border-radius: 4px; }
+.sev-blocker { color: var(--sev-blocker); background: rgba(255,138,138,0.12); }
+.sev-major { color: var(--sev-major); background: rgba(255,192,122,0.12); }
+.sev-minor { color: var(--sev-minor); background: rgba(159,214,255,0.12); }
+.tabs { margin: 0.8rem 0 1.6rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg-panel); }
+.tab-buttons { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-panel-2); }
+.tab-btn { flex: none; background: transparent; border: none; color: var(--text-dim); padding: 0.55rem 1.1rem; cursor: pointer; font-size: 0.88rem; border-right: 1px solid var(--border); }
+.tab-btn.active { color: var(--text); background: var(--bg-panel); font-weight: 600; }
+.tab-panel { padding: 1rem 1.1rem; }
+pre.raw { background: var(--bg-panel-2); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; margin: 0; }
+pre.raw code { background: none; padding: 0; color: var(--text-dim); }
+.tok-key { color: var(--tok-key); }
+.tok-string { color: var(--tok-string); }
+.tok-number { color: var(--tok-number); }
+.tok-bool { color: var(--tok-bool); }
+.tok-null { color: var(--tok-null); }
+.tok-punct { color: var(--tok-punct); }
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+footer { margin-top: 3rem; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Change report: structure-inventory-reservation-split</h1>
+<div class="meta">
+<ul>
+<li><strong>言語</strong>: 日本語（依頼文の言語から解決 — working_language 未設定のため）</li>
+<li><strong>change 状態</strong>: <code>active</code>（設計のみ。実装は未着手）</li>
+<li><strong>対象 change_id</strong>: 明示指定（<code>active-change.json</code> は別 change <code>add-list-sort-expires</code> を指しているため上書き）</li>
+<li><strong>生成元</strong>: <code>solidsdd-report</code>（ビューのみ。SoT ではない）</li>
+</ul>
+</div>
+
+<h2>Status overview</h2>
+
+<table>
+  <thead><tr><th>章</th><th>状態</th><th>主なソース / 不足時のスキル</th></tr></thead>
+  <tbody><tr><td>1. 要求と課題</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-intake</code>（<code>change-context.md</code> 未作成）</td></tr><tr><td>2. 機能要件</td><td><span class="badge badge-present">実施済</span> 部分</td><td><code>change-brief.json</code>（Feature/Scenario 連携は未実施 — <code>solidsdd-decompose</code>）</td></tr><tr><td>3. 非機能要件</td><td><span class="badge badge-present">実施済</span></td><td><code>nfr.json</code></td></tr><tr><td>4. 技術選定</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-intake</code>（<code>change-context.md</code> §5 未作成）</td></tr><tr><td>5. 設計 — WorkPlan</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-decompose</code></td></tr><tr><td>5. 設計 — ArchitecturePlan</td><td><span class="badge badge-present">実施済</span></td><td><code>architecture-plan.json</code>（<code>status: changed</code>）</td></tr><tr><td>5. 設計 — ApplicationPlan</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-judge</code></td></tr><tr><td>5. 設計 — API 契約</td><td><span class="badge badge-present">実施済</span> 既存・未変更</td><td><code>openapi/openapi.yaml</code>（先行 change から継続）</td></tr><tr><td>5. 設計 — DbC (OCL)</td><td><span class="badge badge-present">実施済</span> 既存・未変更</td><td><code>contracts/Reservation.ocl</code>（先行 change から継続）</td></tr><tr><td>5. 設計 — Formal</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-apply-formal</code>（本 change では適用しない）</td></tr><tr><td>6. 判断とトレードオフ</td><td><span class="badge badge-present">実施済</span> 部分</td><td>ArchitecturePlan rationale + critique</td></tr><tr><td>7. 未解決事項</td><td><span class="badge badge-present">実施済</span></td><td>Brief <code>open_questions</code> は空;Context 未作成のため章自体は該当なし</td></tr></tbody>
+</table>
+
+
+<h2>1. 要求と課題</h2>
+<p class="stub"><code>change-context.md</code> が未作成のため、本章は未実施です（<code>solidsdd-intake</code> が生成する章）。</p>
+
+<h2>2. 機能要件</h2>
+
+<h3>ゴール</h3>
+<p>Make stock ownership independently reusable (e.g. for a future multi-warehouse module) without carrying hold/TTL/authZ concerns, before the reservation domain grows further.</p>
+<h3>スコープ内 (<code>in_scope</code>)</h3>
+<ul><li><strong>R1</strong> — Define inventory and reservation as separate modules with a directed dependency (reservation -&gt; inventory) and a forbidden reverse dependency (inventory -&gt; reservation)</li></ul>
+<h3>スコープ外 (<code>out_of_scope</code>)</h3>
+<ul><li><strong>X1</strong> — Implementing the split in src/ — this change stays a structural design artifact; the sample&#x27;s implementation intentionally remains a single reservation.ts file</li><li><strong>X2</strong> — Any behavior change, new endpoint, or new OCL/TLA+ contract</li></ul>
+<h3>成功基準</h3>
+<ul><li><strong>SC1</strong> — ArchitecturePlan documents module responsibilities, the reservation -&gt; inventory dependency, and the inventory -&gt; reservation forbid_dependency constraint, and passes solidsdd-lint / critique(architecture_plan) cleanly</li></ul>
+<h3>受入シナリオ（Gherkin）</h3>
+<p class="stub">本 change に紐づく Feature / Scenario はありません（<code>solidsdd-decompose</code> 未実施のため未実施）。</p>
+
+
+<h2>3. 非機能要件</h2>
+
+<table>
+  <thead><tr><th>ID</th><th>品質</th><th>状態</th><th>要件</th><th>根拠</th><th>閾値 / 検証</th></tr></thead>
+  <tbody><tr><td>NFR1</td><td>reliability</td><td>out_of_scope</td><td>N/A</td><td>Design-only change; no runtime behavior changes.</td><td>—</td></tr><tr><td>NFR2</td><td>security</td><td>out_of_scope</td><td>N/A</td><td>No new boundary or authZ surface introduced.</td><td>—</td></tr><tr><td>NFR3</td><td>performance</td><td>out_of_scope</td><td>N/A</td><td>No implementation change; nothing to measure yet.</td><td>—</td></tr><tr><td>NFR4</td><td>operability</td><td>out_of_scope</td><td>N/A</td><td>No deployable artifact changes as part of this design-only change.</td><td>—</td></tr><tr><td>NFR5</td><td>compatibility</td><td>out_of_scope</td><td>N/A</td><td>No API/contract change; out_of_scope X2.</td><td>—</td></tr><tr class="nfr-in-scope"><td>NFR6</td><td>maintainability</td><td>in_scope</td><td>Stock ownership (inventory) must stay structurally independent of hold/TTL/authZ concerns (reservation), so a future consumer (e.g. multi-warehouse) can depend on inventory alone.</td><td>This is the whole motivation for the module split (see goal).</td><td>Zero violations of the inventory -&gt; reservation forbid_dependency constraint / scripts/solidsdd-lint.sh structural checks on architecture-plan.json (dependency existence / forbidden dependency / cycle)</td></tr></tbody>
+</table>
+
+
+<h2>4. 技術選定</h2>
+<p class="stub"><code>change-context.md</code> §5 が未作成のため、本章は未実施です（<code>solidsdd-intake</code>）。</p>
+
+<h2>5. 設計</h2>
+<h3>WorkPlan — <span class="badge badge-missing">未実施</span></h3><p class="stub">本 change には <code>work-plan.json</code> がありません（<code>solidsdd-decompose</code> 未実施）。構造設計（ArchitecturePlan）は WorkPlan 分解前の設計段階で止まっています。</p><h3>ArchitecturePlan — <span class="badge badge-present">実施済</span></h3>
+<div class="tabs" data-tabs>
+  <div class="tab-buttons">
+    <button type="button" class="tab-btn active" data-tab="arch-summary">Summary</button>
+    <button type="button" class="tab-btn" data-tab="arch-raw">Raw</button>
+  </div>
+  <div class="tab-panel" data-panel="arch-summary">
+<p><strong>status:</strong> <code>changed</code></p>
+<p>Split the single reservation.ts module into an inventory module (stock ownership) and a reservation module (hold lifecycle), so future stock-related work (e.g. multi-warehouse) doesn&#x27;t need to touch hold/TTL/authZ logic. Design-only: this repository&#x27;s implementation intentionally stays a single file for now (see README &quot;Out of scope&quot;).</p>
+<h4>モジュール</h4>
+<table><thead><tr><th>id</th><th>責務</th><th>owns</th><th>public</th></tr></thead><tbody><tr><td><code>inventory</code></td><td>Own available stock per SKU; expose stock read/adjust operations.</td><td>Stock</td><td>InventoryService</td></tr><tr><td><code>reservation</code></td><td>Own hold lifecycle (reserve/release/expire/lookup) and TTL/authZ enforcement.</td><td>Hold</td><td>ReservationService</td></tr></tbody></table>
+<h4>依存関係</h4>
+<table><thead><tr><th>from</th><th>to</th><th>理由</th><th>kind</th></tr></thead><tbody><tr><td><code>reservation</code></td><td><code>inventory</code></td><td>Reserving and releasing a hold must read and adjust available stock.</td><td>runtime</td></tr></tbody></table>
+<h4>構造上の制約</h4>
+<table><thead><tr><th>type</th><th>from</th><th>to</th><th>理由</th></tr></thead><tbody><tr><td><code>forbid_dependency</code></td><td><code>inventory</code></td><td><code>reservation</code></td><td>Stock ownership must stay independent of hold/TTL/authZ concerns so inventory can be reused (e.g. multi-warehouse) without carrying reservation logic.</td></tr></tbody></table>
+<h4>Critique (<code>architecture_plan</code>) — <span class="badge badge-present">pass</span></h4>
+<p>Two modules with clear, non-overlapping responsibilities. One directed dependency (reservation -&gt; inventory) with a stated reason, and a forbid_dependency constraint on the reverse edge that matches the stated rationale (keep inventory reusable independent of hold/TTL/authZ). No responsibility, boundary, ownership, or checkability gaps.</p>
+<ul><li><span class="sev sev-minor">minor</span> <code>architecture-plan.json#modules/1/public</code> — ReservationService is a single facade; a narrower read-only lookup port could be split out later, but one facade is acceptable at standard density.</li></ul>
+<p class="links"><a href="architecture-plan.json">architecture-plan.json</a> ·
+<a href="critique-architecture-plan.json">critique-architecture-plan.json</a></p>
+</div>
+  <div class="tab-panel" data-panel="arch-raw" hidden><pre class="raw"><code><span class="tok-punct">{</span>
+  <span class="tok-key">&quot;version&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;1&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;change_id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;structure-inventory-reservation-split&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;status&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;changed&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;summary&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Split the single reservation.ts module into an inventory module (stock ownership) and a reservation module (hold lifecycle), so future stock-related work (e.g. multi-warehouse) doesn&#x27;t need to touch hold/TTL/authZ logic. Design-only: this repository&#x27;s implementation intentionally stays a single file for now (see README \&quot;Out of scope\&quot;).&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;confidence&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;medium&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;modules&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;responsibility&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Own available stock per SKU; expose stock read/adjust operations.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;owns&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+        <span class="tok-string">&quot;Stock&quot;</span>
+      <span class="tok-punct">]</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;public&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+        <span class="tok-string">&quot;InventoryService&quot;</span>
+      <span class="tok-punct">]</span>
+    <span class="tok-punct">}</span><span class="tok-punct">,</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;reservation&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;responsibility&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Own hold lifecycle (reserve/release/expire/lookup) and TTL/authZ enforcement.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;owns&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+        <span class="tok-string">&quot;Hold&quot;</span>
+      <span class="tok-punct">]</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;public&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+        <span class="tok-string">&quot;ReservationService&quot;</span>
+      <span class="tok-punct">]</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;dependencies&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;from&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;reservation&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;to&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;reason&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Reserving and releasing a hold must read and adjust available stock.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;kind&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;runtime&quot;</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;constraints&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;type&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;forbid_dependency&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;from&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;to&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;reservation&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;reason&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Stock ownership must stay independent of hold/TTL/authZ concerns so inventory can be reused (e.g. multi-warehouse) without carrying reservation logic.&quot;</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></code></pre></div>
+</div>
+<h3>ApplicationPlan — <span class="badge badge-missing">未実施</span></h3><p class="stub"><code>.solidsdd/changes/structure-inventory-reservation-split/</code> 配下に ApplicationPlan JSON は見つかりません（<code>solidsdd-judge</code> 未実施）。本 change は構造設計のみで、契約（API / DbC / formal）の適用判断は行っていません。</p><h3>API 契約 — <span class="badge badge-present">実施済</span> <span class="note">（既存・本 change では未変更）</span></h3>
+<div class="tabs" data-tabs>
+  <div class="tab-buttons">
+    <button type="button" class="tab-btn active" data-tab="api-summary">Summary</button>
+    <button type="button" class="tab-btn" data-tab="api-raw">Raw</button>
+  </div>
+  <div class="tab-panel" data-panel="api-summary">
+<p>自然言語要約（先行 change 由来。本 change はこれを変更していません）:</p>
+<ul>
+  <li>OpenAPI 3.x、タイトル <em>Inventory Reservation API</em>（v0.1.0）</li>
+  <li><code>GET /reservations</code>（<code>listReservations</code>）、<code>POST /reservations</code>（<code>reserve</code>）、
+      <code>GET /reservations/{holdId}</code>（<code>getReservation</code>）、
+      <code>POST /reservations/{holdId}/release</code>（<code>release</code>）、
+      <code>POST /reservations/{holdId}/expire</code>（<code>expire</code>）</li>
+</ul>
+<p>現在の API は <code>reservation</code> 境界のみを表しており、本 change が提案する <code>inventory</code> / <code>reservation</code> の分割はまだ反映されていません（設計のみのため）。</p>
+<p class="links"><a href="../../../openapi/openapi.yaml">openapi/openapi.yaml</a></p>
+</div>
+  <div class="tab-panel" data-panel="api-raw" hidden><pre class="raw"><code><span class="tok-key">openapi</span>:<span class="tok-string"> 3.0.3</span>
+<span class="tok-key">info</span>:
+  <span class="tok-key">title</span>:<span class="tok-string"> Inventory Reservation API</span>
+  <span class="tok-key">version</span>:<span class="tok-string"> 0.1.0</span>
+  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+    Evaluation sample for solid_sdd — soft-hold inventory reservation with
+    opaque-principal authZ. W1 documents authorized reserve; W2 elevates
+    insufficient-stock reserve failure as named InsufficientStockError with
+    no hold and unchanged stock; W3 elevates unauthorized reserve and
+    unauthorized release as named UnauthorizedError with no hold created and
+    available stock plus existing holds unchanged; W4 elevates authorized
+    release so held quantity is restored to available stock as a first-class
+    checkable success; W5 elevates service-side TTL expiry so a hold past
+    its TTL restores held quantity to available stock (no principal / AuthZ).
+    Additive get-by-id lookup (authorized opaque principal) returns an existing
+    visible soft-hold&#x27;s details without mutating stock or holds; missing or
+    not-visible lookup fails as named PreconditionError and unauthorized
+    lookup as named UnauthorizedError, both with stock and holds unchanged.
+    Concurrent last-unit safety elevates that concurrent race losers on reserve
+    use the same named InsufficientStockError channel as sequential
+    insufficient stock (additive; prior success and error surfaces remain).
+    Additive collection list (GET /reservations) returns a full dump of
+    currently visible soft-holds as a JSON array of LookupResponse items
+    (including empty), ordered by expiresAt ascending (earlier first; equal
+    expiresAt order unspecified but stable); unauthorized list fails as named
+    UnauthorizedError with stock and holds unchanged.
+<span class="tok-key">servers</span>:
+  - <span class="tok-key">url</span>:<span class="tok-string"> http://localhost:3000</span>
+<span class="tok-key">paths</span>:
+  <span class="tok-key">/reservations</span>:
+    <span class="tok-key">get</span>:
+      <span class="tok-key">operationId</span>:<span class="tok-string"> listReservations</span>
+      <span class="tok-key">summary</span>:<span class="tok-string"> List currently visible soft-holds (authorized opaque principal)</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Returns one full dump of all currently visible soft-holds in the same
+        visibility universe as get-by-id when the caller is an authorized
+        opaque principal. No paging and no sku, status, or time filter
+        dimensions; no sort query parameters. Success body is a bare JSON
+        array of LookupResponse objects (holdId, sku, quantity, expiresAt,
+        availableStock) — chosen over an { items } envelope because this
+        document has no prior collection wrapper pattern and items are
+        exactly LookupResponse. The array is ordered by expiresAt ascending
+        (earlier expiry first); when two items share the same expiresAt,
+        their relative order is unspecified but stable. Empty array when
+        none are visible. Read-only: stock and holds are unchanged. When the
+        caller is unauthorized, the operation fails with named domain error
+        UnauthorizedError and leaves available stock and existing holds
+        unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
+      <span class="tok-key">parameters</span>:
+        - <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/parameters/OpaquePrincipal&#x27;</span>
+      <span class="tok-key">responses</span>:
+        <span class="tok-key">&#x27;200&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Authorized list success. Clients and tests MUST observe a JSON
+            array (possibly empty) whose elements are LookupResponse-
+            equivalent (holdId, sku, quantity, expiresAt, availableStock)
+            covering all currently visible soft-holds, ordered by expiresAt
+            ascending (earlier first). Equal expiresAt may appear in any
+            stable order. The operation remains non-mutating: clients and
+            tests MUST treat it as leaving available stock and existing holds
+            unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">type</span>:<span class="tok-string"> array</span>
+                <span class="tok-key">items</span>:
+                  <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/LookupResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">nonempty</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Visible soft-holds ordered by expiresAt ascending</span>
+                  <span class="tok-key">value</span>:
+                    - <span class="tok-key">holdId</span>:<span class="tok-string"> hold-earlier</span>
+                      <span class="tok-key">sku</span>:<span class="tok-string"> SKU-1</span>
+                      <span class="tok-key">quantity</span>:<span class="tok-string"> 2</span>
+                      <span class="tok-key">expiresAt</span>:<span class="tok-string"> &#x27;2026-08-04T14:00:00.000Z&#x27;</span>
+                      <span class="tok-key">availableStock</span>:<span class="tok-string"> 5</span>
+                    - <span class="tok-key">holdId</span>:<span class="tok-string"> hold-later</span>
+                      <span class="tok-key">sku</span>:<span class="tok-string"> SKU-2</span>
+                      <span class="tok-key">quantity</span>:<span class="tok-string"> 1</span>
+                      <span class="tok-key">expiresAt</span>:<span class="tok-string"> &#x27;2026-08-04T15:00:00.000Z&#x27;</span>
+                      <span class="tok-key">availableStock</span>:<span class="tok-string"> 5</span>
+                <span class="tok-key">empty</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> No visible soft-holds</span>
+                  <span class="tok-key">value</span>:<span class="tok-string"> []</span>
+        <span class="tok-key">&#x27;403&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to list: available stock and existing holds are
+            unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">UnauthorizedError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Caller not authorized to list</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class failure channel for unauthorized list.
+                    Clients and tests MUST observe errorType UnauthorizedError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> Principal is not authorized to list</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> UnauthorizedError</span>
+        <span class="tok-key">&#x27;400&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Invalid request / PreconditionError (e.g. missing opaque
+            principal): available stock and existing holds are unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">PreconditionError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Invalid list precondition</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    Invalid request precondition. Stock and holds unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> principal is required</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+    <span class="tok-key">post</span>:
+      <span class="tok-key">operationId</span>:<span class="tok-string"> reserve</span>
+      <span class="tok-key">summary</span>:<span class="tok-string"> Soft-hold SKU quantity for a TTL (authorized opaque principal)</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Creates a soft-hold when the caller is authorized and available stock
+        is at least the requested quantity. Reduces available stock by that
+        quantity for the hold TTL. When available stock is below the requested
+        quantity (sequential insufficient stock), or when an authorized
+        concurrent reserve loses a same-SKU race (including last-unit races),
+        the operation fails with the same named domain error
+        <span class="tok-key">InsufficientStockError</span>:<span class="tok-string"> no soft-hold is created for the loser and</span>
+        available stock is unchanged by that failed attempt. When the caller
+        is unauthorized, the operation fails with named domain error
+        <span class="tok-key">UnauthorizedError</span>:<span class="tok-string"> no soft-hold is created and available stock and</span>
+        existing holds are unchanged.
+      <span class="tok-key">parameters</span>:
+        - <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/parameters/OpaquePrincipal&#x27;</span>
+      <span class="tok-key">requestBody</span>:
+        <span class="tok-key">required</span>:<span class="tok-string"> true</span>
+        <span class="tok-key">content</span>:
+          <span class="tok-key">application/json</span>:
+            <span class="tok-key">schema</span>:
+              <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ReserveRequest&#x27;</span>
+      <span class="tok-key">responses</span>:
+        <span class="tok-key">&#x27;200&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> Soft-hold created; available stock reduced by quantity</span>
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ReserveResponse&#x27;</span>
+        <span class="tok-key">&#x27;400&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure InsufficientStockError when available stock
+            is below the requested quantity or when an authorized concurrent
+            reserve loses a same-SKU race (shared channel with sequential
+            insufficient stock): no hold is created for the failing attempt
+            and available stock is unchanged by that attempt. Also used for
+            invalid request / PreconditionError (same no-mutation semantics).
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">InsufficientStockError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Insufficient available stock (sequential or race loser)</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class shared failure channel for sequential
+                    insufficient stock and concurrent race losers. Clients
+                    and tests MUST observe errorType InsufficientStockError
+                    for both cases, and MUST treat the failure as creating no
+                    soft-hold for that attempt with available stock left
+                    unchanged by the failed attempt.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> Insufficient available stock for requested quantity</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> InsufficientStockError</span>
+                <span class="tok-key">PreconditionError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Invalid request precondition</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    Invalid request (e.g. non-positive quantity). No hold
+                    created; stock unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> quantity must be a positive integer</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+        <span class="tok-key">&#x27;403&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to reserve: no soft-hold is created; available stock
+            and existing holds are unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">UnauthorizedError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Caller not authorized to reserve</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class W3 failure channel for reserve. Clients and
+                    tests MUST observe errorType UnauthorizedError, and MUST
+                    treat the failure as creating no soft-hold with available
+                    stock and existing holds left unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> Principal is not authorized to reserve</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> UnauthorizedError</span>
+  <span class="tok-key">/reservations/{holdId}</span>:
+    <span class="tok-key">get</span>:
+      <span class="tok-key">operationId</span>:<span class="tok-string"> getReservation</span>
+      <span class="tok-key">summary</span>:<span class="tok-string"> Look up a soft-hold by id (authorized opaque principal)</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Returns details of an existing visible soft-hold identified by holdId
+        when the caller is an authorized opaque principal. Read-only: stock
+        and holds are unchanged. When the hold is missing or not visible, the
+        operation fails with named domain error PreconditionError and leaves
+        available stock and existing holds unchanged. When the caller is
+        unauthorized, the operation fails with named domain error
+        UnauthorizedError and leaves available stock and existing holds
+        unchanged. Missing and not-visible share one PreconditionError channel.
+      <span class="tok-key">parameters</span>:
+        - <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/parameters/OpaquePrincipal&#x27;</span>
+        - <span class="tok-key">name</span>:<span class="tok-string"> holdId</span>
+          <span class="tok-key">in</span>:<span class="tok-string"> path</span>
+          <span class="tok-key">required</span>:<span class="tok-string"> true</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Identifier of the soft-hold to look up</span>
+          <span class="tok-key">schema</span>:
+            <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+            <span class="tok-key">minLength</span>:<span class="tok-string"> 1</span>
+      <span class="tok-key">responses</span>:
+        <span class="tok-key">&#x27;200&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Authorized lookup success. Clients and tests MUST observe the
+            returned hold details (holdId, sku, quantity, expiresAt) for the
+            requested holdId, and MUST observe availableStock as the current
+            available stock for the hold&#x27;s SKU. The operation remains
+            <span class="tok-key">non-mutating</span>:<span class="tok-string"> clients and tests MUST treat it as leaving available</span>
+            stock and existing holds unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/LookupResponse&#x27;</span>
+        <span class="tok-key">&#x27;403&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to look up: available stock and existing holds are
+            unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">UnauthorizedError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Caller not authorized to look up</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class failure channel for unauthorized lookup.
+                    Clients and tests MUST observe errorType UnauthorizedError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> Principal is not authorized to look up</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> UnauthorizedError</span>
+        <span class="tok-key">&#x27;400&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure PreconditionError when the soft-hold is
+            missing or not visible (shared channel), or for invalid request
+            <span class="tok-key">preconditions</span>:<span class="tok-string"> available stock and existing holds are unchanged.</span>
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">HoldMissingOrNotVisible</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Soft-hold missing or not visible</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class failure channel for missing/not-visible lookup.
+                    Clients and tests MUST observe errorType PreconditionError,
+                    and MUST treat the failure as leaving available stock and
+                    existing holds unchanged. Missing and not-visible share
+                    this named channel.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> holdId does not identify a visible soft-hold</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+                <span class="tok-key">PreconditionError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Invalid lookup precondition</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    Invalid request (e.g. empty holdId). Stock and holds
+                    unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> holdId is required</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+  <span class="tok-key">/reservations/{holdId}/release</span>:
+    <span class="tok-key">post</span>:
+      <span class="tok-key">operationId</span>:<span class="tok-string"> release</span>
+      <span class="tok-key">summary</span>:<span class="tok-string"> Release a soft-hold and restore held quantity (authZ required)</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Releases an existing soft-hold identified by holdId when the caller
+        is an authorized opaque principal. On authorized success, the held
+        quantity is restored to available stock and the hold is removed.
+        When the caller is unauthorized, the operation fails with named
+        domain error UnauthorizedError: no hold is created by the failed
+        attempt, and available stock and existing holds are unchanged.
+      <span class="tok-key">parameters</span>:
+        - <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/parameters/OpaquePrincipal&#x27;</span>
+        - <span class="tok-key">name</span>:<span class="tok-string"> holdId</span>
+          <span class="tok-key">in</span>:<span class="tok-string"> path</span>
+          <span class="tok-key">required</span>:<span class="tok-string"> true</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Identifier of the soft-hold to release</span>
+          <span class="tok-key">schema</span>:
+            <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+            <span class="tok-key">minLength</span>:<span class="tok-string"> 1</span>
+      <span class="tok-key">responses</span>:
+        <span class="tok-key">&#x27;204&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            First-class W4 success channel for authorized release. Clients
+            and tests MUST treat HTTP 204 as authorized release that restores
+            the held quantity to available stock and removes the hold.
+            Observable restore-to-available-stock is checkable against prior
+            hold quantity (available stock increases by that quantity; the
+            released holdId is no longer an active hold).
+        <span class="tok-key">&#x27;403&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure UnauthorizedError when the caller is not
+            authorized to release: no hold is created by the failed attempt;
+            available stock and existing holds are unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">UnauthorizedError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Caller not authorized to release</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class W3 failure channel for release. Clients and
+                    tests MUST observe errorType UnauthorizedError, and MUST
+                    treat the failure as leaving available stock and existing
+                    holds unchanged (no hold created by the failed attempt).
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> Principal is not authorized to release</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> UnauthorizedError</span>
+        <span class="tok-key">&#x27;400&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Invalid request / PreconditionError (e.g. missing hold). No
+            mutation of stock or holds beyond documented preconditions.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">PreconditionError</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Invalid release precondition</span>
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> holdId is required</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+  <span class="tok-key">/reservations/{holdId}/expire</span>:
+    <span class="tok-key">post</span>:
+      <span class="tok-key">operationId</span>:<span class="tok-string"> expire</span>
+      <span class="tok-key">summary</span>:<span class="tok-string"> Treat a soft-hold past TTL as expired and restore held quantity</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Service-side operation that treats an existing soft-hold as expired
+        when its TTL has elapsed (expiresAt is strictly before the service
+        clock). No opaque principal or AuthZ header is required. On success,
+        the held quantity is restored to available stock and the hold is
+        removed. Checkability: clients and tests SHOULD arrange a hold whose
+        expiresAt is already in the past (or use an injectable service clock)
+        so expiry can be exercised without wall-clock waits. When the hold is
+        missing or not yet past TTL, the operation fails with named domain
+        error PreconditionError and leaves available stock and existing holds
+        unchanged.
+      <span class="tok-key">parameters</span>:
+        - <span class="tok-key">name</span>:<span class="tok-string"> holdId</span>
+          <span class="tok-key">in</span>:<span class="tok-string"> path</span>
+          <span class="tok-key">required</span>:<span class="tok-string"> true</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Identifier of the soft-hold to expire</span>
+          <span class="tok-key">schema</span>:
+            <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+            <span class="tok-key">minLength</span>:<span class="tok-string"> 1</span>
+      <span class="tok-key">responses</span>:
+        <span class="tok-key">&#x27;204&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            First-class W5 success channel for TTL expiry. Clients and tests
+            MUST treat HTTP 204 as service-side expiry that restores the held
+            quantity to available stock and removes the hold. Observable
+            restore-to-available-stock is checkable against prior hold
+            quantity (available stock increases by that quantity; the expired
+            holdId is no longer an active hold). Prefer a hold with expiresAt
+            already in the past so the success path is checkable without
+            real-time waits.
+        <span class="tok-key">&#x27;400&#x27;</span>:
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain failure PreconditionError when the hold is missing
+            or its TTL has not yet elapsed (expiresAt is not strictly before
+            the service clock): available stock and existing holds are
+            unchanged.
+          <span class="tok-key">content</span>:
+            <span class="tok-key">application/json</span>:
+              <span class="tok-key">schema</span>:
+                <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+              <span class="tok-key">examples</span>:
+                <span class="tok-key">HoldMissing</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Soft-hold not found</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    holdId does not identify an active soft-hold. No stock or
+                    hold mutation.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> holdId does not identify an active soft-hold</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+                <span class="tok-key">HoldNotPastTtl</span>:
+                  <span class="tok-key">summary</span>:<span class="tok-string"> Soft-hold TTL has not elapsed</span>
+                  <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+                    First-class W5 precondition channel for HoldPastTtl.
+                    Clients and tests MUST observe errorType PreconditionError
+                    when the hold exists but expiresAt is not strictly before
+                    the service clock, and MUST treat the failure as leaving
+                    available stock and existing holds unchanged.
+                  <span class="tok-key">value</span>:
+                    <span class="tok-key">error</span>:<span class="tok-string"> hold TTL has not elapsed</span>
+                    <span class="tok-key">errorType</span>:<span class="tok-string"> PreconditionError</span>
+<span class="tok-key">components</span>:
+  <span class="tok-key">parameters</span>:
+    <span class="tok-key">OpaquePrincipal</span>:
+      <span class="tok-key">name</span>:<span class="tok-string"> X-Principal-Id</span>
+      <span class="tok-key">in</span>:<span class="tok-string"> header</span>
+      <span class="tok-key">required</span>:<span class="tok-string"> true</span>
+      <span class="tok-key">description</span>:<span class="tok-string"> Opaque principal credential for sample-scale authorize/deny</span>
+      <span class="tok-key">schema</span>:
+        <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+        <span class="tok-key">minLength</span>:<span class="tok-string"> 1</span>
+  <span class="tok-key">schemas</span>:
+    <span class="tok-key">ReserveRequest</span>:
+      <span class="tok-key">type</span>:<span class="tok-string"> object</span>
+      <span class="tok-key">additionalProperties</span>:<span class="tok-string"> false</span>
+      <span class="tok-key">required</span>:<span class="tok-string"> [sku, quantity]</span>
+      <span class="tok-key">properties</span>:
+        <span class="tok-key">sku</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">minLength</span>:<span class="tok-string"> 1</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> SKU identifier</span>
+        <span class="tok-key">quantity</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 1</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Quantity to soft-hold</span>
+        <span class="tok-key">ttlSeconds</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 1</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Optional hold TTL in seconds; server default applies when omitted</span>
+    <span class="tok-key">ReserveResponse</span>:
+      <span class="tok-key">type</span>:<span class="tok-string"> object</span>
+      <span class="tok-key">additionalProperties</span>:<span class="tok-string"> false</span>
+      <span class="tok-key">required</span>:<span class="tok-string"> [holdId, sku, quantity, expiresAt, availableStock]</span>
+      <span class="tok-key">properties</span>:
+        <span class="tok-key">holdId</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Identifier of the created soft-hold</span>
+        <span class="tok-key">sku</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+        <span class="tok-key">quantity</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 1</span>
+        <span class="tok-key">expiresAt</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">format</span>:<span class="tok-string"> date-time</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Absolute expiry instant for the hold TTL</span>
+        <span class="tok-key">availableStock</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 0</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Available stock after the reserve</span>
+    <span class="tok-key">LookupResponse</span>:
+      <span class="tok-key">type</span>:<span class="tok-string"> object</span>
+      <span class="tok-key">additionalProperties</span>:<span class="tok-string"> false</span>
+      <span class="tok-key">required</span>:<span class="tok-string"> [holdId, sku, quantity, expiresAt, availableStock]</span>
+      <span class="tok-key">properties</span>:
+        <span class="tok-key">holdId</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Identifier of the soft-hold</span>
+        <span class="tok-key">sku</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> SKU held by this soft-hold</span>
+        <span class="tok-key">quantity</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 1</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Quantity soft-held</span>
+        <span class="tok-key">expiresAt</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">format</span>:<span class="tok-string"> date-time</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Absolute expiry instant for the hold TTL</span>
+        <span class="tok-key">availableStock</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> integer</span>
+          <span class="tok-key">minimum</span>:<span class="tok-string"> 0</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Current available stock for the hold&#x27;s SKU</span>
+    <span class="tok-key">ErrorResponse</span>:
+      <span class="tok-key">type</span>:<span class="tok-string"> object</span>
+      <span class="tok-key">additionalProperties</span>:<span class="tok-string"> false</span>
+      <span class="tok-key">required</span>:<span class="tok-string"> [error, errorType]</span>
+      <span class="tok-key">properties</span>:
+        <span class="tok-key">error</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> Human-readable failure message</span>
+        <span class="tok-key">errorType</span>:
+          <span class="tok-key">type</span>:<span class="tok-string"> string</span>
+          <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+            Named domain error type distinguishable by clients and tests.
+            <span class="tok-key">InsufficientStockError</span>:<span class="tok-string"> available stock below requested quantity,</span>
+            or authorized concurrent same-SKU race loser (same named channel
+            as sequential insufficient stock); response implies no soft-hold
+            created for the failing attempt and available stock unchanged by
+            that attempt.
+            <span class="tok-key">UnauthorizedError</span>:<span class="tok-string"> caller not authorized for reserve, release,</span>
+            lookup, or list; no hold created by the failed attempt
+            (reserve/release); available stock and existing holds unchanged.
+            <span class="tok-key">PreconditionError</span>:<span class="tok-string"> invalid request precondition (including missing</span>
+            or not-visible hold on lookup/release/expire, or expire when TTL
+            has not elapsed); no unintended stock or hold mutation.
+          <span class="tok-key">enum</span>:
+            - InsufficientStockError
+            - UnauthorizedError
+            - PreconditionError
+  <span class="tok-key">responses</span>:
+    <span class="tok-key">InsufficientStockError</span>:
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Named domain failure InsufficientStockError when available stock is
+        below the requested quantity, or when an authorized concurrent reserve
+        loses a same-SKU race (shared channel). No soft-hold is created for
+        the failing attempt; available stock is unchanged by that attempt.
+      <span class="tok-key">content</span>:
+        <span class="tok-key">application/json</span>:
+          <span class="tok-key">schema</span>:
+            <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+          <span class="tok-key">example</span>:
+            <span class="tok-key">error</span>:<span class="tok-string"> Insufficient available stock for requested quantity</span>
+            <span class="tok-key">errorType</span>:<span class="tok-string"> InsufficientStockError</span>
+    <span class="tok-key">UnauthorizedError</span>:
+      <span class="tok-key">description</span>:<span class="tok-string"> &gt;-</span>
+        Named domain failure UnauthorizedError when the caller is not
+        authorized to reserve, release, look up, or list. No soft-hold is
+        created by the failed attempt (reserve/release); available stock and
+        existing holds are unchanged.
+      <span class="tok-key">content</span>:
+        <span class="tok-key">application/json</span>:
+          <span class="tok-key">schema</span>:
+            <span class="tok-key">$ref</span>:<span class="tok-string"> &#x27;</span><span class="tok-comment">#/components/schemas/ErrorResponse&#x27;</span>
+          <span class="tok-key">example</span>:
+            <span class="tok-key">error</span>:<span class="tok-string"> Principal is not authorized</span>
+            <span class="tok-key">errorType</span>:<span class="tok-string"> UnauthorizedError</span>
+</code></pre></div>
+</div>
+<h3>DbC (OCL) — <span class="badge badge-present">実施済</span> <span class="note">（既存・本 change では未変更）</span></h3>
+<div class="tabs" data-tabs>
+  <div class="tab-buttons">
+    <button type="button" class="tab-btn active" data-tab="ocl-summary">Summary</button>
+    <button type="button" class="tab-btn" data-tab="ocl-raw">Raw</button>
+  </div>
+  <div class="tab-panel" data-panel="ocl-summary">
+<p>自然言語要約（先行 change 由来。本 change はこれを変更していません）:</p>
+<ul>
+  <li><strong>Reservation</strong>（<a href="../../../contracts/Reservation.ocl">Reservation.ocl</a>）
+    <ul>
+      <li><code>reserve</code> — pre: 認可済み principal / 数量 &gt; 0 / 十分な在庫。post: TTL 付き hold 生成、在庫減少、在庫不足時は <code>InsufficientStockError</code>、未認可時は <code>UnauthorizedError</code></li>
+      <li><code>release</code> — pre: 認可済み principal / hold が存在。post: 在庫復元、hold 削除、未認可時は <code>UnauthorizedError</code></li>
+      <li><code>expire</code> — pre: hold が存在 / TTL 超過。post: 在庫復元、hold 削除</li>
+    </ul>
+  </li>
+</ul>
+<p>現状の OCL コンテキストは <code>Reservation</code> 単一のままで、<code>inventory</code> / <code>reservation</code> への分割はまだ反映されていません。</p>
+</div>
+  <div class="tab-panel" data-panel="ocl-raw" hidden><pre class="raw"><code>-- Reservation domain contracts for inventory-reservation (solid_sdd evaluation sample)
+-- Source of truth for DbC; tests under tests/contracts are derived from this.
+-- W1: authorized reserve soft-hold (PrincipalAuthorized, QuantityPositive,
+--     SufficientAvailableStock, HoldCreatedWithTtl, AvailableStockReduced).
+-- W2: insufficient-stock reserve failure is first-class — named
+--     InsufficientStockError; no Hold created; available stock unchanged.
+-- W3: unauthorized reserve <span class="tok-key">or</span> release fails with named UnauthorizedError;
+--     no Hold created by the failed attempt; available stock <span class="tok-key">and</span> existing
+--     holds unchanged.
+-- W4: authorized release restores held quantity to available stock <span class="tok-key">and</span>
+--     removes the hold (HoldExists, AvailableStockRestored, HoldRemoved).
+-- W5: service-side expire past TTL restores held quantity <span class="tok-key">and</span> removes the
+--     hold (HoldExists, HoldPastTtl, AvailableStockRestoredOnExpiry,
+--     HoldRemoved); PreconditionError when hold missing <span class="tok-key">or</span> <span class="tok-key">not</span> past TTL.
+-- add-reservation-lookup W1: authorized get-by-id lookup of an existing
+--     visible soft-hold (PrincipalAuthorized, HoldExists, ResultIsHoldDetails,
+--     AvailableStockUnchanged, HoldsUnchanged); no mutation.
+-- add-reservation-lookup W2: named missing/<span class="tok-key">not</span>-visible (PreconditionError)
+--     <span class="tok-key">and</span> unauthorized (UnauthorizedError) lookup failures; stock <span class="tok-key">and</span> holds
+--     unchanged. Missing <span class="tok-key">and</span> <span class="tok-key">not</span>-visible share one PreconditionError channel.
+-- add-lookup-available-stock W2: authorized lookup success includes current
+--     availableStock for the hold&#x27;s SKU (<span class="tok-key">self</span>.availableStock(hold.sku), <span class="tok-key">not</span> a
+--     reserve-time snapshot); retain ResultIsHoldDetails hold fields <span class="tok-key">and</span>
+--     AvailableStockUnchanged / HoldsUnchanged; UnauthorizedError /
+--     PreconditionError failure posts unchanged (no mutation).
+-- add-concurrent-last-unit-safety W1: InsufficientStockError is the shared
+--     named channel for sequential insufficient stock <span class="tok-key">and</span> concurrent race
+--     losers on contract-testable paths; AvailableStockNonNegative is a
+--     checkable module invariant (sequential posts reinforce the operated
+--     SKU). UnauthorizedErrorOnReserve posts unchanged.
+-- add-concurrent-last-unit-safety W2 (thin SoT bridge): no new <span class="tok-key">pre</span>/<span class="tok-key">post</span>/<span class="tok-key">inv</span>.
+--     W2 Vitest/impl sequential stand-ins reuse W1 reserve posts —
+--     PrincipalAuthorized / UnauthorizedErrorOnReserve (+ no-mutation),
+--     InsufficientStockError / NoHoldCreatedOnInsufficientStock /
+--     AvailableStockUnchangedOnInsufficientStock, AvailableStockNonNegative
+--     <span class="tok-key">and</span> AvailableStockNonNegativeAfterReserve. True concurrent last-unit
+--     exclusivity <span class="tok-key">and</span> interleaving never-negative stock are formal-owned
+--     (TLA+/TLC); do <span class="tok-key">not</span> encode interleaving <span class="tok-key">in</span> OCL.
+-- add-list-holds W1: authorized full-dump list of currently visible
+--     soft-holds (same visibility universe as get-by-id / <span class="tok-key">self</span>.holds());
+--     LookupResponse-equivalent items including availableStock; empty
+--     collection when none visible; no mutation. Unauthorized → named
+--     UnauthorizedError; stock <span class="tok-key">and</span> holds unchanged (POL-OPAQUE-PRINCIPAL-AUTHZ).
+-- add-list-sort-expires W1: authorized list success dump ordered by
+--     expiresAt ascending (non-decreasing); equal expiresAt may use any
+--     stable order (no secondary key). AuthZ / UnauthorizedError /
+--     full-dump / no-mutation posts retained unchanged.
+-- Named error vocabulary shared with OpenAPI.
+
+-- Default TTL when caller omits ttlSeconds (seconds).
+-- Sample convention: DEFAULT_TTL_SECONDS = 300
+
+-- Non-negative available stock for every tracked SKU (W1 foundation;
+-- W2 sequential/contract-testable SoT bridge — no additive <span class="tok-key">inv</span>).
+-- Concurrent interleaving exclusivity is formal-owned (W2 formal/).
+<span class="tok-key">context</span> Reservation
+<span class="tok-key">inv</span> AvailableStockNonNegative:
+  <span class="tok-key">self</span>.holds()-&gt;collect(h | h.sku)-&gt;asSet()-&gt;<span class="tok-key">forAll</span>(s |
+    <span class="tok-key">self</span>.availableStock(s) &gt;= 0)
+
+<span class="tok-key">context</span> Reservation::reserve(principal: String, sku: String, quantity: Integer, ttlSeconds: Integer): Hold
+<span class="tok-key">pre</span> PrincipalAuthorized: principal.isAuthorized()
+<span class="tok-key">pre</span> QuantityPositive: quantity &gt; 0
+<span class="tok-key">pre</span> SufficientAvailableStock: <span class="tok-key">self</span>.availableStock(sku) &gt;= quantity
+<span class="tok-key">post</span> HoldCreatedWithTtl: <span class="tok-key">result</span>.<span class="tok-key">oclIsNew</span>() <span class="tok-key">and</span> <span class="tok-key">result</span>.sku = sku <span class="tok-key">and</span> <span class="tok-key">result</span>.quantity = quantity
+  <span class="tok-key">and</span> <span class="tok-key">result</span>.expiresAt = <span class="tok-key">self</span>.now() + ttlSeconds
+<span class="tok-key">post</span> AvailableStockReduced: <span class="tok-key">self</span>.availableStock(sku) = <span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span> - quantity
+-- SufficientAvailableStock violation (sequential insufficient stock OR
+-- concurrent race loser observing availableStock@<span class="tok-key">pre</span> &lt; quantity) → named
+-- domain error InsufficientStockError (same channel; <span class="tok-key">not</span> a language
+-- builtin / <span class="tok-key">not</span> a concurrent-only error type); no extra soft-hold for the
+-- failing attempt; available stock unchanged by that attempt.
+-- W2 reuses these posts as the sequential/Vitest SoT stand-<span class="tok-key">in</span> (no new OCL).
+<span class="tok-key">post</span> InsufficientStockError:
+  (<span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span> &lt; quantity) <span class="tok-key">implies</span> <span class="tok-key">result</span>.oclIsInvalid()
+<span class="tok-key">post</span> NoHoldCreatedOnInsufficientStock:
+  (<span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span> &lt; quantity) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnInsufficientStock:
+  (<span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span> &lt; quantity) <span class="tok-key">implies</span>
+    <span class="tok-key">self</span>.availableStock(sku) = <span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span>
+-- Sequential/contract-testable reinforcement of AvailableStockNonNegative
+-- for the operated SKU (success <span class="tok-key">and</span> insufficient-stock / race-loser paths).
+-- W2 SoT bridge: same <span class="tok-key">post</span>; interleaving never-negative is formal-owned.
+<span class="tok-key">post</span> AvailableStockNonNegativeAfterReserve:
+  <span class="tok-key">self</span>.availableStock(sku) &gt;= 0
+-- W3: PrincipalAuthorized violation → named domain error UnauthorizedError
+--     (<span class="tok-key">not</span> a language builtin); no soft-hold; stock <span class="tok-key">and</span> holds unchanged.
+-- W2 SoT bridge: AuthZ unchanged — opaque-principal UnauthorizedError posts.
+<span class="tok-key">post</span> UnauthorizedErrorOnReserve:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">result</span>.oclIsInvalid()
+<span class="tok-key">post</span> NoHoldCreatedOnUnauthorizedReserve:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnUnauthorizedReserve:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span>
+    <span class="tok-key">self</span>.availableStock(sku) = <span class="tok-key">self</span>.availableStock(sku)@<span class="tok-key">pre</span>
+
+<span class="tok-key">context</span> Reservation::release(principal: String, holdId: String): Void
+<span class="tok-key">pre</span> PrincipalAuthorized: principal.isAuthorized()
+<span class="tok-key">pre</span> HoldExists: <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">notEmpty</span>()
+-- W3: PrincipalAuthorized violation → named UnauthorizedError; stock <span class="tok-key">and</span> holds unchanged.
+<span class="tok-key">post</span> UnauthorizedErrorOnRelease:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> HoldsUnchangedOnUnauthorizedRelease:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnUnauthorizedRelease:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span>
+    <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">notEmpty</span>() <span class="tok-key">implies</span>
+      <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId).sku) =
+        <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId).sku)@<span class="tok-key">pre</span>
+-- W4: HoldExists violation → named domain error PreconditionError
+--     (<span class="tok-key">not</span> a language builtin); authorized success restores stock <span class="tok-key">and</span> removes hold.
+<span class="tok-key">post</span> AvailableStockRestored:
+  <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku) =
+    <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)@<span class="tok-key">pre</span> + <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.quantity
+<span class="tok-key">post</span> HoldRemoved: <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">isEmpty</span>()
+
+-- W5: treat soft-hold past TTL as expired; restore stock <span class="tok-key">and</span> remove hold.
+-- Checkability: <span class="tok-key">self</span>.now() is the service clock (injectable <span class="tok-key">in</span> tests).
+-- Prefer a hold whose expiresAt is already strictly before <span class="tok-key">self</span>.now()
+-- so HoldPastTtl is exercisable without wall-clock waits.
+<span class="tok-key">context</span> Reservation::expire(holdId: String): Void
+<span class="tok-key">pre</span> HoldExists: <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">notEmpty</span>()
+<span class="tok-key">pre</span> HoldPastTtl: <span class="tok-key">self</span>.hold(holdId).expiresAt &lt; <span class="tok-key">self</span>.now()
+-- HoldExists / HoldPastTtl violation → named domain error PreconditionError
+--     (<span class="tok-key">not</span> a language builtin); stock <span class="tok-key">and</span> holds unchanged.
+-- Aligns with OpenAPI expire 400: HoldMissing / HoldNotPastTtl.
+<span class="tok-key">post</span> PreconditionErrorOnExpireHoldMissing:
+  (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">isEmpty</span>()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> PreconditionErrorOnExpireHoldNotPastTtl:
+  (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">notEmpty</span>() <span class="tok-key">and</span>
+    <span class="tok-key">not</span> (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.expiresAt &lt; <span class="tok-key">self</span>.now())) <span class="tok-key">implies</span>
+      <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnExpireHoldNotPastTtl:
+  (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">notEmpty</span>() <span class="tok-key">and</span>
+    <span class="tok-key">not</span> (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.expiresAt &lt; <span class="tok-key">self</span>.now())) <span class="tok-key">implies</span>
+      <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku) =
+        <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockRestoredOnExpiry:
+  <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku) =
+    <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)@<span class="tok-key">pre</span> + <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.quantity
+<span class="tok-key">post</span> HoldRemoved: <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">isEmpty</span>()
+
+-- add-reservation-lookup W1: authorized get-by-id of an existing visible
+-- soft-hold; return that hold&#x27;s details; stock <span class="tok-key">and</span> holds unchanged.
+-- Sample visibility: a hold present <span class="tok-key">in</span> <span class="tok-key">self</span>.holds() is visible; whether
+-- expired holds are <span class="tok-key">not</span>-visible vs a distinct failure is deferred (Brief
+-- open_questions) <span class="tok-key">and</span> shares the W2 missing/<span class="tok-key">not</span>-visible named error.
+-- add-lookup-available-stock W2: authorized success also returns current
+-- availableStock for the hold&#x27;s SKU (= <span class="tok-key">self</span>.availableStock(hold.sku) now;
+-- <span class="tok-key">not</span> the value observed at reserve time). Failure posts unchanged.
+<span class="tok-key">context</span> Reservation::lookup(principal: String, holdId: String): Hold
+<span class="tok-key">pre</span> PrincipalAuthorized: principal.isAuthorized()
+<span class="tok-key">pre</span> HoldExists: <span class="tok-key">self</span>.hold(holdId)-&gt;<span class="tok-key">notEmpty</span>()
+<span class="tok-key">post</span> ResultIsHoldDetails:
+  <span class="tok-key">result</span>.sku = <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku <span class="tok-key">and</span>
+  <span class="tok-key">result</span>.quantity = <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.quantity <span class="tok-key">and</span>
+  <span class="tok-key">result</span>.expiresAt = <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.expiresAt <span class="tok-key">and</span>
+  <span class="tok-key">result</span>.availableStock = <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)
+<span class="tok-key">post</span> AvailableStockUnchanged:
+  <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku) =
+    <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> HoldsUnchanged: <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+-- W2: HoldExists / <span class="tok-key">not</span>-visible violation → named domain error
+--     PreconditionError (shared missing/<span class="tok-key">not</span>-visible channel; same vocabulary
+--     as release/expire HoldExists failures <span class="tok-key">and</span> OpenAPI getReservation 400);
+--     holds unchanged (stock unchanged implied — no sku when hold absent).
+<span class="tok-key">post</span> HoldMissingOrNotVisibleErrorOnLookup:
+  (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">isEmpty</span>()) <span class="tok-key">implies</span> <span class="tok-key">result</span>.oclIsInvalid()
+<span class="tok-key">post</span> HoldsUnchangedOnHoldMissingLookup:
+  (<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">isEmpty</span>()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+-- W2: PrincipalAuthorized violation → named UnauthorizedError; stock <span class="tok-key">and</span>
+--     holds unchanged (aligns with implement UnauthorizedError).
+<span class="tok-key">post</span> UnauthorizedErrorOnLookup:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">result</span>.oclIsInvalid()
+<span class="tok-key">post</span> HoldsUnchangedOnUnauthorizedLookup:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnUnauthorizedLookup:
+  (<span class="tok-key">not</span> principal.isAuthorized() <span class="tok-key">and</span> <span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>-&gt;<span class="tok-key">notEmpty</span>()) <span class="tok-key">implies</span>
+    <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku) =
+      <span class="tok-key">self</span>.availableStock(<span class="tok-key">self</span>.hold(holdId)@<span class="tok-key">pre</span>.sku)@<span class="tok-key">pre</span>
+
+-- add-list-holds W1: authorized full-dump list of currently visible
+-- soft-holds (same visibility as get-by-id: a hold <span class="tok-key">in</span> <span class="tok-key">self</span>.holds() is
+-- visible); one dump with no filter dimensions; each item
+-- LookupResponse-equivalent (sku, quantity, expiresAt, availableStock
+-- = <span class="tok-key">self</span>.availableStock(item.sku) now); empty when none visible;
+-- stock <span class="tok-key">and</span> holds unchanged. No paging / sku/status/time filters <span class="tok-key">in</span> OCL.
+-- PrincipalAuthorized violation → named UnauthorizedError; no mutation
+-- (aligns with lookup/reserve/release UnauthorizedError posts).
+-- add-list-sort-expires W1: success <span class="tok-key">result</span> ordered by expiresAt
+-- ascending (non-decreasing adjacent pairs); equal expiresAt may use
+-- any stable order (no secondary key required). Size 0/1 vacuously
+-- ordered. AuthZ <span class="tok-key">and</span> UnauthorizedError posts unchanged.
+<span class="tok-key">context</span> Reservation::list(principal: String): Sequence(Hold)
+<span class="tok-key">pre</span> PrincipalAuthorized: principal.isAuthorized()
+<span class="tok-key">post</span> ResultIsFullDumpOfVisibleHolds:
+  <span class="tok-key">result</span>-&gt;size() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>-&gt;size() <span class="tok-key">and</span>
+  <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>-&gt;<span class="tok-key">forAll</span>(h |
+    <span class="tok-key">result</span>-&gt;<span class="tok-key">exists</span>(r |
+      r.sku = h.sku <span class="tok-key">and</span>
+      r.quantity = h.quantity <span class="tok-key">and</span>
+      r.expiresAt = h.expiresAt <span class="tok-key">and</span>
+      r.availableStock = <span class="tok-key">self</span>.availableStock(h.sku)))
+<span class="tok-key">post</span> ResultOrderedByExpiresAtAscending:
+  Sequence{1..<span class="tok-key">result</span>-&gt;size()-1}-&gt;<span class="tok-key">forAll</span>(i |
+    <span class="tok-key">result</span>-&gt;at(i).expiresAt &lt;= <span class="tok-key">result</span>-&gt;at(i + 1).expiresAt)
+<span class="tok-key">post</span> EmptyCollectionWhenNoneVisible:
+  <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>-&gt;<span class="tok-key">isEmpty</span>() <span class="tok-key">implies</span> <span class="tok-key">result</span>-&gt;<span class="tok-key">isEmpty</span>()
+<span class="tok-key">post</span> HoldsUnchanged: <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchanged:
+  <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>-&gt;collect(h | h.sku)-&gt;asSet()-&gt;<span class="tok-key">forAll</span>(s |
+    <span class="tok-key">self</span>.availableStock(s) = <span class="tok-key">self</span>.availableStock(s)@<span class="tok-key">pre</span>)
+<span class="tok-key">post</span> UnauthorizedErrorOnList:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">result</span>.oclIsInvalid()
+<span class="tok-key">post</span> HoldsUnchangedOnUnauthorizedList:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span> <span class="tok-key">self</span>.holds() = <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>
+<span class="tok-key">post</span> AvailableStockUnchangedOnUnauthorizedList:
+  (<span class="tok-key">not</span> principal.isAuthorized()) <span class="tok-key">implies</span>
+    <span class="tok-key">self</span>.holds()@<span class="tok-key">pre</span>-&gt;collect(h | h.sku)-&gt;asSet()-&gt;<span class="tok-key">forAll</span>(s |
+      <span class="tok-key">self</span>.availableStock(s) = <span class="tok-key">self</span>.availableStock(s)@<span class="tok-key">pre</span>)
+</code></pre></div>
+</div>
+<h3>Formal — <span class="badge badge-missing">未実施</span></h3><p class="stub"><code>formal/</code> に本 change に関連する仕様はありません。技術選定自体が未実施（Context 未作成）のため、形式手法の適用判断もしていません。</p>
+
+<h2>6. 判断とトレードオフ</h2>
+
+<ul>
+  <li>在庫（<code>inventory</code>）と hold ライフサイクル（<code>reservation</code>）を分離し、依存方向を <code>reservation → inventory</code> に固定。逆方向は <code>forbid_dependency</code> で明示的に禁止し、在庫を将来（マルチ倉庫等）再利用可能に保つことを狙いとする</li>
+  <li>本 change は設計のみに留め、<code>src/</code> の実装分割は意図的にスコープ外（X1）とした — サンプルの実装は単一ファイルのまま</li>
+  <li>Critique の <code>minor</code> 指摘（<code>ReservationService</code> を単一ファサードとする点）は standard density では許容と判断し、修正は求めていない</li>
+</ul>
+
+
+<h2>7. 未解決事項</h2>
+
+<ul>
+  <li>ChangeBrief の <code>open_questions</code>: （空）</li>
+  <li><code>change-context.md</code> が未作成のため、Context §7 由来の未解決事項は該当なし</li>
+</ul>
+
+
+<h2>8. Source artifacts</h2>
+<ul><li><code>.solidsdd/changes/structure-inventory-reservation-split/status.json</code></li><li><code>.solidsdd/changes/structure-inventory-reservation-split/change-brief.json</code></li><li><code>.solidsdd/changes/structure-inventory-reservation-split/nfr.json</code></li><li><code>.solidsdd/changes/structure-inventory-reservation-split/architecture-plan.json</code></li><li><code>.solidsdd/changes/structure-inventory-reservation-split/critique-architecture-plan.json</code></li><li><code>openapi/openapi.yaml（先行 change から継続、本 change では未変更）</code></li><li><code>contracts/Reservation.ocl（先行 change から継続、本 change では未変更）</code></li><li><code>change-context.md: （なし → 未実施）</code></li><li><code>work-plan.json: （なし → 未実施）</code></li><li><code>ApplicationPlan: （なし → 未実施）</code></li><li><code>Formal: （なし → 未実施）</code></li></ul>
+
+<footer>Generated by solidsdd-report (view only; not a source of truth). Offline-safe: no external CDN, colors generated at build time.</footer>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  var wrap = btn.closest('.tabs');
+  wrap.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var target = btn.getAttribute('data-tab');
+  wrap.querySelectorAll('.tab-panel').forEach(function (p) {
+    p.hidden = p.getAttribute('data-panel') !== target;
+  });
+});
+</script>
+</body>
+</html>

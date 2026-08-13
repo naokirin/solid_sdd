@@ -1,0 +1,5 @@
+{
+  "id": "014-architecture-forbidden-dependency",
+  "checker": "lint",
+  "description": "architecture-plan.json declares a dependency edge that a forbid_dependency constraint also forbids"
+}

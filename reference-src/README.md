@@ -8,6 +8,7 @@ Edit sources for skill-bundled docs that do **not** live under repo-root `adapte
 | `change-lifecycle.md` | brief / intake / run / decompose / context / loop |
 | `change-context.md` | intake / run / brief / critique / judge |
 | `judgment-axes.md` | judge / critique |
+| `architecture-axes.md` | architecture / critique / run |
 | `human-gates.md` | judge / loop / brief / intake / run |
 | `loop-retry.md` | verify / critique / loop / run |
 | `adversarial-critique.md` | critique / loop / run |

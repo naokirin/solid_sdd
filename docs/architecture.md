@@ -24,6 +24,7 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
 │   brief + critique(change_brief)         │
 │   decompose + critique(work_plan)        │
 │   [critique(cross_change) when needed]   │
+│   architecture [+ critique when changed] │
 │   → parallel solidsdd.loop waves         │
 │     (serialize on WorkPlan touches∩)     │
 │   → integration verify                   │
@@ -73,6 +74,7 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) | `report.md` / `report.html` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
 | `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
+| `solidsdd.architecture` | Structural judgment (modules / dependencies / ownership / constraints) | **subagent required** | ArchitecturePlan |
 | `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
 | `solidsdd.critique` | Adversarial evaluation of phase artifacts | **subagent required** | CritiqueReport |
 | `solidsdd.apply.api` | Add/update OpenAPI | **subagent required** | OpenAPI diff |
@@ -128,6 +130,49 @@ WorkPlan:
 Requirements use property-level Gherkin ([../reference-src/gherkin-requirements.md](../reference-src/gherkin-requirements.md)), guided by ChangeBrief. Optional EARS wording in Brief texts: [../reference-src/ears-requirements.md](../reference-src/ears-requirements.md). Distinct from `ApplicationPlan.targets` (where contracts land). Decomposition rules: [../reference-src/work-decomposition.md](../reference-src/work-decomposition.md).
 
 Deterministic coverage / NFR / gate checks: `scripts/solidsdd-lint.sh` (critique Step 0/1). Deterministic **next** / declared-step check: `scripts/solidsdd-next.sh` (does not write run-state). Hardening plan: [hardening-plan.md](hardening-plan.md). Intent-inspired stream: [intent-inspired-improvements.md](intent-inspired-improvements.md). Schema evolution: [schema-evolution.md](schema-evolution.md).
+
+## Architecture judgment (`solidsdd.architecture`) output model
+
+Shared schema: [../schemas/architecture-plan.schema.json](../schemas/architecture-plan.schema.json)
+
+```text
+ArchitecturePlan:
+  version / status: changed | unchanged
+  change_id? / summary? / confidence? / human_gate?
+  modules[]:            … only when status: changed
+    id / responsibility
+    owns? / public?
+  dependencies[]:
+    from / to
+    reason? / kind?: runtime | data | event | api
+  constraints[]:
+    type: forbid_dependency | no_cycles
+    from? / to? / reason?
+```
+
+Judges **structure only** — modules, dependencies, dependency direction, public
+boundaries, ownership, and structural constraints — not a design methodology (no
+DDD / Clean / Hexagonal / … requirement) and not *which specification technique
+applies where* (that is `solidsdd.judge` / `ApplicationPlan`, below). Most changes
+do not affect existing structure and emit `status: unchanged`; `ArchitecturePlan`
+is change-level (`.solidsdd/changes/<change_id>/architecture-plan.json`, sibling of
+`work-plan.json`), not per-item like `ApplicationPlan`. Mechanical verification
+(dependency/module existence, forbidden dependencies, declared-cycle detection)
+runs via `scripts/solidsdd-lint.sh`, which every `solidsdd-critique` call already
+runs first regardless of subject — no separate verification step is needed.
+Axes: [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md).
+Human gates: [../reference-src/human-gates.md](../reference-src/human-gates.md).
+
+### Role separation
+
+| Artifact | Answers |
+|----------|---------|
+| Gherkin | What behavior is required? |
+| `ArchitecturePlan` | How is the system structurally organized (modules / dependencies / ownership / constraints)? |
+| `ApplicationPlan` | Which specification mechanism (API / DbC / formal) applies where? |
+| OpenAPI / GraphQL | What is the external API contract? |
+| OCL / DbC | What local invariants/contracts must hold? |
+| TLA+ / Alloy | What state/temporal properties must hold? |
 
 ## Application judgment (`solidsdd.judge`) output model
 

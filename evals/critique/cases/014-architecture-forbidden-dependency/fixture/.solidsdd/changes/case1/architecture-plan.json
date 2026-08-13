@@ -1,0 +1,30 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "case1",
+  "modules": [
+    {
+      "id": "a",
+      "responsibility": "A."
+    },
+    {
+      "id": "b",
+      "responsibility": "B."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "a",
+      "to": "b",
+      "reason": "a needs b"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "forbid_dependency",
+      "from": "a",
+      "to": "b",
+      "reason": "a must not depend on b"
+    }
+  ]
+}

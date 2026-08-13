@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "case1",
+  "modules": [
+    {
+      "id": "inventory",
+      "responsibility": "Own stock."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "reservation",
+      "to": "inventory",
+      "reason": "reservation is not declared in modules[]"
+    }
+  ],
+  "constraints": []
+}

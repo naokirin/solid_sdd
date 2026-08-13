@@ -174,6 +174,37 @@ def depends_on_cycles(items: list[dict[str, Any]]) -> list[list[str]]:
     return cycles
 
 
+def dependency_cycles(
+    module_ids: set[str], edges: list[tuple[str, str]]
+) -> list[list[str]]:
+    graph: dict[str, list[str]] = {m: [] for m in module_ids}
+    for src, dst in edges:
+        if src in graph and dst in module_ids:
+            graph[src].append(dst)
+    cycles: list[list[str]] = []
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {m: WHITE for m in module_ids}
+    stack: list[str] = []
+
+    def dfs(u: str) -> None:
+        color[u] = GRAY
+        stack.append(u)
+        for v in graph.get(u, []):
+            if color[v] == GRAY:
+                if v in stack:
+                    i = stack.index(v)
+                    cycles.append(stack[i:] + [v])
+            elif color[v] == WHITE:
+                dfs(v)
+        stack.pop()
+        color[u] = BLACK
+
+    for node in module_ids:
+        if color[node] == WHITE:
+            dfs(node)
+    return cycles
+
+
 def parse_feature_tags(
     project: Path, requirements_dir: Path | None = None
 ) -> dict[str, set[str]]:
@@ -639,6 +670,91 @@ def lint_change(
         for path in sorted(hist_dir.glob("*.json")):
             data = load_json(path)
             validate_schema(data, "gate-approval.schema.json", str(path), findings)
+
+    # Optional ArchitecturePlan under change dir
+    arch_path = change_dir / "architecture-plan.json"
+    if arch_path.is_file():
+        arch = load_json(arch_path)
+        validate_schema(
+            arch, "architecture-plan.schema.json", str(arch_path), findings
+        )
+        if arch.get("change_id") and arch["change_id"] != change_id:
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    "architecture-plan.json#change_id",
+                    f"change_id {arch['change_id']!r} != directory {change_id!r}",
+                )
+            )
+        if arch.get("status") == "changed":
+            modules = arch.get("modules") or []
+            module_ids = {
+                m["id"] for m in modules if isinstance(m, dict) and "id" in m
+            }
+            dependencies = arch.get("dependencies") or []
+            dep_edges: list[tuple[str, str]] = []
+            for dep in dependencies:
+                if not isinstance(dep, dict):
+                    continue
+                src, dst = dep.get("from"), dep.get("to")
+                for role, mid in (("from", src), ("to", dst)):
+                    if mid and mid not in module_ids:
+                        findings.append(
+                            finding(
+                                "blocker",
+                                "consistency",
+                                "architecture-plan.json#dependencies",
+                                f"dependency {role} references unknown module {mid!r}",
+                            )
+                        )
+                if src and dst:
+                    dep_edges.append((src, dst))
+
+            forbidden: set[tuple[str, str]] = set()
+            cycles_forbidden = False
+            for constraint in arch.get("constraints") or []:
+                if not isinstance(constraint, dict):
+                    continue
+                ctype = constraint.get("type")
+                if ctype == "forbid_dependency":
+                    cf, ct = constraint.get("from"), constraint.get("to")
+                    for role, mid in (("from", cf), ("to", ct)):
+                        if mid and mid not in module_ids:
+                            findings.append(
+                                finding(
+                                    "blocker",
+                                    "consistency",
+                                    "architecture-plan.json#constraints",
+                                    f"forbid_dependency {role} references unknown module {mid!r}",
+                                )
+                            )
+                    if cf and ct:
+                        forbidden.add((cf, ct))
+                elif ctype == "no_cycles":
+                    cycles_forbidden = True
+
+            for src, dst in dep_edges:
+                if (src, dst) in forbidden:
+                    findings.append(
+                        finding(
+                            "blocker",
+                            "consistency",
+                            "architecture-plan.json#dependencies",
+                            f"dependency {src} -> {dst} violates forbid_dependency constraint",
+                        )
+                    )
+
+            if cycles_forbidden:
+                for cycle in dependency_cycles(module_ids, dep_edges):
+                    findings.append(
+                        finding(
+                            "major",
+                            "consistency",
+                            "architecture-plan.json#dependencies",
+                            f"dependency cycle: {' -> '.join(cycle)}",
+                        )
+                    )
 
     # Optional ApplicationPlan / Verification under change dir or .solidsdd/
     for pattern, schema in (

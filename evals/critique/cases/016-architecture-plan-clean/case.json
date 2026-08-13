@@ -1,0 +1,5 @@
+{
+  "id": "016-architecture-plan-clean",
+  "checker": "lint",
+  "description": "must pass clean architecture-plan.json (two modules, one dependency, one matching forbid_dependency constraint on the reverse edge)"
+}

@@ -17,6 +17,7 @@ Execution policy: `solidsdd-run/references/execution-model.md` or `solidsdd-loop
 | [solidsdd-report](solidsdd-report/SKILL.md) | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) |
 | [solidsdd-brief](solidsdd-brief/SKILL.md) | `solidsdd.brief` | ChangeBrief (scope premise / return point) | **subagent required** |
 | [solidsdd-decompose](solidsdd-decompose/SKILL.md) | `solidsdd.decompose` | WorkPlan (one property-level Scenario per item) | **subagent required** |
+| [solidsdd-architecture](solidsdd-architecture/SKILL.md) | `solidsdd.architecture` | ArchitecturePlan (modules / dependencies / ownership / constraints) | **subagent required** |
 | [solidsdd-judge](solidsdd-judge/SKILL.md) | `solidsdd.judge` | ApplicationPlan | **subagent required** |
 | [solidsdd-critique](solidsdd-critique/SKILL.md) | `solidsdd.critique` | CritiqueReport (adversarial phase gate) | **subagent required** |
 | [solidsdd-apply-api](solidsdd-apply-api/SKILL.md) | `solidsdd.apply.api` | OpenAPI | **subagent required** |
@@ -45,7 +46,7 @@ Do **not** hand-edit copies under `skills/*/references/`. Sync from edit sources
 | `docs/execution-model.md` | `solidsdd-loop` / `solidsdd-run` `references/execution-model.md` |
 | `schemas/*.json` | judge / decompose / verify / verify-formal / critique / run |
 | `rules/solidsdd.mdc` | loop / run `references/project-rule.mdc` |
-| `reference-src/*` | contract-layout / change-lifecycle / change-context / change-report / working-language / judgment-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
+| `reference-src/*` | contract-layout / change-lifecycle / change-context / change-report / working-language / judgment-axes / architecture-axes / human-gates / loop-retry / adversarial-critique / work-decomposition / gherkin-requirements / change-brief |
 
 ```bash
 # manual

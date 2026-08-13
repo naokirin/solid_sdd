@@ -1,0 +1,9 @@
+{
+  "result": "fail",
+  "must_include": [
+    {
+      "severity": "blocker",
+      "category": "consistency"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "version": "1",
+  "change_id": "structure-inventory-reservation-split",
+  "status": "changed",
+  "summary": "Split the single reservation.ts module into an inventory module (stock ownership) and a reservation module (hold lifecycle), so future stock-related work (e.g. multi-warehouse) doesn't need to touch hold/TTL/authZ logic. Design-only: this repository's implementation intentionally stays a single file for now (see README \"Out of scope\").",
+  "confidence": "medium",
+  "modules": [
+    {
+      "id": "inventory",
+      "responsibility": "Own available stock per SKU; expose stock read/adjust operations.",
+      "owns": ["Stock"],
+      "public": ["InventoryService"]
+    },
+    {
+      "id": "reservation",
+      "responsibility": "Own hold lifecycle (reserve/release/expire/lookup) and TTL/authZ enforcement.",
+      "owns": ["Hold"],
+      "public": ["ReservationService"]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "reservation",
+      "to": "inventory",
+      "reason": "Reserving and releasing a hold must read and adjust available stock.",
+      "kind": "runtime"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "forbid_dependency",
+      "from": "inventory",
+      "to": "reservation",
+      "reason": "Stock ownership must stay independent of hold/TTL/authZ concerns so inventory can be reused (e.g. multi-warehouse) without carrying reservation logic."
+    }
+  ]
+}

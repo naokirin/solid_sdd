@@ -286,6 +286,20 @@ sync_one reference-src/change-brief.md skills/solidsdd-run/references/change-bri
 sync_one reference-src/change-brief.md skills/solidsdd-decompose/references/change-brief.md
 sync_one reference-src/change-brief.md skills/solidsdd-critique/references/change-brief.md
 sync_one reference-src/change-brief.md skills/solidsdd-judge/references/change-brief.md
+
+# Architecture (structural design)
+sync_one schemas/architecture-plan.schema.json skills/solidsdd-architecture/references/architecture-plan.schema.json
+sync_one schemas/architecture-plan.schema.json skills/solidsdd-run/references/architecture-plan.schema.json
+sync_one reference-src/architecture-axes.md skills/solidsdd-architecture/references/architecture-axes.md
+sync_one reference-src/architecture-axes.md skills/solidsdd-critique/references/architecture-axes.md
+sync_one reference-src/architecture-axes.md skills/solidsdd-run/references/architecture-axes.md
+sync_one reference-src/human-gates.md skills/solidsdd-architecture/references/human-gates.md
+sync_one reference-src/change-brief.md skills/solidsdd-architecture/references/change-brief.md
+sync_one reference-src/change-context.md skills/solidsdd-architecture/references/change-context.md
+sync_one schemas/work-plan.schema.json skills/solidsdd-architecture/references/work-plan.schema.json
+sync_one reference-src/contract-layout.md skills/solidsdd-architecture/references/contract-layout.md
+sync_one reference-src/working-language.md skills/solidsdd-architecture/references/working-language.md
+
 sync_one reference-src/loop-retry.md skills/solidsdd-verify/references/loop-retry.md
 sync_one reference-src/loop-retry.md skills/solidsdd-loop/references/loop-retry.md
 sync_one reference-src/loop-retry.md skills/solidsdd-critique/references/loop-retry.md

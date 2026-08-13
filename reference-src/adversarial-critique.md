@@ -20,6 +20,7 @@ Per solid_sdd execution efficiency policy (see [run-cost.md](run-cost.md)), the 
 1. **Checkpoint Reviews**: Critique is executed at major quality boundaries:
    - **Specification Review** (`change_context`, `change_brief`)
    - **WorkPlan Review** (`work_plan`)
+   - **Architecture Review** (`architecture_plan`, only when `solidsdd-architecture` wrote `status: changed`; skipped entirely on `status: unchanged`)
    - **Integration Review** (`verification_report` after whole-system verify)
 2. **Failure-Driven Critique**: Intermediate artifact critiques (e.g. `critique(application_plan)`, `critique(api_contracts)`, `critique(dbc_contracts)`) are omitted in normal green paths. Full Critique / Diagnosis subagents are launched **when a verification failure or isolation retry occurs** to identify the root cause and guide recovery.
 
@@ -99,6 +100,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `change_context` | `solidsdd-intake`, when `change-context-gate.json` **required** a human gate (reviewed alone so the gate can be checked before Brief runs) | intake | `solidsdd-run` |
 | `change_brief` | `solidsdd-brief`, only on the `change_context`-gate-required path (paired with a standalone `change_context` critique above) | brief | `solidsdd-run` |
 | `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
+| `architecture_plan` | `solidsdd-architecture`, only when it wrote `status: changed` | architecture | `solidsdd-run` |
 | `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
 | `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api | `solidsdd-loop` |
 | `dbc_contracts` | `solidsdd-apply-dbc` (if any dbc apply) | apply-dbc | `solidsdd-loop` |
@@ -111,6 +113,23 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `knowledge_consistency` | After consult + Context/Brief exist when consult cites confirmed/canonical knowledge | — | `solidsdd-run` (recommended when consult is non-empty) |
 
 Evaluate a subject only when it is part of the requested review scope (e.g., a Checkpoint Review boundary or a verification failure).
+
+### `architecture_plan` (major examples)
+
+Mechanical dependency/cycle/module-existence problems are caught by
+`scripts/solidsdd-lint.sh` (Step 0) and surface as `blocker`/`major` `consistency`
+findings automatically — do not re-derive those here. This table is for
+**adequacy**: is the structure this change proposes actually well-formed, per
+[architecture-axes.md](architecture-axes.md).
+
+| Check | `major` examples | Not major |
+|-------|-------------------|-----------|
+| Responsibility clarity | `responsibility` empty/vague (e.g. "misc", "helpers") or merges clearly unrelated concerns into one module | Slightly broad but coherent single responsibility |
+| Dependency direction | New dependency contradicts an existing/prior committed direction with no rationale, or reintroduces an edge a still-active `constraint` forbids elsewhere | Additive dependency with a reason citing WorkPlan `touches` / Brief scope |
+| Boundary leakage | `public` exposes internal storage/implementation types instead of a service/facade surface | `public` lists an intentional service entry point |
+| Ownership ambiguity | The same owned data/state is claimed by two modules with no rationale | Single, clear owner per piece of state |
+| Change impact | Plan silently omits a structural change evident from the WorkPlan (`touches` implies a new module/boundary) or contradicts a `constraint` from a still-active prior `ArchitecturePlan` | New module/dependency consistent with Brief scope and prior constraints |
+| Status shortcut misuse | `status: unchanged` despite WorkPlan `touches` indicating a new module, new public boundary, or a changed dependency direction | `status: unchanged` for a copy/config-only or internal-implementation-only change |
 
 ### `knowledge_consistency` (major examples)
 

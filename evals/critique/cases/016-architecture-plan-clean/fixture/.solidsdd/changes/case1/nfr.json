@@ -1,0 +1,48 @@
+{
+  "version": "1",
+  "change_id": "case1",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "out"
+    }
+  ]
+}

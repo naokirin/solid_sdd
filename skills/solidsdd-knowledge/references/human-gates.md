@@ -10,6 +10,7 @@ Set `human_gate.required: true` (plan-level and/or per target **or** Change Cont
 |-----------|-----------------|
 | **Change Context framing** | Material `agent_default` tech (language, API style, persistence, contract approach); user intent vs repo stack conflict; new security/money NFR in §4; blocking §7 questions; low framing confidence — see [change-context.md](change-context.md). **Do not** gate when the initial user instruction already settled those decisions |
 | Breaking API change | Removed fields, stricter types, status code changes, renames without compatibility |
+| Architecture (structural) | Large module/boundary change; a new **external-facing** boundary; a reversal of an existing dependency direction; a deliberate removal/change of an existing structural `constraint` — see [architecture-axes.md](architecture-axes.md). **Do not** gate ordinary additive module/dependency additions |
 | Money / ledger boundary | Payments, balances, fees, refunds |
 | AuthZ / session boundary | New permission checks, role model changes (optional gate; prefer gate when also `breaking` or `low_confidence`) |
 | Low confidence | Judge cannot map intent to axes; missing stack context; conflicting requirements; **brief** has blocking `open_questions`; **decompose** cannot form checkable Gherkin Scenarios |
@@ -99,7 +100,8 @@ When the human approves:
 4. If ChangeBrief has `human_gate.required` → **stop before decompose** until approved; write `gate-approval.json` with `scope: change_brief`.
 5. After `solidsdd-decompose`, initialize `items` in `run-state.json` from the WorkPlan; run **Task** `solidsdd-critique` (`subject: work_plan`). Optionally run **Task** `solidsdd-critique` (`subject: cross_change_consistency`) when prior Features / prior change `out_of_scope` exist.
 6. If WorkPlan or any item has `human_gate.required` → **stop before launching slice loops** (or before that item’s loop); write `gate-approval.json` with `scope: work_plan`.
-7. Do not thin Change Context, ChangeBrief, or WorkPlan to avoid the gate.
+6b. After the WorkPlan gate (if any) resolves: **Task** `solidsdd-architecture`. When it writes `status: changed`, **Task** `solidsdd-critique` (`subject: architecture_plan`); persist both under the change dir. Skip both when `status: unchanged`. If the `ArchitecturePlan` has `human_gate.required` → **stop before launching waves**; write `gate-approval.json` with `scope: architecture_plan` on approval — see [architecture-axes.md](architecture-axes.md) for what warrants a gate here.
+7. Do not thin Change Context, ChangeBrief, WorkPlan, or ArchitecturePlan to avoid the gate.
 8. After approval + `gate-approval.json`, resume from `run-state.json` `phase` with the approved artifacts; continue via brief/decompose and/or `solidsdd-loop` as appropriate.
 9. After successful integration verify (+ critique): **Task** `solidsdd-knowledge` (`mode: harvest`) → write `knowledge-harvest.json`; set `phase: knowledge_harvest`. Optionally **Task** `solidsdd-critique` (`subject: knowledge_harvest`). If `human_gate.required` → **stop before `done`** until `gate-approval.json` with `scope: knowledge_harvest`; on approve apply selected candidates (CLI promote / hand-authored files + links), then mark change `done`. On reject/skip with empty apply set, still mark `done` after recording decisions on candidates.
 

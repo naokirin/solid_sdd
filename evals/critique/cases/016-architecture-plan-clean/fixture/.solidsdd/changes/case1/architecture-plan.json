@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "case1",
+  "modules": [
+    {
+      "id": "inventory",
+      "responsibility": "Own stock.",
+      "owns": ["Stock"],
+      "public": ["InventoryService"]
+    },
+    {
+      "id": "reservation",
+      "responsibility": "Own hold lifecycle.",
+      "owns": ["Hold"],
+      "public": ["ReservationService"]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "reservation",
+      "to": "inventory",
+      "reason": "reserving/releasing needs to read/adjust stock",
+      "kind": "runtime"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "forbid_dependency",
+      "from": "inventory",
+      "to": "reservation",
+      "reason": "keep inventory reusable independent of hold/TTL/authZ"
+    }
+  ]
+}

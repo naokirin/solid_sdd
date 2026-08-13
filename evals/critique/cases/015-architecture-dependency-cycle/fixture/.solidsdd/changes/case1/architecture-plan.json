@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "case1",
+  "modules": [
+    {
+      "id": "a",
+      "responsibility": "A."
+    },
+    {
+      "id": "b",
+      "responsibility": "B."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "a",
+      "to": "b",
+      "reason": "a needs b"
+    },
+    {
+      "from": "b",
+      "to": "a",
+      "reason": "b needs a"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "no_cycles"
+    }
+  ]
+}

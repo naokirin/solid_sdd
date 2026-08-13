@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/architecture-plan.schema.json",
+  "title": "ArchitecturePlan",
+  "description": "Output of solidsdd.architecture: module/dependency/ownership structure and structural constraints for the active change. status: unchanged means this change does not affect existing structure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "status"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["changed", "unchanged"],
+      "description": "changed: modules/dependencies/constraints below apply. unchanged: this change does not affect existing structure."
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48,
+      "description": "Optional but recommended: active change_id this plan belongs to."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short human-readable summary of the plan (or of why no structural change is needed)."
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "human_gate": {
+      "$ref": "#/$defs/human_gate"
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/module"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "status": { "const": "changed" }
+    }
+  },
+  "then": {
+    "required": ["version", "status", "modules", "dependencies", "constraints"]
+  },
+  "else": {
+    "properties": {
+      "modules": false,
+      "dependencies": false,
+      "constraints": false
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "human_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reason"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "responsibility"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Module identifier, referenced by dependencies[]/constraints[]."
+        },
+        "responsibility": {
+          "type": "string",
+          "description": "What this module owns/does, in one or two sentences."
+        },
+        "owns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary data/state this module owns. Record only when confidently derivable from context; do not guess."
+        },
+        "public": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Public boundary (service/type names other modules may depend on). Record only when confidently derivable from context; do not guess."
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Dependent module id."
+        },
+        "to": {
+          "type": "string",
+          "description": "Depended-on module id."
+        },
+        "reason": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["runtime", "data", "event", "api"],
+          "description": "Use only when the kind is confirmed; do not use kind for its own sake."
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["forbid_dependency", "no_cycles"]
+        },
+        "from": {
+          "type": "string",
+          "description": "Module id. Required for type: forbid_dependency."
+        },
+        "to": {
+          "type": "string",
+          "description": "Module id. Required for type: forbid_dependency."
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "architecture_plan",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "architecture-plan.json#modules/1/public",
+      "detail": "ReservationService is a single facade; a narrower read-only lookup port could be split out later, but one facade is acceptable at standard density."
+    }
+  ],
+  "summary": "Two modules with clear, non-overlapping responsibilities. One directed dependency (reservation -> inventory) with a stated reason, and a forbid_dependency constraint on the reverse edge that matches the stated rationale (keep inventory reusable independent of hold/TTL/authZ). No responsibility, boundary, ownership, or checkability gaps."
+}

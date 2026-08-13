@@ -18,6 +18,7 @@
         "change_context",
         "change_brief",
         "work_plan",
+        "architecture_plan",
         "application_plan",
         "api_contracts",
         "dbc_contracts",
