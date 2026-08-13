@@ -39,7 +39,7 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 1. Default **max_auto_retries = 3** per orchestrator run — count **each** verify-fail retry **and** each critique-fail retry (shared budget within that orchestrator). Isolation-violation re-runs also consume this budget.
 2. **Persist budgets** in `run-state.json`: `run_retry` for `solidsdd-run`, `items.<id>.loop_retry` for each slice ([run-state.md](run-state.md)). Read at step start; write at step end; decrement `remaining` when a retry is consumed. Do not track remaining only in chat.
 3. **`solidsdd-loop`**: budget is per slice. **`solidsdd-run`**: separate budget for intake/critique(change_context)/brief/critique(change_brief)/decompose/critique(work_plan) and integration verify/critique; each nested loop has its own budget.
-4. On `loop_action: retry` (from verify **or** critique), launch suggested skills as **new Task subagents**, then re-run the relevant critique and/or verify (for run: re-intake, re-brief, re-decompose, or re-run the owning slice loop when appropriate).
+4. On `loop_action: retry` (from verify **or** critique), launch suggested skills as **new Task subagents**, then re-run the relevant critique and/or verify (for run: re-intake, re-brief, re-decompose, or re-run the owning slice loop when appropriate). When re-running critique on the **same subject** that just failed, pass the prior `CritiqueReport` path (and the fix Task's summary, if any) into the retry Task's prompt — see [adversarial-critique.md](adversarial-critique.md) "Retry critique". Do not silently drop this on retry: a retry critique that re-derives everything from scratch defeats the point of the retry.
 5. On `loop_action: human_gate` or `stop`, end the orchestrator; print report + reasons; update `run-state.json` (`phase` / item `status` / `stopped_reason`).
 6. If the same skill is suggested for consecutive retries without progress, escalate to `human_gate`.
 7. Never edit contracts or thin WorkPlan/ApplicationPlan in the parent to force a green verify or critique.
@@ -51,6 +51,8 @@ On **pass** with only `minor` findings: continue the loop; minors may be listed 
 |---------|-----------------|-------------|
 | Critique: change_context missing headings / NFR or tech selection without rationale / missing or wrong gate JSON | `solidsdd-intake` | `retry` |
 | Critique: change_brief missing in/out scope, unverifiable success criteria, or unmarked blocking questions | `solidsdd-brief` | `retry` |
+| Critique: specification (combined) finding concerns Change Context content | `solidsdd-intake` | `retry` |
+| Critique: specification (combined) finding concerns ChangeBrief content | `solidsdd-brief` | `retry` |
 | Critique / lint: schema invalid Brief, bare-string scope lists, duplicate ids | `solidsdd-brief` | `retry` |
 | Critique: work_plan unverifiable / multi-AC item / cycle / coverage gap / Brief scope drift | `solidsdd-decompose` (and `solidsdd-brief` / `solidsdd-intake` if premise is wrong) | `retry` |
 | Critique / lint: missing `covers`, Scenario tag mismatch, depends_on cycle | `solidsdd-decompose` | `retry` |

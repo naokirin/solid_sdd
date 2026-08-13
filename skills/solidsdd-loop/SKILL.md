@@ -75,7 +75,7 @@ Do **not** launch separate subagent Tasks for every intermediate file write (`ap
 6. **Verify Slice (Task Subagent)**: Launch **Verify Slice** Task. Run contract suite and verification checks. Write `verification-report.json`. Update `run-state.json` (`loop_phase: verify`).
 7. **Failure-Driven Diagnosis (on failure only)**:
    - If verification **passes** → proceed to Step 8.
-   - If verification **fails** → launch **Critique / Diagnosis Task** (`subject: verification_report` or targeted component failure). Follow `loop-retry.md` (Retry → Fix Task → Re-verify, max 3 budget).
+   - If verification **fails** → launch **Critique / Diagnosis Task** (`subject: verification_report` or targeted component failure). Follow `loop-retry.md` (Retry → Fix Task → Re-verify, max 3 budget). If verify fails again after a fix and critique runs a second time on the same subject, pass the prior `CritiqueReport` into that Task's prompt so it follows [adversarial-critique.md](references/adversarial-critique.md) "Retry critique" (targeted re-check, not full re-derivation).
 8. **Complete Slice**: Update `run-state.json` item status to `done` (`solidsdd-run-state set-item --id <id> --status done --loop-phase done --sync-work-plan`). Record metrics via `solidsdd-run-state record-metrics`.
 
 ## Success Criteria (Outcome-based)

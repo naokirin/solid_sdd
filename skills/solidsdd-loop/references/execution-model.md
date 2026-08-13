@@ -22,10 +22,13 @@ User or solidsdd.run (outer parent)
   │
   ├─ solidsdd.context                 … parent OK
   ├─ Task: solidsdd.intake            ← Change Context (MD) + gate JSON
-  ├─ Task: solidsdd.critique          ← subject: change_context
-  ├─ [stop if change-context-gate human_gate.required]
+  ├─ [only if change-context-gate human_gate.required]
+  │     ├─ Task: solidsdd.critique    ← subject: change_context
+  │     └─ [stop until approved]
   ├─ Task: solidsdd.brief             ← ChangeBrief
-  ├─ Task: solidsdd.critique          ← subject: change_brief
+  ├─ Task: solidsdd.critique          ← subject: change_brief (gate-required path above)
+  │                                     or subject: specification, Context+Brief combined
+  │                                     in one Task (gate not required — the common case)
   ├─ Task: solidsdd.decompose         ← WorkPlan (from Brief)
   ├─ Task: solidsdd.critique          ← subject: work_plan
   ├─ wave: all currently ready items (depends_on satisfied)
@@ -138,7 +141,7 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 
 ## Parent obligations (`solidsdd.run`)
 
-1. Do not inline `solidsdd.intake` / `critique(change_context)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify` (except B4 reuse of a covering item verify)
+1. Do not inline `solidsdd.intake` / `critique(change_context)` / `critique(specification)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify` (except B4 reuse of a covering item verify)
 2. Each item follows the **`solidsdd.loop` skill on this parent session** (run parent must not directly run judge/apply/implement, and must **not** delegate the whole loop to a single Task)
 3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
 4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices

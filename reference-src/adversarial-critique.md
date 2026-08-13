@@ -31,6 +31,26 @@ Before LLM review, run **`scripts/solidsdd-lint.sh`** against the consuming proj
 
 The LLM pass then judges **adequacy** (thin contracts, missing `pre`, density vs signals, whether a cover is meaningful)—not whether coverage ids exist. Do **not** skip lint when the solid_sdd checkout is available; if the script cannot run (`tooling`), record a `minor` or `major` finding with category `other` and reason, and still complete LLM review when possible.
 
+## Efficient adversarial method (required)
+
+A live cost measurement (2026-08) found critique passes taking 5–30 minutes on small additive changes by re-exploring the whole repo instead of targeting the specific claim under review. This section tightens **how** critique investigates — it does not loosen the severity bar above/below: a `major` is still a `major`.
+
+- Read only what this subject needs: the target artifact plus its specific scope authority (e.g. `change_brief` critique needs Change Context + Brief, not the whole `.solidsdd/` tree). Do not re-derive context already established by lint or a prior report.
+- Prefer one targeted check (a `grep`, a specific diff, a single command run) over broad re-exploration (`find`, repo-wide re-reads) for each claim.
+- Run the full test/build suite **at most once** per critique pass, unless reproducing a specific fix (see Retry critique below).
+- For `subject: verification_report`: start with a cheap mechanical sweep — list every file this change actually touched (git diff against the change's base, or the item/WorkPlan `touches`) and confirm each has at least one test that references it (import, route, symbol). Only escalate to a manual mutation-style spot-check (temporarily reverting one touched line and re-running the suite) when that sweep is ambiguous or surfaces a plausible gap — do not mutation-test every check by default.
+- For `subject: cross_change_consistency`: start by checking whether this change's `touches` / Brief `in_scope` actually intersects any prior change's `out_of_scope` paths/themes, or modifies (not merely adds to) an existing enum/schema/OCL context. When there is no intersection and the diff is purely additive, one targeted pass confirming that is sufficient — do not re-derive the full prior Brief/WorkPlan from scratch.
+
+## Retry critique (after a prior fail on the same subject)
+
+When the orchestrator re-invokes critique for a `subject` that just failed (same change/item, Failure-Driven retry per [loop-retry.md](loop-retry.md)), the orchestrator passes the prior `CritiqueReport` path (and the fix summary, if any) into the Task prompt. That Task must **not** re-derive every major-table check from scratch:
+
+1. Verify each specific finding that caused the prior `fail` is now closed, with a targeted, reproducible check — prefer re-running the exact reproduction the prior critique used (e.g. the same mutation/spot-check).
+2. Run one cheap regression pass (the existing test/build suite, once) to catch new breakage.
+3. Only widen back to a full independent review if the fix plausibly touched areas the prior critique did not cover, or something newly looks suspicious.
+
+Still classify severity honestly: an incomplete fix, or a new defect, is still a `fail`.
+
 ## Severity calibration (loop must progress)
 
 Critique is adversarial, but **must not fail the loop for polish**. Default density for additive work is `standard`. Calibrate as follows:
@@ -64,6 +84,8 @@ Do **not** raise `major` solely because a consuming example or production sample
 | WorkPlan slice | Item with **uncheckable** acceptance prose; **no Gherkin** Given/When/Then when a Scenario could express the check; **two+** independent Scenarios in one item; dependency **cycle**; ChangeBrief `in_scope` / `success_criteria` ids not in any `item.covers`; Scenario tags missing those ids; items that `covers` Brief `out_of_scope` | Preferring fewer items when each Scenario is still checkable; property-level wording vs concrete Examples; writing step prose in the working language while keeping English keywords ([working-language.md](working-language.md)). **Existence** of id coverage is primarily `scripts/solidsdd-lint.sh`; critique focuses on whether the cover is *adequate*. Greenfield smell: many `ready` items share intersecting `touches` with empty `depends_on` → **minor** (suggest foundation `depends_on` / narrow touches; not major if Scenarios remain checkable) |
 | Scope drift | WorkPlan / ApplicationPlan invents features listed in Brief `out_of_scope`, or drops Brief `in_scope` without rationale | Naming differences that still match Brief intent |
 
+`subject: specification` applies **both** the "Change Context framing" and "ChangeBrief scope" rows above to the respective document; a finding's `suggested_next_skills` names `solidsdd-intake` and/or `solidsdd-brief` depending on which document it concerns.
+
 ### Named domain errors
 
 - **Runtime / tests / implement**: prefer named domain errors (e.g. `PreconditionError`) — see project rule and loop-retry.
@@ -73,8 +95,9 @@ Do **not** raise `major` solely because a consuming example or production sample
 
 | `subject` | After | Producer skill(s) | Orchestrator |
 |-----------|-------|-------------------|--------------|
-| `change_context` | `solidsdd-intake` | intake | `solidsdd-run` |
-| `change_brief` | `solidsdd-brief` | brief | `solidsdd-run` |
+| `specification` | `solidsdd-brief`, when `change-context-gate.json` did **not** require a human gate | intake, brief | `solidsdd-run` |
+| `change_context` | `solidsdd-intake`, when `change-context-gate.json` **required** a human gate (reviewed alone so the gate can be checked before Brief runs) | intake | `solidsdd-run` |
+| `change_brief` | `solidsdd-brief`, only on the `change_context`-gate-required path (paired with a standalone `change_context` critique above) | brief | `solidsdd-run` |
 | `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
 | `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
 | `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api | `solidsdd-loop` |

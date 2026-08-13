@@ -31,8 +31,8 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 - [working-language.md](references/working-language.md) — finding detail language
 - [gherkin-requirements.md](references/gherkin-requirements.md) — when `subject` is `work_plan`
 - [ears-requirements.md](references/ears-requirements.md) — optional Brief wording (not lint-required)
-- [change-brief.md](references/change-brief.md) — when `subject` is `change_brief`
-- [change-context.md](references/change-context.md) — when `subject` is `change_context` or `cross_change_consistency`
+- [change-brief.md](references/change-brief.md) — when `subject` is `change_brief` or `specification`
+- [change-context.md](references/change-context.md) — when `subject` is `change_context`, `specification`, or `cross_change_consistency`
 - [knowledge.md](references/knowledge.md) — when `subject` is `knowledge_harvest`
 - [knowledge-harvest.schema.json](references/knowledge-harvest.schema.json) — harvest artifact shape
 - [change-context-gate.schema.json](references/change-context-gate.schema.json) — when reviewing Change Context gate
