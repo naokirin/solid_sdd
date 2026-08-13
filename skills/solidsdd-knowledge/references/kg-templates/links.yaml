@@ -1,0 +1,6 @@
+# Optional explicit edges when annotations cannot be embedded.
+# edges:
+#   - type: implements
+#     from: code:src/foo.ts
+#     to: initial-reservation/R1
+edges: []

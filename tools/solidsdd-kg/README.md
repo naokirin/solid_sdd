@@ -29,6 +29,11 @@ Optional frontmatter: `maturity` (`hypothesized` \| `confirmed` \| `canonical`; 
 | `.solidsdd-cache/kg.db` | 派生物（gitignore） |
 
 走査パス（`knowledge_dirs` / `brief_glob` / `feature_glob` / `cache_dir` / `schema_path` / `links_files`）は、まず `.solidsdd/config.yaml` の `paths` から既定値を取り、その後 `kg/config.yaml` で overlay する。パス変更はプロジェクト config を推奨し、kg config は kg 固有項目と明示上書き用。
+
+## 初回導入（scaffold）
+
+`.solidsdd/kg/` が存在しないプロジェクトでの初回導入は、Go バイナリのビルドを待たず `scripts/solidsdd-kg.sh init --root <project>` が汎用テンプレート（`skills/solidsdd-knowledge/references/kg-templates/{schema,config,links}.yaml`）をそのままコピーする。既存ファイルがあれば何もしない（`--force` で上書き）。`solidsdd-knowledge` の consult / harvest apply はこのコマンドを **親オーケストレータが**（Task サブエージェントではなく）機械的に実行してから進む。
+
 ## ビルド
 
 ```bash
@@ -40,6 +45,7 @@ go build -o ../../bin/solidsdd-kg ./cmd/solidsdd-kg
 リポジトリルートから:
 
 ```bash
+./scripts/solidsdd-kg.sh init --root .   # scaffold .solidsdd/kg/ from templates (no build needed)
 ./scripts/solidsdd-kg.sh build --root .
 ./scripts/solidsdd-kg.sh check --root .
 ./scripts/solidsdd-kg.sh check --root . --baseline

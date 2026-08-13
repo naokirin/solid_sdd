@@ -72,7 +72,7 @@ Optional frontmatter `facets`: array of `vocabulary` | `invariant` | `decider` |
 
 ## Consult (consume)
 
-1. Ensure `.solidsdd/kg/` exists (or note gap). Run `scripts/solidsdd-kg.sh build --root .` when the CLI is available.
+1. Ensure `.solidsdd/kg/` exists. If not, the **parent** (not this Task) runs `scripts/solidsdd-kg.sh init --root .` first — a mechanical, idempotent file copy from shipped templates (`skills/solidsdd-knowledge/references/kg-templates/`), not something a Task subagent should reconstruct by reasoning or by reading another project's `.solidsdd/kg/`. Then run `scripts/solidsdd-kg.sh build --root .` when the CLI is available.
 2. Prefer `solidsdd-kg context <id> --budget 8k` / `scope <dotted>` / `impact` for relevant policies and decisions.
 3. Write a short Markdown pack for intake/brief with these sections:
    - **Policies / decisions / invariants** (Means)
@@ -89,7 +89,7 @@ Optional frontmatter `facets`: array of `vocabulary` | `invariant` | `decider` |
 4. Emit `knowledge-harvest.json` per [knowledge-harvest.schema.json](../schemas/knowledge-harvest.schema.json). Each `rationale` must say **(1)** why this change yielded the candidate (extraction provenance: Grill Q, Brief Means, Context §6, existing POL extension, critique finding, etc.), **(2)** why the node is reusable across changes, **and** **(3)** what is non-obvious (choice, exception, or boundary). Set candidate `maturity` to `hypothesized` until human confirms; after gate apply, nodes are written `canonical`.
 5. Set `human_gate.required: true` when `candidates.length >= 1` **or** when the agent judges durable knowledge was discovered but needs human framing. Empty candidates with `required: false` is OK.
 6. **Never apply** candidates without `gate-approval.json` `scope: knowledge_harvest` and `decision` `approve` or `approve_partial`.
-7. On approval: create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
+7. On approval: if `.solidsdd/kg/` is still missing at this point, the **parent** runs `scripts/solidsdd-kg.sh init --root .` first (same mechanical scaffold as Consult step 1) before this Task writes anything. Then create nodes under `knowledge/<type>/` via `solidsdd-kg promote apply --approve --type …` or hand-authored Markdown (apply writes `maturity: canonical`); add downstream links (`derives_from` / `links.yaml`) from `<change_id>/R*` to knowledge ids; run `solidsdd-kg check`.
 8. On reject / skip: mark candidates `rejected` / `skipped` and proceed to `done`.
 
 ## Human gate
