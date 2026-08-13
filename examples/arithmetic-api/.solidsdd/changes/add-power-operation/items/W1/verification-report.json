@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec — validated in 10ms; 'Woohoo! Your API description is valid.' Operation enum now includes pow alongside add/sub/mul/div/mod.",
+      "covers": ["W1", "R6", "SC6"]
+    },
+    {
+      "name": "Full contract test suite (vitest, npm test)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "mise exec -- npm test → 2 test files, 15 tests, all passed (262ms). tests/contracts/calculator.test.ts: 9 tests (add:1, sub:1, mul:1, div:2, mod:2, pow:2 — pow post ResultIsPower for (2,3)/(-2,3)/(5,0), and explicit no-precondition assertions for b<=0 and a=0 cases). tests/contracts/memory.test.ts: 6 tests, unaffected. No regressions in pre-existing operations.",
+      "covers": ["W1", "R1", "R2", "R3", "R4", "R5", "SC1", "SC2", "SC3", "SC4", "SC5", "SC6"]
+    },
+    {
+      "name": "Live HTTP smoke test against POST /calculate and /memory/* (manual, supplementing absent automated integration suite)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Started `npm start` on PORT=3919 and curl'd end-to-end: POST /calculate {op:pow,a:2,b:10} -> 200 {result:1024}; {op:pow,a:2,b:-1} -> 200 {result:0.5} (negative exponent NOT rejected, confirming no precondition); {op:pow,a:0,b:0} -> 200 {result:1} (edge case NOT rejected). Regression spot-check: add/sub/mul/div/mod all return correct results via HTTP; div/mod by zero still return HTTP 400 {error:'divisor must be non-zero'} (PreconditionError path unaffected by pow addition); memory/add, /memory/recall, /memory/subtract, /memory/clear all behave correctly. Note: this repo has no automated HTTP/integration-level test file (tests/ only contains tests/contracts/calculator.test.ts and memory.test.ts, both unit-level against the Calculator/Memory modules directly) — this gap is pre-existing and applies equally to add/sub/mul/div/mod, not introduced by this item and not part of npm test. This check was performed manually (live curl against a running server), not by an automated harness, to satisfy the 'checkable via HTTP/API' framing in requirements/calculator.feature's Feature description; it is not repeatable via npm test and should not be read as closing that pre-existing gap.",
+      "covers": ["W1", "R1", "R3", "R6"]
+    }
+  ]
+}

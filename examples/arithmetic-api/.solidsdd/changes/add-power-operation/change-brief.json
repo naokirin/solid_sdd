@@ -1,0 +1,50 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "summary": "Extend the existing arithmetic calculator's POST /calculate endpoint with a new pow operation (a ** b), reusing the existing request/response shape and error handling, without introducing any precondition for pow and without touching memory operations, other arithmetic operations, or routes.",
+  "goal": "Callers can request exponentiation (pow) through POST /calculate the same way they already request add/sub/mul/div/mod, with pow computing a ** b and never rejected by a precondition check the way div/mod are.",
+  "background": "Follow-on to the done initial-calculator change. Today POST /calculate supports add, sub, mul, div, mod; there is no way to raise a to the power of b through the API, forcing client-side computation.",
+  "in_scope": [
+    { "id": "R1", "text": "Add pow to the op enum in openapi/openapi.yaml for POST /calculate, as an additive-only change." },
+    { "id": "R2", "text": "Extend contracts/Calculator.ocl with a pow operation contract that computes a ** b and defines no precondition." },
+    { "id": "R3", "text": "Add a new Gherkin Scenario for pow to requirements/calculator.feature." },
+    { "id": "R4", "text": "Implement pow in src/calculator.ts: extend the Operation union, add Calculator.pow, and add the calculate() switch arm returning a ** b." },
+    { "id": "R5", "text": "Add or extend contract tests in tests/contracts/*.test.ts covering pow, derived from the OCL/Gherkin for this change." }
+  ],
+  "out_of_scope": [
+    { "id": "X1", "text": "Memory operations (src/memory.ts, contracts/Memory.ocl, requirements/memory.feature) are unchanged." },
+    { "id": "X2", "text": "Existing operations add/sub/mul/div/mod keep their current behavior, contracts, and tests; no refactor of them." },
+    { "id": "X3", "text": "No new HTTP routes; pow only extends the existing POST /calculate endpoint." },
+    { "id": "X4", "text": "No precondition or domain-error check is introduced for pow (e.g. must not reject b <= 0, a == 0, or negative base with fractional exponent) — pow does not get the div/mod zero-divisor PreconditionError pattern." },
+    { "id": "X5", "text": "Overflow / special-value behavior for pow (Infinity, NaN, 0 ** 0) beyond native JS ** semantics is deferred, not tightened, in this change." },
+    { "id": "X6", "text": "No change to the POST /calculate response JSON shape; pow reuses the existing result shape." }
+  ],
+  "assumptions": [
+    "The existing PreconditionError type and the div/mod zero-divisor pattern established in initial-calculator remain unchanged; pow simply never throws it.",
+    "pow reuses the existing calculate() response shape (no new response fields); exact shape is confirmed at OpenAPI apply time, consistent with the other operations.",
+    "Native JS ** operator (IEEE-754 double) semantics for edge cases (very large exponents, 0 ** 0, NaN-producing inputs) are acceptable for this change unless a future change tightens them."
+  ],
+  "constraints": [
+    "pow must not have a zero-divisor-style precondition: OCL, tests, and implementation must not reject b <= 0, a == 0, or similar inputs for pow (Change Context §4 NFR1, §6).",
+    "The op enum change in openapi/openapi.yaml must be strictly additive: no existing enum value, route, or schema may be removed or narrowed (Change Context §4 NFR5).",
+    "contracts/Calculator.ocl remains the DbC source of truth for pow; contract tests are derived from OCL, not written ahead of it (Change Context §4 NFR6, repo adapter policy).",
+    "Stack stays as-is: TypeScript/Node, existing OpenAPI/OCL/Vitest toolchain (Change Context §5); no new dependencies for pow."
+  ],
+  "success_criteria": [
+    { "id": "SC1", "text": "openapi/openapi.yaml op enum includes pow and passes Redocly lint (--extends=spec) with only an additive diff versus the pre-change spec." },
+    { "id": "SC2", "text": "contracts/Calculator.ocl documents a pow operation computing a ** b with no precondition clause." },
+    { "id": "SC3", "text": "requirements/calculator.feature contains a new Scenario for pow asserting a ** b results for representative inputs." },
+    { "id": "SC4", "text": "src/calculator.ts implements Calculator.pow and calculate() handles op: \"pow\", returning a ** b." },
+    { "id": "SC5", "text": "tests/contracts/*.test.ts includes passing tests asserting pow results for representative inputs and asserting pow never throws PreconditionError." },
+    { "id": "SC6", "text": "All pre-existing contract tests and Gherkin Scenarios for add/sub/mul/div/mod and memory operations continue to pass unmodified (no regression)." }
+  ],
+  "open_questions": [
+    "Overflow / special-value behavior for pow (very large exponents, 0 ** 0, negative base with fractional exponent) is left to native JS ** semantics unless a later change tightens it — non-blocking, matches initial-calculator's deferred div/mod sign-convention precedent (Change Context §7).",
+    "Exact response JSON shape for pow results is deferred to OpenAPI apply, expected to match existing operations with no new shape — non-blocking (Change Context §7)."
+  ],
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Scope, precondition exclusion, and stack are already settled by the user's instruction and Change Context (gate required: false, confidence: high, no blocking §7 items); this Brief only makes that delta concrete, it does not introduce a new material default, breaking change, money/authz boundary, or low-confidence judgment."
+  }
+}

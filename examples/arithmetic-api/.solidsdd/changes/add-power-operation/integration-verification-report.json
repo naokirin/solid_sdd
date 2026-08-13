@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "openapi/openapi.yaml Redocly --extends=spec (whole-workspace, integration)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec -> validated in 11ms; 'Woohoo! Your API description is valid.' Independently confirmed the Operation enum change is additive-only: `git diff HEAD~1 -- openapi/openapi.yaml` shows a single line changed, `enum: [add, sub, mul, div, mod]` -> `enum: [add, sub, mul, div, mod, pow]`; no other paths, schemas, or routes touched.",
+      "covers": ["acceptance_of_whole", "SC1"]
+    },
+    {
+      "name": "Full contract + HTTP test suite (vitest, npm test) - whole workspace",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "mise exec -- npm test -> 3 test files, 18 tests, all passed (~330ms). tests/contracts/calculator.test.ts: 9 tests (add, sub, mul, div x2, mod x2, pow x2). tests/contracts/memory.test.ts: 6 tests, all passing, file untouched by this change (`git status --short` clean on memory files). tests/http/server.test.ts: 3 new tests (see dedicated check below). No regressions; test count rose from the prior report's 15 to 18 with the addition of tests/http/server.test.ts.",
+      "covers": ["acceptance_of_whole", "SC4", "SC5", "SC6"]
+    },
+    {
+      "name": "tests/http/server.test.ts: real HTTP-level test of src/server.ts's OPERATIONS whitelist (closes prior critique gap)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "This check directly answers the major finding in critique-integration-verification-report.json (unverifiable_acceptance): that no automated check exercised src/server.ts's request-routing/whitelist path, and that the prior report's own mutation test (removing \"pow\" from OPERATIONS) left all tests green. tests/http/server.test.ts now starts the real exported `requestListener` handler (via `createServer(requestListener).listen(0, ...)` on an ephemeral port, `src/server.ts`'s `listen()` call itself is guarded behind `isMainModule()` so it does not bind PORT during tests) and drives it with real `fetch()` calls: (1) POST /calculate {op:\"pow\",a:2,b:10} -> 200 {result:1024}, exercising `isOperation()` -> `OPERATIONS.has(\"pow\")` -> `Calculator.pow` end-to-end over HTTP; (2) POST /calculate {op:\"add\",a:2,b:3} -> 200 {result:5}, confirming the refactor (exporting `requestListener`, guarding `listen()`) is behavior-preserving for a pre-existing op; (3) POST /calculate {op:\"not-a-real-op\",...} -> 400, confirming the whitelist still rejects unknown ops. Ran `mise exec -- npm test`: 3/3 tests in this file pass as part of the 18/18 total. I independently re-ran the exact mutation the prior critique used to prove the gap: temporarily edited `OPERATIONS = new Set<Operation>([\"add\",\"sub\",\"mul\",\"div\",\"mod\",\"pow\"])` back to `[\"add\",\"sub\",\"mul\",\"div\",\"mod\"]` (dropping \"pow\") and re-ran `npm test` twice -> now FAILS as expected: 'POST /calculate (real HTTP layer) > dispatches op:pow through the OPERATIONS whitelist and returns 200 {result}' -> AssertionError: expected 400 to be 200 (17/18 passed, 1 failed, exit code 1). This is the opposite of the prior report's finding (previously this exact mutation left 15/15 green). File was restored (`git diff --stat -- src/server.ts` afterward shows only the change's real, intended diff: 21 insertions / 5 deletions for the `requestListener` export + `isMainModule()` guard + \"pow\" addition to OPERATIONS) and the clean re-run confirmed green again (18/18). The gap the previous critique found is therefore now demonstrably covered by an automated, re-runnable, regression-sensitive check, not prose or source inspection.",
+      "covers": ["acceptance_of_whole", "SC1", "SC4", "SC5", "SC6"]
+    },
+    {
+      "name": "contracts/Calculator.ocl documents pow with no precondition (source inspection)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Read contracts/Calculator.ocl directly: `context Calculator::pow(a: Real, b: Real): Real` / `post ResultIsPower: result = a ** b`, with an explicit comment noting the deliberate absence of a `pre` clause (unlike div/mod's DivisorIsNonZero). Matches ChangeBrief SC2 and constraint X4 verbatim.",
+      "covers": ["acceptance_of_whole", "SC2"]
+    },
+    {
+      "name": "requirements/calculator.feature contains a pow Scenario (source inspection, no regression to existing Scenarios)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Read requirements/calculator.feature: new Scenario 'Power raises the base to the exponent' tagged @R1 @R2 @R3 @R4 @R5 @SC1 @SC2 @SC3 @SC4 @SC5 @SC6, asserting a ** b results and 'never rejected by a precondition check'. `git diff HEAD~1 --stat -- requirements/calculator.feature` confirms this is a pure append (7 insertions, 0 deletions) with zero modification to the six pre-existing add/sub/mul/div/mod/div-by-zero/mod-by-zero Scenarios.",
+      "covers": ["acceptance_of_whole", "SC3", "SC6"]
+    },
+    {
+      "name": "src/calculator.ts implements Calculator.pow and calculate() op:\"pow\" (source inspection)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Read src/calculator.ts: Operation union includes \"pow\"; `Calculator.pow(a, b) { return a ** b; }`; calculate() switch has `case \"pow\": return Calculator.pow(a, b);`. No changes to add/sub/mul/div/mod implementations or the PreconditionError class.",
+      "covers": ["acceptance_of_whole", "SC4"]
+    },
+    {
+      "name": "tests/contracts/calculator.test.ts pow assertions cover result correctness and no-precondition (source inspection, cross-checked against passing run above)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "New `describe(\"OCL Calculator::pow\")` block asserts pow(2,3), pow(-2,3), pow(5,0) equal native ** results, and explicitly asserts pow(2,0), pow(2,-1), pow(0,0) do NOT throw PreconditionError (covering b<=0 and a==0 edge cases called out in ChangeBrief X4). All these assertions are part of the 18/18 passing run above.",
+      "covers": ["acceptance_of_whole", "SC5"]
+    }
+  ]
+}

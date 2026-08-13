@@ -1,0 +1,72 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "The new `pow` operation computes `a ** b` deterministically using standard IEEE-754 double-precision semantics, with no additional precondition/domain-error check introduced. Unlike `div`/`mod`, `pow` has no zero-divisor-style precondition, so OCL/tests must not invent one (e.g. must not reject `b <= 0` or `a == 0`).",
+      "rationale": "Prior change `initial-calculator` established named `PreconditionError` for div/mod-by-zero; `pow` must not silently inherit that pattern where it does not apply, or later NFR/OCL work will over-generalize preconditions onto an operation that has none.",
+      "threshold": "For all finite numeric `a`, `b` accepted by the existing `{op,a,b}` request shape, `pow` returns `a ** b` (JS `Math.pow`/`**` semantics) and never throws `PreconditionError`; malformed body still yields the existing generic 400, unchanged.",
+      "measurement": "OCL-derived Vitest contract test(s) for `pow` (add to `tests/contracts/calculator.test.ts` or a new file) plus a new Gherkin Scenario in `requirements/calculator.feature`.",
+      "verified_by": [
+        "tests/contracts/calculator.test.ts",
+        "contracts/Calculator.ocl",
+        "requirements/calculator.feature"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A — no authentication, authorization, or other security-sensitive surface is introduced by adding `pow`.",
+      "rationale": "Pure arithmetic addition to an already-unauthenticated sample endpoint; no new attack surface beyond the existing `POST /calculate` body validation."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no latency or throughput target is set for `pow`.",
+      "rationale": "Sample / evaluation workload; `pow` is a single native exponentiation operation with negligible cost relative to existing ops."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "The `pow` operation is checkable end-to-end via the HTTP/API surface and module contracts, consistent with the other operations, without relying on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires every in-scope operation to be machine-checkable, matching the precedent set for add/sub/mul/div/mod in `initial-calculator`.",
+      "threshold": "`openapi/openapi.yaml` documents `pow` in the `op` enum and request/response shapes remain otherwise unchanged; contract tests exist and pass for `pow`.",
+      "measurement": "Presence of `pow` in `openapi/openapi.yaml` `op` enum plus passing `tests/contracts/*` covering `pow`.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "tests/contracts/calculator.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Adding `pow` is strictly additive: the `op` enum gains one new value; existing `add`/`sub`/`mul`/`div`/`mod` request/response behavior, HTTP routes, and error shapes are unchanged.",
+      "rationale": "Change is explicitly scoped to a new operation only; out of scope includes memory operations, changing existing op behavior, and new routes (per change request).",
+      "threshold": "`openapi/openapi.yaml` structurally validates after the `op` enum extension (Redocly `--extends=spec`); no existing enum values, routes, or schemas are removed or narrowed.",
+      "measurement": "`openapi_lint` toolchain command (`npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec`) plus diff review confirming only additive enum change.",
+      "verified_by": [
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL remains the DbC source of truth for `pow`; contract tests are derived from `contracts/Calculator.ocl`, matching the existing adapter policy used for the other operations.",
+      "rationale": "Consistency with `initial-calculator` NFR6 / solid_sdd adapter policy: OCL first, tests derived, not the reverse.",
+      "threshold": "`contracts/Calculator.ocl` documents `pow` with the property from NFR1 (no spurious precondition), and `tests/contracts/calculator.test.ts` (or a new derived file) exercises it.",
+      "measurement": "Inspect `contracts/Calculator.ocl` for a `pow` operation/context; confirm `tests/contracts/` references it; regenerate via `solidsdd-derive-tests` if OCL changes after this intake.",
+      "verified_by": [
+        "contracts/Calculator.ocl",
+        "tests/contracts/calculator.test.ts"
+      ]
+    }
+  ]
+}

@@ -50,3 +50,39 @@ describe("OCL Calculator::mod", () => {
     expect(Calculator.mod(-7, -3)).toBe((-7) % -3);
   });
 });
+
+describe("OCL Calculator::pow", () => {
+  it("post ResultIsPower: result = a ** b", () => {
+    expect(Calculator.pow(2, 3)).toBe(2 ** 3);
+    expect(Calculator.pow(-2, 3)).toBe((-2) ** 3);
+    expect(Calculator.pow(5, 0)).toBe(5 ** 0);
+  });
+
+  // No `pre` clause in OCL (deliberate — ChangeBrief X4): pow must never
+  // reject inputs that div/mod would reject as zero-divisor violations.
+  it("has no precondition: never rejects b <= 0 or a == 0 with PreconditionError", () => {
+    expect(() => Calculator.pow(2, 0)).not.toThrow(PreconditionError);
+    expect(() => Calculator.pow(2, -1)).not.toThrow(PreconditionError);
+    expect(() => Calculator.pow(0, 0)).not.toThrow(PreconditionError);
+    expect(Calculator.pow(2, 0)).toBe(1);
+    expect(Calculator.pow(2, -1)).toBe(0.5);
+  });
+});
+
+describe("OCL Calculator::avg", () => {
+  it("post ResultIsMean: result = (a + b) / 2", () => {
+    expect(Calculator.avg(2, 4)).toBe((2 + 4) / 2);
+    expect(Calculator.avg(-2, 3)).toBe((-2 + 3) / 2);
+    expect(Calculator.avg(0, 0)).toBe(0);
+  });
+
+  // No `pre` clause in OCL (deliberate — ChangeBrief X4): avg must never
+  // reject inputs that div/mod would reject as zero-divisor violations.
+  it("has no precondition: never rejects b <= 0 or a == 0 with PreconditionError", () => {
+    expect(() => Calculator.avg(2, 0)).not.toThrow(PreconditionError);
+    expect(() => Calculator.avg(0, -1)).not.toThrow(PreconditionError);
+    expect(() => Calculator.avg(0, 0)).not.toThrow(PreconditionError);
+    expect(Calculator.avg(2, 0)).toBe(1);
+    expect(Calculator.avg(0, -1)).toBe(-0.5);
+  });
+});

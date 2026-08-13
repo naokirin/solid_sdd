@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "change_id": "add-avg-operation",
+  "summary": "Single coherent Slice: add the `avg` operation end-to-end across the OpenAPI `op` enum, the `Calculator.ocl` contract, the Gherkin Scenario, the `Calculator.avg` implementation and `OPERATIONS` whitelist wiring, module-level contract tests, and a real HTTP-level dispatch test. All Brief ids share the same implementation boundary, so this is one WorkPlan item, not a foundation/properties split.",
+  "acceptance_of_whole": "Scenario \"Average returns the mean of its operands\" in requirements/calculator.feature passes: `openapi/openapi.yaml` documents `avg` in the `op` enum (Redocly structural lint passes, additive-only diff); `contracts/Calculator.ocl` documents an `avg` operation with postcondition `result = (a + b) / 2` and no precondition; `tests/contracts/calculator.test.ts` passes for `avg` and never observes `PreconditionError`; `tests/http/server.test.ts` sends a real `POST /calculate` with `op: \"avg\"` and asserts a correct 200 response; and all pre-existing Scenarios, OCL contexts, contract tests, and HTTP tests for the other operations continue to pass unmodified.",
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Add the `avg` operation to the arithmetic calculator end-to-end: extend the `POST /calculate` `op` enum in openapi/openapi.yaml, add an `avg` context/operation to contracts/Calculator.ocl with postcondition `result = (a + b) / 2` and no precondition, add the new Gherkin Scenario, implement `Calculator.avg` in src/calculator.ts wired into the existing Operation union/dispatch, extend the `OPERATIONS` whitelist in src/server.ts so POST /calculate actually dispatches `avg`, add/extend OCL-derived module contract tests in tests/contracts/calculator.test.ts, and add a real HTTP-level test in tests/http/server.test.ts that sends `POST /calculate` with `op: \"avg\"` over an actual server instance and asserts a correct 200 response. All existing operations, routes, and error shapes must remain unchanged.",
+      "acceptance_criterion": "Scenario: Average returns the mean of its operands\n  Given a calculator service available to clients\n  When the client requests the average of two numbers\n  Then the result equals the arithmetic mean of those operands\n  And the operation is never rejected by a precondition check\n  And the request is reachable and successful over the real HTTP endpoint",
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "SC1",
+        "SC2",
+        "SC3",
+        "SC4",
+        "SC5",
+        "SC6"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Calculator.ocl",
+        "requirements/calculator.feature",
+        "src/calculator.ts",
+        "src/server.ts",
+        "tests/contracts/calculator.test.ts",
+        "tests/http/server.test.ts"
+      ],
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Average returns the mean of its operands",
+      "depends_on": [],
+      "status": "done",
+      "confidence": "high"
+    }
+  ]
+}

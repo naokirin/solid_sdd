@@ -1,0 +1,54 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "candidates": [
+    {
+      "id": "PAT-OPERATION-PRECONDITION-SCOPE",
+      "type": "pattern",
+      "title": "Decide each arithmetic operation's precondition scope from its own domain, not by analogy to sibling operations",
+      "scope": "product.arithmetic_api",
+      "body": "When adding a new operation to POST /calculate (or any future arithmetic op in this API), decide whether it needs a PreconditionError-guarded domain restriction (like div/mod's b === 0 zero-divisor check) by examining that operation's own mathematically undefined/invalid input region -- never by defaulting to, or mechanically copying, an existing sibling operation's precondition set. An operation with no genuinely undefined native-semantics input region (e.g. pow under IEEE-754 **) gets no precondition; one with a real undefined region (e.g. div/mod's zero divisor) does. Absence of a precondition must be a deliberate, explicit statement in Change Context/Brief, not a silent omission.",
+      "rationale": "(1) Extraction provenance: this change's Brief (X4, NFR1) and Change Context §6 explicitly state pow gets no zero-divisor-style PreconditionError, in deliberate contrast to div/mod's established pattern from the prior initial-calculator change -- the Brief calls this out specifically so later NFR/OCL work does not over-generalize the div/mod pattern onto pow. (2) Reuse: this project's operation set is evolving one operation at a time (add/sub/mul/div/mod, then pow); any future addition (e.g. sqrt, log, root) faces the identical judgment call of whether to inherit a precondition, so the criterion (domain-driven, not analogy-driven) is directly reusable across those changes. (3) Non-obvious boundary: the natural engineering instinct when adding a new op alongside div/mod is to also add an input-validation precondition 'for consistency', even where none is mathematically warranted; this pattern makes explicit that precondition scope is a per-operation domain judgment, not a house style applied uniformly across all operations -- which is exactly the over-generalization this change's Brief was written to head off.",
+      "source_refs": [
+        "add-power-operation/R2",
+        "add-power-operation/X4",
+        "add-power-operation/NFR1",
+        ".solidsdd/changes/add-power-operation/change-context.md#6-key-judgments-and-trade-offs"
+      ],
+      "status": "applied",
+      "maturity": "canonical",
+      "facets": ["decider"]
+    },
+    {
+      "id": "LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH",
+      "type": "lesson",
+      "title": "Green contract tests do not prove a new operation is reachable through the HTTP dispatch/whitelist layer",
+      "scope": "product.arithmetic_api",
+      "body": "Contract-level tests against module logic (e.g. Calculator.pow, calculate()) exercise business logic directly and can pass fully even when the HTTP layer (src/server.ts) never routes the new operation value to that logic -- e.g. because a hand-maintained request-validation whitelist (an OPERATIONS Set/array) was not updated to include it. Passing unit/contract tests are not sufficient evidence that a new operation is actually callable end-to-end over the real transport. Verify with an HTTP-layer test that sends a real request for the new operation and asserts success, and confirm the test's sensitivity with a mutation spot-check: temporarily remove the new value from the whitelist, rerun, confirm the HTTP test (and only that test) now fails, then restore.",
+      "rationale": "(1) Extraction provenance: this change's first-pass integration verification found all contract tests green for pow, but no automated check exercised src/server.ts's HTTP request-validation whitelist -- pow had not been added to the OPERATIONS Set, so it was unreachable over real HTTP despite fully passing contract tests. Critique flagged this as a scope gap; the fix added tests/http/server.test.ts, and re-verification independently reproduced the mutation spot-check (removing \"pow\" from the whitelist made exactly the new HTTP test fail, 17/18 vs 18/18) to confirm the gap was genuinely closed rather than merely asserted. (2) Reuse: this repo's whitelist-then-dispatch shape at the HTTP boundary (a validation list gating access to per-operation logic) is a recurring integration seam for every future operation or route addition, not specific to pow; the mutation-spot-check technique (deliberately break the code path a test claims to cover, confirm the test catches it) generalizes to any change that tags a check as 'covering' a given behavior. (3) Non-obvious boundary: a fully green contract-test suite is easy to mistake for full end-to-end coverage; this gap was invisible from contract-test output alone and surfaced only by explicitly exercising the transport layer -- future Briefs/WorkPlans should require an HTTP-layer check whenever a change adds a new dispatchable value behind a whitelist/switch, and should prefer mutation-style verification over trusting a verification report's 'covers' tag at face value.",
+      "source_refs": [
+        ".solidsdd/changes/add-power-operation/critique-integration-verification-report.json",
+        ".solidsdd/changes/add-power-operation/integration-verification-report.json",
+        "add-power-operation/R5"
+      ],
+      "status": "applied",
+      "maturity": "canonical",
+      "facets": ["acceptance-property"],
+      "link_edges": [
+        { "type": "derives_from", "from": "add-power-operation/R5", "to": "LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH" }
+      ]
+    }
+  ],
+  "skipped_reasons": [
+    "NFR5's additive-only op-enum-extension constraint (never remove/narrow an existing enum value, route, or schema) is standard API-compatibility discipline restated for this change; not proposed as a separate knowledge node because it carries no domain-specific non-obvious boundary beyond ordinary additive-API practice any competent API team would already apply -- tautological in this context.",
+    "Native JS ** (IEEE-754) edge-case semantics for pow (0 ** 0, NaN, Infinity, very large exponents) are left unhandled per this change's open_questions -- a one-off §5 tech-selection / edge-case deferral scoped to this change, not a reusable cross-change Means. Could become knowledge only if a future change deliberately tightens or hardens pow's edge-case behavior.",
+    "PreconditionError and the div/mod zero-divisor pattern are vocabulary/behavior originating from the prior initial-calculator change, not this one; add-power-operation's Brief/Context raise no new neighbor-confusion or scope risk about that term specifically, so no concept node is proposed here on this change's behalf. Flagging as a knowledge/ gap: this project has no knowledge/ directory yet at all, so a retroactive seed harvest against initial-calculator (covering PreconditionError, the div/mod precondition contract, and other core calculator vocabulary) is recommended as separate, deliberate future work rather than being folded into this change's harvest.",
+    "pow's reuse of the existing calculate() response shape (no new JSON fields) is explicitly marked 'deferred to OpenAPI apply' in this change's open_questions -- not yet a settled contract detail and not a Means-level judgment criterion, so not harvested.",
+    "Tooling gap: scripts/solidsdd-kg.sh build --root . failed with 'open .../.solidsdd/kg/schema.yaml: no such file or directory' -- this project has no .solidsdd/kg/ at all yet (consistent with there being no knowledge/ directory either), so 'promote suggest --json' could not be run. This harvest was produced entirely from filesystem reading of the change's artifacts (change-context.md, change-brief.json, integration-verification-report.json, critique-integration-verification-report.json) rather than CLI-assisted suggestion; cli_suggest is omitted rather than fabricated.",
+    "Apply-time note (both candidates applied, gate-approval.json scope: knowledge_harvest, decision: approve): knowledge/{concepts,policies,patterns,decisions,lessons}/ and .solidsdd/kg/{config.yaml,schema.yaml,links.yaml} were created for the first time in this project (config.yaml/schema.yaml copied unmodified from examples/inventory-reservation's kg scaffold, the only precedent in this repo). Both nodes were hand-authored as Markdown under knowledge/patterns/ and knowledge/lessons/ (frontmatter id/type/title/status:active/maturity:canonical/scope/facets/verified_at + body from each candidate's `body` field). `scripts/solidsdd-kg.sh build --root .` and `check --root .` now run successfully (nodes=35, edges=1, parse_issues=0; check exit 0, only pre-existing unrelated REQ_MUST_HAVE_IMPL/REQ_MUST_HAVE_VERIFY warns for both changes' requirements, no errors) -- the earlier schema-build failure was purely 'no .solidsdd/kg/ yet' and is resolved now that the scaffold exists. One downstream link was written to .solidsdd/kg/links.yaml: derives_from add-power-operation/R5 -> LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH. No link was written from add-power-operation/R2 to PAT-OPERATION-PRECONDITION-SCOPE: this repo's shared schema.yaml restricts derives_from's `to` type to [policy, invariant, requirement, decision, lesson, concept], which excludes `pattern` -- a requirement can currently link to a lesson/policy/decision/concept via derives_from but not to a pattern under this schema. Flagging as a follow-up schema gap rather than forcing an invalid edge; PAT-OPERATION-PRECONDITION-SCOPE's provenance is still carried via its own source_refs and body text."
+  ],
+  "human_gate": {
+    "required": true,
+    "reason": "2 candidates proposed (a reusable operation-precondition-scope pattern and a testing-strategy lesson about HTTP-dispatch coverage gaps); per skill policy human review is required before writing to knowledge/, and this is additionally the project's first-ever knowledge/ / .solidsdd/kg/ initialization, so the human should also decide whether to commission a separate retroactive seed harvest against the earlier initial-calculator change (see skipped_reasons) before or alongside approving these two."
+  }
+}

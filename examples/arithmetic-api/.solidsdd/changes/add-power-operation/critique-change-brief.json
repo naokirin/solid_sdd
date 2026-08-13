@@ -1,0 +1,27 @@
+{
+  "version": "1",
+  "subject": "change_brief",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": ".solidsdd/changes/add-power-operation/change-brief.json#R5",
+      "detail": "R5 targets \"tests/contracts/*.test.ts\" (a glob) while nfr.json (NFR1/NFR4/NFR6 verified_by) and success_criteria SC5 both point at the single existing file tests/contracts/calculator.test.ts. The glob still covers the intended file so this is not a scope or coverage defect, but tightening R5 to name the file explicitly (as the rest of the Brief/NFR already do) would remove a needless degree of freedom for solidsdd-decompose/implement."
+    },
+    {
+      "severity": "minor",
+      "category": "scope_gap",
+      "location": ".solidsdd/changes/add-power-operation/change-brief.json#success_criteria",
+      "detail": "X6 (\"No change to the POST /calculate response JSON shape\") is a named out-of-scope/constraint item, but no success_criteria entry directly verifies that the response shape for pow matches the existing shape (SC4 only checks that calculate() returns a ** b, not that the response envelope is unchanged). This is not a checkability hole today because the Brief's own open_questions explicitly and correctly defers exact response-shape confirmation to OpenAPI apply time with rationale (matching Change Context §7) — but decompose/judge should be aware there is currently no SC tied to X6 and may want to add one once the shape is confirmed."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-power-operation/change-brief.json#constraints",
+      "detail": "All four constraints restate points already made in in_scope/out_of_scope (or nfr.json) almost verbatim (e.g. the no-precondition constraint duplicates X4/R2, the additive-enum constraint duplicates R1/NFR5). Harmless redundancy/polish, not a contradiction — every restatement is consistent with the source item it echoes."
+    }
+  ],
+  "suggested_next_skills": [],
+  "summary": "Adversarial pass. Deterministic solidsdd-lint.sh ran clean (result: pass, zero findings) — schema shape, change_id match, and id well-formedness are already verified mechanically. LLM adequacy review against change-context.md / nfr.json / change-context-gate.json found no scope-creep or scope-gap: every in_scope item (R1-R5) maps onto a specific NFR or §3 functional-intent line (R1->NFR5, R2->NFR1/NFR6, R3->NFR1's Gherkin measurement, R4->§3, R5->NFR1/NFR4/NFR6), and no NFR or §3 requirement is left without a covering in_scope item. out_of_scope correctly and explicitly excludes a precondition for pow (X4 names the exact div/mod pattern it must not inherit — b<=0, a==0, negative base with fractional exponent — matching Change Context §6's explicit anti-generalization warning almost word for word), plus memory ops, other-op behavior, new routes, response-shape changes, and overflow/special-value tightening (X1-X3, X5-X6); none of these contradict in_scope, and none of Change Context's explicit non-goals are left unlisted. success_criteria (SC1-SC6) are all concrete and independently checkable (tool commands, file contents, or test assertions named directly: Redocly lint + additive diff, OCL text inspection, Gherkin Scenario presence, switch-arm behavior, passing/negative contract-test assertions, and a no-regression check on the pre-existing suite) — none are slogan-only. human_gate.required:false was independently re-derived against the major-table triggers (material agent_default tech, stack conflict, new security/money NFR, blocking §7 item): NFR2/NFR3 are explicitly out_of_scope with rationale, the two agent_default rows in Change Context §5 (native ** operator, no formal methods) are non-material given the fixed stack and absence of a concurrency/precision signal (already independently assessed as non-gating in critique-change-context.json for the same artifact), and both §7 open_questions are marked non-blocking with precedent — so the false gate stands, matching upstream confidence:high. No blocker or major findings; three minor polish/consistency notes listed above do not affect checkability and do not change the result."
+}

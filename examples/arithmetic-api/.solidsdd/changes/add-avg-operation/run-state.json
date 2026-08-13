@@ -1,0 +1,50 @@
+{
+  "version": "1",
+  "change_id": "add-avg-operation",
+  "phase": "done",
+  "wave_index": 0,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1",
+      "loop_phase": "done"
+    }
+  },
+  "isolation_notes": [
+    "intake_written",
+    "knowledge_consult_2_canonical_nodes_applicable",
+    "brief_written",
+    "critique_specification_pass_merged_change_context_and_brief",
+    "decompose_written_1_item_with_gherkin",
+    "critique_work_plan_pass",
+    "critique_cross_change_consistency_pass",
+    "W1_plan_slice_done_with_precedent_and_cheatsheet",
+    "W1_implement_slice_done_no_gap_this_time",
+    "W1_verify_slice_pass_first_try_acceptance_of_whole_tagged",
+    "cost_skip:B4_reused_items/W1/verification-report.json_skipped_integration_verify_and_its_critique",
+    "knowledge_harvest_no_new_candidates_existing_nodes_confirmed_working"
+  ],
+  "updated_at": "2026-08-13T11:39:50Z",
+  "host_toolchain": {
+    "ready": true,
+    "source": ".solidsdd/host-toolchain.json",
+    "missing": [],
+    "resolved_at": "2026-08-13T04:48:23Z"
+  },
+  "metrics": {
+    "started_at": "2026-08-13T10:55:00Z",
+    "task_launch_count": 11,
+    "critique_count": 3,
+    "completed_at": "2026-08-13T11:39:50Z"
+  }
+}

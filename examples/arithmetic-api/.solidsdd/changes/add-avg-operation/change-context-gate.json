@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "human_gate": {
+    "required": false,
+    "reason": "User instruction already settled framing: single additive operation (`avg`) on the existing `POST /calculate` endpoint, explicitly no new precondition (same pattern as the already-approved `pow` addition), explicit out-of-scope list (memory ops, existing-op behavior, new routes). Stack is `repo_existing` (TypeScript/OpenAPI/OCL/Vitest) with no conflict. No new security/money NFR. §7 items are non-blocking deferrals (rounding/precision, response shape, operand-count generalization), consistent with prior-change precedent (`initial-calculator`, `add-power-operation`)."
+  },
+  "confidence": "high",
+  "decisions_to_confirm": []
+}

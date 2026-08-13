@@ -1,10 +1,11 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { pathToFileURL } from "node:url";
 import { Calculator, PreconditionError, type Operation } from "./calculator.js";
 import { Memory } from "./memory.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
-const OPERATIONS = new Set<Operation>(["add", "sub", "mul", "div", "mod"]);
+const OPERATIONS = new Set<Operation>(["add", "sub", "mul", "div", "mod", "pow", "avg"]);
 
 /** Shared memory register for the process lifetime. */
 const memory = new Memory();
@@ -47,7 +48,13 @@ function isOperation(value: unknown): value is Operation {
   return typeof value === "string" && OPERATIONS.has(value as Operation);
 }
 
-createServer(async (req, res) => {
+/**
+ * The actual HTTP request-routing logic, exported so integration tests can
+ * exercise it directly over a real ephemeral-port server (via
+ * `createServer(requestListener).listen(0)`) without depending on the
+ * fixed PORT this module binds to when run as the main entrypoint.
+ */
+export async function requestListener(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     if (req.method === "POST" && req.url === "/calculate") {
       const body = (await readJson(req)) as Record<string, unknown>;
@@ -111,6 +118,15 @@ createServer(async (req, res) => {
     }
     sendJson(res, 500, { error: "internal error" });
   }
-}).listen(PORT, () => {
-  console.log(`arithmetic-api listening on http://localhost:${PORT}`);
-});
+}
+
+/** True only when this module is executed directly (e.g. `npm start`), not when imported by a test. */
+function isMainModule(): boolean {
+  return process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href;
+}
+
+if (isMainModule()) {
+  createServer(requestListener).listen(PORT, () => {
+    console.log(`arithmetic-api listening on http://localhost:${PORT}`);
+  });
+}

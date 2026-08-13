@@ -1,0 +1,44 @@
+{
+  "version": "1",
+  "change_id": "add-avg-operation",
+  "summary": "Add a new `avg` operation (`(a + b) / 2`) to the existing `POST /calculate` endpoint, extending the `initial-calculator` and `add-power-operation` surfaces (OpenAPI `op` enum, OCL contract, Gherkin Scenario, `Calculator` implementation, contract tests) without introducing a precondition for `avg`, a new route, or any change to existing operations.",
+  "goal": "Callers can request `op: \"avg\"` on `POST /calculate` and receive the arithmetic mean of `a` and `b`, verified end-to-end (module contracts and a real HTTP request), while every other operation, route, and error shape stays exactly as it is today.",
+  "background": "Follow-on to `initial-calculator` and `add-power-operation` (both `done`). Clients currently have no way to request an average through the shared arithmetic API surface and would otherwise have to compute it client-side.",
+  "in_scope": [
+    { "id": "R1", "text": "Extend the `op` enum in `openapi/openapi.yaml` for `POST /calculate` with `avg`; request/response shapes otherwise unchanged." },
+    { "id": "R2", "text": "Extend `contracts/Calculator.ocl` with an `avg` operation contract: postcondition `result = (a + b) / 2`, no precondition clause." },
+    { "id": "R3", "text": "Add a new Gherkin Scenario for `avg` in `requirements/calculator.feature`, alongside the existing add/sub/mul/div/mod/pow Scenarios." },
+    { "id": "R4", "text": "Implement `avg` in `src/calculator.ts` (`Calculator.avg`, wired into the existing `Operation` union / dispatch) returning `(a + b) / 2` and never throwing `PreconditionError`." },
+    { "id": "R5", "text": "Extend `src/server.ts`'s `OPERATIONS` whitelist to include `avg` so `POST /calculate` actually dispatches it." },
+    { "id": "R6", "text": "Add or extend module-level contract tests (`tests/contracts/calculator.test.ts`) for `avg`, derived from the OCL contract." },
+    { "id": "R7", "text": "Add a real HTTP-level test (`tests/http/server.test.ts`) that sends `POST /calculate` with `op: \"avg\"` over an actual server instance and asserts a correct 200 response — an explicit HTTP-dispatch-reachability success criterion distinct from and in addition to the module-level contract tests in R6." }
+  ],
+  "out_of_scope": [
+    { "id": "X1", "text": "Memory operations (`store` / `recall` / `clear`) — untouched by this change." },
+    { "id": "X2", "text": "Behavior of existing calculate operations (`add`, `sub`, `mul`, `div`, `mod`, `pow`) — unchanged request/response/error shapes." },
+    { "id": "X3", "text": "New HTTP routes — `avg` is served only via the existing `POST /calculate` endpoint." },
+    { "id": "X4", "text": "A precondition / domain-error (`PreconditionError`) for `avg` — deliberately not introduced." },
+    { "id": "X5", "text": "Rounding or precision guarantees for the `avg` result beyond native IEEE-754 double-precision division." },
+    { "id": "X6", "text": "Generalizing `avg` (or any operation) to accept more than two operands (`a`, `b`) — request shape is unchanged." }
+  ],
+  "assumptions": [
+    "`src/server.ts`'s `OPERATIONS` Set is the sole HTTP-layer gate for which `op` values reach `Calculator`; extending it is additive and does not require route changes.",
+    "Native JS double-precision division is an acceptable arithmetic semantics for `(a + b) / 2`; no precision/rounding requirement was stated (Change Context §7, non-blocking).",
+    "Working language for this Brief's string values: en (per Change Context §6)."
+  ],
+  "constraints": [
+    "avg's precondition scope must be decided per PAT-OPERATION-PRECONDITION-SCOPE (canonical pattern, cited not restated): no precondition unless the operation has its own mathematically undefined/invalid input region; `avg` has none, so it must not inherit the div/mod `PreconditionError` pattern by analogy.",
+    "HTTP-dispatch reachability for `avg` must be demonstrated by a real HTTP-level test, not module/contract tests alone, per LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH (canonical lesson, cited not restated): green contract tests against `Calculator.avg` do not prove `src/server.ts`'s `OPERATIONS` whitelist was updated.",
+    "Additive-only: no existing OpenAPI enum value, route, schema, or error shape may be removed or narrowed (NFR5)."
+  ],
+  "success_criteria": [
+    { "id": "SC1", "text": "`openapi/openapi.yaml` documents `avg` in the `op` enum; Redocly structural lint (`--extends=spec`) passes; diff shows only an additive enum change." },
+    { "id": "SC2", "text": "`contracts/Calculator.ocl` documents an `avg` context/operation with postcondition `result = (a + b) / 2` and no precondition clause." },
+    { "id": "SC3", "text": "`requirements/calculator.feature` contains a passing Gherkin Scenario for `avg` covering this Brief's `in_scope` ids." },
+    { "id": "SC4", "text": "`tests/contracts/calculator.test.ts` passes for `avg`, confirming `(a + b) / 2` and that `PreconditionError` is never thrown for it." },
+    { "id": "SC5", "text": "`tests/http/server.test.ts` contains a passing test that sends a real `POST /calculate` request with `op: \"avg\"` and asserts a correct successful response — proof of HTTP-dispatch reachability, not just module-level contract coverage." },
+    { "id": "SC6", "text": "All pre-existing Gherkin Scenarios, OCL contexts, contract tests, and HTTP tests for `add`/`sub`/`mul`/`div`/`mod`/`pow`/memory operations continue to pass unmodified." }
+  ],
+  "open_questions": [],
+  "confidence": "high"
+}

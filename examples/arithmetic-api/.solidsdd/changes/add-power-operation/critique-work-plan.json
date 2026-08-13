@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "work-plan.json#/items/0/touches",
+      "detail": "touches lists requirements/calculator.feature, but the new Scenario was already written into that file during decompose's own Gherkin normalization (it is present verbatim in requirements/calculator.feature before this item's loop runs). None of judge/apply/implement/verify for W1 is expected to edit the feature file again. Harmless here (single-item WorkPlan, nothing to serialize against), but keep touches limited to paths the item's loop will actually edit going forward so the contention-advisory stays meaningful on multi-item WorkPlans."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "work-plan.json#/items/0/covers (SC6)",
+      "detail": "Item W1 covers SC6 (\"all pre-existing contract tests and Gherkin Scenarios ... continue to pass unmodified\"), but W1's own acceptance_criterion (the pow Scenario) only asserts pow's result and its non-rejection by a precondition check — it does not itself encode a regression property. SC6 is only voiced at the WorkPlan-level acceptance_of_whole (\"existing add/sub/mul/div/mod and memory operations continue to behave unchanged\"), not in the item's checkable Scenario text. This is checkable in practice only because verify will re-run the full pre-existing suite unmodified; the cover is real but its evidence lives outside the item's own acceptance_criterion, which is worth being explicit about at verify time."
+    }
+  ],
+  "suggested_next_skills": [],
+  "summary": "solidsdd-lint (--project-root examples/arithmetic-api --change-id add-power-operation) passes with zero findings. Adversarial review of the single W1 item confirms it is neither over- nor under-fragmented: pow's success (result = a ** b) and its guaranteed non-rejection by a precondition check are two assertions on the same call/code path, not independently-failing behaviors, so bundling them into one Scenario matches the documented 'co-delivered channels of the same operation -> one item' rule; and bundling the OpenAPI enum edit (R1), OCL contract (R2), Gherkin Scenario (R3), implementation (R4), and contract tests (R5) into one item matches the required 'no vocabulary-only foundation on follow-on changes' rule for a small additive follow-on with one primary touch set. covers = R1-R5, SC1-SC6 maps cleanly to ChangeBrief in_scope/success_criteria ids and includes no out_of_scope (X1-X6) id anywhere. touches (openapi/openapi.yaml, contracts/Calculator.ocl, requirements/calculator.feature, src/calculator.ts, tests/contracts/calculator.test.ts) are all real, correctly-scoped paths that exclude memory.ts/Memory.ocl per X1. acceptance_criterion is property-level Gherkin (Given/When/Then, no bare numeric example) and matches the 'Power raises the base to the exponent' Scenario actually present in requirements/calculator.feature verbatim, with feature_path/scenario_name correctly set and Scenario tags (@R1 @R2 @R3 @R4 @R5 @SC1..@SC6) matching item.covers exactly. The absence of any pre/PreconditionError for pow is intentional per Brief X4/constraints, not a missing-precondition defect. Two minor adequacy nits noted (touches listing an already-normalized feature file; SC6's regression evidence living only in acceptance_of_whole rather than in the item's own Scenario text) do not lose checkability and do not fail the loop."
+}

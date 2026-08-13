@@ -18,3 +18,19 @@ post ResultIsQuotient: result = a / b
 context Calculator::mod(a: Real, b: Real): Real
 pre DivisorIsNonZero: b <> 0
 post ResultIsRemainder: result = a - b * (a / b).truncatedTowardZero()
+
+-- JavaScript `**` exponentiation (IEEE-754 double semantics).
+-- Deliberately no `pre` clause: unlike div/mod, pow does not reject any (a, b)
+-- pair with a zero-divisor-style PreconditionError (ChangeBrief X4 / Change
+-- Context NFR1 & §6). Any a, b accepted by the request shape is valid input.
+context Calculator::pow(a: Real, b: Real): Real
+post ResultIsPower: result = a ** b
+
+-- Arithmetic mean of the two operands.
+-- Deliberately no `pre` clause: like pow, avg has no mathematically
+-- undefined/invalid input region, so it must not inherit the div/mod
+-- zero-divisor-style PreconditionError pattern by analogy (ChangeBrief X4,
+-- PAT-OPERATION-PRECONDITION-SCOPE). Any a, b accepted by the request shape
+-- is valid input.
+context Calculator::avg(a: Real, b: Real): Real
+post ResultIsMean: result = (a + b) / 2

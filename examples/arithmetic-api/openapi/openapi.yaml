@@ -115,7 +115,7 @@ components:
   schemas:
     Operation:
       type: string
-      enum: [add, sub, mul, div, mod]
+      enum: [add, sub, mul, div, mod, pow, avg]
     CalculateRequest:
       type: object
       additionalProperties: false

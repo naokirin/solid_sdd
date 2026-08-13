@@ -1,0 +1,27 @@
+{
+  "version": "1",
+  "subject": "change_context",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-power-operation/change-brief.json",
+      "detail": "solidsdd-lint.sh (scripts/solidsdd-lint/lint.py:262-266) reports a major 'change-brief.json missing for active change' finding because it unconditionally expects a Brief once status.json is 'active'. This is a lint-tool limitation, not a defect of the Change Context artifact under review: run-state.json shows phase 'intake' and change-context.md itself documents the Brief as 'not yet written' in §8 Links. Per change-context.md, solidsdd-run runs critique(change_context) before solidsdd-brief, so no Brief is expected to exist yet at this checkpoint. Downgraded from lint's 'major' to 'minor' and excluded from the pass/fail decision for this subject; re-run lint after solidsdd-brief writes change-brief.json."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-power-operation/nfr.json#items/*/verified_by",
+      "detail": "NFR1, NFR4, NFR5, NFR6 already populate verified_by with target file paths (tests/contracts/calculator.test.ts, contracts/Calculator.ocl, openapi/openapi.yaml, requirements/calculator.feature) even though none of those files currently mention `pow` (confirmed: no `pow` hits in src/, contracts/Calculator.ocl, or requirements/calculator.feature) and the change is still in the intake phase. verified_by is documented as 'filled as verify progresses' — these are forward-declared intended evidence locations, not yet actual evidence. Harmless (schema doesn't restrict this), but slightly optimistic; would read cleaner as empty until solidsdd-verify populates them, or explicitly labeled as planned/target paths."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-power-operation/change-context.md#5",
+      "detail": "Two of five §5 technology-selection rows are source 'agent_default' (native `**`/Math.pow implementation choice; formal methods not applied). Neither matches the gate table's 'material' examples (language/runtime, API style, persistence, contract approach) — the implementation-operator choice has no realistic alternative given the already-fixed TS/Node stack and no precision requirement, and 'no formal methods' follows judgment-axes.md's default (concurrency_safety signal absent) rather than an arbitrary pick. Listed for completeness but does not rise to a gate-triggering material default, so it does not change the human_gate verdict below."
+    }
+  ],
+  "suggested_next_skills": [],
+  "summary": "Adversarial pass. All eight required headings (§1-§8) are present verbatim and in order; nothing is invented or missing. §4 is a faithful projection of nfr.json — verified independently: all six required qualities (reliability, security, performance, operability, compatibility, maintainability) are present, the three out-of-scope/deferred-adjacent items (NFR2, NFR3) carry explicit N/A + rationale, and all four in_scope items (NFR1, NFR4, NFR5, NFR6) carry both threshold and measurement in nfr.json with matching prose in the Markdown table — no contradiction between the two. §5's five decisions each carry decision/alternatives/rationale/source; the three non-agent_default rows (language/runtime, API style, module contracts) are correctly sourced as repo_existing/user, cross-checked against contracts/Calculator.ocl (existing div/mod pre-conditions confirm the PreconditionError precedent cited in §6) and openapi/openapi.yaml (existing /calculate endpoint, no pow yet, as expected pre-implementation). §6 states a specific, checkable, non-obvious judgment (pow has no zero-divisor-style precondition, contrary to div/mod) with an explicit anti-pattern warning for later phases, plus the required working-language bullet. §7's two open questions are both explicitly marked non-blocking and consistent with the initial-calculator precedent. The change-context-gate.json verdict (human_gate.required: false, confidence: high) was independently re-derived against every trigger in the gate table: no material agent_default choice among the canonical trigger categories, no user/repo-stack conflict, no new security/money NFR (NFR2 is explicitly out_of_scope with rationale), no blocking §7 item, and the framing is unambiguous — so 'false' is correct, not an under-gate. Deterministic solidsdd-lint.sh ran clean for change-context.md, nfr.json, and change-context-gate.json (schema, change_id match, quality coverage, in-scope threshold/measurement all pass); its one 'major' output concerns change-brief.json, which is out of scope for this artifact and this pipeline checkpoint (Brief is written after this critique per the documented phase order), so it is downgraded to a minor, non-blocking note rather than treated as a change_context defect. Net: no blocker or major findings against change-context.md / nfr.json / change-context-gate.json; three minor notes listed for polish."
+}

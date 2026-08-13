@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "approved_at": "2026-08-13T08:55:00Z",
+  "approver": "naoki.rin186@gmail.com (chat: 両方承認)",
+  "scope": "knowledge_harvest",
+  "decision": "approve",
+  "note": "Approve apply of both harvest candidates: PAT-OPERATION-PRECONDITION-SCOPE, LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH.",
+  "artifact_paths": [
+    ".solidsdd/changes/add-power-operation/knowledge-harvest.json"
+  ]
+}

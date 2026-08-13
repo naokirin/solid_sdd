@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "change-brief.json#in_scope/R1",
+      "detail": "`initial-calculator`'s out_of_scope X4 (\"Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder\") is worded broadly enough to brush against adding `avg`. This is not a silent drift: `add-avg-operation`'s own Brief explicitly opens this scope in R1/R2 with an explicit rationale, exactly the precedent already set (and already passed) by `add-power-operation` adding `pow` under the same X4 wording. No action needed; noting only so the precedent is visible if a future reviewer re-checks X4 literally."
+    }
+  ],
+  "summary": "Efficient-method pass per adversarial-critique.md: checked add-avg-operation's Brief in_scope (R1-R7) and WorkPlan touches (openapi/openapi.yaml, contracts/Calculator.ocl, requirements/calculator.feature, src/calculator.ts, src/server.ts, tests/contracts/calculator.test.ts, tests/http/server.test.ts) against both prior done changes' out_of_scope lists (initial-calculator X1-X7, add-power-operation X1-X6). No intersection: avg does not touch memory (X1/X2 of either), does not change existing add/sub/mul/div/mod/pow behavior or contracts (X2 of add-power-operation, confirmed by reading contracts/Calculator.ocl and requirements/calculator.feature directly - the pow context/Scenario is untouched by anything avg-related, since avg has not yet been applied to non-Gherkin artifacts), adds no new HTTP route (X3 of both), introduces no precondition analogous to pow's X4, and does not change request/response shape or operand count (X6 of add-power-operation / X5-X6 of the current Brief), confirmed against openapi.yaml's CalculateRequest/CalculateResponse schemas which remain two-operand. The diff to date is purely additive at every touched location: openapi.yaml's Operation enum gains one value (add/sub/mul/div/mod/pow -> +avg pattern, not yet applied), and requirements/calculator.feature already carries the new 'Average returns the mean of its operands' Scenario appended after the existing seven Scenarios (including the already-landed 'Power' Scenario) with none of their Given/When/Then steps altered; its tags (@R1-@R7 @SC1-@SC6) are scoped to add-avg-operation's own Brief id space and do not reuse or collide with any prior change's out_of_scope ids. Neither existing OCL context (add/sub/mul/div/mod/pow) nor any existing Scenario is modified - avg is a wholly new context/Scenario, not an edit to one already in force. scripts/solidsdd-lint.sh (maintainer checkout fallback, no vendored .solidsdd/tooling.json present) ran clean with zero findings. One minor note listed above for traceability; no blocker or major findings - checkability of both this change and the two prior done changes remains fully intact."
+}

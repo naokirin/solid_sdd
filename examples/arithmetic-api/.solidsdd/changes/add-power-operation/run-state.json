@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "phase": "done",
+  "wave_index": 0,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {
+    "W1": {
+      "status": "done",
+      "loop_retry": {
+        "remaining": 3,
+        "max": 3,
+        "last_suggested_skills": []
+      },
+      "artifact_dir": "items/W1",
+      "loop_phase": "done"
+    }
+  },
+  "isolation_notes": [
+    "intake_written",
+    "critique_change_context_pass",
+    "brief_written",
+    "critique_change_brief_pass",
+    "decompose_written",
+    "decompose_gherkin_correction_orchestrator_error",
+    "critique_work_plan_pass",
+    "critique_cross_change_consistency_pass",
+    "W1_plan_slice_done",
+    "loop_phase_enum_mismatch_legacy_fine_grained_names_vs_consolidated_model",
+    "W1_implement_slice_done",
+    "W1_verify_slice_pass_done",
+    "integration_verify_pass",
+    "critique_integration_verification_report_FAIL_no_automated_http_test_for_server.ts_OPERATIONS_whitelist",
+    "tooling_gap:run-state_cli_has_no_run_retry_decrement_command_contradicts_loop-retry.md",
+    "critique_integration_verification_report_pass_after_retry",
+    "knowledge_harvest_written_awaiting_gate_2_candidates",
+    "knowledge_applied_2_candidates"
+  ],
+  "updated_at": "2026-08-13T08:58:30Z",
+  "host_toolchain": {
+    "ready": true,
+    "source": ".solidsdd/host-toolchain.json",
+    "missing": [],
+    "resolved_at": "2026-08-13T04:48:23Z"
+  },
+  "metrics": {
+    "started_at": "2026-08-13T06:41:18Z",
+    "task_launch_count": 18,
+    "critique_count": 6,
+    "completed_at": "2026-08-13T08:58:30Z"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "version": "1",
+  "change_id": "add-avg-operation",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "The new `avg` operation computes `(a + b) / 2` deterministically using standard IEEE-754 double-precision semantics, with no additional precondition/domain-error check introduced. Like `pow` (and unlike `div`/`mod`), `avg` has no zero-divisor-style precondition, so OCL/tests must not invent one.",
+      "rationale": "Prior changes established two patterns on this same endpoint: `div`/`mod` use a named `PreconditionError` for a genuinely undefined input region (zero divisor); `pow` has no such region and gets none. `avg` mathematically has no undefined input region either (division is always by the constant `2`), so it must follow the `pow` pattern, not be over-generalized into the `PreconditionError` pattern by analogy alone.",
+      "threshold": "For all finite numeric `a`, `b` accepted by the existing `{op,a,b}` request shape, `avg` returns `(a + b) / 2` and never throws `PreconditionError`; malformed body still yields the existing generic 400, unchanged.",
+      "measurement": "OCL-derived Vitest contract test(s) for `avg` (added to `tests/contracts/calculator.test.ts` or a new file) plus a new Gherkin Scenario in `requirements/calculator.feature`.",
+      "verified_by": [
+        "tests/contracts/calculator.test.ts",
+        "contracts/Calculator.ocl",
+        "requirements/calculator.feature"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A — no authentication, authorization, or other security-sensitive surface is introduced by adding `avg`.",
+      "rationale": "Pure arithmetic addition to an already-unauthenticated sample endpoint; no new attack surface beyond the existing `POST /calculate` body validation."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no latency or throughput target is set for `avg`.",
+      "rationale": "Sample / evaluation workload; `avg` is a single addition plus a division by a constant, with negligible cost relative to existing ops."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "The `avg` operation is checkable end-to-end via the HTTP/API surface and module contracts, consistent with the other operations, without relying on opaque internals alone.",
+      "rationale": "solid_sdd evaluation path requires every in-scope operation to be machine-checkable, matching the precedent set for add/sub/mul/div/mod/pow. Contract-level (module) tests alone are not sufficient evidence that a new operation value is actually dispatched by the HTTP layer, so end-to-end coverage is required, not optional.",
+      "threshold": "`openapi/openapi.yaml` documents `avg` in the `op` enum and request/response shapes remain otherwise unchanged; contract tests exist and pass for `avg`; an HTTP-level test sends a real request with `op: \"avg\"` and asserts success.",
+      "measurement": "Presence of `avg` in `openapi/openapi.yaml` `op` enum, passing `tests/contracts/*` covering `avg`, and a passing `tests/http/server.test.ts` case for `avg`.",
+      "verified_by": [
+        "openapi/openapi.yaml",
+        "tests/contracts/calculator.test.ts",
+        "tests/http/server.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "in_scope",
+      "requirement": "Adding `avg` is strictly additive: the `op` enum gains one new value; existing `add`/`sub`/`mul`/`div`/`mod`/`pow` request/response behavior, HTTP routes, and error shapes are unchanged.",
+      "rationale": "Change is explicitly scoped to a new operation only; out of scope includes memory operations, changing existing op behavior, and new routes (per change request).",
+      "threshold": "`openapi/openapi.yaml` structurally validates after the `op` enum extension (Redocly `--extends=spec`); no existing enum values, routes, or schemas are removed or narrowed.",
+      "measurement": "`openapi_lint` toolchain command (`npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec`) plus diff review confirming only additive enum change.",
+      "verified_by": [
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "UML OCL remains the DbC source of truth for `avg`; contract tests are derived from `contracts/Calculator.ocl`, matching the existing adapter policy used for the other operations.",
+      "rationale": "Consistency with `initial-calculator` NFR6 / `add-power-operation` NFR6 / solid_sdd adapter policy already adopted in this repo — OCL first, tests derived, not the reverse.",
+      "threshold": "`contracts/Calculator.ocl` documents `avg` with the property from NFR1 (no spurious precondition), and `tests/contracts/calculator.test.ts` (or a new derived file) exercises it.",
+      "measurement": "Inspect `contracts/Calculator.ocl` for an `avg` operation/context; confirm `tests/contracts/` references it; regenerate via `solidsdd-derive-tests` if OCL changes after this intake.",
+      "verified_by": [
+        "contracts/Calculator.ocl",
+        "tests/contracts/calculator.test.ts"
+      ]
+    }
+  ]
+}

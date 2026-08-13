@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "subject": "cross_change_consistency",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "scope_gap",
+      "location": ".solidsdd/changes/add-power-operation/change-context.md#8 (cf. .solidsdd/changes/initial-calculator/change-brief.json#out_of_scope/X4)",
+      "detail": "initial-calculator's out_of_scope X4 (\"Scientific, bitwise, or advanced math beyond add/sub/mul/div/remainder\") could plausibly be read to cover exponentiation, and add-power-operation's R1 now adds exactly that. This is not scope drift under the calibration rule (\"new change that deliberately opens that scope in its own Brief\" is not major) — add-power-operation's Brief plainly and intentionally lists pow as in_scope (R1) with rationale in Change Context §1/§3/§6, so the reopening is deliberate, not silent. But neither change-context.md §2/§8 nor change-brief.json cites initial-calculator's X4 by id; §8 only names the prior change generically (\"establishes Calculator, PreconditionError, and the div/mod precondition pattern\"). Explicitly citing X4 as the boundary being deliberately extended would tighten the audit trail per change-context.md's Cross-change framing guidance (list prior out_of_scope that must not be silently contradicted) without changing any decision already made."
+    },
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": "requirements/calculator.feature (tag namespace across changes)",
+      "detail": "The new \"Power raises the base to the exponent\" Scenario is tagged @R1 @R2 @R3 @R4 @R5 @SC1..@SC6, reusing the same tag strings (@R1, @R5, @SC1, @SC4, etc.) that the pre-existing add/sub/mul/div/mod/memory Scenarios already use to point at initial-calculator's Brief ids. Within each change this is correctly scoped (solidsdd-lint.sh --change-id add-power-operation validates tags against add-power-operation's own WorkPlan.covers and passes clean), but a reader scanning the cumulative requirements/calculator.feature file without change-id context cannot tell from the tag alone which Brief (initial-calculator vs add-power-operation) @R1 refers to on a given Scenario. No checkability is lost (each change's lint/critique is change-scoped), but a change-qualified tag convention (e.g. change_id noted alongside tags, or in a Scenario comment) would remove this ambiguity for future follow-on changes."
+    }
+  ],
+  "suggested_next_skills": [],
+  "summary": "Pass. Compared add-power-operation's change-brief.json / work-plan.json against the done initial-calculator baseline (change-brief.json, work-plan.json, openapi/openapi.yaml, contracts/Calculator.ocl, requirements/calculator.feature, src/calculator.ts) and against the major-table checks in adversarial-critique.md#cross_change_consistency. No silent rewrite of prior acceptance: all five pre-existing add/sub/mul/div/mod Scenarios and the two zero-divisor-failure Scenarios are untouched in requirements/calculator.feature, and add-power-operation's own out_of_scope (X1-X6) explicitly preserves them (X2) plus memory (X1), routes (X3), response shape (X6), and the div/mod PreconditionError pattern (X4, reinforced by NFR1/Context §6's explicit anti-generalization warning) unchanged. The op enum extension is strictly additive: current openapi/openapi.yaml Operation enum is [add, sub, mul, div, mod] with no pow yet (apply-api has not run), and R1/NFR5/SC1 all specify adding pow only, with no removed or renamed value anywhere in the Brief/WorkPlan text. No naming collision: Calculator.pow / calculate() op:\"pow\" do not clash with any existing symbol, OCL context, HTTP route, or Gherkin Scenario name; contracts/Calculator.ocl has no pow context yet and pow's planned no-precondition contract does not weaken or contradict the existing DivisorIsNonZero preconditions on div/mod (different operation contexts). solidsdd-lint.sh --project-root examples/arithmetic-api --change-id add-power-operation ran clean (result: pass, zero findings) confirming schema, change_id match, id/covers/tag consistency, and no depends_on cycle. Two minor findings noted for traceability/readability (explicit X4 cross-reference; tag-namespace ambiguity across changes' reused @R*/@SC* ids in the shared feature file) — neither loses checkability nor blocks the loop."
+}

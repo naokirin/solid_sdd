@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "work_plan",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": ".solidsdd/changes/add-avg-operation/work-plan.json",
+      "detail": "This WorkPlan omits the optional `human_gate` object at the plan level (and at item `W1`), while both sibling WorkPlans in this project (`initial-calculator` and `add-power-operation`) include a plan-level `human_gate` — and `add-power-operation` also includes an item-level `human_gate` restating the same rationale. `human_gate` is optional per `work-plan.schema.json` (not required), and its absence here causes no checkability loss: the gate question was already resolved at the Specification Review (`change-context-gate.json` `required:false`, `confidence: high`, upheld by `critique-specification.json`). Still, it breaks an established paper-trail convention in this project's WorkPlans; a one-line `human_gate: {required:false, reason:...}` block would restore consistency."
+    }
+  ],
+  "summary": "Adversarial review of work-plan.json against change-brief.json and the new `avg` Scenario in requirements/calculator.feature, targeted rather than a full repo re-exploration: scripts/solidsdd-lint.sh passed with zero findings. Fragmentation is correct — this is genuinely one coherent, independently-checkable slice (one new operation, one new Scenario, no independently-failing sub-behavior since `avg` has no precondition), matching the canonical consolidated slice model and the identical shape already used for the `pow` follow-on; splitting it further would produce a vacuous-verify item. `touches` is accurate and complete: all seven paths (openapi/openapi.yaml, contracts/Calculator.ocl, requirements/calculator.feature, src/calculator.ts, src/server.ts, tests/contracts/calculator.test.ts, tests/http/server.test.ts) exist in the repo, map 1:1 onto Brief R1–R7, and `avg` is confirmed absent from src/server.ts's OPERATIONS whitelist and src/calculator.ts's Operation union today (correctly not-yet-implemented, consistent with item `status: ready`). `covers` is exact and complete: item W1 covers R1–R7 and SC1–SC6, i.e. every Brief `in_scope` and `success_criteria` id and nothing from `out_of_scope` (X1–X6 absent). `acceptance_criterion`'s Gherkin text is byte-for-byte identical to the \"Average returns the mean of its operands\" Scenario actually present in requirements/calculator.feature (Given/When/Then/And/And, including the HTTP-dispatch-reachability clause), and that Scenario's tags (@R1–@R7 @SC1–@SC6) match `covers` exactly; `feature_path` and `scenario_name` are correct. `acceptance_of_whole` correctly enumerates the same checks as Brief SC1–SC6. One minor consistency nit is listed above; no blocker or major findings — checkability is fully intact."
+}

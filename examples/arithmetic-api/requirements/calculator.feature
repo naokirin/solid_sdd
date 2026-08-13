@@ -50,3 +50,18 @@ Feature: Arithmetic calculator operations
     When the client takes the remainder with a zero divisor
     Then the operation fails with a named domain error
     And the failure is not an opaque language or runtime error
+
+  @R1 @R2 @R3 @R4 @R5 @SC1 @SC2 @SC3 @SC4 @SC5 @SC6
+  Scenario: Power raises the base to the exponent
+    Given a calculator service available to clients
+    When the client raises one number to the power of another
+    Then the result equals the mathematical power of those operands
+    And the operation is never rejected by a precondition check
+
+  @R1 @R2 @R3 @R4 @R5 @R6 @R7 @SC1 @SC2 @SC3 @SC4 @SC5 @SC6
+  Scenario: Average returns the mean of its operands
+    Given a calculator service available to clients
+    When the client requests the average of two numbers
+    Then the result equals the arithmetic mean of those operands
+    And the operation is never rejected by a precondition check
+    And the request is reachable and successful over the real HTTP endpoint

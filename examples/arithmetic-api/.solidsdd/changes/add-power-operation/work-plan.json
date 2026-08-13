@@ -1,0 +1,47 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "summary": "Single coherent slice: add pow (a ** b) to POST /calculate end-to-end \u2014 OpenAPI op enum, Calculator.ocl contract (no precondition), a new Gherkin Scenario, src/calculator.ts implementation, and contract tests \u2014 as one additive follow-on change with no independently-failing sub-behavior.",
+  "acceptance_of_whole": "Scenario: Calculator service supports pow via POST /calculate\n  Given the arithmetic calculator service for clients\n  When a client requests op: \"pow\" with two operands a and b\n  Then the result equals the mathematical power of those operands (a ** b) for representative inputs\n  And the operation never fails with a precondition error\n  And existing add/sub/mul/div/mod and memory operations continue to behave unchanged",
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Scope, precondition exclusion, and stack are already settled by the ChangeBrief (gate required: false, confidence: high); this WorkPlan only slices that Brief into one checkable item and introduces no new judgment, breaking change, or money/authz boundary."
+  },
+  "items": [
+    {
+      "id": "W1",
+      "intent": "Add the pow operation (a ** b) to the existing calculator service end-to-end: extend the OpenAPI op enum additively, extend Calculator.ocl with a pow contract that has no precondition, add a Gherkin Scenario for pow, implement Calculator.pow and the calculate() switch arm in src/calculator.ts, and extend the contract tests to assert pow results and the absence of a PreconditionError \u2014 without touching memory operations or existing add/sub/mul/div/mod behavior.",
+      "acceptance_criterion": "Scenario: Power raises the base to the exponent\n  Given a calculator service available to clients\n  When the client raises one number to the power of another\n  Then the result equals the mathematical power of those operands\n  And the operation is never rejected by a precondition check",
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "SC1",
+        "SC2",
+        "SC3",
+        "SC4",
+        "SC5",
+        "SC6"
+      ],
+      "touches": [
+        "openapi/openapi.yaml",
+        "contracts/Calculator.ocl",
+        "requirements/calculator.feature",
+        "src/calculator.ts",
+        "tests/contracts/calculator.test.ts"
+      ],
+      "feature_path": "requirements/calculator.feature",
+      "scenario_name": "Power raises the base to the exponent",
+      "depends_on": [],
+      "status": "done",
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "Same rationale as WorkPlan-level gate: settled scope, additive-only change, no precondition/breaking/money/authz boundary introduced."
+      }
+    }
+  ]
+}

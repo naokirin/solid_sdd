@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "change_id": "add-avg-operation",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "Redocly structural lint (openapi/openapi.yaml, --extends=spec)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "Command: `mise exec -- npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec`. Output: \"openapi/openapi.yaml: validated in 11ms / Woohoo! Your API description is valid.\" Diff vs HEAD confirmed additive-only: `enum: [add, sub, mul, div, mod]` -> `enum: [add, sub, mul, div, mod, pow, avg]` (no removals/narrowing).",
+      "covers": ["W1", "R1", "SC1"]
+    },
+    {
+      "name": "Full contract/HTTP test suite (npm test / vitest run)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "Command: `mise exec -- npm test` (vitest v3.2.7). Result: 3 test files, 21 tests, all passed in 335ms. Files: tests/contracts/memory.test.ts (6 passed), tests/contracts/calculator.test.ts (11 passed, incl. new `describe(\"OCL Calculator::avg\")` block asserting result = (a+b)/2 for (2,4)->3, (-2,3)->0.5, (0,0)->0, and explicitly asserting `PreconditionError` is never thrown for avg on b<=0 / a==0 inputs that would reject div/mod), tests/http/server.test.ts (4 passed, incl. `dispatches op:avg through the OPERATIONS whitelist and returns 200 {result}` sending a real `POST /calculate` with op:\"avg\" over an actual server instance/fetch and asserting {result:6} for a=2,b=10). No test file, describe block, or assertion for add/sub/mul/div/mod/pow/memory was modified or removed — all pre-existing tests pass unmodified, confirming no regression.",
+      "covers": ["W1", "R2", "R3", "R4", "R5", "R6", "R7", "SC2", "SC3", "SC4", "SC5", "SC6", "acceptance_of_whole"]
+    },
+    {
+      "name": "TypeScript typecheck (tsc --noEmit)",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Command: `mise exec -- node node_modules/.bin/tsc --noEmit -p .`. Exit code 0, no diagnostics. Confirms `Calculator.avg` and the `OPERATIONS` whitelist extension type-check against the existing `Operation` union with no `any`/unsafe casts introduced.",
+      "covers": ["W1"]
+    }
+  ]
+}

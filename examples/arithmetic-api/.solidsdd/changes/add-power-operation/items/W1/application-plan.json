@@ -1,0 +1,36 @@
+{
+  "version": "1",
+  "change_id": "add-power-operation",
+  "summary": "Extend the existing POST /calculate boundary and the Calculator domain contract with a pow operation. Both targets are additive-only, standard-density: the API gains one enum value with no schema/route changes, and the OCL gains a post-only contract for pow with no precondition, matching ChangeBrief X4 / Change Context NFR1/§6. No breaking, money, authz, or formal signals apply, so no human gate is needed beyond the already-settled Brief.",
+  "human_gate": {
+    "required": false,
+    "reason": "additive_change only (new op enum value + new post-only OCL contract, no removals/tightenings); ChangeBrief already recorded human_gate.required=false with confidence=high and the no-precondition decision is explicit, non-ambiguous scope (X4), so no breaking_change, money_boundary, authz_boundary, or low_confidence signal fires here."
+  },
+  "confidence": "high",
+  "targets": [
+    {
+      "kind": "api",
+      "location": "openapi/openapi.yaml#/components/schemas/Operation (POST /calculate, operationId: calculate)",
+      "density": "standard",
+      "rationale": "http_boundary signal (POST /calculate) selects kind=api/openapi. additive_change signal (new enum value only, no new routes/fields/status codes, no removals) keeps density at standard rather than strict, and rules out a human gate on its own per judgment-axes.md combining rule 4. stable_core also applies (mature, already-shipped endpoint) which independently supports standard rather than thin.",
+      "adapter_hint": "openapi",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["http_boundary", "additive_change", "stable_core"],
+      "breaking": false,
+      "confidence": "high"
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/Calculator.ocl#Calculator::pow(a: Real, b: Real): Real",
+      "density": "standard",
+      "rationale": "domain_contract signal (Calculator module operation) selects kind=dbc/ocl. additive_change signal (new operation contract only) keeps density at standard, matching the sibling add/sub/mul contracts (post-only, no pre). The deliberate absence of a pre clause is a load-bearing scope decision from ChangeBrief X4 and Change Context NFR1/§6 (pow must not inherit the div/mod zero-divisor PreconditionError pattern) — not a lower-rigor judgment call, so density stays standard rather than thin.",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "additive_change"],
+      "breaking": false,
+      "confidence": "high"
+    }
+  ]
+}

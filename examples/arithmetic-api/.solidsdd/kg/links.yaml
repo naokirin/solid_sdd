@@ -1,0 +1,12 @@
+# Optional explicit edges when annotations cannot be embedded.
+# Requirement → knowledge edges use links.yaml (downstream declaration).
+#
+# Note: schema.yaml's derives_from edge type only allows
+# to: [policy, invariant, requirement, decision, lesson, concept] -- "pattern"
+# is not a valid derives_from target, so no requirement -> pattern edge is
+# declared here for PAT-OPERATION-PRECONDITION-SCOPE (source_refs in
+# knowledge-harvest.json / this node's body remain the provenance pointer).
+edges:
+  - type: derives_from
+    from: add-power-operation/R5
+    to: LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH

@@ -1,4 +1,4 @@
-export type Operation = "add" | "sub" | "mul" | "div" | "mod";
+export type Operation = "add" | "sub" | "mul" | "div" | "mod" | "pow" | "avg";
 
 export class PreconditionError extends Error {
   constructor(message: string) {
@@ -33,6 +33,14 @@ export const Calculator = {
     }
     return a % b;
   },
+
+  pow(a: number, b: number): number {
+    return a ** b;
+  },
+
+  avg(a: number, b: number): number {
+    return (a + b) / 2;
+  },
 };
 
 export function calculate(op: Operation, a: number, b: number): number {
@@ -47,6 +55,10 @@ export function calculate(op: Operation, a: number, b: number): number {
       return Calculator.div(a, b);
     case "mod":
       return Calculator.mod(a, b);
+    case "pow":
+      return Calculator.pow(a, b);
+    case "avg":
+      return Calculator.avg(a, b);
     default: {
       const _exhaustive: never = op;
       return _exhaustive;

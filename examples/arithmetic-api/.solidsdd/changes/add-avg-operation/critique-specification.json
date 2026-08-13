@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "subject": "specification",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "consistency",
+      "location": ".solidsdd/changes/add-avg-operation/change-context.md#8-links",
+      "detail": "§8 Links still reads \"ChangeBrief: ... (not yet written)\", but change-brief.json now exists at that exact path (and is one of the two artifacts under this review). change-context.md's own §8 guidance says to \"fill placeholders as artifacts appear\" — this placeholder was not updated after solidsdd-brief ran. No checkability loss (the path itself is correct), just a stale annotation; worth a one-line touch-up next time Context is opened."
+    },
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": ".solidsdd/changes/add-avg-operation/change-context.md#5-technology-selection",
+      "detail": "The \"Arithmetic implementation\" row sources native double `(a + b) / 2` as `agent_default`, but every existing operation (add/sub/mul/div/mod/pow) already uses native JS double semantics with no rounding layer — this is arguably `repo_existing` precedent rather than a fresh agent default. Doesn't change the gate outcome (not material either way) or checkability, just a source-tag precision nit."
+    }
+  ],
+  "summary": "Adversarial review of both documents as one Specification Review (Change Context + nfr.json + gate, and ChangeBrief). Targeted checks rather than a full repo re-exploration: solidsdd-lint.sh passed with zero findings; the OCL was read directly and confirms `pow` has no `pre` clause while `div`/`mod` do, so the Context/Brief's central claim (\"avg follows the pow no-precondition pattern, not div/mod\") is factually accurate, not asserted; src/server.ts's OPERATIONS whitelist was read directly and matches the Brief's R5/assumption description exactly (avg correctly absent pre-change); the two knowledge nodes the Brief cites as canonical (PAT-OPERATION-PRECONDITION-SCOPE, LES-CONTRACT-TESTS-MISS-HTTP-DISPATCH) exist in knowledge/ and are not fabricated; tests/http/server.test.ts and tests/contracts/calculator.test.ts (targeted by R6/R7/SC4/SC5) already exist. All 8 required Change Context headings are present with non-empty, non-hand-wavy §4/§5 content (every §5 decision carries alternatives + rationale + source); nfr.json in_scope items all carry threshold + measurement and match §4's projection; change-context-gate.json's human_gate.required:false is justified against every trigger in the major table (no agent_default choice is material/contested, no stack conflict, no new security/money NFR, §7 has no blocking items, confidence is high). ChangeBrief in_scope/out_of_scope are populated, non-contradictory (X4's \"no PreconditionError\" matches R2's \"no precondition clause\"), success_criteria are observable (lint/test/scenario outcomes, not slogans), open_questions is empty, and scope ids use {id,text} objects (lint-confirmed). No blocker/major findings; the two minors above are paperwork/labeling nits with no checkability impact."
+}
