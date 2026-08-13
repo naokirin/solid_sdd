@@ -20,6 +20,7 @@ For multi-criterion requirements, use **`solidsdd-run`** (decompose → WorkPlan
 ## References
 
 - [execution-model.md](references/execution-model.md) — canonical orchestrator & slice execution rules
+- [plan-slice-cheatsheet.md](references/plan-slice-cheatsheet.md) — **give this to the Plan Slice Task** (generated; consolidates judge + apply-api + apply-dbc + derive-tests)
 - [adversarial-critique.md](references/adversarial-critique.md) — Checkpoint Reviews & Failure-driven Critique
 - [human-gates.md](references/human-gates.md) — when to stop for a person
 - [loop-retry.md](references/loop-retry.md) — verify/critique failure → retry / gate / stop
@@ -69,6 +70,7 @@ Do **not** launch separate subagent Tasks for every intermediate file write (`ap
 2. **Context & Pack (Parent)**: Run `solidsdd-context` and snapshot host toolchain. Write `.solidsdd/changes/<change_id>/items/<item_id>/context-pack.md`.
 3. **Plan Slice (Task Subagent)**: Launch a single **Plan Slice** Task.
    - Outputs: `application-plan.json`, updated OpenAPI/OCL contracts, and derived contract test files.
+   - Point the Task at **[plan-slice-cheatsheet.md](references/plan-slice-cheatsheet.md)** (a generated concatenation of `solidsdd-judge` + `solidsdd-apply-api` + `solidsdd-apply-dbc` + `solidsdd-derive-tests`'s SKILL.md + primary adapter reference) instead of naming all four skills' paths separately — a live diagnostic measurement (2026-08) found most of a Plan Slice Task's time going to re-reading those same four skills' worth of onboarding docs from scratch on every slice. The cheat sheet links to the full individual skills for edge cases (GraphQL, RSpec, exact schema validation, human-gate detail).
    - Update `run-state.json` (`loop_phase: plan`).
 4. **Plan Review (Checkpoint)**: Run deterministic `scripts/solidsdd-lint.sh`. If human gate is required, stop and await approval before implementation.
 5. **Implement Slice (Task Subagent)**: Launch **Implement Slice** Task (unless cost skip **B3** applies for non-code items). Update `run-state.json` (`loop_phase: implement`).
