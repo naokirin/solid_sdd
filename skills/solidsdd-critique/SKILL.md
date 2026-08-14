@@ -33,6 +33,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 - [ears-requirements.md](references/ears-requirements.md) — optional Brief wording (not lint-required)
 - [change-brief.md](references/change-brief.md) — when `subject` is `change_brief` or `specification`
 - [change-context.md](references/change-context.md) — when `subject` is `change_context`, `specification`, or `cross_change_consistency`
+- [architecture-axes.md](references/architecture-axes.md), [architecture-depth.md](references/architecture-depth.md), [architecture-reasoning-template.md](references/architecture-reasoning-template.md), [structurizr-dsl.md](references/structurizr-dsl.md), [physical-design.md](references/physical-design.md), [architecture-traceability.md](references/architecture-traceability.md) — when `subject` is `architecture_plan` (read alongside `adversarial-critique.md`'s `architecture_plan` table; these define what "well-formed" and "Physical Design warranted" mean)
 - [knowledge.md](references/knowledge.md) — when `subject` is `knowledge_harvest`
 - [knowledge-harvest.schema.json](references/knowledge-harvest.schema.json) — harvest artifact shape
 - [change-context-gate.schema.json](references/change-context-gate.schema.json) — when reviewing Change Context gate

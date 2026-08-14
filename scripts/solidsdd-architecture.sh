@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Architecture Model CLI (Structurizr DSL subset): validate / project.
 # Usage:
-#   scripts/solidsdd-architecture.sh validate [--project-root DIR] [--pretty]
+#   scripts/solidsdd-architecture.sh validate [--project-root DIR] [--change-id ID] [--pretty] [--with-structurizr-cli]
 #   scripts/solidsdd-architecture.sh project --change-id ID [--project-root DIR] [--out PATH] [--pretty]
 # Exit (validate): 0 pass, 1 fail (blocker/major), 2 tooling error
 set -euo pipefail
