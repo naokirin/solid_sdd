@@ -59,6 +59,7 @@ Gherkin). See "Role separation" in
 - [structurizr-dsl.md](references/structurizr-dsl.md) — DSL grammar and concept mapping (required when depth ≥ Level 1)
 - [architecture-reasoning-template.md](references/architecture-reasoning-template.md) — required when depth ≥ Level 1
 - [physical-design.md](references/physical-design.md) — optional, Level 3 only, when the physical realization decision is non-obvious
+- [architecture-traceability.md](references/architecture-traceability.md) — when an explicit Logical → Physical mapping is worth recording; do not embed filesystem metadata in `workspace.dsl`
 - [architecture-plan.schema.json](references/architecture-plan.schema.json) — shape of the generated projection
 - [human-gates.md](references/human-gates.md)
 - [change-brief.md](references/change-brief.md) — scope premise
@@ -73,6 +74,7 @@ Gherkin). See "Role separation" in
 - Do not require or name a specific architectural style (DDD, Clean Architecture, Hexagonal, Onion, MVC, CQRS, Event Sourcing, …) — the model only records modules/dependencies/ownership/constraints, not a methodology
 - Decide structure from Logical Decomposition first (responsibility / state ownership / knowledge ownership / change locality), not from the directory tree — physical structure is a later, separate concern ([physical-design.md](references/physical-design.md), Level 3 only)
 - When writing `physical-design.md`, stop at module/package/directory/class/process/service/database/adapter boundary and Physical Dependency allocation — do not pre-design every class, method, function, or implementation algorithm (that is Implementation)
+- Never add filesystem paths/filenames as `properties` on a `workspace.dsl` element — `workspace.dsl` is the Logical Model, not a filesystem index; record Logical → Physical mappings in `physical-design.md` only when [architecture-traceability.md](references/architecture-traceability.md)'s triggers apply
 - Judge from the existing Architecture Model (read it first) plus this change's WorkPlan `touches` / Brief scope — do not redesign structure the change does not touch
 - Do not pad `workspace.dsl` with unrelated existing elements' `change:<id>` tags just to look complete; do not skip tagging touched elements/relationships to avoid writing a plan when `touches` implies a new module/boundary/dependency-direction change
 - Populate `properties["owns"]` / `properties["public"]` / a relationship's `kind:*` tag only when confidently derivable from context — never guess to fill out the model
@@ -92,7 +94,7 @@ Gherkin). See "Role separation" in
 8. Decide the boundary and dependency direction for this change's structural delta.
 9. Write `.solidsdd/changes/<change_id>/architecture-reasoning.md` from the [template](references/architecture-reasoning-template.md) — record *why*, not the structure itself, including Decision Drivers when extracted.
 10. Edit `workspace.dsl`: add/modify elements and relationships per [structurizr-dsl.md](references/structurizr-dsl.md), tagging every element/relationship this change adds or modifies with `change:<change_id>` (append to existing tags, don't replace them). Edit `invariants.yaml` if a constraint or invariant is added, changed, or deliberately removed.
-11. At Level 3, when the Logical → Physical realization itself is non-obvious (not a trivial 1:1 rename), write `.solidsdd/changes/<change_id>/physical-design.md` from the [template](references/physical-design.md) — module/package/directory/class/process/service/database/adapter boundary and Physical Dependency, stopping short of class/method/algorithm design.
+11. At Level 3, when one of the [explicit-traceability triggers](references/architecture-traceability.md) applies (not a trivial 1:1 rename), write `.solidsdd/changes/<change_id>/physical-design.md` from the [template](references/physical-design.md) — module/package/directory/class/process/service/database/adapter boundary and Physical Dependency, stopping short of class/method/algorithm design. Do not add filesystem paths to `workspace.dsl` itself.
 12. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
 13. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
 14. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).

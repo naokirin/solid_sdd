@@ -88,11 +88,15 @@ rather than hand-rolling support.
 | Forbidden dependency / no-cycles constraint | `.solidsdd/architecture/invariants.yaml` `constraints[]` — **not** expressed in the DSL, since Structurizr models only positive relationships |
 | Architecture Invariant (prose) | `invariants.yaml` `invariants[]` — not mechanically verified, kept as a durable readable list |
 | Change attribution | `tags` includes `change:<change_id>` on elements/relationships this change added or modified (existing tags are preserved, not replaced) |
+| Physical realization (paths, directories, packages) | **Not** in the DSL — `.solidsdd/changes/<change_id>/physical-design.md`, only when non-obvious ([physical-design.md](physical-design.md), [architecture-traceability.md](architecture-traceability.md)) |
 
 Do not duplicate the same structural fact in both the DSL and
 `invariants.yaml` — elements/relationships/hierarchy/tags/properties live
 in the DSL; only rules *about* that structure (forbidden edges, cycle
-policy, prose invariants) live in `invariants.yaml`.
+policy, prose invariants) live in `invariants.yaml`. Likewise, do not embed
+filesystem metadata (paths, filenames) as `properties` on an element —
+`workspace.dsl` is the Logical Architecture Model, not a filesystem index;
+put Logical → Physical path mappings in `physical-design.md` instead.
 
 ## Optional Structurizr CLI
 

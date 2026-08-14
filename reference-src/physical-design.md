@@ -25,13 +25,12 @@ Logical boundary is already decided, not before.
 ## When to write this
 
 Only at [Architecture Depth](architecture-depth.md) Level 3, and only when
-the physical realization decision itself is non-obvious — e.g. one Logical
-element maps to several physical modules, several Logical elements share one
-physical module, or the boundary must be enforced through a mechanism (package
-visibility, process boundary, service boundary, database boundary) that isn't
-self-evident from the element's name. Skip it when the mapping is a trivial
-1:1 rename (`Inventory` → `src/inventory/`) — recording that adds no
-information.
+the physical realization decision itself is non-obvious — see
+[architecture-traceability.md](architecture-traceability.md) "When explicit
+traceability is required" for the concrete triggers (boundary divergence,
+1:many / many:1 realization, migration coexistence, an architecturally
+significant mapping). Skip it when the mapping is a trivial 1:1 rename
+(`Inventory` → `src/inventory/`) — recording that adds no information.
 
 ## Physical Design Decisions
 
@@ -116,6 +115,11 @@ Physical Design stops at boundaries and allocation. Do not pre-design:
 * implementation algorithm
 
 Those are decided during Implementation, not Architecture.
+
+Once written, the "Physical Realization" table above **is** the Logical →
+Physical trace — see [architecture-traceability.md](architecture-traceability.md)
+for how far traceability needs to go and how Physical → Implementation is
+recovered from it.
 
 ## Relation to solid_sdd Skills
 
