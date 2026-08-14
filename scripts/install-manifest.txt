@@ -23,6 +23,7 @@ scripts/solidsdd-lint/README.md
 
 scripts/solidsdd-architecture/dsl.py
 scripts/solidsdd-architecture/validate.py
+scripts/solidsdd-architecture/physical.py
 scripts/solidsdd-architecture/project.py
 scripts/solidsdd-architecture/cli.py
 scripts/solidsdd-architecture/README.md

@@ -32,6 +32,7 @@ _ARCH_DIR = _SCRIPTS / "solidsdd-architecture"
 if str(_ARCH_DIR) not in sys.path:
     sys.path.insert(0, str(_ARCH_DIR))
 import validate as _architecture_validate  # noqa: E402
+import physical as _architecture_physical  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
@@ -788,6 +789,11 @@ def lint_change(
     # Optional Architecture Model (.solidsdd/architecture/workspace.dsl + invariants.yaml).
     # Whole-project, persistent across changes; no-op when the directory doesn't exist.
     findings.extend(_architecture_validate.validate_project(lay))
+
+    # Optional Physical Design (.solidsdd/changes/<change_id>/physical-design.md).
+    # Change-local, best-effort cross-check against the Architecture Model;
+    # no-op when physical-design.md doesn't exist for this change.
+    findings.extend(_architecture_physical.validate_physical_design_project(lay, change_dir))
 
     return findings
 

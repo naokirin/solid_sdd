@@ -200,6 +200,20 @@ already runs first regardless of subject — no separate verification step is
 needed. No Java/JVM toolchain is required; Structurizr CLI remains an optional,
 not-yet-adopted toolchain for future rendering/validation.
 
+When a change wrote `physical-design.md` (Level 3),
+`scripts/solidsdd-architecture/physical.py` additionally cross-checks it
+against the Architecture Model — every referenced Logical Element must
+resolve in `workspace.dsl`, and any `A -> B` Physical Dependency line is
+checked against `invariants.yaml`'s `forbid_dependency` constraints and the
+declared Logical dependency direction — also folded into `solidsdd-lint.sh`.
+This is intentionally best-effort: `physical-design.md` stays free-form
+prose, not a second parsed grammar, so unrecognized shapes are skipped
+rather than flagged. It performs no static analysis of actual source code
+(import graphs, directory conventions) — only what was explicitly declared
+gets checked; everything else stays a `solidsdd-critique` / human-review
+concern (see [physical-design.md](../reference-src/physical-design.md),
+[architecture-traceability.md](../reference-src/architecture-traceability.md)).
+
 Depth: [../reference-src/architecture-depth.md](../reference-src/architecture-depth.md)
 (most changes stay at Level 0 and never touch the model).
 Axes: [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md).

@@ -61,6 +61,15 @@ Payment                         payment_port/
                                  infrastructure/payment/ → payment_port/
 ```
 
+In the "Physical Dependencies" section of the artifact (below), write entries
+worth machine-checking as `<physical_a> -> <physical_b>` — the same arrow
+convention as `workspace.dsl` relationships. `scripts/solidsdd-architecture.sh
+validate --change-id <id>` resolves each side back to its Logical element via
+the Physical Realization table and checks it against `invariants.yaml`'s
+`forbid_dependency` constraints and the declared Logical dependency
+direction. Lines that don't match this shape are read as plain prose and
+stay unchecked — this is optional structure, not a required grammar.
+
 ## Physical Boundary enforcement
 
 Use whichever mechanism actually enforces the Logical boundary in this
@@ -100,7 +109,7 @@ Only when Physical Design is a significant judgment for this change (see
 
 ## Physical Dependencies
 
-- ...
+- `src/domain/inventory/` -> `src/domain/inventory/reservation/`
 ```
 
 Keep entries short — one line per row is normal. Omit a section that

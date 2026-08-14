@@ -409,6 +409,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-root", default=".")
     parser.add_argument("--pretty", action="store_true")
     parser.add_argument(
+        "--change-id",
+        default=None,
+        help=(
+            "Optional: also cross-check "
+            ".solidsdd/changes/<change-id>/physical-design.md against the "
+            "Architecture Model, when that file exists for this change."
+        ),
+    )
+    parser.add_argument(
         "--with-structurizr-cli",
         action="store_true",
         help=(
@@ -423,6 +432,12 @@ def main(argv: list[str] | None = None) -> int:
 
     layout = load_layout(Path(args.project_root))
     findings = validate_project(layout)
+
+    if args.change_id:
+        import physical as _physical  # noqa: E402  (local import: avoids a cycle at module load)
+
+        change_dir = layout.change_dir(args.change_id)
+        findings.extend(_physical.validate_physical_design_project(layout, change_dir))
 
     if args.with_structurizr_cli:
         workspace_path = layout.architecture_dir() / "workspace.dsl"
