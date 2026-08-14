@@ -24,6 +24,13 @@ that genuinely doesn't apply to this change rather than padding it.
 
 What is the structural problem this change needs to solve?
 
+## Decision Drivers
+
+Constraints, goals, or evaluation criteria this change's boundary/dependency
+decision must satisfy (see [architecture-axes.md](architecture-axes.md)
+Decision Drivers) — not a restatement of the Requirement. Omit when the
+trigger itself is justification enough (most Level 1 deltas).
+
 ## Logical Decomposition
 
 ### Responsibility
@@ -42,6 +49,19 @@ Which domain rule/knowledge is being kept in one place, and why there?
 
 What change reason does this boundary keep local, that would otherwise
 spill into an unrelated module?
+
+### Consistency Boundary
+
+Which state must stay consistent together, and does it live in the same
+boundary? (Only when this change's boundary decision hinges on a
+consistency requirement.)
+
+### Concurrency Boundary
+
+Which boundary coordinates concurrent access, if any? States *where*, not
+the transition semantics (that is TLA+/Alloy — see Role separation in
+[architecture-axes.md](architecture-axes.md)). Omit when this change has no
+concurrency concern.
 
 ## Boundary Decisions
 

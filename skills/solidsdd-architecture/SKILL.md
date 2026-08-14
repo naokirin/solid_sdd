@@ -81,13 +81,14 @@ Gherkin). See "Role separation" in
 3. Apply the "When architecture changes" / "When architecture does not change" tables in [architecture-axes.md](references/architecture-axes.md).
 4. If no trigger applies: emit `{"version": "1", "status": "unchanged", "change_id": ..., "summary": "..."}` directly as `architecture-plan.json` and stop — do not touch the Architecture Model or write `architecture-reasoning.md` (Level 0, [architecture-depth.md](references/architecture-depth.md)).
 5. If a trigger applies, determine the required [Architecture Depth](references/architecture-depth.md) (Level 1–4).
-6. At Level 2+, work through Logical Decomposition (Responsibility / State Ownership / Knowledge Ownership / Change Locality — [architecture-axes.md](references/architecture-axes.md)) before deciding boundaries.
-7. Decide the boundary and dependency direction for this change's structural delta.
-8. Write `.solidsdd/changes/<change_id>/architecture-reasoning.md` from the [template](references/architecture-reasoning-template.md) — record *why*, not the structure itself.
-9. Edit `workspace.dsl`: add/modify elements and relationships per [structurizr-dsl.md](references/structurizr-dsl.md), tagging every element/relationship this change adds or modifies with `change:<change_id>` (append to existing tags, don't replace them). Edit `invariants.yaml` if a constraint or invariant is added, changed, or deliberately removed.
-10. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
-11. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
-12. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
+6. Extract Decision Drivers when this change's boundary/dependency decision needs justification beyond the trigger itself ([architecture-axes.md](references/architecture-axes.md) Decision Drivers) — most Level 1 deltas skip this.
+7. At Level 2+, work through Logical Decomposition (Responsibility / State Ownership / Knowledge Ownership / Change Locality, plus Consistency Boundary / Concurrency Boundary when this change hinges on either — [architecture-axes.md](references/architecture-axes.md)) before deciding boundaries.
+8. Decide the boundary and dependency direction for this change's structural delta.
+9. Write `.solidsdd/changes/<change_id>/architecture-reasoning.md` from the [template](references/architecture-reasoning-template.md) — record *why*, not the structure itself, including Decision Drivers when extracted.
+10. Edit `workspace.dsl`: add/modify elements and relationships per [structurizr-dsl.md](references/structurizr-dsl.md), tagging every element/relationship this change adds or modifies with `change:<change_id>` (append to existing tags, don't replace them). Edit `invariants.yaml` if a constraint or invariant is added, changed, or deliberately removed.
+11. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
+12. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
+13. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
 
 ## Output
 

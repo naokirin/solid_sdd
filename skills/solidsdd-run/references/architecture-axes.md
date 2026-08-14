@@ -41,6 +41,46 @@ existing architecture + change requirements → proposed architecture (delta onl
 Only describe modules/dependencies that are new or changed by this WorkPlan; do not
 re-document unrelated existing structure just to have a "complete" diagram.
 
+## Decision Drivers
+
+Before Logical Decomposition, when this change's boundary/dependency decision
+needs justification beyond the trigger itself, extract the Decision Drivers
+that will be used to evaluate design alternatives:
+
+```text
+Requirement
+    ↓
+Decision Drivers
+    ↓
+Design Alternatives (Logical Decomposition)
+    ↓
+Architecture Decision (Boundary / Dependency)
+```
+
+A Decision Driver is a constraint, goal, or evaluation criterion the
+Architecture Decision must satisfy — not a restatement of the Requirement.
+Consider, only when relevant to this change: business constraints, state
+ownership constraints, consistency requirements, concurrency requirements,
+change locality requirements, external dependency constraints,
+security/isolation constraints, and architecturally-relevant performance
+constraints.
+
+```text
+Requirement: order processing must not corrupt inventory counts when two
+orders race for the same stock.
+
+Decision Drivers:
+- Inventory state must have a single owner.
+- Concurrent reservation must share a consistency boundary.
+- Order processing must not directly mutate inventory state.
+```
+
+Do not enumerate Decision Drivers for every change — most Level 1 deltas
+(see [architecture-depth.md](architecture-depth.md)) have none worth
+recording. Record them in `architecture-reasoning.md`
+([template](architecture-reasoning-template.md)), not as a separate
+document.
+
 ## Logical Decomposition axes
 
 Before naming modules or editing `workspace.dsl`, decide structure from
