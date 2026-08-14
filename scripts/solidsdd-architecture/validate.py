@@ -181,6 +181,27 @@ def _check_model_consistency(
                     f"relationship {rel.source} -> {rel.dest} is a self-loop",
                 )
             )
+        elif (
+            rel.source in ws.elements
+            and rel.dest in ws.elements
+            and (
+                _is_ancestor(ws, rel.source, rel.dest)
+                or _is_ancestor(ws, rel.dest, rel.source)
+            )
+        ):
+            # Structurizr forbids relationships between a parent and its own
+            # child — containment is already an implicit relationship.
+            # Confirmed against the real Structurizr CLI (structurizr validate).
+            findings.append(
+                finding(
+                    "blocker",
+                    "consistency",
+                    f"{location}#L{rel.line}",
+                    f"relationship {rel.source} -> {rel.dest} is between a parent "
+                    "and its own child; model the dependency between siblings "
+                    "instead (e.g. a sibling element, not a nested one)",
+                )
+            )
 
     for view in ws.views:
         if view.element_id not in ws.elements:
@@ -343,6 +364,43 @@ def validate_project(layout: Layout) -> list[dict[str, str]]:
     return validate(workspace_path, invariants_path)
 
 
+def find_structurizr_cli() -> str | None:
+    """Resolve an optional, external Structurizr CLI. Never required.
+
+    Checked, in order: $STRUCTURIZR_CLI, then `structurizr.sh` / `structurizr-cli`
+    / `structurizr` on PATH. Returns None (not an error) when absent.
+    """
+    import os
+    import shutil
+
+    override = os.environ.get("STRUCTURIZR_CLI")
+    if override:
+        return override
+    for name in ("structurizr.sh", "structurizr-cli", "structurizr"):
+        found = shutil.which(name)
+        if found:
+            return found
+    return None
+
+
+def run_structurizr_cli(cli_path: str, workspace_path: Path) -> tuple[bool, str]:
+    """Run `<cli> validate -w <workspace>`. Returns (ok, output). Never raises."""
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            [cli_path, "validate", "-w", str(workspace_path)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError as e:
+        return False, f"could not execute {cli_path!r}: {e}"
+    if proc.returncode == 0:
+        return True, (proc.stdout or "").strip()
+    return False, ((proc.stderr or "") + (proc.stdout or "")).strip()
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
     import json as jsonmod
@@ -350,10 +408,45 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate the Architecture Model")
     parser.add_argument("--project-root", default=".")
     parser.add_argument("--pretty", action="store_true")
+    parser.add_argument(
+        "--with-structurizr-cli",
+        action="store_true",
+        help=(
+            "Additionally validate workspace.dsl with an external Structurizr "
+            "CLI ($STRUCTURIZR_CLI or structurizr.sh/structurizr-cli/structurizr "
+            "on PATH). Optional — solid_sdd's own parser above is always run "
+            "regardless; this flag errors (exit 2) only if explicitly passed "
+            "and no CLI can be found."
+        ),
+    )
     args = parser.parse_args(argv)
 
     layout = load_layout(Path(args.project_root))
     findings = validate_project(layout)
+
+    if args.with_structurizr_cli:
+        workspace_path = layout.architecture_dir() / "workspace.dsl"
+        if workspace_path.is_file():
+            cli_path = find_structurizr_cli()
+            if cli_path is None:
+                print(
+                    "--with-structurizr-cli given but no Structurizr CLI found "
+                    "($STRUCTURIZR_CLI, or structurizr.sh/structurizr-cli/structurizr "
+                    "on PATH)",
+                    file=sys.stderr,
+                )
+                return 2
+            ok, output = run_structurizr_cli(cli_path, workspace_path)
+            if not ok:
+                findings.append(
+                    finding(
+                        "blocker",
+                        "schema_violation",
+                        str(workspace_path),
+                        f"structurizr-cli validate: {output}",
+                    )
+                )
+
     indent = 2 if args.pretty else None
     print(jsonmod.dumps({"findings": findings}, indent=indent, ensure_ascii=False))
     return 1 if any(f["severity"] in ("blocker", "major") for f in findings) else 0

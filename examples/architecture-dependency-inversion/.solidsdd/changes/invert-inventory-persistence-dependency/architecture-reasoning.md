@@ -36,14 +36,14 @@ infrastructure side.
 
 ## Boundary Decisions
 
-Add `inventory_repository_port`, a `container` nested inside `inventory`:
-the persistence abstraction Inventory depends on. It is tagged `Public` —
-this is the one internal element of `inventory` that other systems are
-allowed to depend on directly (see
-[structurizr-dsl.md](../../../../../reference-src/structurizr-dsl.md) on
-why crossing into an untagged internal `component` would otherwise be
-flagged as boundary leakage; a `container`-level port is the right
-granularity for this).
+Add `inventory_repository_port` as its own top-level `softwareSystem`
+(not nested inside `inventory`): the persistence abstraction Inventory
+depends on. Structurizr forbids a relationship between a parent element
+and its own child (containment is already an implicit relationship), so
+the port must be a sibling, not a child, of `inventory` — confirmed
+against the real Structurizr CLI (`structurizr validate`) while building
+this example; `scripts/solidsdd-architecture/validate.py` enforces the
+same rule (see [structurizr-dsl.md](../../../../../reference-src/structurizr-dsl.md)).
 
 ## Dependency Decisions
 

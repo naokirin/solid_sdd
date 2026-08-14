@@ -24,6 +24,10 @@ tools/tla/tla2tools.jar
 **/states/
 *.toolbox/
 
+# Structurizr CLI (optional)
+tools/structurizr/cli/
+tools/structurizr/structurizr-cli.zip
+
 # solidsdd-kg derived index / local binaries
 .solidsdd-cache/
 bin/

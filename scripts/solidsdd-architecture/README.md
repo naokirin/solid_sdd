@@ -11,9 +11,14 @@ wrapper. See [structurizr-dsl.md](../../reference-src/structurizr-dsl.md).
 From a consuming project root (directory that contains `.solidsdd/`):
 
 ```bash
-scripts/solidsdd-architecture.sh validate [--project-root .] [--pretty]
+scripts/solidsdd-architecture.sh validate [--project-root .] [--pretty] [--with-structurizr-cli]
 scripts/solidsdd-architecture.sh project --change-id ID [--project-root .] [--out PATH] [--pretty]
 ```
+
+`--with-structurizr-cli` is optional and off by default: it additionally
+runs a real Structurizr CLI (`$STRUCTURIZR_CLI` or
+`structurizr.sh`/`structurizr-cli`/`structurizr` on `PATH`) as a second
+check. See [tools/structurizr/README.md](../../tools/structurizr/README.md).
 
 Requires Python 3 + [`PyYAML`](https://pypi.org/project/PyYAML/) +
 [`jsonschema`](https://pypi.org/project/jsonschema/) (same as

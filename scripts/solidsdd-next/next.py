@@ -431,14 +431,55 @@ def compute_next(
         return hint(
             change_id=change_id,
             phase="critique_work_plan",
+            action="architecture",
+            skill="solidsdd-architecture",
+            reason="work plan ready; run architecture judgment",
+            legal=["architecture"],
+        )
+
+    if phase in ("critique_work_plan", "architecture"):
+        arch = load_optional(change_dir, "architecture-plan.json")
+        if not isinstance(arch, dict):
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="architecture",
+                skill="solidsdd-architecture",
+                reason="architecture-plan.json missing; run architecture judgment",
+                legal=["architecture"],
+            )
+        if arch.get("status") == "changed":
+            if not critique_pass(change_dir, "critique-architecture-plan.json"):
+                return hint(
+                    change_id=change_id,
+                    phase=phase,
+                    action="critique_architecture",
+                    skill="solidsdd-critique",
+                    subject="architecture_plan",
+                    reason="ArchitecturePlan status=changed; need critique(architecture_plan)",
+                    inputs=["architecture-plan.json"],
+                    legal=["critique_architecture", "architecture"],
+                )
+            if gate_required(arch) and not approval_covers(change_dir, "architecture_plan"):
+                return hint(
+                    change_id=change_id,
+                    phase=phase,
+                    action="human_gate",
+                    reason="ArchitecturePlan human_gate required",
+                    inputs=["architecture-plan.json"],
+                    legal=["human_gate"],
+                )
+        return hint(
+            change_id=change_id,
+            phase="critique_architecture",
             action="waves",
             skill="solidsdd-loop",
-            reason="work plan ready; start waves",
+            reason="architecture judgment resolved; start waves",
             item_ids=ready_item_ids(rs, work),
             legal=["waves", "loop_wave", "critique_cross_change_consistency", "critique_knowledge_consistency"],
         )
 
-    if phase == "critique_work_plan":
+    if phase == "critique_architecture":
         ready = ready_item_ids(rs, work)
         if ready or not all_items_done(rs, work):
             return hint(

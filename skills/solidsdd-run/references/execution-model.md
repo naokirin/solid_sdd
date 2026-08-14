@@ -31,6 +31,12 @@ User or solidsdd.run (outer parent)
   │                                     in one Task (gate not required — the common case)
   ├─ Task: solidsdd.decompose         ← WorkPlan (from Brief)
   ├─ Task: solidsdd.critique          ← subject: work_plan
+  ├─ [WorkPlan human_gate.required?  → stop until approved]
+  ├─ Task: solidsdd.architecture      ← ArchitecturePlan (status: unchanged, or
+  │                                     changed + Architecture Model edit)
+  ├─ [only if status: changed]
+  │     ├─ Task: solidsdd.critique    ← subject: architecture_plan
+  │     └─ [ArchitecturePlan human_gate.required? → stop until approved]
   ├─ wave: all currently ready items (depends_on satisfied)
   │     ├─ solidsdd.loop (item A)     … same wave: parallel by default
   │     └─ solidsdd.loop (item B)     … serialize only on path contention
@@ -43,7 +49,7 @@ User or solidsdd.run (outer parent)
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: Intake → Brief → decompose → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
+- **`solidsdd.run`**: Intake → Brief → decompose → architecture judgment → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
 - **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan; may receive ChangeBrief / Change Context excerpts for scope and tech.
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
@@ -86,6 +92,7 @@ The **Consolidated Slice Model** is the canonical execution model for `solidsdd-
 | `solidsdd.intake` | **subagent required** | Isolate demand / NFR / tech framing from scope slicing |
 | `solidsdd.brief` | **subagent required** | Isolate change scope (in/out) from slicing and implementation |
 | `solidsdd.decompose` | **subagent required** | Isolate work decomposition from contract judgment and implementation |
+| `solidsdd.architecture` | **subagent required** | Isolate structural judgment (and any Architecture Model edit) from implementation context; parent must not thin the returned plan |
 | `solidsdd.judge` | **subagent required** | Isolate density judgment from implementation context; avoid thinning contracts |
 | `solidsdd.critique` | **subagent required** | Someone other than the producer adversarially evaluates phase artifacts (including weak contracts) |
 | `solidsdd.apply.api` | **subagent required** | Stay within API contracts; do not mix with implementation or tests |
@@ -141,10 +148,10 @@ Phase 3: only after human-gate approval for `formal` `apply`, launch `solidsdd.a
 
 ## Parent obligations (`solidsdd.run`)
 
-1. Do not inline `solidsdd.intake` / `critique(change_context)` / `critique(specification)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / integration `verify` (except B4 reuse of a covering item verify)
+1. Do not inline `solidsdd.intake` / `critique(change_context)` / `critique(specification)` / `solidsdd.brief` / `critique(change_brief)` / `solidsdd.decompose` / `critique(work_plan)` / `solidsdd.architecture` / `critique(architecture_plan)` / integration `verify` (except B4 reuse of a covering item verify)
 2. Each item follows the **`solidsdd.loop` skill on this parent session** (run parent must not directly run judge/apply/implement, and must **not** delegate the whole loop to a single Task)
-3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / CritiqueReport in the parent
-4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices
+3. Do not thin Change Context / `ChangeBrief` / `WorkPlan` / ArchitecturePlan / CritiqueReport in the parent
+4. Respect Change Context gate before brief; ChangeBrief human_gate before decompose; WorkPlan human_gate before launching slices; ArchitecturePlan human_gate (when `status: changed`) before launching slices
 5. Pass Change Context and ChangeBrief paths/excerpts **and context-pack paths** into decompose and into each loop prompt when scope or tech questions may arise
 6. Launch loops for independent `ready` items in the same wave **in parallel** (serialize only with a recorded reason on contention). If many ready items share `touches`, prefer a WorkPlan that used foundation `depends_on` ([work-decomposition.md](../reference-src/work-decomposition.md)); record serialize reason in `run-state.isolation_notes`
 7. After all items complete: run integration `solidsdd.verify` (+ **separate** critique Task) **unless B4** applies (single item whose verify already covers `acceptance_of_whole`); then record `cost_skip:B4`

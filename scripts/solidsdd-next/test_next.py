@@ -155,6 +155,116 @@ class NextTests(unittest.TestCase):
         h = nxt.compute_next(cid, cdir)
         self.assertEqual(h["action"], "integration_verify")
 
+    def test_critique_work_plan_runs_architecture_when_no_plan_yet(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "critique_work_plan",
+                    "run_retry": {"remaining": 3, "max": 3},
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "architecture")
+        self.assertEqual(h["skill"], "solidsdd-architecture")
+
+    def test_architecture_unchanged_skips_critique_and_enters_waves(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "architecture",
+                    "run_retry": {"remaining": 3, "max": 3},
+                },
+                "architecture-plan.json": {
+                    "version": "1",
+                    "status": "unchanged",
+                    "change_id": "sample-change",
+                    "summary": "no structural change",
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "waves")
+        self.assertEqual(h["phase"], "critique_architecture")
+
+    def test_architecture_changed_needs_critique(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "architecture",
+                    "run_retry": {"remaining": 3, "max": 3},
+                },
+                "architecture-plan.json": {
+                    "version": "1",
+                    "status": "changed",
+                    "change_id": "sample-change",
+                    "modules": [{"id": "a", "responsibility": "r"}],
+                    "dependencies": [],
+                    "constraints": [],
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "critique_architecture")
+        self.assertEqual(h["subject"], "architecture_plan")
+
+    def test_architecture_gate_required_blocks_waves(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "architecture",
+                    "run_retry": {"remaining": 3, "max": 3},
+                },
+                "architecture-plan.json": {
+                    "version": "1",
+                    "status": "changed",
+                    "change_id": "sample-change",
+                    "modules": [{"id": "a", "responsibility": "r"}],
+                    "dependencies": [],
+                    "constraints": [],
+                    "human_gate": {"required": True, "reason": "external boundary change"},
+                },
+                "critique-architecture-plan.json": {
+                    "version": "1",
+                    "subject": "architecture_plan",
+                    "result": "pass",
+                    "findings": [],
+                    "summary": "ok",
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "human_gate")
+
+    def test_critique_architecture_enters_waves_with_ready_items(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "critique_architecture",
+                    "run_retry": {"remaining": 3, "max": 3},
+                    "items": {"W1": {"status": "ready"}},
+                },
+                "work-plan.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "items": [{"id": "W1", "intent": "i", "acceptance_criterion": "s", "covers": ["R1"]}],
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "waves")
+        self.assertEqual(h["item_ids"], ["W1"])
+
 
 if __name__ == "__main__":
     unittest.main()

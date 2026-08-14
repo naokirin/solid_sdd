@@ -6,9 +6,9 @@ workspace "Architecture Dependency Inversion" "Minimal Architecture Model illust
         "owns" "Stock"
         "public" "InventoryService"
       }
-      inventory_repository_port = container "InventoryRepositoryPort" "Persistence abstraction that Inventory depends on and infrastructure adapters implement." "Interface" {
-        tags "change:invert-inventory-persistence-dependency, Public"
-      }
+    }
+    inventory_repository_port = softwareSystem "InventoryRepositoryPort" "Persistence abstraction that Inventory depends on and infrastructure adapters implement." {
+      tags "change:invert-inventory-persistence-dependency, Port"
     }
     postgres_store = softwareSystem "PostgresInventoryStore" "Concrete PostgreSQL persistence for inventory rows." {
       tags "change:establish-inventory-persistence, Infrastructure"

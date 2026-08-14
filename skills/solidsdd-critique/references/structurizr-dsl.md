@@ -8,10 +8,11 @@ projection (see [contract-layout.md](contract-layout.md)).
 
 This is a real subset of Structurizr DSL syntax (not an invented dialect),
 parsed and validated by `scripts/solidsdd-architecture/dsl.py` (no Java/JVM
-required). A file using only this subset also parses with the real
-Structurizr CLI, should that ever be introduced as an optional toolchain
-(see [architecture-depth.md](architecture-depth.md) — this project does not
-require it).
+required). A file using only this subset also validates against the real
+Structurizr CLI (`structurizr validate -w workspace.dsl`) — confirmed
+against every `workspace.dsl` in this repo's examples. The CLI remains an
+**optional** toolchain, never a hard dependency of `solid_sdd`; see
+[Optional Structurizr CLI](#optional-structurizr-cli) below.
 
 ## Grammar
 
@@ -54,6 +55,17 @@ Elements nest exactly three levels deep: `softwareSystem` → `container` →
 [architecture-depth.md](architecture-depth.md) for how much structure a
 given change actually needs.
 
+**A relationship cannot connect a parent element to its own child** (e.g.
+`inventory -> a_container_inside_inventory`) — containment is already an
+implicit relationship in Structurizr, and the real Structurizr CLI rejects
+this (`Relationships cannot be added between parents and children`).
+`scripts/solidsdd-architecture/validate.py` enforces the same rule. If a
+domain element needs to depend on an abstraction (e.g. a port), model that
+abstraction as a **sibling** element, not a child of the element that
+depends on it — see
+[architecture-dependency-inversion](../examples/architecture-dependency-inversion/)
+for a worked example.
+
 ## Unsupported (v1)
 
 `person`, `deploymentNode`, dynamic views, styles, themes, `!include`,
@@ -81,6 +93,18 @@ Do not duplicate the same structural fact in both the DSL and
 `invariants.yaml` — elements/relationships/hierarchy/tags/properties live
 in the DSL; only rules *about* that structure (forbidden edges, cycle
 policy, prose invariants) live in `invariants.yaml`.
+
+## Optional Structurizr CLI
+
+`scripts/solidsdd-architecture.sh validate` never requires a JVM. If a real
+Structurizr CLI happens to be available, pass `--with-structurizr-cli` to
+additionally validate `workspace.dsl` with it (a second, independently
+implemented check) — resolved via `$STRUCTURIZR_CLI` or
+`structurizr.sh`/`structurizr-cli`/`structurizr` on `PATH`. Without the
+flag, `validate` never looks for it. This repo's own optional copy:
+[`tools/structurizr/`](../tools/structurizr/README.md) (fetch script +
+wrapper, gitignored download — not vendored into consuming projects by the
+installer).
 
 ## Limitations (v1)
 

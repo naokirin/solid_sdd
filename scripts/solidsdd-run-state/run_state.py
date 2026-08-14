@@ -58,6 +58,8 @@ PHASES = [
     "critique_change_brief",
     "decompose",
     "critique_work_plan",
+    "architecture",
+    "critique_architecture",
     "waves",
     "integration_verify",
     "critique_integration",

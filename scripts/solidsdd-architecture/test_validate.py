@@ -2,10 +2,12 @@
 """Unit tests for solidsdd-architecture validate.py."""
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
@@ -188,12 +190,85 @@ class ValidateTests(unittest.TestCase):
             [f for f in findings if "internal component" in f["detail"]], []
         )
 
+    def test_parent_child_relationship_is_rejected(self) -> None:
+        root = self._root()
+        text = """
+        workspace "W" {
+          model {
+            a = softwareSystem "A" {
+              a_container = container "AContainer"
+            }
+            a -> a_container "reaches into its own child"
+          }
+        }
+        """
+        ws, inv = _write(root, text)
+        findings = validate.validate(ws, inv)
+        self.assertTrue(
+            any(
+                "parent and its own child" in f["detail"] and f["severity"] == "blocker"
+                for f in findings
+            )
+        )
+
     def test_dsl_syntax_error_becomes_blocker_finding(self) -> None:
         root = self._root()
         text = 'workspace "W" { model { a = person "User" } }'
         ws, inv = _write(root, text)
         findings = validate.validate(ws, inv)
         self.assertTrue(any(f["severity"] == "blocker" for f in findings))
+
+
+class StructurizrCliTests(unittest.TestCase):
+    def test_find_structurizr_cli_prefers_env_override(self) -> None:
+        with mock.patch.dict(os.environ, {"STRUCTURIZR_CLI": "/opt/structurizr.sh"}):
+            self.assertEqual(validate.find_structurizr_cli(), "/opt/structurizr.sh")
+
+    def test_find_structurizr_cli_none_when_absent(self) -> None:
+        env = {k: v for k, v in os.environ.items() if k != "STRUCTURIZR_CLI"}
+        env["PATH"] = ""
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertIsNone(validate.find_structurizr_cli())
+
+    def test_run_structurizr_cli_ok_on_zero_exit(self) -> None:
+        fake = mock.Mock(returncode=0, stdout="", stderr="")
+        with mock.patch("subprocess.run", return_value=fake):
+            ok, output = validate.run_structurizr_cli("structurizr.sh", Path("workspace.dsl"))
+        self.assertTrue(ok)
+
+    def test_run_structurizr_cli_reports_failure_output(self) -> None:
+        fake = mock.Mock(returncode=1, stdout="", stderr="boom")
+        with mock.patch("subprocess.run", return_value=fake):
+            ok, output = validate.run_structurizr_cli("structurizr.sh", Path("workspace.dsl"))
+        self.assertFalse(ok)
+        self.assertIn("boom", output)
+
+    def test_main_with_structurizr_cli_flag_errors_when_not_found(self) -> None:
+        root = tempfile.TemporaryDirectory()
+        self.addCleanup(root.cleanup)
+        arch_dir = Path(root.name) / ".solidsdd" / "architecture"
+        arch_dir.mkdir(parents=True)
+        (arch_dir / "workspace.dsl").write_text(
+            'workspace "W" { model { a = softwareSystem "A" } }', encoding="utf-8"
+        )
+        env = {k: v for k, v in os.environ.items() if k != "STRUCTURIZR_CLI"}
+        env["PATH"] = ""
+        with mock.patch.dict(os.environ, env, clear=True):
+            rc = validate.main(["--project-root", root.name, "--with-structurizr-cli"])
+        self.assertEqual(rc, 2)
+
+    def test_main_without_flag_never_looks_for_cli(self) -> None:
+        root = tempfile.TemporaryDirectory()
+        self.addCleanup(root.cleanup)
+        arch_dir = Path(root.name) / ".solidsdd" / "architecture"
+        arch_dir.mkdir(parents=True)
+        (arch_dir / "workspace.dsl").write_text(
+            'workspace "W" { model { a = softwareSystem "A" } }', encoding="utf-8"
+        )
+        with mock.patch.object(validate, "find_structurizr_cli") as m:
+            rc = validate.main(["--project-root", root.name])
+        m.assert_not_called()
+        self.assertEqual(rc, 0)
 
 
 if __name__ == "__main__":
