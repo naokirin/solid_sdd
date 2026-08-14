@@ -1,0 +1,5 @@
+# solid_sdd project path layout (SoT for agents, scripts, solidsdd-kg).
+# Omit keys to keep defaults. Meta root discovery: SOLIDSDD_DIR or .solidsdd/
+# Schema: schemas/project-config.schema.json
+version: "1"
+working_language: "ja"

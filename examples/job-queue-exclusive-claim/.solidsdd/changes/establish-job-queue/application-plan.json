@@ -1,0 +1,92 @@
+{
+  "version": "1",
+  "change_id": "establish-job-queue",
+  "summary": "このプロジェクトにはHTTP/GraphQL境界が存在しない(src/なし、設計のみのサンプル)ため、W1(投入)・W2(クレーム)・W3(結果記録/取得)いずれもapiではなくdbc(OCL, contracts/JobQueue.ocl)を主契約とする。W2はクレーム排他性(NFR1/R2/SC1/SC2)の核心であり、OCLは単発呼び出しの事前/事後条件(未クレーム→クレーム成功、既クレーム→named failure)しか表現できないため、並行インターリーブの安全性はformal(TLA+/TLC, formal/ClaimCoordinator.tla)側でstrict/apply、Phase 3の早期ロールアウト方針に従いhuman_gateを必須とする。全dbcターゲットはarchitecture-plan.jsonのpublic[]配下(architecture_public_boundary)にあるため少なくともstandard密度とする。",
+  "confidence": "high",
+  "human_gate": {
+    "required": true,
+    "reason": "W2のformalターゲット(kind: formal, status: apply)がPhase 3早期ロールアウト方針により常時human_gate必須(judgment-axes.md「Formal apply vs defer」条件4、human-gates.mdの`formal`行)。他のターゲット(W1/W3のdbc、W2のdbc)はbreaking_change/money_boundary/authz_boundary/low_confidenceのいずれも発火しないため、この形式検証ゲート以外にプラン全体を止める理由はない。"
+  },
+  "targets": [
+    {
+      "kind": "dbc",
+      "location": "contracts/JobQueue.ocl#submitJob",
+      "density": "standard",
+      "rationale": "domain_contract: NFR2が「投入・クレーム・結果記録それぞれの単一操作としての事前条件・事後条件」をcontracts/JobQueue.ocl(measurement欄で明示)に要求しており、submitJobはその3操作の1つ。architecture_public_boundary: architecture-plan.jsonでjob-queueモジュールのpublic[]は[\"SubmitJob\"]であり、公開サーフェスに該当する——ただしこのプロジェクトにHTTP/GraphQL層は存在しない(src/なし、設計のみのサンプル)ため、この軸は『apiへkindを切り替えよ』ではなく『dbcの厳密さを引き上げよ』と読み、kindはdbcのまま据え置く。additive_change: 新規グリーンフィールドの単一操作追加であり削除/破壊的変更を伴わないため、この軸単独ではhuman_gateを要求しない(judgment-axes.md combining rule 4)。post条件として「未クレーム状態で保存され、ジョブIDが割り当てられる」(W1受け入れ条件/R1)を第一級のOCL postとして表現する対象。",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W1"],
+      "signals": ["domain_contract", "architecture_public_boundary", "additive_change"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "追加のみのdbc適用であり、breaking_change/money_boundary/authz_boundary/low_confidenceはいずれも発火しない。"
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/JobQueue.ocl#claimJob",
+      "density": "standard",
+      "rationale": "domain_contract: NFR2の3操作のうちclaimに相当し、単発呼び出しとしての事前条件(対象ジョブが存在し未クレーム)と事後条件(成功時はクレーム状態に遷移、既にクレーム済みの場合は「既にクレーム済み」というnamed failureを返す——W2受け入れ条件の後半)を表現する。architecture_public_boundary: claim-coordinatorモジュールのpublic[]は[\"ClaimJob\"]であり、worker-poolという別プロセス/別マシンでも動作しうる呼び出し元向けの唯一の公開サーフェス(physical-design.md)——このプロジェクトにapi技術が存在しないため、kindはdbcのまま据え置きつつdensityをstandardとする。重要な限定: OCLは単一呼び出しの事前/事後条件のみを表現でき、『並行する2つのクレーム試行のうち成功するのはちょうど1件』というインターリーブにまたがる安全性(concurrency_safety/NFR1/R2/SC1/SC2そのもの)は表現できないため、その責務は下記のformalターゲットに委譲し、ここでは持たせない(judgment-axes.mdの主要kind選定表でconcurrency_safetyはformalを優先)。",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["domain_contract", "architecture_public_boundary"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "単発呼び出しの事前/事後条件のみを扱うdbc適用であり、並行安全性の懸念は下のformalターゲット側でゲートするため、ここでは重複してゲートしない。"
+      }
+    },
+    {
+      "kind": "formal",
+      "location": "formal/ClaimCoordinator.tla",
+      "density": "strict",
+      "rationale": "concurrency_safety: NFR1(「並行するワーカーが同一ジョブをクレームしようとしても、成功するクレームは常にちょうど1件である」)がW2/R2/SC1/SC2の核心であり、そのmeasurement欄が明示的に「formal/ClaimCoordinator.tla のTLC model checking」を指定している。Phase 3のformal apply vs defer条件(judgment-axes.md)を4つとも確認: (1) concurrency_safetyシグナルが存在する(NFR1本体)。(2) 形式アダプタとチェッカーがプロジェクト向けに文書化されている——リポジトリ直下tools/tla/(tla2tools.jar, fetch-tla2tools.sh)にTLC実行環境があり、かつformal/ClaimCoordinator.tlaという具体パスがnfr.json/architecture-reasoning.md/physical-design.md/requirements/job-queue.featureの4箇所で一貫して名指しされている——単なる一般論ではなくこのプロジェクト自身が採用を確定させている。(3) スコープは単一の共有資源/プロトコル(ClaimCoordinatorのクレーム状態遷移1つ)に限定されており「アプリ全体の形式化」ではない。(4) human_gate.required=trueを設定する(下記)。以上により status: apply、adapter_hint: tla、density: strictとする(NFR1が安全性クリティカルなプロパティであるため)。architecture-reasoning.mdのConcurrency Boundary/physical-design.mdの共有ストアへのアトミック条件付き更新という物理設計判断も、この形式モデルが検証すべき遷移プロパティの前提として整合する。",
+      "adapter_hint": "tla",
+      "status": "apply",
+      "covers": ["W2"],
+      "signals": ["concurrency_safety"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": true,
+        "reason": "judgment-axes.md「Formal apply vs defer(Phase 3)」条件4、およびhuman-gates.mdの`formal`行(「常にPhase 3早期ロールアウトでゲート」)により、kind:formalでstatus:applyは常にhuman_gate必須。solidsdd-apply-formalへ進む前にgate-approval.json(scope: application_plan または formal_apply)が必要。"
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/JobQueue.ocl#recordResult",
+      "density": "standard",
+      "rationale": "domain_contract: NFR2の3操作のうち結果記録に相当し、事前条件(対象ジョブがクレーム済みで処理が完了している)と事後条件(結果がジョブIDに紐づけて記録される——W3受け入れ条件/R3)を表現する。architecture_public_boundary: result-storeモジュールのpublic[]は[\"RecordResult\", \"GetResult\"]の一つであり公開サーフェスに該当するが、api技術が存在しないためkindはdbcのまま据え置く。R3にはR2のような二重クレーム相当の排他性要件が明記されておらず(architecture-reasoning.md State Ownershipの通り)、concurrency_safetyシグナルは発火しないため、formalは不要でdbcのみで十分と判断する。",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W3"],
+      "signals": ["domain_contract", "architecture_public_boundary"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "追加のみのdbc適用であり、concurrency_safety/money_boundary/authz_boundary/low_confidenceはいずれも発火しない。"
+      }
+    },
+    {
+      "kind": "dbc",
+      "location": "contracts/JobQueue.ocl#getResult",
+      "density": "standard",
+      "rationale": "domain_contract + architecture_public_boundary: result-storeモジュールのもう一つの公開操作GetResultは、R3の「ジョブIDで取得できる」という要求とSC1/SC2が求める検証可能性を支える読み取り側であり、NFR2が名指しする3操作(投入/クレーム/結果記録)には含まれないものの、公開サーフェスである以上、存在有無(記録済み/未記録)を明確にするpost条件を第一級のOCL契約として持たせる方が、実装フェーズでの曖昧さ(未記録時の挙動)を残さない。副作用を持たない単純な問い合わせ操作であり、複雑な事前条件やconcurrency_safetyの懸念はない。",
+      "adapter_hint": "ocl",
+      "status": "apply",
+      "covers": ["W3"],
+      "signals": ["domain_contract", "architecture_public_boundary"],
+      "breaking": false,
+      "confidence": "high",
+      "human_gate": {
+        "required": false,
+        "reason": "副作用のない読み取り専用のdbc適用であり、いずれのゲート条件も発火しない。"
+      }
+    }
+  ]
+}

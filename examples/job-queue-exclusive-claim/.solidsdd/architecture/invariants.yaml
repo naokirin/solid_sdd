@@ -1,0 +1,13 @@
+version: "1"
+constraints:
+  - type: forbid_dependency
+    from: worker_pool
+    to: job_queue
+    reason: >-
+      ワーカーはJobQueueの投入サーフェスを直接呼び出してはならない。クレームは常に
+      ClaimCoordinatorの排他的クレームサーフェスを経由しなければならない(R2/NFR1
+      の排他性要件)。
+invariants:
+  - "ClaimCoordinatorのみがJobを未クレームからクレーム済みへ遷移させる権限を持つ(単一の権威)。"
+  - "任意の時点で、あるジョブに対して成功したクレームはちょうど1件である(排他制御、NFR1)。"
+  - "JobQueueが所有するJob(ペイロード/存在)とClaimCoordinatorが所有するClaimStateは別個の関心事であり、投入(R1)の変更はクレーム排他性(R2)のロジックへ波及しない。"

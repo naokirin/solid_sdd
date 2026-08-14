@@ -1,0 +1,40 @@
+{
+  "version": "1",
+  "change_id": "establish-job-queue",
+  "summary": "グリーンフィールドのジョブキュー: 投入、排他的クレーム、結果記録の3スライス。",
+  "items": [
+    {
+      "id": "W1",
+      "intent": "プロデューサーがジョブを投入できるようにする",
+      "acceptance_criterion": "Scenario: プロデューサーがジョブを投入する\nGiven ジョブキューが空である\nWhen プロデューサーがペイロードを持つ新しいジョブを投入する\nThen ジョブは未クレーム状態で保存され、ジョブIDが割り当てられる",
+      "covers": ["R1"],
+      "touches": ["src/job-queue/**", "src/job-queue/submission.ts"],
+      "feature_path": "requirements/job-queue.feature",
+      "scenario_name": "プロデューサーがジョブを投入する",
+      "depends_on": [],
+      "status": "pending"
+    },
+    {
+      "id": "W2",
+      "intent": "並行するクレーム試行があっても、ワーカーは未クレームのジョブをちょうど1件だけクレームできるようにする",
+      "acceptance_criterion": "Scenario: 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する\nGiven 未クレームのジョブが1件存在する\nAnd 2人のワーカーが同時にそのジョブのクレームを試みる\nWhen 両方のクレームリクエストが並行して処理される\nThen ちょうど1人のワーカーのクレームが成功する\nAnd もう1人のワーカーは「既にクレーム済み」という結果を受け取る",
+      "covers": ["R2", "SC1", "SC2"],
+      "touches": ["src/worker-pool/**", "src/job-queue/claim-coordinator.ts"],
+      "feature_path": "requirements/job-queue.feature",
+      "scenario_name": "複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する",
+      "depends_on": ["W1"],
+      "status": "pending"
+    },
+    {
+      "id": "W3",
+      "intent": "完了したジョブの結果を記録し、ジョブIDで取得できるようにする",
+      "acceptance_criterion": "Scenario: 完了したジョブの結果が記録され取得できる\nGiven ワーカーがジョブのクレームに成功し処理を完了している\nWhen ワーカーが処理結果を記録する\nThen その結果はジョブIDで取得可能になる",
+      "covers": ["R3"],
+      "touches": ["src/result-store/**"],
+      "feature_path": "requirements/job-queue.feature",
+      "scenario_name": "完了したジョブの結果が記録され取得できる",
+      "depends_on": ["W2"],
+      "status": "pending"
+    }
+  ]
+}

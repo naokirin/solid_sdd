@@ -39,6 +39,7 @@
         "change_context",
         "change_brief",
         "work_plan",
+        "architecture_plan",
         "application_plan",
         "formal_apply",
         "knowledge_harvest",

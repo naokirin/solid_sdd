@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "change_id": "establish-job-queue",
+  "approved_at": "2026-08-14T20:46:20Z",
+  "approver": "naoki (user)",
+  "scope": "architecture_plan",
+  "decision": "approve",
+  "note": "Approve the first-ever Architecture Model for this project (job_queue/claim_coordinator/worker_pool/result_store, with claim_coordinator's ClaimJob as an external-facing boundary) and the accompanying Physical Design decision (shared-store atomic conditional update for claim exclusivity). Gated per human-gates.md's default rule for a project's first Architecture Model.",
+  "artifact_paths": [
+    ".solidsdd/changes/establish-job-queue/architecture-plan.json",
+    ".solidsdd/changes/establish-job-queue/architecture-reasoning.md",
+    ".solidsdd/changes/establish-job-queue/physical-design.md"
+  ]
+}

@@ -1,0 +1,91 @@
+-- contracts/JobQueue.ocl
+-- Design-by-Contract (OCL) for change: establish-job-queue
+-- Source: .solidsdd/changes/establish-job-queue/application-plan.json (kind: dbc targets),
+--         architecture-reasoning.md (State/Knowledge Ownership), work-plan.json, requirements/job-queue.feature
+--
+-- Ownership (architecture-reasoning.md State Ownership / workspace.dsl properties."owns"):
+--   JobQueue         owns Job        { id: JobId, payload: String, claimed: Boolean }
+--   ClaimCoordinator owns ClaimState { jobId: JobId, claimed: Boolean, claimedBy: WorkerId }
+--                    (ClaimCoordinator is a container inside JobQueue; public surface: ClaimJob)
+--   ResultStore      owns JobResult  { jobId: JobId, output: String }
+-- No companion UML class-diagram file exists in this project (design-only sample); the
+-- collections referenced below (self.jobs / self.claims / self.results) are the minimal
+-- structural assumptions needed to state pre/post meaningfully, per each type's documented
+-- "owns" property. They introduce no new business rule.
+--
+-- SCOPE NOTE (W2 / claimJob — see application-plan.json rationale for
+-- contracts/JobQueue.ocl#claimJob, and architecture-reasoning.md Concurrency Boundary):
+-- OCL here expresses only the single-call pre/post shape: unclaimed -> claimed on success,
+-- already-claimed -> a named precondition-violation/failure. It does NOT and MUST NOT express
+-- "at most one concurrent claim succeeds" across interleaved calls (NFR1/R2/SC1/SC2) — that
+-- cross-call safety property is out of scope for OCL and is verified by
+-- formal/ClaimCoordinator.tla (TLA+/TLC) instead.
+
+-- ============================================================
+-- W1 (R1): 投入 — JobQueue::submitJob — JobQueue が Job を所有する
+-- ============================================================
+context JobQueue::submitJob(payload: String): JobId
+pre PayloadIsProvided:
+  payload->notNull()
+post JobIsStoredUnclaimed:
+  self.jobs->exists(j | j.id = result and j.payload = payload and j.claimed = false)
+post JobIdIsFresh:
+  self.jobs@pre->forAll(j | j.id <> result)
+post OneJobAdded:
+  self.jobs->size() = self.jobs@pre->size() + 1
+
+-- ============================================================
+-- W2 (R2/SC1/SC2, single-call shape only): クレーム
+-- ClaimCoordinator::claimJob — ClaimCoordinator が ClaimState を所有する
+-- ============================================================
+context ClaimCoordinator::claimJob(jobId: JobId, workerId: WorkerId): Boolean
+pre JobIsRegistered:
+  self.claims->exists(c | c.jobId = jobId)
+pre JobNotAlreadyClaimed:
+  self.claims->exists(c | c.jobId = jobId and c.claimed = false)
+  -- 違反時(=対象ジョブが既にクレーム済み)は、TypeError/ZeroDivisionError相当の生の例外ではなく
+  -- 「既にクレーム済み」という named failure (例: AlreadyClaimedError) を呼び出し元
+  -- (WorkerPool)へ返す設計を意図する(W2受け入れ条件後半、application-plan.json rationale)。
+  -- solidsdd-derive-tests はこのpre違反時にnamed failureが返る/送出されることを検証すること。
+  -- 「並行する2試行のうちちょうど1件だけが成功する」という複数呼び出しにまたがる排他性は
+  -- ここでは表現しない(formal/ClaimCoordinator.tlaの責務。上記SCOPE NOTE参照)。
+post ClaimTransitionsToClaimed:
+  self.claims->exists(c | c.jobId = jobId and c.claimed = true and c.claimedBy = workerId)
+post OtherClaimsUnchanged:
+  self.claims@pre->select(c | c.jobId <> jobId) = self.claims->select(c | c.jobId <> jobId)
+post ResultConfirmsSuccess:
+  result = true
+
+-- ============================================================
+-- W3 (R3): 結果記録 — ResultStore::recordResult — ResultStore が JobResult を所有する
+-- ============================================================
+context ResultStore::recordResult(jobId: JobId, output: String): JobResult
+-- 「対象ジョブがクレーム済みで処理が完了している」ことは呼び出し元(WorkerPool)が保証する
+-- 外部事前条件である。ResultStoreはJob/ClaimStateを所有せず(architecture-reasoning.md
+-- State Ownership)、result_store -> job_queue / claim_coordinator の依存も
+-- architecture-plan/invariants.yamlに存在しないため、ResultStore自身が検証可能な範囲
+-- (パラメータの妥当性)のみをOCLのpreとして表現する。
+pre JobIdIsProvided:
+  jobId->notNull()
+post ResultIsRecorded:
+  self.results->exists(r | r.jobId = jobId and r.output = output)
+post ResultIsReturned:
+  result.jobId = jobId and result.output = output
+post OneResultAdded:
+  self.results->size() = self.results@pre->size() + 1
+
+-- ============================================================
+-- W3 (R3): 結果取得 — ResultStore::getResult — 副作用のない問い合わせ操作
+-- 未記録時の挙動を明確にする(application-plan.json rationale for getResult)。
+-- ============================================================
+context ResultStore::getResult(jobId: JobId): JobResult[0..1]
+pre JobIdIsProvided:
+  jobId->notNull()
+post RecordedResultIsReturned:
+  self.results->exists(r | r.jobId = jobId)
+  implies result = self.results->any(r | r.jobId = jobId)
+post UnrecordedResultIsUndefined:
+  self.results->forAll(r | r.jobId <> jobId)
+  implies result.oclIsUndefined()
+post NoSideEffects:
+  self.results = self.results@pre

@@ -1,0 +1,69 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "establish-job-queue",
+  "summary": "Projected from workspace.dsl + invariants.yaml for change 'establish-job-queue': 4 module(s), 2 dependency edge(s), 1 constraint(s).",
+  "human_gate": {
+    "required": true,
+    "reason": "プロジェクト最初のArchitecture Model(workspace.dslがこの変更以前は存在しなかった)であり、human-gates.mdのデフォルトにより大規模/外部境界変更として扱う。WorkerPoolは別々のOSプロセス/マシンで動作しうる外部呼び出し元であり、ClaimCoordinatorの排他的クレームサーフェス(ClaimJob)はその外部呼び出し元向けの公開境界であるため、「entirely internal」の例外には当てはまらない。"
+  },
+  "modules": [
+    {
+      "id": "claim-coordinator",
+      "responsibility": "同一ジョブへの並行クレーム試行を直列化し、ちょうど1件だけを成功させる。クレーム状態を所有する。",
+      "owns": [
+        "ClaimState"
+      ],
+      "public": [
+        "ClaimJob"
+      ]
+    },
+    {
+      "id": "job-queue",
+      "responsibility": "ジョブの投入を受け付け、未クレームジョブのペイロードと存在を保持する。",
+      "owns": [
+        "Job"
+      ],
+      "public": [
+        "SubmitJob"
+      ]
+    },
+    {
+      "id": "result-store",
+      "responsibility": "完了したジョブの結果を記録し、ジョブIDで取得可能にする。",
+      "owns": [
+        "JobResult"
+      ],
+      "public": [
+        "RecordResult",
+        "GetResult"
+      ]
+    },
+    {
+      "id": "worker-pool",
+      "responsibility": "並行して稼働する複数ワーカーを表し、ジョブのクレームを試み、処理結果を記録する。"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "worker-pool",
+      "to": "claim-coordinator",
+      "reason": "ワーカーがジョブのクレームを試みる。並行クレームに対してちょうど1件だけが成功する。",
+      "kind": "runtime"
+    },
+    {
+      "from": "worker-pool",
+      "to": "result-store",
+      "reason": "処理完了後、結果をジョブIDで記録する。",
+      "kind": "runtime"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "forbid_dependency",
+      "from": "worker-pool",
+      "to": "job-queue",
+      "reason": "ワーカーはJobQueueの投入サーフェスを直接呼び出してはならない。クレームは常に ClaimCoordinatorの排他的クレームサーフェスを経由しなければならない(R2/NFR1 の排他性要件)。"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "change_id": "establish-job-queue",
+  "approved_at": "2026-08-14T20:46:20Z",
+  "approver": "naoki (user)",
+  "scope": "formal_apply",
+  "decision": "approve",
+  "note": "Approve solidsdd-apply-formal for the ClaimCoordinator exclusive-claim mutual-exclusion property (formal/ClaimCoordinator.tla, TLA+/TLC), per application-plan.json's formal target (kind: formal, status: apply, human_gate.required: true under early Phase 3 policy).",
+  "artifact_paths": [
+    ".solidsdd/changes/establish-job-queue/application-plan.json"
+  ]
+}

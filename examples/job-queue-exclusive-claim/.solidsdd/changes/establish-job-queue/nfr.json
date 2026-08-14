@@ -1,0 +1,52 @@
+{
+  "version": "1",
+  "change_id": "establish-job-queue",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "並行するワーカーが同一ジョブをクレームしようとしても、成功するクレームは常にちょうど1件である(二重クレームが発生しない)",
+      "rationale": "R2/SC1/SC2の核心。二重クレームは同一ジョブの二重処理・二重の副作用につながり、キューの正しさを損なう",
+      "threshold": "並行クレーム試行に対して二重成功が0件であること",
+      "measurement": "formal/ClaimCoordinator.tla のTLC model checkingで安全性プロパティとして検証する(実装レベルの結合テストはPhase 3スコープ外)"
+    },
+    {
+      "id": "NFR2",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "ジョブの投入・クレーム・結果記録それぞれの単一操作としての事前条件・事後条件がドキュメント化され、機械的にレビュー可能である",
+      "rationale": "R1/R2(逐次的な形)/R3の契約が実装より先に明確であることで、後続のimplementレビューが容易になる",
+      "threshold": "対象となる3操作すべてにOCLのpre/postが定義されている",
+      "measurement": "contracts/JobQueue.ocl のレビュー、および solidsdd-lint / critique(dbc_contracts)"
+    },
+    {
+      "id": "NFR3",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "設計のみのサンプルであり、認証・認可・データ保護を伴う実行環境を持たない"
+    },
+    {
+      "id": "NFR4",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "実装が存在しないため、スループットやレイテンシの数値目標は本changeのスコープ外"
+    },
+    {
+      "id": "NFR5",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "デプロイ・監視・運用手順は実装フェーズの関心事であり、本changeは設計のみを扱う"
+    },
+    {
+      "id": "NFR6",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "グリーンフィールドプロジェクトであり、互換性を保つべき既存の外部インターフェースが存在しない"
+    }
+  ]
+}
