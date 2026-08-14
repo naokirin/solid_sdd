@@ -304,6 +304,9 @@ sync_one reference-src/structurizr-dsl.md skills/solidsdd-run/references/structu
 sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-architecture/references/architecture-reasoning-template.md
 sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-critique/references/architecture-reasoning-template.md
 sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-run/references/architecture-reasoning-template.md
+sync_one reference-src/physical-design.md skills/solidsdd-architecture/references/physical-design.md
+sync_one reference-src/physical-design.md skills/solidsdd-critique/references/physical-design.md
+sync_one reference-src/physical-design.md skills/solidsdd-run/references/physical-design.md
 sync_one reference-src/human-gates.md skills/solidsdd-architecture/references/human-gates.md
 sync_one reference-src/change-brief.md skills/solidsdd-architecture/references/change-brief.md
 sync_one reference-src/change-context.md skills/solidsdd-architecture/references/change-context.md

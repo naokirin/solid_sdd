@@ -156,6 +156,12 @@ job — do not duplicate the same structural fact across more than one of them:
 
 .solidsdd/changes/<change_id>/            generated projection, for
   architecture-plan.json                    existing consumers (see below)
+
+.solidsdd/changes/<change_id>/            optional, Level 3 only: Logical →
+  physical-design.md                        Physical realization (module /
+                                             package / directory / process /
+                                             service / database / adapter
+                                             boundary), when non-obvious
 ```
 
 `architecture-plan.json` (schema:
@@ -199,6 +205,7 @@ Depth: [../reference-src/architecture-depth.md](../reference-src/architecture-de
 Axes: [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md).
 DSL grammar: [../reference-src/structurizr-dsl.md](../reference-src/structurizr-dsl.md).
 Reasoning template: [../reference-src/architecture-reasoning-template.md](../reference-src/architecture-reasoning-template.md).
+Physical Design (Level 3 only): [../reference-src/physical-design.md](../reference-src/physical-design.md).
 Human gates: [../reference-src/human-gates.md](../reference-src/human-gates.md).
 
 ### Role separation

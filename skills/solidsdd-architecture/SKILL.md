@@ -36,6 +36,10 @@ change affects structure, edit the Architecture Model:
 - `.solidsdd/changes/<change_id>/architecture-reasoning.md` — **why** this
   decomposition/boundary/ownership/direction was chosen (change-local; see
   [architecture-reasoning-template.md](references/architecture-reasoning-template.md))
+- `.solidsdd/changes/<change_id>/physical-design.md` — **optional**, only at
+  Architecture Depth Level 3 when the Logical → Physical realization itself
+  is non-obvious (change-local; see
+  [physical-design.md](references/physical-design.md))
 
 `architecture-plan.json` is still produced — now as a deterministic
 **projection** of the Architecture Model for this change_id
@@ -54,6 +58,7 @@ Gherkin). See "Role separation" in
 - [architecture-depth.md](references/architecture-depth.md) — **how deep this change needs to go (required)**
 - [structurizr-dsl.md](references/structurizr-dsl.md) — DSL grammar and concept mapping (required when depth ≥ Level 1)
 - [architecture-reasoning-template.md](references/architecture-reasoning-template.md) — required when depth ≥ Level 1
+- [physical-design.md](references/physical-design.md) — optional, Level 3 only, when the physical realization decision is non-obvious
 - [architecture-plan.schema.json](references/architecture-plan.schema.json) — shape of the generated projection
 - [human-gates.md](references/human-gates.md)
 - [change-brief.md](references/change-brief.md) — scope premise
@@ -66,7 +71,8 @@ Gherkin). See "Role separation" in
 
 - Edit only the Architecture Model and its generated projection (no OpenAPI / OCL / formal / implementation edits, no ApplicationPlan)
 - Do not require or name a specific architectural style (DDD, Clean Architecture, Hexagonal, Onion, MVC, CQRS, Event Sourcing, …) — the model only records modules/dependencies/ownership/constraints, not a methodology
-- Decide structure from Logical Decomposition first (responsibility / state ownership / knowledge ownership / change locality), not from the directory tree — physical structure is a later, separate concern
+- Decide structure from Logical Decomposition first (responsibility / state ownership / knowledge ownership / change locality), not from the directory tree — physical structure is a later, separate concern ([physical-design.md](references/physical-design.md), Level 3 only)
+- When writing `physical-design.md`, stop at module/package/directory/class/process/service/database/adapter boundary and Physical Dependency allocation — do not pre-design every class, method, function, or implementation algorithm (that is Implementation)
 - Judge from the existing Architecture Model (read it first) plus this change's WorkPlan `touches` / Brief scope — do not redesign structure the change does not touch
 - Do not pad `workspace.dsl` with unrelated existing elements' `change:<id>` tags just to look complete; do not skip tagging touched elements/relationships to avoid writing a plan when `touches` implies a new module/boundary/dependency-direction change
 - Populate `properties["owns"]` / `properties["public"]` / a relationship's `kind:*` tag only when confidently derivable from context — never guess to fill out the model
@@ -86,9 +92,10 @@ Gherkin). See "Role separation" in
 8. Decide the boundary and dependency direction for this change's structural delta.
 9. Write `.solidsdd/changes/<change_id>/architecture-reasoning.md` from the [template](references/architecture-reasoning-template.md) — record *why*, not the structure itself, including Decision Drivers when extracted.
 10. Edit `workspace.dsl`: add/modify elements and relationships per [structurizr-dsl.md](references/structurizr-dsl.md), tagging every element/relationship this change adds or modifies with `change:<change_id>` (append to existing tags, don't replace them). Edit `invariants.yaml` if a constraint or invariant is added, changed, or deliberately removed.
-11. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
-12. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
-13. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
+11. At Level 3, when the Logical → Physical realization itself is non-obvious (not a trivial 1:1 rename), write `.solidsdd/changes/<change_id>/physical-design.md` from the [template](references/physical-design.md) — module/package/directory/class/process/service/database/adapter boundary and Physical Dependency, stopping short of class/method/algorithm design.
+12. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
+13. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
+14. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
 
 ## Output
 
@@ -98,7 +105,9 @@ one-paragraph summary.
 At Level 1+: the edited `.solidsdd/architecture/{workspace.dsl,invariants.yaml}`,
 a new `.solidsdd/changes/<change_id>/architecture-reasoning.md`, and the
 generated `.solidsdd/changes/<change_id>/architecture-plan.json`
-(`status: changed`), conforming to the ArchitecturePlan schema.
+(`status: changed`), conforming to the ArchitecturePlan schema. At Level 3,
+additionally `.solidsdd/changes/<change_id>/physical-design.md` when the
+physical realization decision was non-obvious enough to write one.
 
 When invoked from `solidsdd-run`, **write** these files under the project's
 `.solidsdd/` tree (caller supplies the change_id) and return the artifacts

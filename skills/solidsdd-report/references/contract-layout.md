@@ -12,6 +12,7 @@
 | Architecture Model | `.solidsdd/architecture/workspace.dsl`, `.solidsdd/architecture/invariants.yaml` | Structurizr DSL subset (structure Source of Truth) + forbid_dependency/no_cycles/prose invariants; persistent, whole-project — not per-change ([structurizr-dsl.md](structurizr-dsl.md)) |
 | Architecture Reasoning | `.solidsdd/changes/<change_id>/architecture-reasoning.md` | Why this change's boundary/ownership/dependency-direction was chosen; only written at Architecture Depth Level 1+ ([architecture-reasoning-template.md](architecture-reasoning-template.md)) |
 | ArchitecturePlan | `.solidsdd/changes/<change_id>/architecture-plan.json` | Generated projection of the Architecture Model for this change (`scripts/solidsdd-architecture/project.py`; never hand-authored); `status: unchanged` when this change doesn't affect structure |
+| Physical Design | `.solidsdd/changes/<change_id>/physical-design.md` | Logical → physical realization (module/package/directory/process/service/database/adapter boundary); only written at Architecture Depth Level 3 when the realization itself is non-obvious ([physical-design.md](physical-design.md)) |
 | Run state | `.solidsdd/changes/<change_id>/run-state.json` | Orchestrator phase, waves, retry budgets ([run-state.md](run-state.md)) |
 | Gate approval | `.solidsdd/changes/<change_id>/gate-approval.json` | Latest human gate approval ([human-gates.md](human-gates.md)) |
 | Per-item loop artifacts | `.solidsdd/changes/<change_id>/items/<item_id>/` | ApplicationPlan, CritiqueReports, VerificationReport for that slice |
