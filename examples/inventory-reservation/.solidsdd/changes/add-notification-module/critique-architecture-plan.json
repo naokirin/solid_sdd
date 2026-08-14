@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "architecture_plan",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "architecture-plan.json#modules/1/public",
+      "detail": "NotificationService is a single facade; splitting a narrower read-only delivery-status query out later is plausible, but one facade is acceptable at standard density."
+    }
+  ],
+  "summary": "New module with a clear, single responsibility (hold-expiry delivery) that doesn't overlap Reservation's hold-lifecycle responsibility. The notification -> reservation dependency has a stated reason, and the new reservation -> notification forbid_dependency constraint matches the stated rationale (keep hold lifecycle usable without a notification channel). architecture-reasoning.md names the change-locality problem being solved and the rejected alternative. No responsibility, boundary, ownership, or checkability gaps."
+}

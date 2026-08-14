@@ -7,6 +7,14 @@ constraints:
       Stock ownership must stay independent of hold/TTL/authZ concerns so
       inventory can be reused (e.g. multi-warehouse) without carrying
       reservation logic.
+  - type: forbid_dependency
+    from: reservation
+    to: notification
+    reason: >-
+      Hold lifecycle rules must not depend on notification delivery
+      mechanics, so reservation stays usable/testable without a
+      notification channel configured.
 invariants:
   - "Inventory owns available stock per SKU."
   - "Reservation owns hold lifecycle and TTL/authZ enforcement."
+  - "Notification owns hold-expiry delivery (channel/formatting/retry); it does not decide hold lifecycle."

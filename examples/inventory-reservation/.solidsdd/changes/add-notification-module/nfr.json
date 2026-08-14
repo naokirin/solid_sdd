@@ -1,0 +1,51 @@
+{
+  "version": "1",
+  "change_id": "add-notification-module",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Reservation must not gain a compile-time or runtime dependency on notification delivery mechanics.",
+      "rationale": "Keeps hold-lifecycle correctness changeable independent of delivery-channel changes (see architecture-reasoning.md Change Locality).",
+      "measurement": "Zero forbid_dependency violations for reservation -> notification, verified via solidsdd-lint structural checks.",
+      "threshold": "0 violations",
+      "verified_by": ["solidsdd-lint.sh (Architecture Model validation)"]
+    }
+  ]
+}

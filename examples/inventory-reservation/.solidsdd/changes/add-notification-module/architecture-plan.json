@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "add-notification-module",
+  "summary": "Projected from workspace.dsl + invariants.yaml for change 'add-notification-module': 3 module(s), 1 dependency edge(s), 2 constraint(s).",
+  "modules": [
+    {
+      "id": "inventory",
+      "responsibility": "Own available stock per SKU; expose stock read/adjust operations.",
+      "owns": [
+        "Stock"
+      ],
+      "public": [
+        "InventoryService"
+      ]
+    },
+    {
+      "id": "notification",
+      "responsibility": "Own hold-expiry notification delivery (channel, formatting, retry).",
+      "owns": [
+        "NotificationLog"
+      ],
+      "public": [
+        "NotificationService"
+      ]
+    },
+    {
+      "id": "reservation",
+      "responsibility": "Own hold lifecycle (reserve/release/expire/lookup) and TTL/authZ enforcement.",
+      "owns": [
+        "Hold"
+      ],
+      "public": [
+        "ReservationService"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "notification",
+      "to": "reservation",
+      "reason": "Reads hold-expiry events to notify the holder.",
+      "kind": "event"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "forbid_dependency",
+      "from": "inventory",
+      "to": "reservation",
+      "reason": "Stock ownership must stay independent of hold/TTL/authZ concerns so inventory can be reused (e.g. multi-warehouse) without carrying reservation logic."
+    },
+    {
+      "type": "forbid_dependency",
+      "from": "reservation",
+      "to": "notification",
+      "reason": "Hold lifecycle rules must not depend on notification delivery mechanics, so reservation stays usable/testable without a notification channel configured."
+    }
+  ]
+}

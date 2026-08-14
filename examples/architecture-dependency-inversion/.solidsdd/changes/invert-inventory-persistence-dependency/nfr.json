@@ -1,0 +1,51 @@
+{
+  "version": "1",
+  "change_id": "invert-inventory-persistence-dependency",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Inventory must not depend on a concrete persistence technology; PostgresInventoryStore must not depend on Inventory directly.",
+      "rationale": "This is the whole point of the inversion: swapping or mocking persistence must not require changing the Inventory domain module.",
+      "measurement": "Zero forbid_dependency violations for postgres_store -> inventory, verified via solidsdd-lint structural checks.",
+      "threshold": "0 violations",
+      "verified_by": ["solidsdd-lint.sh (Architecture Model validation)"]
+    }
+  ]
+}

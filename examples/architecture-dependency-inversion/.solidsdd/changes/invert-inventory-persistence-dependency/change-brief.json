@@ -1,0 +1,33 @@
+{
+  "version": "1",
+  "change_id": "invert-inventory-persistence-dependency",
+  "summary": "Invert the direct Inventory -> PostgresInventoryStore dependency by introducing a persistence port: Inventory depends on the port, PostgresInventoryStore implements it.",
+  "goal": "Let Inventory's persistence technology be swapped (or mocked in tests) without changing the Inventory domain module, by depending on an abstraction instead of a concrete store.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Introduce inventory_repository_port; remove the direct inventory -> postgres_store dependency; add inventory -> port and postgres_store -> port instead"
+    },
+    {
+      "id": "R2",
+      "text": "Add a forbid_dependency constraint so postgres_store cannot depend on inventory directly, only on the port"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Any implementation in src/ — this whole example is a structural design artifact, not a runnable project"
+    },
+    {
+      "id": "X2",
+      "text": "Introducing a second persistence adapter — one implementation (PostgresInventoryStore) is enough to demonstrate the inversion"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ArchitecturePlan documents inventory_repository_port, the inventory -> port and postgres_store -> port dependencies, and the postgres_store -> inventory forbid_dependency constraint, and passes solidsdd-lint / critique(architecture_plan) cleanly"
+    }
+  ],
+  "confidence": "medium"
+}

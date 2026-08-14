@@ -1,0 +1,31 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "establish-inventory-persistence",
+  "summary": "Projected from workspace.dsl + invariants.yaml for change 'establish-inventory-persistence': 2 module(s), 1 dependency edge(s), 0 constraint(s).",
+  "modules": [
+    {
+      "id": "inventory",
+      "responsibility": "Own available stock per SKU; expose stock read/adjust operations.",
+      "owns": [
+        "Stock"
+      ],
+      "public": [
+        "InventoryService"
+      ]
+    },
+    {
+      "id": "postgres-store",
+      "responsibility": "Concrete PostgreSQL persistence for inventory rows."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "inventory",
+      "to": "postgres-store",
+      "reason": "Reads and writes stock rows directly.",
+      "kind": "data"
+    }
+  ],
+  "constraints": []
+}

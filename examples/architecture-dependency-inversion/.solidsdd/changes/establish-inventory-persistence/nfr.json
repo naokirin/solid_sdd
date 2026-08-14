@@ -1,0 +1,48 @@
+{
+  "version": "1",
+  "change_id": "establish-inventory-persistence",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Design-only change; no runtime behavior introduced."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "This change is intentionally the 'before' baseline for a follow-on dependency-inversion change; the maintainability concern is addressed there."
+    }
+  ]
+}

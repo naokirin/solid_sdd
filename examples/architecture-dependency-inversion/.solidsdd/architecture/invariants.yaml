@@ -1,0 +1,12 @@
+version: "1"
+constraints:
+  - type: forbid_dependency
+    from: postgres_store
+    to: inventory
+    reason: >-
+      Infrastructure must depend only on the persistence port, not directly
+      on the Inventory domain module, so persistence implementations can be
+      swapped without the domain knowing about them.
+invariants:
+  - "Inventory owns available stock per SKU."
+  - "Inventory depends only on the persistence port, never on a concrete persistence technology directly."

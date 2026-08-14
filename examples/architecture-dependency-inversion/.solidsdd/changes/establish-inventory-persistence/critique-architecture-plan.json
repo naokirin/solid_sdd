@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "subject": "architecture_plan",
+  "result": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "other",
+      "location": "architecture-plan.json#dependencies/0",
+      "detail": "inventory depends directly on a concrete PostgresInventoryStore rather than an abstraction; architecture-reasoning.md is explicit that this is an intentional 'before' baseline for the follow-on invert-inventory-persistence-dependency change, so this is not flagged as a boundary/dependency-direction problem here."
+    }
+  ],
+  "summary": "Two modules with clear, non-overlapping responsibilities (domain vs. concrete persistence). The direct inventory -> postgres_store dependency is explicitly framed by architecture-reasoning.md as the deliberate baseline for a later dependency-inversion change, not an oversight. No responsibility or ownership gaps."
+}

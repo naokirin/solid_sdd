@@ -17,6 +17,16 @@ workspace "Inventory Reservation" "Architecture Model for the inventory-reservat
     reservation -> inventory "Reserving and releasing a hold must read and adjust available stock." "runtime" {
       tags "change:structure-inventory-reservation-split, kind:runtime"
     }
+    notification = softwareSystem "Notification" "Own hold-expiry notification delivery (channel, formatting, retry)." {
+      tags "change:add-notification-module"
+      properties {
+        "owns" "NotificationLog"
+        "public" "NotificationService"
+      }
+    }
+    notification -> reservation "Reads hold-expiry events to notify the holder." "event" {
+      tags "change:add-notification-module, kind:event"
+    }
   }
   views {
     systemContext inventory {

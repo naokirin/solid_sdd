@@ -1,0 +1,29 @@
+{
+  "version": "1",
+  "change_id": "add-notification-module",
+  "summary": "Design a notification module for hold-expiry delivery, kept structurally independent of hold lifecycle rules.",
+  "goal": "Let hold-expiry notifications (channel, formatting, retry) evolve independently of reservation's core hold lifecycle, without reservation depending on delivery mechanics.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Define notification as a new module that reads hold-expiry events from reservation, with a forbidden reverse dependency (reservation -> notification)"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Implementing the module in src/ — this change stays a structural design artifact; the sample's implementation intentionally remains a single reservation.ts file"
+    },
+    {
+      "id": "X2",
+      "text": "Any behavior change, new endpoint, or new OCL/TLA+ contract"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ArchitecturePlan documents the notification module, the notification -> reservation dependency, and the reservation -> notification forbid_dependency constraint, and passes solidsdd-lint / critique(architecture_plan) cleanly"
+    }
+  ],
+  "confidence": "medium"
+}
