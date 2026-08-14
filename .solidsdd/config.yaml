@@ -8,6 +8,7 @@ paths:
   changes: .solidsdd/changes
   host_toolchain: .solidsdd/host-toolchain.json
   kg: .solidsdd/kg
+  architecture: .solidsdd/architecture
   cache: .solidsdd-cache
   knowledge:
     - knowledge

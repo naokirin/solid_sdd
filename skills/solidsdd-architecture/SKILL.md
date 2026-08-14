@@ -3,11 +3,13 @@ name: solidsdd-architecture
 description: >-
   Decide whether a change affects existing system structure (modules,
   responsibilities, dependencies, dependency direction, public boundaries,
-  ownership, structural constraints). When called from solidsdd-run, must run
-  as an explicit Task subagent. Emits ArchitecturePlan (status: changed) or a
-  status: unchanged shortcut when the change does not affect structure. Does
-  not choose specification techniques (see solidsdd-judge) or edit contracts
-  / implementation.
+  ownership, structural constraints), and when it does, edit the
+  Architecture Model (Structurizr DSL subset + invariants) and record why.
+  When called from solidsdd-run, must run as an explicit Task subagent.
+  Emits ArchitecturePlan (status: changed, generated from the Architecture
+  Model) or a status: unchanged shortcut when the change does not affect
+  structure. Does not choose specification techniques (see solidsdd-judge)
+  or edit contracts / implementation.
 license: MIT
 ---
 
@@ -21,50 +23,85 @@ the returned plan inline. Solo user invocation may run in the current agent.
 
 ## Purpose
 
-Emit an `ArchitecturePlan`: either `status: unchanged` (this change does not
-affect existing structure) or `status: changed` with the modules,
-dependencies, and structural constraints this change introduces or modifies.
+Decide **structure only** — which modules exist, what each owns, how they
+depend on each other, which dependencies are forbidden — and, when this
+change affects structure, edit the Architecture Model:
 
-This skill judges **structure only** — which modules exist, what each owns,
-how they depend on each other, and which dependencies are forbidden. It does
-not decide where OpenAPI / OCL / formal specs apply (that is
+- `.solidsdd/architecture/workspace.dsl` — Structurizr DSL subset, the
+  Source of Truth for structure (persistent, whole-project; see
+  [structurizr-dsl.md](references/structurizr-dsl.md))
+- `.solidsdd/architecture/invariants.yaml` — forbidden-dependency /
+  no-cycles constraints and prose Architecture Invariants (persistent,
+  whole-project)
+- `.solidsdd/changes/<change_id>/architecture-reasoning.md` — **why** this
+  decomposition/boundary/ownership/direction was chosen (change-local; see
+  [architecture-reasoning-template.md](references/architecture-reasoning-template.md))
+
+`architecture-plan.json` is still produced — now as a deterministic
+**projection** of the Architecture Model for this change_id
+(`scripts/solidsdd-architecture/project.py`), kept for existing consumers
+(`solidsdd-lint`, `solidsdd-critique`, `solidsdd-report`). Do not hand-author
+`architecture-plan.json` — generate it.
+
+This skill does not decide where OpenAPI / OCL / formal specs apply (that is
 `solidsdd-judge` / `ApplicationPlan`) and does not describe behavior (that is
 Gherkin). See "Role separation" in
 [architecture-axes.md](references/architecture-axes.md).
 
 ## References
 
-- [architecture-plan.schema.json](references/architecture-plan.schema.json)
-- [architecture-axes.md](references/architecture-axes.md) — **when architecture changes, field minimality, role separation (required)**
+- [architecture-axes.md](references/architecture-axes.md) — **when architecture changes, Logical Decomposition axes, field minimality, role separation (required)**
+- [architecture-depth.md](references/architecture-depth.md) — **how deep this change needs to go (required)**
+- [structurizr-dsl.md](references/structurizr-dsl.md) — DSL grammar and concept mapping (required when depth ≥ Level 1)
+- [architecture-reasoning-template.md](references/architecture-reasoning-template.md) — required when depth ≥ Level 1
+- [architecture-plan.schema.json](references/architecture-plan.schema.json) — shape of the generated projection
 - [human-gates.md](references/human-gates.md)
 - [change-brief.md](references/change-brief.md) — scope premise
 - [change-context.md](references/change-context.md) — existing structure signals (stack, layout)
 - [work-plan.schema.json](references/work-plan.schema.json) — read `items[].touches` as the primary structural-change signal
-- [contract-layout.md](references/contract-layout.md) — default artifact path
-- [working-language.md](references/working-language.md) — `summary`/`responsibility`/`reason` string language
+- [contract-layout.md](references/contract-layout.md) — default artifact paths
+- [working-language.md](references/working-language.md) — `summary`/reasoning/DSL description string language
 
 ## Constraints
 
-- Produce the ArchitecturePlan only (no OpenAPI / OCL / formal / implementation edits, no ApplicationPlan)
-- Do not require or name a specific architectural style (DDD, Clean Architecture, Hexagonal, Onion, MVC, CQRS, Event Sourcing, …) — `ArchitecturePlan` only records modules/dependencies/ownership/constraints, not a methodology
-- Judge from the existing structure (Context) plus this change's WorkPlan `touches` / Brief scope — do not redesign structure the change does not touch
-- Do not pad `status: changed` with unrelated existing modules just to look complete; do not force `status: unchanged` to avoid writing a plan when `touches` implies a new module/boundary/dependency-direction change
-- Populate `owns` / `public` / `dependency.kind` only when confidently derivable from context — never guess to fill out the schema
-- Set `human_gate` per [human-gates.md](references/human-gates.md) (large boundary change, external-boundary change, dependency-direction reversal, or deliberate change to an existing structural constraint) — do not gate ordinary additive module/dependency additions
-- JSON keys English; human-readable `summary` / `responsibility` / `reason` strings in the **working language** ([working-language.md](references/working-language.md))
+- Edit only the Architecture Model and its generated projection (no OpenAPI / OCL / formal / implementation edits, no ApplicationPlan)
+- Do not require or name a specific architectural style (DDD, Clean Architecture, Hexagonal, Onion, MVC, CQRS, Event Sourcing, …) — the model only records modules/dependencies/ownership/constraints, not a methodology
+- Decide structure from Logical Decomposition first (responsibility / state ownership / knowledge ownership / change locality), not from the directory tree — physical structure is a later, separate concern
+- Judge from the existing Architecture Model (read it first) plus this change's WorkPlan `touches` / Brief scope — do not redesign structure the change does not touch
+- Do not pad `workspace.dsl` with unrelated existing elements' `change:<id>` tags just to look complete; do not skip tagging touched elements/relationships to avoid writing a plan when `touches` implies a new module/boundary/dependency-direction change
+- Populate `properties["owns"]` / `properties["public"]` / a relationship's `kind:*` tag only when confidently derivable from context — never guess to fill out the model
+- Set `human_gate` on the generated `architecture-plan.json` per [human-gates.md](references/human-gates.md) (large boundary change, external-boundary change, dependency-direction reversal, or deliberate change to an existing structural constraint) — do not gate ordinary additive module/dependency additions
+- Never hand-edit `architecture-plan.json` directly — always regenerate it via `scripts/solidsdd-architecture.sh project`
+- DSL identifiers and JSON keys English; human-readable `description`/reasoning strings in the **working language** ([working-language.md](references/working-language.md))
 
 ## Steps
 
 1. Read change intent, active Change Context and ChangeBrief, and the WorkPlan (`items[].touches` across all items is the primary signal for structural change). Resolve working language from project rule or Context §6.
-2. Apply the "When architecture changes" / "When architecture does not change" tables in [architecture-axes.md](references/architecture-axes.md).
-3. If no trigger applies: emit `{"version": "1", "status": "unchanged", "change_id": ..., "summary": "..."}` and stop.
-4. If a trigger applies: list `modules` (id, responsibility, optional `owns`/`public`), `dependencies` (from, to, optional reason/kind), and `constraints` (type `forbid_dependency` or `no_cycles`, with from/to/reason as applicable) — delta only, not a full re-documentation of unrelated existing structure.
-5. Apply human-gate rules in [human-gates.md](references/human-gates.md).
-6. Validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
+2. Read the existing `.solidsdd/architecture/workspace.dsl` and `invariants.yaml` (treat as empty if they don't exist yet — this is the first structural change in the project).
+3. Apply the "When architecture changes" / "When architecture does not change" tables in [architecture-axes.md](references/architecture-axes.md).
+4. If no trigger applies: emit `{"version": "1", "status": "unchanged", "change_id": ..., "summary": "..."}` directly as `architecture-plan.json` and stop — do not touch the Architecture Model or write `architecture-reasoning.md` (Level 0, [architecture-depth.md](references/architecture-depth.md)).
+5. If a trigger applies, determine the required [Architecture Depth](references/architecture-depth.md) (Level 1–4).
+6. At Level 2+, work through Logical Decomposition (Responsibility / State Ownership / Knowledge Ownership / Change Locality — [architecture-axes.md](references/architecture-axes.md)) before deciding boundaries.
+7. Decide the boundary and dependency direction for this change's structural delta.
+8. Write `.solidsdd/changes/<change_id>/architecture-reasoning.md` from the [template](references/architecture-reasoning-template.md) — record *why*, not the structure itself.
+9. Edit `workspace.dsl`: add/modify elements and relationships per [structurizr-dsl.md](references/structurizr-dsl.md), tagging every element/relationship this change adds or modifies with `change:<change_id>` (append to existing tags, don't replace them). Edit `invariants.yaml` if a constraint or invariant is added, changed, or deliberately removed.
+10. Run `scripts/solidsdd-architecture.sh validate --project-root <project>` and fix any findings before continuing.
+11. Run `scripts/solidsdd-architecture.sh project --project-root <project> --change-id <change_id> --out .solidsdd/changes/<change_id>/architecture-plan.json` to generate the projection.
+12. Apply human-gate rules from [human-gates.md](references/human-gates.md) by adding `human_gate` to the generated `architecture-plan.json` when required, then re-validate against [architecture-plan.schema.json](references/architecture-plan.schema.json).
 
 ## Output
 
-JSON conforming to the ArchitecturePlan schema, plus a one-paragraph summary.
-When invoked from `solidsdd-run`, **write** the plan to
-`.solidsdd/changes/<change_id>/architecture-plan.json` (caller supplies the
-change_id) and return those artifacts to the parent unchanged in meaning.
+At Level 0: `architecture-plan.json` with `status: unchanged`, plus a
+one-paragraph summary.
+
+At Level 1+: the edited `.solidsdd/architecture/{workspace.dsl,invariants.yaml}`,
+a new `.solidsdd/changes/<change_id>/architecture-reasoning.md`, and the
+generated `.solidsdd/changes/<change_id>/architecture-plan.json`
+(`status: changed`), conforming to the ArchitecturePlan schema.
+
+When invoked from `solidsdd-run`, **write** these files under the project's
+`.solidsdd/` tree (caller supplies the change_id) and return the artifacts
+to the parent unchanged in meaning. Known limitation: the projection is
+additive-only — element/relationship deletions and renames are not
+reflected in `architecture-plan.json`; note them explicitly in
+`architecture-reasoning.md` instead.

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/architecture-invariants.schema.json",
+  "title": "ArchitectureInvariants",
+  "description": "Persistent, whole-project structural constraints and invariants for the Architecture Model (.solidsdd/architecture/invariants.yaml). Declares rules ABOUT the Structurizr DSL model (.solidsdd/architecture/workspace.dsl); does not duplicate the model's elements/relationships. Referenced element ids must exist in workspace.dsl (checked by scripts/solidsdd-architecture/validate.py, not by this schema alone).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      },
+      "description": "Mechanically checkable structural constraints, mirroring ArchitecturePlan.constraints[]."
+    },
+    "invariants": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Prose Architecture Invariants (structural conditions to maintain, not behavior or formal state properties). One sentence each, e.g. 'Domain must not depend on Infrastructure.'"
+    }
+  },
+  "$defs": {
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["forbid_dependency", "no_cycles"]
+        },
+        "from": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Element id in workspace.dsl (underscore identifier form). Required for type: forbid_dependency."
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Element id in workspace.dsl (underscore identifier form). Required for type: forbid_dependency."
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["all"],
+          "description": "For type: no_cycles. 'all' checks the whole relationship graph. Omit 'from'/'to' when scope is 'all'."
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

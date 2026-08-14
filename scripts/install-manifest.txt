@@ -8,6 +8,7 @@ rules/solidsdd.mdc
 
 scripts/requirements.txt
 scripts/solidsdd-lint.sh
+scripts/solidsdd-architecture.sh
 scripts/solidsdd-run-state.sh
 scripts/solidsdd-next.sh
 scripts/solidsdd-host-toolchain.sh
@@ -19,6 +20,12 @@ scripts/solidsdd_lib/paths.py
 scripts/solidsdd-lint/lint.py
 scripts/solidsdd-lint/ambiguity-lexicon.json
 scripts/solidsdd-lint/README.md
+
+scripts/solidsdd-architecture/dsl.py
+scripts/solidsdd-architecture/validate.py
+scripts/solidsdd-architecture/project.py
+scripts/solidsdd-architecture/cli.py
+scripts/solidsdd-architecture/README.md
 
 scripts/solidsdd-run-state/run_state.py
 scripts/solidsdd-run-state/README.md

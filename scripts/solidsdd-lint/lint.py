@@ -28,6 +28,11 @@ from solidsdd_lib.paths import (  # noqa: E402
     resolve_change_dir as _resolve_change_dir,
 )
 
+_ARCH_DIR = _SCRIPTS / "solidsdd-architecture"
+if str(_ARCH_DIR) not in sys.path:
+    sys.path.insert(0, str(_ARCH_DIR))
+import validate as _architecture_validate  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
 LEXICON_PATH = Path(__file__).resolve().parent / "ambiguity-lexicon.json"
@@ -779,6 +784,10 @@ def lint_change(
                 if "subject" not in data or "findings" not in data:
                     continue
             validate_schema(data, schema, str(path), findings)
+
+    # Optional Architecture Model (.solidsdd/architecture/workspace.dsl + invariants.yaml).
+    # Whole-project, persistent across changes; no-op when the directory doesn't exist.
+    findings.extend(_architecture_validate.validate_project(lay))
 
     return findings
 

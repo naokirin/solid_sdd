@@ -290,9 +290,20 @@ sync_one reference-src/change-brief.md skills/solidsdd-judge/references/change-b
 # Architecture (structural design)
 sync_one schemas/architecture-plan.schema.json skills/solidsdd-architecture/references/architecture-plan.schema.json
 sync_one schemas/architecture-plan.schema.json skills/solidsdd-run/references/architecture-plan.schema.json
+sync_one schemas/architecture-invariants.schema.json skills/solidsdd-architecture/references/architecture-invariants.schema.json
+sync_one schemas/architecture-invariants.schema.json skills/solidsdd-run/references/architecture-invariants.schema.json
 sync_one reference-src/architecture-axes.md skills/solidsdd-architecture/references/architecture-axes.md
 sync_one reference-src/architecture-axes.md skills/solidsdd-critique/references/architecture-axes.md
 sync_one reference-src/architecture-axes.md skills/solidsdd-run/references/architecture-axes.md
+sync_one reference-src/architecture-depth.md skills/solidsdd-architecture/references/architecture-depth.md
+sync_one reference-src/architecture-depth.md skills/solidsdd-critique/references/architecture-depth.md
+sync_one reference-src/architecture-depth.md skills/solidsdd-run/references/architecture-depth.md
+sync_one reference-src/structurizr-dsl.md skills/solidsdd-architecture/references/structurizr-dsl.md
+sync_one reference-src/structurizr-dsl.md skills/solidsdd-critique/references/structurizr-dsl.md
+sync_one reference-src/structurizr-dsl.md skills/solidsdd-run/references/structurizr-dsl.md
+sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-architecture/references/architecture-reasoning-template.md
+sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-critique/references/architecture-reasoning-template.md
+sync_one reference-src/architecture-reasoning-template.md skills/solidsdd-run/references/architecture-reasoning-template.md
 sync_one reference-src/human-gates.md skills/solidsdd-architecture/references/human-gates.md
 sync_one reference-src/change-brief.md skills/solidsdd-architecture/references/change-brief.md
 sync_one reference-src/change-context.md skills/solidsdd-architecture/references/change-context.md

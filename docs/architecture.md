@@ -74,7 +74,7 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
 | `solidsdd.report` | Human-readable Change Report (Markdown / optional HTML) | manual (orchestrator OK) | `report.md` / `report.html` |
 | `solidsdd.brief` | Change scope premise | **subagent required** | ChangeBrief |
 | `solidsdd.decompose` | Work decomposition | **subagent required** | WorkPlan |
-| `solidsdd.architecture` | Structural judgment (modules / dependencies / ownership / constraints) | **subagent required** | ArchitecturePlan |
+| `solidsdd.architecture` | Structural judgment (modules / dependencies / ownership / constraints) | **subagent required** | Architecture Model (`workspace.dsl`, `invariants.yaml`) + `architecture-reasoning.md` + generated `ArchitecturePlan` |
 | `solidsdd.judge` | Application judgment | **subagent required** | ApplicationPlan |
 | `solidsdd.critique` | Adversarial evaluation of phase artifacts | **subagent required** | CritiqueReport |
 | `solidsdd.apply.api` | Add/update OpenAPI | **subagent required** | OpenAPI diff |
@@ -133,7 +133,35 @@ Deterministic coverage / NFR / gate checks: `scripts/solidsdd-lint.sh` (critique
 
 ## Architecture judgment (`solidsdd.architecture`) output model
 
-Shared schema: [../schemas/architecture-plan.schema.json](../schemas/architecture-plan.schema.json)
+Judges **structure only** — modules, dependencies, dependency direction, public
+boundaries, ownership, and structural constraints — not a design methodology (no
+DDD / Clean / Hexagonal / … requirement) and not *which specification technique
+applies where* (that is `solidsdd.judge` / `ApplicationPlan`, below). Most changes
+do not affect existing structure and emit `status: unchanged` directly. When a
+change does affect structure, the output is three layers, each with a distinct
+job — do not duplicate the same structural fact across more than one of them:
+
+```text
+.solidsdd/architecture/workspace.dsl      structure: Source of Truth
+  (Structurizr DSL subset, persistent,      (elements / relationships /
+   whole-project — not per change)           hierarchy / tags / properties / views)
+
+.solidsdd/architecture/invariants.yaml    rules ABOUT that structure
+  (persistent, whole-project)               (forbid_dependency / no_cycles
+                                             constraints, prose invariants)
+
+.solidsdd/changes/<change_id>/            why (change-local)
+  architecture-reasoning.md                 (Logical Decomposition, boundary/
+                                             dependency rationale, trade-offs)
+
+.solidsdd/changes/<change_id>/            generated projection, for
+  architecture-plan.json                    existing consumers (see below)
+```
+
+`architecture-plan.json` (schema:
+[../schemas/architecture-plan.schema.json](../schemas/architecture-plan.schema.json))
+is unchanged in shape and is **generated**, never hand-authored — a
+deterministic, change-scoped view of the model above:
 
 ```text
 ArchitecturePlan:
@@ -150,17 +178,27 @@ ArchitecturePlan:
     from? / to? / reason?
 ```
 
-Judges **structure only** — modules, dependencies, dependency direction, public
-boundaries, ownership, and structural constraints — not a design methodology (no
-DDD / Clean / Hexagonal / … requirement) and not *which specification technique
-applies where* (that is `solidsdd.judge` / `ApplicationPlan`, below). Most changes
-do not affect existing structure and emit `status: unchanged`; `ArchitecturePlan`
-is change-level (`.solidsdd/changes/<change_id>/architecture-plan.json`, sibling of
-`work-plan.json`), not per-item like `ApplicationPlan`. Mechanical verification
-(dependency/module existence, forbidden dependencies, declared-cycle detection)
-runs via `scripts/solidsdd-lint.sh`, which every `solidsdd-critique` call already
-runs first regardless of subject — no separate verification step is needed.
+`scripts/solidsdd-architecture/project.py` builds it from elements/relationships
+tagged `change:<change_id>` in `workspace.dsl`, plus relevant entries from
+`invariants.yaml`. This keeps `solidsdd-lint`, `solidsdd-critique`, and
+`solidsdd-report` working against the same artifact shape they always have,
+while the DSL — not this generated JSON — is the durable Source of Truth for
+structure across changes. `ArchitecturePlan` stays change-level, sibling of
+`work-plan.json`, not per-item like `ApplicationPlan`.
+
+Mechanical verification — DSL syntax, referenced-element existence, forbidden
+dependencies, declared-cycle detection, ownership conflicts, internal-boundary
+leakage — runs via `scripts/solidsdd-architecture/validate.py`, folded into
+`scripts/solidsdd-lint.sh`'s findings, which every `solidsdd-critique` call
+already runs first regardless of subject — no separate verification step is
+needed. No Java/JVM toolchain is required; Structurizr CLI remains an optional,
+not-yet-adopted toolchain for future rendering/validation.
+
+Depth: [../reference-src/architecture-depth.md](../reference-src/architecture-depth.md)
+(most changes stay at Level 0 and never touch the model).
 Axes: [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md).
+DSL grammar: [../reference-src/structurizr-dsl.md](../reference-src/structurizr-dsl.md).
+Reasoning template: [../reference-src/architecture-reasoning-template.md](../reference-src/architecture-reasoning-template.md).
 Human gates: [../reference-src/human-gates.md](../reference-src/human-gates.md).
 
 ### Role separation

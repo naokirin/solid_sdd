@@ -100,7 +100,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `change_context` | `solidsdd-intake`, when `change-context-gate.json` **required** a human gate (reviewed alone so the gate can be checked before Brief runs) | intake | `solidsdd-run` |
 | `change_brief` | `solidsdd-brief`, only on the `change_context`-gate-required path (paired with a standalone `change_context` critique above) | brief | `solidsdd-run` |
 | `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
-| `architecture_plan` | `solidsdd-architecture`, only when it wrote `status: changed` | architecture | `solidsdd-run` |
+| `architecture_plan` | `solidsdd-architecture`, only when it wrote `status: changed`. Inputs: `.solidsdd/architecture/workspace.dsl`, `.solidsdd/architecture/invariants.yaml`, `.solidsdd/changes/<id>/architecture-reasoning.md`, generated `architecture-plan.json` | architecture | `solidsdd-run` |
 | `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
 | `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api | `solidsdd-loop` |
 | `dbc_contracts` | `solidsdd-apply-dbc` (if any dbc apply) | apply-dbc | `solidsdd-loop` |
@@ -116,20 +116,26 @@ Evaluate a subject only when it is part of the requested review scope (e.g., a C
 
 ### `architecture_plan` (major examples)
 
-Mechanical dependency/cycle/module-existence problems are caught by
-`scripts/solidsdd-lint.sh` (Step 0) and surface as `blocker`/`major` `consistency`
-findings automatically — do not re-derive those here. This table is for
-**adequacy**: is the structure this change proposes actually well-formed, per
-[architecture-axes.md](architecture-axes.md).
+Mechanical dependency/cycle/module-existence problems, and forbidden-dependency
+/ no-cycles / ownership-conflict / boundary-leakage violations over
+`workspace.dsl` + `invariants.yaml`, are caught by `scripts/solidsdd-lint.sh`
+(Step 0, folding in `scripts/solidsdd-architecture/validate.py`) and surface as
+`blocker`/`major` `consistency` findings automatically — do not re-derive those
+here. This table is for **adequacy**: is the structure this change proposes
+actually well-formed, per [architecture-axes.md](architecture-axes.md), and
+does the Architecture Model / Reasoning / generated projection actually agree
+with each other.
 
 | Check | `major` examples | Not major |
 |-------|-------------------|-----------|
-| Responsibility clarity | `responsibility` empty/vague (e.g. "misc", "helpers") or merges clearly unrelated concerns into one module | Slightly broad but coherent single responsibility |
-| Dependency direction | New dependency contradicts an existing/prior committed direction with no rationale, or reintroduces an edge a still-active `constraint` forbids elsewhere | Additive dependency with a reason citing WorkPlan `touches` / Brief scope |
-| Boundary leakage | `public` exposes internal storage/implementation types instead of a service/facade surface | `public` lists an intentional service entry point |
-| Ownership ambiguity | The same owned data/state is claimed by two modules with no rationale | Single, clear owner per piece of state |
-| Change impact | Plan silently omits a structural change evident from the WorkPlan (`touches` implies a new module/boundary) or contradicts a `constraint` from a still-active prior `ArchitecturePlan` | New module/dependency consistent with Brief scope and prior constraints |
+| Responsibility clarity | `responsibility` (element description) empty/vague (e.g. "misc", "helpers") or merges clearly unrelated concerns into one element | Slightly broad but coherent single responsibility |
+| Dependency direction | New dependency contradicts an existing/prior committed direction with no rationale, or reintroduces an edge a still-active constraint forbids elsewhere | Additive dependency with a reason citing WorkPlan `touches` / Brief scope |
+| Boundary leakage | `public` (element property) exposes internal storage/implementation types instead of a service/facade surface | `public` lists an intentional service entry point |
+| Ownership ambiguity | The same owned data/state is claimed by two elements with no rationale | Single, clear owner per piece of state |
+| Change impact | Model silently omits a structural change evident from the WorkPlan (`touches` implies a new module/boundary) or contradicts a constraint from a still-active prior `invariants.yaml` entry | New module/dependency consistent with Brief scope and prior constraints |
 | Status shortcut misuse | `status: unchanged` despite WorkPlan `touches` indicating a new module, new public boundary, or a changed dependency direction | `status: unchanged` for a copy/config-only or internal-implementation-only change |
+| Reasoning missing/hollow | `status: changed` but `architecture-reasoning.md` is absent, or restates structure instead of explaining the boundary/ownership/dependency-direction choice | Reasoning is short but names the actual trade-off/decision |
+| Model not reflected | `architecture-plan.json` doesn't match elements/relationships actually tagged `change:<id>` in `workspace.dsl` (a sign `project.py` wasn't run, or the JSON was hand-edited afterward) | Generated JSON matches the tagged model |
 
 ### `knowledge_consistency` (major examples)
 

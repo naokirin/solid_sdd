@@ -1,0 +1,5 @@
+{
+  "id": "017-architecture-dsl-forbidden-dependency",
+  "checker": "lint",
+  "description": ".solidsdd/architecture/workspace.dsl declares a relationship that invariants.yaml's forbid_dependency constraint also forbids"
+}

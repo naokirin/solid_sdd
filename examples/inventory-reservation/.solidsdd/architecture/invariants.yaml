@@ -1,0 +1,12 @@
+version: "1"
+constraints:
+  - type: forbid_dependency
+    from: inventory
+    to: reservation
+    reason: >-
+      Stock ownership must stay independent of hold/TTL/authZ concerns so
+      inventory can be reused (e.g. multi-warehouse) without carrying
+      reservation logic.
+invariants:
+  - "Inventory owns available stock per SKU."
+  - "Reservation owns hold lifecycle and TTL/authZ enforcement."

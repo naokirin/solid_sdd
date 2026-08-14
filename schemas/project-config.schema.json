@@ -41,6 +41,10 @@
           "type": "string",
           "description": "Knowledge-graph meta directory (schema/config/links)"
         },
+        "architecture": {
+          "type": "string",
+          "description": "Architecture Model meta directory (workspace.dsl/invariants.yaml), persistent across changes"
+        },
         "cache": {
           "type": "string",
           "description": "Derived cache directory (e.g. kg.db)"

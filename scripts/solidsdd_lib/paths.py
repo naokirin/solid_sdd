@@ -22,6 +22,7 @@ DEFAULT_PATHS: dict[str, Any] = {
     "changes": ".solidsdd/changes",
     "host_toolchain": ".solidsdd/host-toolchain.json",
     "kg": ".solidsdd/kg",
+    "architecture": ".solidsdd/architecture",
     "cache": ".solidsdd-cache",
     "knowledge": ["knowledge"],
     "requirements": "requirements",
@@ -45,6 +46,7 @@ class Layout:
     changes: str = ".solidsdd/changes"
     host_toolchain: str = ".solidsdd/host-toolchain.json"
     kg: str = ".solidsdd/kg"
+    architecture: str = ".solidsdd/architecture"
     cache: str = ".solidsdd-cache"
     knowledge: tuple[str, ...] = ("knowledge",)
     requirements: str = "requirements"
@@ -77,6 +79,9 @@ class Layout:
 
     def kg_dir(self) -> Path:
         return self.abs(self.kg)
+
+    def architecture_dir(self) -> Path:
+        return self.abs(self.architecture)
 
     def cache_dir(self) -> Path:
         return self.abs(self.cache)
@@ -158,6 +163,7 @@ def _layout_from_merged(
         changes=merged["changes"],
         host_toolchain=merged["host_toolchain"],
         kg=merged["kg"],
+        architecture=merged["architecture"],
         cache=merged["cache"],
         knowledge=knowledge_t,
         requirements=merged["requirements"],
@@ -186,7 +192,7 @@ def load_layout(
     # rewrite default meta paths that still point at .solidsdd.
     if discovered != ".solidsdd":
         merged["solidsdd"] = discovered
-        for key in ("active_change", "changes", "host_toolchain", "kg"):
+        for key in ("active_change", "changes", "host_toolchain", "kg", "architecture"):
             val = merged[key]
             if isinstance(val, str) and val.startswith(".solidsdd"):
                 merged[key] = discovered + val[len(".solidsdd") :]

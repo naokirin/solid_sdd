@@ -2,10 +2,24 @@
 
 `solidsdd-architecture` decides whether a change affects existing **structure**
 (modules, responsibilities, dependencies, public boundaries, ownership) and, when it
-does, emits an `ArchitecturePlan`. This is judgment about *structure*, not about
+does, edits the Architecture Model. This is judgment about *structure*, not about
 *which specification technique applies where* (that is `solidsdd-judge` /
 `ApplicationPlan` — see Role separation below) and not about *behavior*
 (that is Gherkin).
+
+Structure lives in `.solidsdd/architecture/workspace.dsl` (Structurizr DSL
+subset — see [structurizr-dsl.md](structurizr-dsl.md)) and `invariants.yaml`
+(forbidden dependencies / no-cycles / prose invariants), both persistent and
+whole-project. `ArchitecturePlan` (`architecture-plan.json`) is still
+generated per change — now as a deterministic **projection** of that model
+(`scripts/solidsdd-architecture/project.py`), for existing consumers
+(`solidsdd-lint`, `solidsdd-critique`, `solidsdd-report`). The *why* behind a
+structural decision goes in `architecture-reasoning.md`, not in the DSL or
+the projected JSON — see
+[architecture-reasoning-template.md](architecture-reasoning-template.md).
+How much of this a given change needs is decided by
+[architecture-depth.md](architecture-depth.md); most changes stay at Level 0
+(no trigger below applies) and never touch the model at all.
 
 `ArchitecturePlan` is not a design methodology. Do not require DDD, Clean
 Architecture, Hexagonal Architecture, Onion Architecture, MVC, CQRS, or Event
@@ -26,6 +40,32 @@ existing architecture + change requirements → proposed architecture (delta onl
 
 Only describe modules/dependencies that are new or changed by this WorkPlan; do not
 re-document unrelated existing structure just to have a "complete" diagram.
+
+## Logical Decomposition axes
+
+Before naming modules or editing `workspace.dsl`, decide structure from
+**logical** decomposition, not from the directory tree. Physical structure
+(package/directory/file/class) is a later, separate concern — see
+[architecture-depth.md](architecture-depth.md) Level 3. Consider, only to
+the depth this change actually needs:
+
+| Axis | Question |
+|---|---|
+| Responsibility | Who is responsible for this concept/behavior? |
+| Cohesion | Do the elements inside one boundary share the same purpose and change reason? |
+| Coupling | Is a dependency between boundaries stronger than it needs to be? |
+| Change locality | Does one change reason stay inside one boundary, or does it spill into unrelated boundaries? |
+| State ownership | Is there exactly one owner for this state? (`properties { "owns" ... }` in the DSL) |
+| Knowledge ownership | Is this domain rule kept in one place, or duplicated/scattered? |
+| Consistency | Should state that must stay consistent together live in the same boundary? |
+| Concurrency | Which boundary controls a race, if any? (Architecture states *where*; TLA+/Alloy states the *transition property* — see Role separation below) |
+| External boundary | Where is an external system's dependency isolated? |
+
+Not every axis applies to every change — judge from the WorkPlan `touches` /
+Brief scope, the same density philosophy as the rest of this document. A
+Level 1 delta (see [architecture-depth.md](architecture-depth.md)) usually
+only needs Responsibility and State/Knowledge Ownership; the rest matter
+more at Level 2+ (a genuine boundary re-split).
 
 ## When architecture changes (emit status: changed)
 
@@ -58,19 +98,25 @@ module directory, a new public boundary, or a changed dependency direction,
 
 ## Field minimality rules
 
-- `module.owns` / `module.public`: populate only when confidently derivable from
-  Context / the codebase / the WorkPlan — do not guess to fill out the schema. An
-  empty/omitted array is correct when ownership or the public surface isn't yet
-  decided by this change.
-- `dependency.kind`: use only when the kind (`runtime` / `data` / `event` / `api`)
-  is actually known; omit rather than guess.
-- `constraint.type`: use `forbid_dependency` for a specific forbidden edge, and
-  `no_cycles` only when the project actually wants a general "no dependency cycles
-  among these modules" rule enforced. Do not introduce new constraint types — grow
-  this enum only when a concrete verification need shows up (mirrors
-  `judgment-axes.md`'s density philosophy: judge from real signals, not
-  completeness).
-- `rationale`/`reason` strings: cite the WorkPlan `touches` / Brief scope that
+These now apply to what you write in `workspace.dsl` / `invariants.yaml`
+(the projection carries them into `architecture-plan.json` automatically —
+see [structurizr-dsl.md](structurizr-dsl.md)):
+
+- `properties { "owns" ... }` / `properties { "public" ... }`: populate only
+  when confidently derivable from Context / the codebase / the WorkPlan — do
+  not guess to fill out the model. Omitting the property is correct when
+  ownership or the public surface isn't yet decided by this change.
+- `dependency.kind` (projected JSON): only set when a relationship carries an
+  explicit `kind:runtime` / `kind:data` / `kind:event` / `kind:api` tag; do
+  not add that tag just to fill out the field.
+- `constraint.type` in `invariants.yaml`: use `forbid_dependency` for a
+  specific forbidden edge, and `no_cycles` (`scope: all`) only when the
+  project actually wants a general "no dependency cycles" rule enforced. Do
+  not introduce new constraint types — grow this enum only when a concrete
+  verification need shows up (mirrors `judgment-axes.md`'s density
+  philosophy: judge from real signals, not completeness).
+- `reason` strings (relationship description, `invariants.yaml`
+  `constraint.reason`): cite the WorkPlan `touches` / Brief scope that
   motivated the module/dependency/constraint, the same way `judgment-axes.md`
   expects `ApplicationPlan.targets[].rationale` to cite a signal id.
 
