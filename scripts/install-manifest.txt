@@ -9,6 +9,7 @@ rules/solidsdd.mdc
 scripts/requirements.txt
 scripts/solidsdd-lint.sh
 scripts/solidsdd-architecture.sh
+scripts/solidsdd-report.sh
 scripts/solidsdd-run-state.sh
 scripts/solidsdd-next.sh
 scripts/solidsdd-host-toolchain.sh
@@ -27,6 +28,13 @@ scripts/solidsdd-architecture/physical.py
 scripts/solidsdd-architecture/project.py
 scripts/solidsdd-architecture/cli.py
 scripts/solidsdd-architecture/README.md
+
+scripts/solidsdd-report/collect.py
+scripts/solidsdd-report/highlight.py
+scripts/solidsdd-report/diagram.py
+scripts/solidsdd-report/render.py
+scripts/solidsdd-report/cli.py
+scripts/solidsdd-report/README.md
 
 scripts/solidsdd-run-state/run_state.py
 scripts/solidsdd-run-state/README.md

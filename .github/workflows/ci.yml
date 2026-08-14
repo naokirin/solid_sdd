@@ -42,6 +42,9 @@ jobs:
       - name: solidsdd-architecture unit tests
         run: python3 -m unittest discover -s scripts/solidsdd-architecture
 
+      - name: solidsdd-report unit tests
+        run: python3 -m unittest discover -s scripts/solidsdd-report
+
       - name: solidsdd_lib unit tests
         run: python3 -m unittest discover -s scripts/solidsdd_lib
 

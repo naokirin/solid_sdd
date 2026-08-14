@@ -18,6 +18,33 @@ Manual skill only. Not part of `solidsdd-run` / `solidsdd-loop` automation. Orch
 
 The report is a **view**, not a new source of truth. Do not feed the report back as input that overrides Brief / contracts.
 
+## Tooling (do this, not manual discovery)
+
+`scripts/solidsdd-report.sh` — `collect` / `highlight` / `diagram` / `render`
+(see [scripts/solidsdd-report/README.md](../scripts/solidsdd-report/README.md))
+— does the mechanical work this document describes, so the agent doesn't
+redo it by hand on every run:
+
+1. **`collect`** resolves `change_id`, reads every artifact in the Role
+   split table above, and returns one JSON blob: Present/Not-performed per
+   section (the "Presence rules" table below), the Brief-id coverage
+   matrix, verbatim Change Context section text, verbatim tied Gherkin
+   Scenario blocks, and diagram eligibility + node/edge data (the
+   "Diagrams" section below). Call this first.
+2. **`render`** takes that data plus a small **narrative JSON** — only the
+   handful of sections that need real LLM synthesis (API contract / DbC /
+   Formal natural-language summaries, the status-overview paragraph, and,
+   when applicable, a Formal state-diagram simplification) — and writes
+   `report.md`/`report.html` **directly to disk**. `highlight` (raw
+   contract/plan syntax coloring) and `diagram` (Mermaid + inline SVG) run
+   inside `render`; call them standalone only if inspecting intermediate
+   output.
+
+Everything below this point documents *what those scripts compute and why*,
+not a sequence of manual steps to repeat — read it to understand/validate
+the tooling's output or to write the narrative JSON, not to hand-derive
+presence, coverage, or diagrams yourself.
+
 ## Inputs
 
 | Input | Default | Notes |
@@ -54,6 +81,11 @@ Overwrite previous reports for the same `change_id`. Do not write product-wide r
 
 ## Presence rules (required)
 
+Computed by `collect` as `sections` — read `sections.<name>.state` directly
+instead of re-deriving it from the artifacts by hand. The rules below are
+what `collect` implements, kept here so the output is checkable and so
+partial/legacy layouts that predate the tooling are still documented.
+
 For each report section (and each design subsection), decide:
 
 | State | When |
@@ -87,7 +119,7 @@ Rules:
 
 ### ApplicationPlan discovery
 
-Look for (first match set wins; include all that clearly belong to this change):
+Implemented by `collect` (`artifacts.application_plans`). Look for (first match set wins; include all that clearly belong to this change):
 
 - `.solidsdd/changes/<change_id>/items/*/application-plan.json` (**preferred**)
 - `.solidsdd/changes/<change_id>/application-plan*.json`
@@ -100,7 +132,7 @@ If none found → Design — ApplicationPlan = **Not performed**.
 
 ### ArchitecturePlan discovery
 
-Look for `.solidsdd/changes/<change_id>/architecture-plan.json` (change-level, not per-item — unlike ApplicationPlan; it is a **generated projection** of `.solidsdd/architecture/workspace.dsl` + `invariants.yaml`, not hand-authored). If missing → Design — ArchitecturePlan = **Not performed** (`solidsdd-architecture`). If present with `status: unchanged`, render as **Present** with a one-line "no structural change" note (do not treat it as Not performed — the judgment ran, it just found nothing to record) plus its `summary` when given. When `status: changed` and `.solidsdd/changes/<change_id>/architecture-reasoning.md` exists, link it alongside the ArchitecturePlan tables as the *why* behind the modules/dependencies/constraints shown (do not inline its full text — it is prose, not a table). When `.solidsdd/changes/<change_id>/physical-design.md` also exists (Architecture Depth Level 3 only), link it too as the Logical → Physical realization — do not inline its table; it is optional and most changes won't have one.
+Implemented by `collect` (`artifacts.architecture_plan`, `sections.design.architecture_plan`). Look for `.solidsdd/changes/<change_id>/architecture-plan.json` (change-level, not per-item — unlike ApplicationPlan; it is a **generated projection** of `.solidsdd/architecture/workspace.dsl` + `invariants.yaml`, not hand-authored). If missing → Design — ArchitecturePlan = **Not performed** (`solidsdd-architecture`). If present with `status: unchanged`, render as **Present** with a one-line "no structural change" note (do not treat it as Not performed — the judgment ran, it just found nothing to record) plus its `summary` when given. When `status: changed` and `.solidsdd/changes/<change_id>/architecture-reasoning.md` exists, link it alongside the ArchitecturePlan tables as the *why* behind the modules/dependencies/constraints shown (do not inline its full text — it is prose, not a table). When `.solidsdd/changes/<change_id>/physical-design.md` also exists (Architecture Depth Level 3 only), link it too as the Logical → Physical realization — do not inline its table; it is optional and most changes won't have one.
 
 ## Required document shape (Markdown)
 
@@ -126,23 +158,23 @@ Table of sections → Present / Not performed (and skill that produces the missi
 
 ### §1 Demand and problem
 
-From Change Context §1–§2. Include drivers/constraints. If Context missing → entire section Not performed (`solidsdd-intake`).
+From Change Context §1–§2, copied **verbatim** by `render` (`artifacts.change_context_sections["1"|"2"].text`) — this is prose that already exists; it is not re-authored. If Context missing → entire section Not performed (`solidsdd-intake`).
 
 ### §2 Functional requirements
 
-- From Brief: `goal`, `in_scope`, `out_of_scope`, `success_criteria` — render each scoped item as **`id` — `text`** (do not drop ids or concrete scope items).
-- From Features: Scenario names + tags (`@R1` …) + short Given/When/Then paraphrase or verbatim Scenario blocks; link to `feature_path`.
-- **Coverage matrix** (when Brief + WorkPlan exist): table or list of Brief `R*` / `SC*` ids → WorkPlan item ids that `covers` them → Scenario name / tags. Mark uncovered ids explicitly (should already fail lint).
+- From Brief: `goal`, `in_scope`, `out_of_scope`, `success_criteria` — render each scoped item as **`id` — `text`** (do not drop ids or concrete scope items). `render` builds this table mechanically from `change-brief.json`.
+- From Features: Scenario names + tags (`@R1` …) + short Given/When/Then paraphrase or verbatim Scenario blocks; link to `feature_path`. `render` embeds the **verbatim** block `collect` already extracted (`artifacts.tied_scenarios[].gherkin`) — prefer that over an LLM paraphrase; it is exact and costs nothing to produce.
+- **Coverage matrix** (when Brief + WorkPlan exist): table or list of Brief `R*` / `SC*` ids → WorkPlan item ids that `covers` them → Scenario name / tags. Mark uncovered ids explicitly (should already fail lint). Precomputed as `coverage_matrix` by `collect`.
 - If Brief and Features both missing → Not performed (`solidsdd-brief` / `solidsdd-decompose`).
 
 ### §3–§4 NFR and technology
 
-- Prefer `nfr.json` as SoT for §3 Non-functional requirements (render id / quality / status / requirement / threshold). Fall back to Context §4 only if `nfr.json` is missing (mark that SoT is absent).
-- Technology: copy/adapt tables from Context §5. Missing Context → Not performed.
+- Prefer `nfr.json` as SoT for §3 Non-functional requirements (render id / quality / status / requirement / threshold). Fall back to Context §4 only if `nfr.json` is missing (mark that SoT is absent). `render` builds the table from `nfr.json` mechanically, or copies Context §4 verbatim as a fallback.
+- Technology: copy/adapt tables from Context §5 — `render` copies §5 **verbatim**, same reasoning as §1. Missing Context → Not performed.
 
 ### §5 Design
 
-Subsections (omit a subsection only when not applicable to the stack **and** no plan asked for it; otherwise mark Not performed):
+Subsections (omit a subsection only when not applicable to the stack **and** no plan asked for it; otherwise mark Not performed). WorkPlan / ArchitecturePlan / ApplicationPlan tables and diagrams are fully mechanical (`render` builds them from `collect`'s data with no narrative input); only API contract, DbC, and Formal need an agent-authored natural-language summary, supplied via the narrative JSON's `api_contract_summary` / `dbc_summary` / `formal_summary`:
 
 1. **WorkPlan** — item id, intent, `covers`, scenario name, status, depends_on (table). Link to `work-plan.json`.
 2. **ArchitecturePlan** — `status`; when `changed`: **a dependency diagram first** (see "Diagrams" below), then modules (id, responsibility, `owns`, `public`), dependencies (from, to, reason, kind), constraints (type, from, to, reason) as tables; when `unchanged`: one-line note + `summary`. Link to `architecture-plan.json`. When `physical-design.md` exists (Level 3 only), add a short **Physical Design** sub-note linking to it and naming the Logical → Physical realizations it records (one line per row is enough — do not reproduce its tables in the report).
@@ -162,6 +194,14 @@ against the table below; do not add a diagram anywhere else (see
 substitute for the required tables, it goes **in addition to** them,
 placed right after the one-line `status`/`summary` line and before the
 tables (skim the picture, then read the detail).
+
+For ArchitecturePlan / WorkPlan / ApplicationPlan, `collect` already applies
+the eligibility row below as `diagrams.<kind>.eligible` and extracts the
+node/edge data; `diagram` (invoked by `render`) lays out the Mermaid source
+and, below its own node-count ceiling, an inline SVG — neither needs manual
+threshold-checking or hand-computed coordinates. Formal is the one kind that
+still needs an agent judgment call (identifying the mode variable from
+prose), passed to `render` as `formal_state_diagram` in the narrative JSON.
 
 | Source | Diagram kind | When |
 |--------|--------------|------|
@@ -241,7 +281,8 @@ stateDiagram-v2
 
 #### Markdown rendering (all kinds)
 
-Emit a fenced ` ```mermaid ` block using the diagram kind's own syntax
+Implemented by `diagram.py`'s `mermaid_*` functions — described here so the
+output is checkable, not as manual steps. Emit a fenced ` ```mermaid ` block using the diagram kind's own syntax
 (`flowchart LR` / `stateDiagram-v2`) — GitHub, GitLab, and most Markdown
 viewers render these natively; they degrade to readable pseudo-diagram
 text everywhere else, so no fallback image is needed. Sanitize node ids
@@ -251,9 +292,10 @@ label text).
 
 #### HTML rendering (all kinds)
 
-Render as an **inline, generation-time SVG** (no JS library, no CDN —
-consistent with this spec's "prefer generation-time processing, stay
-offline-safe" stance):
+Implemented by `diagram.py`'s `svg_*` functions — a fixed layout formula,
+not a per-run judgment call. Renders as an **inline, generation-time SVG**
+(no JS library, no CDN — consistent with this spec's "prefer
+generation-time processing, stay offline-safe" stance):
 
 1. **Dependency graphs / target mappings**: place nodes left-to-right (or,
    for the bipartite target mapping, in two columns) in the order they
@@ -292,50 +334,30 @@ hurts understanding more than a good table does.
 
 ### §6–§7 Judgments and open questions
 
-From Context §6–§7 and Brief `open_questions`. Deduplicate.
+From Context §6–§7 and Brief `open_questions`. Deduplicate. `render` copies
+Context §6/§7 **verbatim** and lists Brief `open_questions` mechanically —
+no LLM authorship needed here either.
 
 ### §8 Source artifacts
 
-Bullet list of paths actually read (Context, Brief, WorkPlan, Features, plans, contracts).
+Bullet list of paths actually read (Context, Brief, WorkPlan, Features, plans, contracts) — `source_artifacts` from `collect`, verbatim.
 
 ## HTML format (optional)
 
-When `format` includes `html`, write a **self-contained** `report.html` (inline CSS; minimal inline JS allowed for tabs).
-
-Requirements:
+When `format` includes `html`, `render --format html` (or `both`) writes a
+**self-contained** `report.html` itself — the agent does not hand-assemble
+it. Requirements below describe what `render.py`'s `render_html` /
+`highlight.py` implement; they're documentation of the output's shape, not
+manual steps:
 
 - Same section order and presence rules as Markdown.
-- **Dark theme by default**: calm deep navy / near-black surfaces (`#070b14`–`#0f1626` range), **white or near-white body text** (`#ffffff` / light gray for secondary). Avoid loud yellow / chartreuse / neon monokai-style code backgrounds; prefer muted syntax themes such as Pygments `github-dark` (or equivalent) with inlined CSS.
-- **Syntax token contrast (required for Raw)**: keys and string/scalar values must be clearly distinguishable (e.g. cool cyan keys vs warm salmon strings). In Gherkin, keywords (`Feature` / `Scenario` / `Given` / `When` / `Then`) must contrast with step/title prose (near-white). Do not paint keys and `.nf` step text the same color.
-- **Natural language** is the default visible body for each design/contract block.
-- For OpenAPI, GraphQL, OCL, formal, and ApplicationPlan/WorkPlan raw JSON:
-  - Provide **tabs** or equivalent switcher: e.g. `Summary` | `Raw`
-  - And/or `<details>` / accordion so raw can be expanded without leaving the page
-- Embed raw file contents inside the HTML (escape properly). If a file is huge (> ~100KB), embed a truncated head with a clear note and keep the repo path link.
-- **Syntax highlighting on Raw panels** (YAML / JSON / Gherkin Feature / OCL / formal / GraphQL as applicable).
-  - **Prefer generation-time highlighting** (e.g. Pygments) with token CSS **inlined** in `report.html`, so colors work offline, under `file://`, and in IDE HTML previews without a network.
-  - CDN highlight.js is optional only; if used, load from a known-good package path such as `@highlightjs/cdn-assets` (plain `npm/highlight.js@…/highlight.min.js` may 404). Raw must remain readable if scripts fail.
-  - Mark languages appropriately when using a runtime highlighter (`language-yaml`, `language-json`, `language-gherkin`, custom `language-ocl`, etc.).
-- Basic layout/tabs must not *require* a CDN (page remains usable offline without colors when generation-time highlighting was skipped).
-- **Diagrams** (dependency graphs, target mappings, state diagrams — see "Diagrams" above): inline, generation-time SVG — no bundled/CDN JS library. Raw Mermaid source available alongside for portability.
-
-### Suggested HTML patterns
-
-```html
-<section class="contract">
-  <h3>API contract</h3>
-  <p class="summary">…natural language…</p>
-  <div class="tabs" data-tabs>
-    <button type="button" aria-selected="true" data-tab="summary">Summary</button>
-    <button type="button" data-tab="raw">Raw</button>
-    <div data-panel="summary">…</div>
-    <div data-panel="raw" hidden>
-      <p><a href="../../../openapi/openapi.yaml">openapi/openapi.yaml</a></p>
-      <pre><code class="language-yaml">…escaped raw…</code></pre>
-    </div>
-  </div>
-</section>
-```
+- **Dark theme by default**: calm deep navy / near-black surfaces (`#070b14`–`#0f1626` range), **white or near-white body text** (`#ffffff` / light gray for secondary). Avoid loud yellow / chartreuse / neon monokai-style code backgrounds.
+- **Syntax token contrast (required for Raw)**: keys and string/scalar values must be clearly distinguishable (e.g. cool cyan keys vs warm salmon strings). In Gherkin, keywords (`Feature` / `Scenario` / `Given` / `When` / `Then`) must contrast with step/title prose (near-white). `highlight.py`'s regex tokenizer (JSON / YAML / Gherkin / OCL / GraphQL) does this deterministically — no per-token LLM judgment, no Pygments/CDN dependency; its `TOKEN_CSS` is inlined once via `highlight --css-only`.
+- **Natural language** is the default visible body for each design/contract block (the narrative JSON's summaries; see "Tooling" above).
+- For OpenAPI, GraphQL, OCL, formal, and ApplicationPlan/WorkPlan raw JSON: a `<details class="raw">` accordion per file (pure CSS/HTML, no JS needed for this) so raw can be expanded without leaving the page.
+- Embed raw file contents inside the HTML (escaped, highlighted). If a file is huge (> ~100KB, `highlight.py`'s `--max-bytes` default), embed a truncated head with a clear note and keep the repo path link.
+- **Diagrams** (dependency graphs, target mappings, state diagrams — see "Diagrams" above): inline, generation-time SVG from `diagram.py` — no bundled/CDN JS library. Raw Mermaid source available alongside (in a `<details>`) for portability.
+- The page remains fully usable offline / under `file://` — no network fetch of any kind.
 
 Relative links from `.solidsdd/changes/<change_id>/report.html` to repo-root contracts must be correct (typically `../../../openapi/…`, `../../../contracts/…`).
 
