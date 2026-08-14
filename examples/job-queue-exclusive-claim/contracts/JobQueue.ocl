@@ -41,11 +41,15 @@ post OneJobAdded:
 context ClaimCoordinator::claimJob(jobId: JobId, workerId: WorkerId): Boolean
 pre JobIsRegistered:
   self.claims->exists(c | c.jobId = jobId)
+  -- 違反時(=存在しないjobId)は「ジョブが見つからない」という named failure を呼び出し元
+  -- (WorkerPool)へ返す設計を意図する(W5: requirements/job-queue.feature「存在しないジョブID
+  -- へのクレーム試行は失敗する」、application-plan.json rationale)。
 pre JobNotAlreadyClaimed:
   self.claims->exists(c | c.jobId = jobId and c.claimed = false)
   -- 違反時(=対象ジョブが既にクレーム済み)は、TypeError/ZeroDivisionError相当の生の例外ではなく
   -- 「既にクレーム済み」という named failure (例: AlreadyClaimedError) を呼び出し元
-  -- (WorkerPool)へ返す設計を意図する(W2受け入れ条件後半、application-plan.json rationale)。
+  -- (WorkerPool)へ返す設計を意図する(W2受け入れ条件後半およびW4: requirements/job-queue.feature
+  -- 「既にクレーム済みのジョブへのクレーム試行は失敗する」、application-plan.json rationale)。
   -- solidsdd-derive-tests はこのpre違反時にnamed failureが返る/送出されることを検証すること。
   -- 「並行する2試行のうちちょうど1件だけが成功する」という複数呼び出しにまたがる排他性は
   -- ここでは表現しない(formal/ClaimCoordinator.tlaの責務。上記SCOPE NOTE参照)。

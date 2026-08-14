@@ -1,12 +1,12 @@
 {
   "version": "1",
   "change_id": "establish-job-queue",
-  "summary": "グリーンフィールドのジョブキュー: 投入、排他的クレーム、結果記録の3スライス。",
+  "summary": "グリーンフィールドのジョブキュー: 投入(W1)、排他的クレームの成功パス(W2)、既クレーム/存在しないジョブIDへのクレーム失敗パス(W4/W5)、結果記録(W3)の5スライス。",
   "items": [
     {
       "id": "W1",
       "intent": "プロデューサーがジョブを投入できるようにする",
-      "acceptance_criterion": "Scenario: プロデューサーがジョブを投入する\nGiven ジョブキューが空である\nWhen プロデューサーがペイロードを持つ新しいジョブを投入する\nThen ジョブは未クレーム状態で保存され、ジョブIDが割り当てられる",
+      "acceptance_criterion": "Scenario: プロデューサーがジョブを投入する\nGiven ジョブキューサービスが利用可能である\nWhen プロデューサーがペイロードを持つ新しいジョブを投入する\nThen ジョブは未クレーム状態で保存され、ジョブIDが割り当てられる",
       "covers": ["R1"],
       "touches": ["src/job-queue/**", "src/job-queue/submission.ts"],
       "feature_path": "requirements/job-queue.feature",
@@ -23,6 +23,28 @@
       "feature_path": "requirements/job-queue.feature",
       "scenario_name": "複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する",
       "depends_on": ["W1"],
+      "status": "pending"
+    },
+    {
+      "id": "W4",
+      "intent": "既にクレーム済みのジョブへの後続クレーム試行を明示的に失敗させる(claimJobのJobNotAlreadyClaimed事前条件の失敗パスとしての単独検証)",
+      "acceptance_criterion": "Scenario: 既にクレーム済みのジョブへのクレーム試行は失敗する\nGiven ワーカーAがジョブのクレームに既に成功している\nWhen 別のワーカーBが同じジョブIDのクレームを試みる\nThen ワーカーBのクレームは失敗し、「既にクレーム済み」という結果を受け取る\nAnd ジョブのクレーム者はワーカーAのままである",
+      "covers": ["R2"],
+      "touches": ["src/worker-pool/**", "src/job-queue/claim-coordinator.ts"],
+      "feature_path": "requirements/job-queue.feature",
+      "scenario_name": "既にクレーム済みのジョブへのクレーム試行は失敗する",
+      "depends_on": ["W2"],
+      "status": "pending"
+    },
+    {
+      "id": "W5",
+      "intent": "存在しないジョブIDへのクレーム試行を明示的に失敗させる(claimJobのJobIsRegistered事前条件の失敗パスとしての単独検証)",
+      "acceptance_criterion": "Scenario: 存在しないジョブIDへのクレーム試行は失敗する\nGiven 指定したジョブIDに対応するジョブがジョブキューに存在しない\nWhen ワーカーがそのジョブIDのクレームを試みる\nThen クレームは失敗し、「ジョブが見つからない」という結果を受け取る",
+      "covers": ["R2"],
+      "touches": ["src/worker-pool/**", "src/job-queue/claim-coordinator.ts"],
+      "feature_path": "requirements/job-queue.feature",
+      "scenario_name": "存在しないジョブIDへのクレーム試行は失敗する",
+      "depends_on": ["W2"],
       "status": "pending"
     },
     {

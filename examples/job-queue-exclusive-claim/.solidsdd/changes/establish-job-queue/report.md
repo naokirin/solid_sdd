@@ -53,7 +53,7 @@
 ```gherkin
   @R1
   Scenario: プロデューサーがジョブを投入する
-    Given ジョブキューが空である
+    Given ジョブキューサービスが利用可能である
     When プロデューサーがペイロードを持つ新しいジョブを投入する
     Then ジョブは未クレーム状態で保存され、ジョブIDが割り当てられる
 ```
@@ -68,6 +68,27 @@ Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature
     When 両方のクレームリクエストが並行して処理される
     Then ちょうど1人のワーカーのクレームが成功する
     And もう1人のワーカーは「既にクレーム済み」という結果を受け取る
+```
+
+Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature)
+
+```gherkin
+  @R2
+  Scenario: 既にクレーム済みのジョブへのクレーム試行は失敗する
+    Given ワーカーAがジョブのクレームに既に成功している
+    When 別のワーカーBが同じジョブIDのクレームを試みる
+    Then ワーカーBのクレームは失敗し、「既にクレーム済み」という結果を受け取る
+    And ジョブのクレーム者はワーカーAのままである
+```
+
+Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature)
+
+```gherkin
+  @R2
+  Scenario: 存在しないジョブIDへのクレーム試行は失敗する
+    Given 指定したジョブIDに対応するジョブがジョブキューに存在しない
+    When ワーカーがそのジョブIDのクレームを試みる
+    Then クレームは失敗し、「ジョブが見つからない」という結果を受け取る
 ```
 
 Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature)
@@ -88,7 +109,7 @@ Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature
 | id | text | covered by | scenario |
 | --- | --- | --- | --- |
 | R1 | プロデューサーはペイロードを持つ新しいジョブを投入できる | W1 | プロデューサーがジョブを投入する |
-| R2 | ワーカーは未クレームのジョブをちょうど1件だけクレームできる。異なるワーカーからの並行クレーム試行が同一ジョブに対して両方成功することは決してない | W2 | 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する |
+| R2 | ワーカーは未クレームのジョブをちょうど1件だけクレームできる。異なるワーカーからの並行クレーム試行が同一ジョブに対して両方成功することは決してない | W2, W4, W5 | 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する, 既にクレーム済みのジョブへのクレーム試行は失敗する, 存在しないジョブIDへのクレーム試行は失敗する |
 | R3 | 完了したジョブの結果は記録され、ジョブIDで取得できる | W3 | 完了したジョブの結果が記録され取得できる |
 | SC1 | Architecture Modelが、どのモジュールがキュー/ジョブ状態を所有し、並行クレーム試行がどこで直列化されるかを明示している | W2 | 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する |
 | SC2 | 2人のワーカーが同一ジョブをクレームできない(希望として文書化するだけでなく、構造的に防止されている) | W2 | 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する |
@@ -116,8 +137,12 @@ Source: [requirements/job-queue.feature](../../../requirements/job-queue.feature
 flowchart LR
   W1["W1<br/>プロデューサーがジョブを投入できるようにする"]
   W2["W2<br/>並行するクレーム試行があっても、ワーカーは未クレームのジョブをちょうど1件だけ…"]
+  W4["W4<br/>既にクレーム済みのジョブへの後続クレーム試行を明示的に失敗させる(claimJ…"]
+  W5["W5<br/>存在しないジョブIDへのクレーム試行を明示的に失敗させる(claimJobのJ…"]
   W3["W3<br/>完了したジョブの結果を記録し、ジョブIDで取得できるようにする"]
   W2 --> W1
+  W4 --> W2
+  W5 --> W2
   W3 --> W2
 ```
 
@@ -125,6 +150,8 @@ flowchart LR
 | --- | --- | --- | --- | --- | --- |
 | W1 | プロデューサーがジョブを投入できるようにする | R1 | プロデューサーがジョブを投入する | pending | — |
 | W2 | 並行するクレーム試行があっても、ワーカーは未クレームのジョブをちょうど1件だけクレームできるようにする | R2, SC1, SC2 | 複数ワーカーが同一ジョブへ並行してクレームを試みても1人だけが成功する | pending | W1 |
+| W4 | 既にクレーム済みのジョブへの後続クレーム試行を明示的に失敗させる(claimJobのJobNotAlreadyClaimed事前条件の失敗パスとしての単独検証) | R2 | 既にクレーム済みのジョブへのクレーム試行は失敗する | pending | W2 |
+| W5 | 存在しないジョブIDへのクレーム試行を明示的に失敗させる(claimJobのJobIsRegistered事前条件の失敗パスとしての単独検証) | R2 | 存在しないジョブIDへのクレーム試行は失敗する | pending | W2 |
 | W3 | 完了したジョブの結果を記録し、ジョブIDで取得できるようにする | R3 | 完了したジョブの結果が記録され取得できる | pending | W2 |
 
 Source: [.solidsdd/changes/establish-job-queue/work-plan.json](../../../.solidsdd/changes/establish-job-queue/work-plan.json)
@@ -178,6 +205,8 @@ flowchart LR
   W1["W1"]
   W2["W2"]
   W3["W3"]
+  W4["W4"]
+  W5["W5"]
   dbc1["dbc: contracts/JobQueue.ocl#claimJ…"]
   dbc2["dbc: contracts/JobQueue.ocl#getRes…"]
   dbc3["dbc: contracts/JobQueue.ocl#record…"]
@@ -185,6 +214,8 @@ flowchart LR
   formal1["formal: formal/ClaimCoordinator.tla"]
   W1 --> dbc4
   W2 --> dbc1
+  W4 --> dbc1
+  W5 --> dbc1
   W2 --> formal1
   W3 --> dbc3
   W3 --> dbc2
@@ -193,7 +224,7 @@ flowchart LR
 | kind | location | density | status | covers | rationale |
 | --- | --- | --- | --- | --- | --- |
 | dbc | contracts/JobQueue.ocl#submitJob | standard | apply | W1 | domain_contract: NFR2が「投入・クレーム・結果記録それぞれの単一操作としての事前条件・事後条件」をcontracts/JobQueue.ocl(measurement欄で明示)に要求しており、submitJobはその3操作の1つ。architecture_public_boundary: architecture-plan.jsonでjob-queueモジュールのpublic[]は["SubmitJob"]であり、公開サーフェスに該当する——ただしこのプロジェクトにHTTP/GraphQL層は存在しない(src/なし、設計のみのサンプル)ため、この軸は『apiへkindを切り替えよ』ではなく『dbcの厳密さを引き上げよ』と読み、kindはdbcのまま据え置く。additive_change: 新規グリーンフィールドの単一操作追加であり削除/破壊的変更を伴わないため、この軸単独ではhuman_gateを要求しない(judgment-axes.md combining rule 4)。post条件として「未クレーム状態で保存され、ジョブIDが割り当てられる」(W1受け入れ条件/R1)を第一級のOCL postとして表現する対象。 |
-| dbc | contracts/JobQueue.ocl#claimJob | standard | apply | W2 | domain_contract: NFR2の3操作のうちclaimに相当し、単発呼び出しとしての事前条件(対象ジョブが存在し未クレーム)と事後条件(成功時はクレーム状態に遷移、既にクレーム済みの場合は「既にクレーム済み」というnamed failureを返す——W2受け入れ条件の後半)を表現する。architecture_public_boundary: claim-coordinatorモジュールのpublic[]は["ClaimJob"]であり、worker-poolという別プロセス/別マシンでも動作しうる呼び出し元向けの唯一の公開サーフェス(physical-design.md)——このプロジェクトにapi技術が存在しないため、kindはdbcのまま据え置きつつdensityをstandardとする。重要な限定: OCLは単一呼び出しの事前/事後条件のみを表現でき、『並行する2つのクレーム試行のうち成功するのはちょうど1件』というインターリーブにまたがる安全性(concurrency_safety/NFR1/R2/SC1/SC2そのもの)は表現できないため、その責務は下記のformalターゲットに委譲し、ここでは持たせない(judgment-axes.mdの主要kind選定表でconcurrency_safetyはformalを優先)。 |
+| dbc | contracts/JobQueue.ocl#claimJob | standard | apply | W2, W4, W5 | domain_contract: NFR2の3操作のうちclaimに相当し、単発呼び出しとしての事前条件(対象ジョブが存在し未クレーム——W4/W5がそれぞれの失敗パスを単独検証)と事後条件(成功時はクレーム状態に遷移、既にクレーム済みの場合は「既にクレーム済み」というnamed failureを返す——W2受け入れ条件の後半およびW4)を表現する。architecture_public_boundary: claim-coordinatorモジュールのpublic[]は["ClaimJob"]であり、worker-poolという別プロセス/別マシンでも動作しうる呼び出し元向けの唯一の公開サーフェス(physical-design.md)——このプロジェクトにapi技術が存在しないため、kindはdbcのまま据え置きつつdensityをstandardとする。重要な限定: OCLは単一呼び出しの事前/事後条件のみを表現でき、『並行する2つのクレーム試行のうち成功するのはちょうど1件』というインターリーブにまたがる安全性(concurrency_safety/NFR1/R2/SC1/SC2そのもの)は表現できないため、その責務は下記のformalターゲットに委譲し、ここでは持たせない(judgment-axes.mdの主要kind選定表でconcurrency_safetyはformalを優先)。 |
 | formal | formal/ClaimCoordinator.tla | strict | apply | W2 | concurrency_safety: NFR1(「並行するワーカーが同一ジョブをクレームしようとしても、成功するクレームは常にちょうど1件である」)がW2/R2/SC1/SC2の核心であり、そのmeasurement欄が明示的に「formal/ClaimCoordinator.tla のTLC model checking」を指定している。Phase 3のformal apply vs defer条件(judgment-axes.md)を4つとも確認: (1) concurrency_safetyシグナルが存在する(NFR1本体)。(2) 形式アダプタとチェッカーがプロジェクト向けに文書化されている——リポジトリ直下tools/tla/(tla2tools.jar, fetch-tla2tools.sh)にTLC実行環境があり、かつformal/ClaimCoordinator.tlaという具体パスがnfr.json/architecture-reasoning.md/physical-design.md/requirements/job-queue.featureの4箇所で一貫して名指しされている——単なる一般論ではなくこのプロジェクト自身が採用を確定させている。(3) スコープは単一の共有資源/プロトコル(ClaimCoordinatorのクレーム状態遷移1つ)に限定されており「アプリ全体の形式化」ではない。(4) human_gate.required=trueを設定する(下記)。以上により status: apply、adapter_hint: tla、density: strictとする(NFR1が安全性クリティカルなプロパティであるため)。architecture-reasoning.mdのConcurrency Boundary/physical-design.mdの共有ストアへのアトミック条件付き更新という物理設計判断も、この形式モデルが検証すべき遷移プロパティの前提として整合する。 |
 | dbc | contracts/JobQueue.ocl#recordResult | standard | apply | W3 | domain_contract: NFR2の3操作のうち結果記録に相当し、事前条件(対象ジョブがクレーム済みで処理が完了している)と事後条件(結果がジョブIDに紐づけて記録される——W3受け入れ条件/R3)を表現する。architecture_public_boundary: result-storeモジュールのpublic[]は["RecordResult", "GetResult"]の一つであり公開サーフェスに該当するが、api技術が存在しないためkindはdbcのまま据え置く。R3にはR2のような二重クレーム相当の排他性要件が明記されておらず(architecture-reasoning.md State Ownershipの通り)、concurrency_safetyシグナルは発火しないため、formalは不要でdbcのみで十分と判断する。 |
 | dbc | contracts/JobQueue.ocl#getResult | standard | apply | W3 | domain_contract + architecture_public_boundary: result-storeモジュールのもう一つの公開操作GetResultは、R3の「ジョブIDで取得できる」という要求とSC1/SC2が求める検証可能性を支える読み取り側であり、NFR2が名指しする3操作(投入/クレーム/結果記録)には含まれないものの、公開サーフェスである以上、存在有無(記録済み/未記録)を明確にするpost条件を第一級のOCL契約として持たせる方が、実装フェーズでの曖昧さ(未記録時の挙動)を残さない。副作用を持たない単純な問い合わせ操作であり、複雑な事前条件やconcurrency_safetyの懸念はない。 |
