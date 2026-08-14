@@ -62,9 +62,16 @@ this (`Relationships cannot be added between parents and children`).
 `scripts/solidsdd-architecture/validate.py` enforces the same rule. If a
 domain element needs to depend on an abstraction (e.g. a port), model that
 abstraction as a **sibling** element, not a child of the element that
-depends on it — see
+depends on it: instead of nesting a port inside the element that depends on
+it (`order -> a_payment_port_inside_order`, rejected), declare the port as
+its own top-level element and connect both sides to it as siblings
+(`order = softwareSystem ...`, `payment_port = softwareSystem ...`,
+`order -> payment_port`, `payment_adapter -> payment_port`). For a full
+worked example, see
 [architecture-dependency-inversion](../examples/architecture-dependency-inversion/)
-for a worked example.
+in a `solid_sdd` checkout — that directory is not vendored into installed
+consuming projects, so this link only resolves when reading this file from
+`solid_sdd` itself.
 
 ## Unsupported (v1)
 

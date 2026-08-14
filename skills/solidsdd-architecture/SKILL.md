@@ -79,7 +79,7 @@ Gherkin). See "Role separation" in
 - Do not pad `workspace.dsl` with unrelated existing elements' `change:<id>` tags just to look complete; do not skip tagging touched elements/relationships to avoid writing a plan when `touches` implies a new module/boundary/dependency-direction change
 - Populate `properties["owns"]` / `properties["public"]` / a relationship's `kind:*` tag only when confidently derivable from context — never guess to fill out the model
 - Set `human_gate` on the generated `architecture-plan.json` per [human-gates.md](references/human-gates.md) (large boundary change, external-boundary change, dependency-direction reversal, or deliberate change to an existing structural constraint) — do not gate ordinary additive module/dependency additions
-- Never hand-edit `architecture-plan.json` directly — always regenerate it via `scripts/solidsdd-architecture.sh project`
+- Never hand-edit `architecture-plan.json`'s generated content (`modules`/`dependencies`/`constraints`/`summary`) — always regenerate those via `scripts/solidsdd-architecture.sh project`. The one exception is adding the top-level `human_gate` field after generation (Step 14): `project.py` never computes `human_gate` on its own, so that one field is meant to be hand-added to the freshly generated file, not a violation of this rule
 - DSL identifiers and JSON keys English; human-readable `description`/reasoning strings in the **working language** ([working-language.md](references/working-language.md))
 
 ## Steps

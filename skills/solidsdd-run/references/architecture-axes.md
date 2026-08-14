@@ -159,6 +159,14 @@ see [structurizr-dsl.md](structurizr-dsl.md)):
   `constraint.reason`): cite the WorkPlan `touches` / Brief scope that
   motivated the module/dependency/constraint, the same way `judgment-axes.md`
   expects `ApplicationPlan.targets[].rationale` to cite a signal id.
+- `Technology` (element field) and `views` (workspace block) follow the same
+  rule as `owns`/`public`, not a separate one: populate `Technology` only
+  when unambiguously derivable (e.g. every WorkPlan `touches` path for that
+  element shares one language/runtime extension) — leave it blank rather
+  than guessing from a partial or extension-less `touches` glob. Add a
+  `views` block only when it aids readability for a Level 2+ change with
+  multiple elements/relationships; skip it for Level 0/1 deltas where one or
+  two elements are already easy to read directly from `model {}`.
 
 ## Human gate
 
@@ -166,7 +174,11 @@ Gate (`human_gate.required: true`) only for: a large module/boundary change, a
 change to an **external-facing** boundary, a reversal of an existing dependency
 direction, or a deliberate removal/change of an existing structural `constraint`.
 Do not gate ordinary additive module or dependency additions — see
-[human-gates.md](human-gates.md).
+[human-gates.md](human-gates.md). A project's **first-ever** Architecture
+Model (no `workspace.dsl` existed before this change) counts as a large/
+external-facing change by default, since there is no prior structure to
+measure "ordinary additive" against — gate it unless the model is genuinely
+small and entirely internal.
 
 ## Role separation
 
