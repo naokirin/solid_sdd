@@ -96,14 +96,18 @@ Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal n
 | `stable_core` | Mature, rarely changing core → density `standard` or `strict` |
 | `additive_change` | New optional fields/ops without removals or tightenings → usually **no** human gate; density often `standard` |
 | `low_confidence` | Ambiguous requirements or weak context → set `confidence: low` and `human_gate.required: true` |
-| `architecture_public_boundary` | When `.solidsdd/changes/<change_id>/architecture-plan.json` exists (`status: changed`) and a target's location falls under a module's declared `public[]` → target likely needs an external-facing contract (`api`), not just internal `dbc`; when it falls under a module's internal surface only (not in `public[]`) → `dbc` alone is often sufficient |
+| `architecture_public_boundary` | When `.solidsdd/changes/<change_id>/architecture-plan.json` exists (`status: changed`) and a target's location falls under a module's declared `public[]`: if this project actually has an HTTP/GraphQL boundary (i.e. `http_boundary` also applies) → added weight toward `api` over `dbc` alone for that target. If the project has **no** API technology at all (no `http_boundary` signal anywhere — e.g. a design-only or library-style change) → this row does not invent an `api` kind out of nothing; instead it raises `dbc` density (e.g. `thin` → `standard`), since `public[]` still means other modules/processes depend on this surface. When a target's location falls under a module's internal surface only (not in `public[]`) → `dbc` alone at ordinary density is often sufficient. |
 
 `architecture_public_boundary` is **read-only context**, not a new judgment
 responsibility: `solidsdd-judge` reads `public[]`/`owns` from an existing
 ArchitecturePlan when present to sharpen kind/density selection above — it
 never edits the Architecture Model, re-derives module boundaries, or
 overrides `solidsdd-architecture`'s judgment. Absent an ArchitecturePlan
-(most changes), ignore this row entirely.
+(most changes), ignore this row entirely. It also does not carry its own
+human-gate obligation: the Architecture human gate (see `human-gates.md`
+"Architecture (structural)") is `solidsdd-architecture`'s responsibility
+alone, already recorded on `architecture-plan.json.human_gate` — do not
+re-apply or duplicate it here just because a target sits under `public[]`.
 
 ## Combining rules
 
