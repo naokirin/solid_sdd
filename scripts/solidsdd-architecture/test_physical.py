@@ -128,32 +128,6 @@ class ValidatePhysicalDesignTests(unittest.TestCase):
         self.assertEqual(findings[0]["severity"], "blocker")
         self.assertIn("forbid_dependency", findings[0]["detail"])
 
-    def test_physical_dependency_reversed_from_logical_is_major(self) -> None:
-        root = self._root()
-        text = """# Physical Design
-
-## Physical Realization
-
-| Logical Element | Physical Realization |
-|---|---|
-| Inventory | `src/inventory/` |
-| Reservation | `src/reservation/` |
-
-## Physical Dependencies
-
-- `src/inventory/` -> `src/reservation/`
-"""
-        path = self._write(root, text)
-        # Logical relationship is reservation -> inventory; forbid the opposite
-        # pair so only the "reversed direction" check (not forbid_dependency)
-        # fires for inventory -> reservation.
-        ws = dsl.parse(WS_TEXT)
-        invariants = {"version": "1", "constraints": []}
-        findings = physical.validate_physical_design(path, ws, invariants)
-        self.assertEqual(len(findings), 1)
-        self.assertEqual(findings[0]["severity"], "major")
-        self.assertIn("opposite", findings[0]["detail"])
-
     def test_physical_dependency_matching_logical_direction_has_no_findings(self) -> None:
         root = self._root()
         text = """# Physical Design
@@ -168,6 +142,34 @@ class ValidatePhysicalDesignTests(unittest.TestCase):
 ## Physical Dependencies
 
 - `src/reservation/` -> `src/inventory/`
+"""
+        path = self._write(root, text)
+        ws = dsl.parse(WS_TEXT)
+        invariants = {"version": "1", "constraints": []}
+        findings = physical.validate_physical_design(path, ws, invariants)
+        self.assertEqual(findings, [])
+
+    def test_physical_dependency_inverted_from_logical_direction_has_no_findings(self) -> None:
+        # Physical Design is allowed to introduce a port/adapter inversion not
+        # present in the Logical model (see physical-design.md "Physical
+        # Dependency"). The Logical relationship is reservation -> inventory;
+        # this Physical Dependency line runs the other way and must NOT be
+        # flagged merely for not matching that direction -- only an actual
+        # forbid_dependency violation should ever fire (see the blocker test
+        # above).
+        root = self._root()
+        text = """# Physical Design
+
+## Physical Realization
+
+| Logical Element | Physical Realization |
+|---|---|
+| Inventory | `src/inventory/` |
+| Reservation | `src/reservation/` |
+
+## Physical Dependencies
+
+- `src/inventory/` -> `src/reservation/`
 """
         path = self._write(root, text)
         ws = dsl.parse(WS_TEXT)

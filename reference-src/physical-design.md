@@ -65,10 +65,13 @@ In the "Physical Dependencies" section of the artifact (below), write entries
 worth machine-checking as `<physical_a> -> <physical_b>` — the same arrow
 convention as `workspace.dsl` relationships. `scripts/solidsdd-architecture.sh
 validate --change-id <id>` resolves each side back to its Logical element via
-the Physical Realization table and checks it against `invariants.yaml`'s
-`forbid_dependency` constraints and the declared Logical dependency
-direction. Lines that don't match this shape are read as plain prose and
-stay unchecked — this is optional structure, not a required grammar.
+the Physical Realization table and checks that the realization does not
+violate an `invariants.yaml` `forbid_dependency` constraint. Physical
+Dependency direction is **not** required to mirror the Logical relationship
+direction — a port/adapter inversion (as above) is an expected, legitimate
+realization, not a violation; only an actual `forbid_dependency` hit is
+flagged. Lines that don't match this shape are read as plain prose and stay
+unchecked — this is optional structure, not a required grammar.
 
 ## Physical Boundary enforcement
 
@@ -127,8 +130,9 @@ Those are decided during Implementation, not Architecture.
 
 Once written, the "Physical Realization" table above **is** the Logical →
 Physical trace — see [architecture-traceability.md](architecture-traceability.md)
-for how far traceability needs to go and how Physical → Implementation is
-recovered from it.
+for how far traceability needs to go, and how finding the implementation
+(traceability) differs from whether it still matches this table
+(Implementation Conformance, not mechanically verified).
 
 ## Relation to solid_sdd Skills
 

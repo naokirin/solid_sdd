@@ -1,8 +1,8 @@
 # Architecture Traceability
 
-Makes the `Requirement → Logical Architecture → Physical Design →
-Implementation` chain traceable **when it matters**, without turning every
-mapping into a maintained artifact:
+Makes the `Requirement → Logical Architecture → Physical Design` chain
+traceable **when it matters**, without turning every mapping into a
+maintained artifact:
 
 ```text
 Requirement
@@ -11,8 +11,13 @@ Logical Architecture     .solidsdd/architecture/workspace.dsl
     ↓
 Physical Design           .solidsdd/changes/<change_id>/physical-design.md (optional — see below)
     ↓
-Implementation             actual source
+Implementation             actual source — see "Implementation Conformance" below
 ```
+
+The first three links are traceability in the ordinary sense: each is a
+lookup between two **declared** artifacts. The last link (Physical Design →
+Implementation) is different in kind — see "Implementation Conformance"
+below — do not conflate the two.
 
 ## Logical → Physical
 
@@ -21,14 +26,29 @@ Realization" table already **is** the Logical → Physical trace — a Logical
 element id maps to one or more concrete paths. Do not maintain a second,
 separate mapping artifact for the same fact.
 
-## Physical → Implementation
+## Physical → Implementation: Implementation Conformance
 
-Physical Design entries name real repository paths, so Physical →
-Implementation traceability holds by construction: read the path from
+Physical Design entries name real repository paths, so **finding** the
+implementation is a lookup, not a separate concern: read the path from
 `physical-design.md`'s table (or, when no `physical-design.md` was written,
-the element's `name`/`description` in `workspace.dsl`) and it points at the
-actual source. No extra bookkeeping is needed beyond that, except for the
-migration case below.
+the element's `name`/`description` in `workspace.dsl`) and it points at
+where the code should live. This lookup holds by construction — that part
+genuinely is traceability.
+
+Whether the code **at that path still does what was declared** — the
+boundary is actually enforced, the allocation hasn't silently drifted since
+the change that wrote `physical-design.md` — is a different question:
+**Implementation Conformance**, not traceability. Traceability only answers
+"where do I look"; conformance answers "does what's there still match the
+plan". solid_sdd does not verify conformance mechanically —
+`scripts/solidsdd-architecture/physical.py` only cross-checks
+`physical-design.md` against the Architecture Model itself (declared facts
+against declared facts, e.g. that a Physical Dependency doesn't violate a
+`forbid_dependency` constraint — never against actual source; no
+import-graph / directory-convention static analysis). Conformance stays a
+`solidsdd-critique` / human-review concern, and it can drift silently after
+`physical-design.md` is written, since code keeps changing while the
+Architecture artifact usually doesn't.
 
 ## When explicit traceability is required
 
@@ -62,6 +82,9 @@ Field minimality rules): record signal, not completeness.
   `architecture-reasoning.md`), not a living database that must be kept in
   sync forever; there is no requirement to retroactively update it when a
   later, unrelated change moves files.
+* Don't treat Logical → Physical traceability as proof of Implementation
+  Conformance — they are different guarantees. A correct, up-to-date mapping
+  table says nothing about whether the code at that path still honors it.
 
 ## Relation to ArchitecturePlan
 

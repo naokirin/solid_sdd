@@ -204,14 +204,20 @@ When a change wrote `physical-design.md` (Level 3),
 `scripts/solidsdd-architecture/physical.py` additionally cross-checks it
 against the Architecture Model — every referenced Logical Element must
 resolve in `workspace.dsl`, and any `A -> B` Physical Dependency line is
-checked against `invariants.yaml`'s `forbid_dependency` constraints and the
-declared Logical dependency direction — also folded into `solidsdd-lint.sh`.
-This is intentionally best-effort: `physical-design.md` stays free-form
-prose, not a second parsed grammar, so unrecognized shapes are skipped
-rather than flagged. It performs no static analysis of actual source code
-(import graphs, directory conventions) — only what was explicitly declared
-gets checked; everything else stays a `solidsdd-critique` / human-review
-concern (see [physical-design.md](../reference-src/physical-design.md),
+checked against `invariants.yaml`'s `forbid_dependency` constraints — also
+folded into `solidsdd-lint.sh`. Physical Dependency direction is not
+required to mirror the Logical relationship direction (a port/adapter
+inversion is an expected, legitimate realization); only an actual
+`forbid_dependency` violation is flagged, i.e. Physical realization must not
+violate a Logical constraint, not "must match Logical direction." This is
+intentionally best-effort: `physical-design.md` stays free-form prose, not a
+second parsed grammar, so unrecognized shapes are skipped rather than
+flagged. It performs no static analysis of actual source code (import
+graphs, directory conventions) — only what was explicitly declared gets
+checked; whether the code still conforms to what was declared is
+Implementation Conformance, not traceability, and stays a
+`solidsdd-critique` / human-review concern (see
+[physical-design.md](../reference-src/physical-design.md),
 [architecture-traceability.md](../reference-src/architecture-traceability.md)).
 
 Depth: [../reference-src/architecture-depth.md](../reference-src/architecture-depth.md)

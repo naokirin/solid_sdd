@@ -18,9 +18,14 @@ Two checks:
   - Physical dependency vs. `forbid_dependency`: a declared `A -> B` Physical
     Dependency line, resolved back to Logical element ids via the Physical
     Realization table, is checked against `invariants.yaml`'s
-    `forbid_dependency` constraints and against the declared Logical
-    dependency direction — the same mechanism already used for Logical
-    relationships in `workspace.dsl`, not a new constraint type.
+    `forbid_dependency` constraints — the same mechanism already used for
+    Logical relationships in `workspace.dsl`, not a new constraint type.
+    Physical Dependency direction is **not** required to mirror the Logical
+    relationship direction — Physical Design is free to introduce a
+    port/adapter inversion or other realization not present in the Logical
+    model (see [physical-design.md](../../reference-src/physical-design.md)
+    "Physical Dependency"); only an actual `forbid_dependency` violation is
+    flagged.
 
 Does not perform static analysis of actual source code (import graphs,
 directory conventions) — only what the agent declared in
@@ -172,8 +177,6 @@ def validate_physical_design(
                 if cf and ct:
                     forbidden.add((cf, ct))
 
-    logical_rel_pairs = {(r.source, r.dest) for r in ws.relationships}
-
     dep_lines = _section_lines(lines, _PHYSICAL_DEPENDENCIES_HEADING)
     for phys_a, phys_b in _parse_arrows(dep_lines):
         elem_a = path_to_logical.get(phys_a) or _resolve_element(ws, phys_a)
@@ -191,20 +194,10 @@ def validate_physical_design(
                     "forbid_dependency constraint in invariants.yaml",
                 )
             )
-        elif (
-            (elem_b.id, elem_a.id) in logical_rel_pairs
-            and (elem_a.id, elem_b.id) not in logical_rel_pairs
-        ):
-            findings.append(
-                finding(
-                    "major",
-                    "consistency",
-                    location,
-                    f"physical dependency {phys_a} -> {phys_b} (Logical "
-                    f"{elem_a.id} -> {elem_b.id}) is opposite the declared Logical "
-                    f"dependency direction {elem_b.id} -> {elem_a.id} in workspace.dsl",
-                )
-            )
+        # Physical Dependency direction is not required to mirror the Logical
+        # relationship direction (Physical Design may introduce a port/adapter
+        # inversion not present in the Logical model) -- only an actual
+        # forbid_dependency violation, checked above, is flagged.
 
     return findings
 
