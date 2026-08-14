@@ -148,6 +148,22 @@ class RenderTests(unittest.TestCase):
         self.assertTrue(Path(written["html"]).is_file())
         self.assertTrue(written["markdown"].endswith(".solidsdd/changes/demo/report.md"))
 
+    def test_html_diagram_forwards_allow_network_to_diagram_render(self) -> None:
+        from unittest.mock import patch
+
+        payload = {"kind": "dependency_graph", "nodes": [{"id": "a", "label": "A"}], "edges": [], "forbidden_edges": []}
+        with patch("render.diagrammod.render", return_value={"mermaid": "x", "svg": None}) as render_fn:
+            render._html_diagram(payload, allow_network=True)
+        render_fn.assert_called_once_with(payload, allow_network=True)
+
+    def test_html_diagram_defaults_allow_network_to_false(self) -> None:
+        from unittest.mock import patch
+
+        payload = {"kind": "dependency_graph", "nodes": [{"id": "a", "label": "A"}], "edges": [], "forbidden_edges": []}
+        with patch("render.diagrammod.render", return_value={"mermaid": "x", "svg": None}) as render_fn:
+            render._html_diagram(payload)
+        render_fn.assert_called_once_with(payload, allow_network=False)
+
 
 if __name__ == "__main__":
     unittest.main()

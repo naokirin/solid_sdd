@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
@@ -63,7 +64,12 @@ class CliDispatchTests(unittest.TestCase):
             encoding="utf-8",
         )
         buf = io.StringIO()
-        with redirect_stdout(buf):
+        # Don't let this hit a real npx/mmdc spawn — the SVG path itself is
+        # covered by diagram.py's own tests; here we only need to check
+        # dispatch, and a real subprocess attempt would make this test slow
+        # and environment-dependent (fast/instant with mmdc installed,
+        # ~1-2s of failed spawns without it).
+        with patch("diagram.render_svg_via_mermaid_cli", return_value=None), redirect_stdout(buf):
             rc = cli.main(["diagram", "--in", str(payload_path)])
         self.assertEqual(rc, 0)
         self.assertIn('"mermaid"', buf.getvalue())

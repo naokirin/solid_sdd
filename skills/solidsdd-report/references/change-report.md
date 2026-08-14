@@ -197,11 +197,13 @@ tables (skim the picture, then read the detail).
 
 For ArchitecturePlan / WorkPlan / ApplicationPlan, `collect` already applies
 the eligibility row below as `diagrams.<kind>.eligible` and extracts the
-node/edge data; `diagram` (invoked by `render`) lays out the Mermaid source
-and, below its own node-count ceiling, an inline SVG — neither needs manual
-threshold-checking or hand-computed coordinates. Formal is the one kind that
-still needs an agent judgment call (identifying the mode variable from
-prose), passed to `render` as `formal_state_diagram` in the narrative JSON.
+node/edge data; `diagram` (invoked by `render`) builds the Mermaid source
+and, when the optional Mermaid CLI (`mmdc`) is available, an inline SVG
+rendered *by Mermaid itself* — node placement, edge routing, and label
+placement are the renderer's job, not something to hand-compute or
+threshold-check here. Formal is the one kind that still needs an agent
+judgment call (identifying the mode variable from prose), passed to
+`render` as `formal_state_diagram` in the narrative JSON.
 
 | Source | Diagram kind | When |
 |--------|--------------|------|
@@ -292,31 +294,47 @@ label text).
 
 #### HTML rendering (all kinds)
 
-Implemented by `diagram.py`'s `svg_*` functions — a fixed layout formula,
-not a per-run judgment call. Renders as an **inline, generation-time SVG**
-(no JS library, no CDN — consistent with this spec's "prefer
-generation-time processing, stay offline-safe" stance):
+Implemented by `diagram.py`'s `render_svg_via_mermaid_cli`, which renders
+the Mermaid source above through the optional [Mermaid
+CLI](https://github.com/mermaid-js/mermaid-cli) (`mmdc`) into an **inline
+SVG**. This used to be a hand-computed layout (fixed box/arrow/label
+coordinates); that repeatedly produced diagrams that were technically
+non-overlapping but still hard to read — arrows crossing through boxes,
+curve labels reading as attached to the wrong arrow, a label background
+hiding the arrow underneath it. Node placement, edge routing, and label
+placement without collisions is a genuinely hard layout problem, and
+Mermaid's own renderer already solves it (the same renderer GitHub/GitLab
+use to render the Markdown fallback above) — so let it, rather than
+re-deriving that logic here.
 
-1. **Dependency graphs / target mappings**: place nodes left-to-right (or,
-   for the bipartite target mapping, in two columns) in the order they
-   appear in the source array, one row per column, evenly spaced boxes.
-   Draw a straight solid arrow between boxes per edge, labelled with
-   `kind` near the midpoint when present; draw forbidden edges dashed red,
-   curved above the row, labelled `forbidden`.
-2. **State diagrams**: for ≤ 4–5 states, arrange boxes in a simple row or
-   small loop and draw labelled arrows for each transition the same way;
-   above that, or when transitions would cross too much to stay legible,
-   skip the SVG and keep only the Mermaid source.
-3. In every case: above roughly 6–8 nodes, or when a hand-laid-out single
-   row/loop would stop being legible, skip the SVG and keep only the
-   Mermaid source — do not force a layout that would be misleading.
+`mmdc` renders with Mermaid's built-in `dark` theme (`-t dark`) and a
+transparent background so the diagram reads correctly against this
+document's dark navy page rather than clashing with Mermaid's light
+default. `mmdc` is optional and requires a Chromium/Puppeteer runtime;
+`diagram.py` looks for a `mmdc` binary on `PATH` first (a global install),
+then falls back to `npx --offline @mermaid-js/mermaid-cli` (a project
+devDependency install, without needing it on `PATH`) — `--offline` means
+that fallback only ever uses an already-installed local/cached copy, never
+a network fetch, so this stays offline-safe. When neither path can invoke
+the tool, or the render fails for any reason (no browser runtime, timeout),
+`diagram` returns `svg: null` and the caller keeps the Mermaid source only
+— a complete, correct report either way, per the Markdown rendering rule
+above (GitHub/GitLab/most viewers render `mermaid` fences natively).
+
+**When the offline attempt yields no SVG and nicer inline diagrams are
+worth it**, `render`/`diagram` accept `--allow-network`: this drops
+`--offline` from the npx fallback (adding `--yes` so it installs
+non-interactively instead of prompting) and raises the timeout to
+accommodate a first-run npx install plus a Chromium/Puppeteer download.
+Since `solidsdd-report` always runs with a human present (it's manual-only
+— see "Execution" in SKILL.md), **ask the human before passing
+`--allow-network`** rather than defaulting to it; only retry with it once
+they've agreed to the one-time install. Never pass it from an unattended
+context.
 
 Put the rendered SVG in view by default, and the raw Mermaid source in a
 `Diagram source` `<details>`/tab next to it (same tab/accordion mechanism as
-Raw JSON below) so a reader can copy it into a Mermaid-aware tool. Reuse the
-report's existing color tokens (`--accent` for normal edges/nodes,
-`#ff6b6b` for forbidden edges) so the diagram matches the rest of the dark
-theme.
+Raw JSON below) so a reader can copy it into a Mermaid-aware tool.
 
 #### Non-targets
 

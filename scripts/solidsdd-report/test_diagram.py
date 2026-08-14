@@ -2,9 +2,15 @@
 """Unit tests for solidsdd-report diagram.py."""
 from __future__ import annotations
 
+import io
+import json
+import subprocess
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
@@ -13,7 +19,7 @@ if str(_HERE) not in sys.path:
 import diagram  # noqa: E402
 
 
-class DependencyGraphTests(unittest.TestCase):
+class DependencyGraphMermaidTests(unittest.TestCase):
     NODES = [{"id": "inventory", "label": "own stock"}, {"id": "reservation", "label": "own holds"}]
     EDGES = [{"from": "reservation", "to": "inventory", "kind": "runtime"}]
     FORBIDDEN = [{"from": "inventory", "to": "reservation", "reason": "keep independent"}]
@@ -37,21 +43,8 @@ class DependencyGraphTests(unittest.TestCase):
         text = diagram.mermaid_dependency_graph(self.NODES, [], [])
         self.assertIn("no dependency edges", text)
 
-    def test_svg_produced_for_small_graph(self) -> None:
-        svg = diagram.svg_dependency_graph(self.NODES, self.EDGES, self.FORBIDDEN)
-        self.assertIsNotNone(svg)
-        self.assertIn("<svg", svg)
-        self.assertIn("forbidden", svg)
 
-    def test_svg_skipped_above_node_threshold(self) -> None:
-        many_nodes = [{"id": f"m{i}", "label": ""} for i in range(diagram.MAX_ROW_NODES + 1)]
-        self.assertIsNone(diagram.svg_dependency_graph(many_nodes, [], []))
-
-    def test_svg_none_for_empty_nodes(self) -> None:
-        self.assertIsNone(diagram.svg_dependency_graph([], [], []))
-
-
-class TargetMappingTests(unittest.TestCase):
+class TargetMappingMermaidTests(unittest.TestCase):
     LEFT = ["W1", "W2"]
     RIGHT = [
         {"kind": "api", "location": "openapi/openapi.yaml#/paths/~1things/post", "density": "standard"},
@@ -82,18 +75,8 @@ class TargetMappingTests(unittest.TestCase):
         self.assertIn("W1 --> api1", text)
         self.assertIn("W1 --> api2", text)
 
-    def test_svg_skipped_above_threshold(self) -> None:
-        left = [f"W{i}" for i in range(diagram.MAX_TARGET_NODES)]
-        right = [{"kind": "api", "location": f"a{i}"} for i in range(diagram.MAX_TARGET_NODES)]
-        self.assertIsNone(diagram.svg_target_mapping(left, right, []))
 
-    def test_svg_produced_for_small_mapping(self) -> None:
-        svg = diagram.svg_target_mapping(self.LEFT, self.RIGHT, self.EDGES)
-        self.assertIsNotNone(svg)
-        self.assertIn("<svg", svg)
-
-
-class StateDiagramTests(unittest.TestCase):
+class StateDiagramMermaidTests(unittest.TestCase):
     STATES = ["Idle", "Owned"]
     TRANSITIONS = [{"from": "Idle", "to": "Owned", "label": "Acquire"}, {"from": "Owned", "to": "Idle", "label": "Add"}]
 
@@ -103,32 +86,203 @@ class StateDiagramTests(unittest.TestCase):
         self.assertIn("[*] --> Idle", text)
         self.assertIn("Idle --> Owned: Acquire", text)
 
-    def test_svg_skipped_above_threshold(self) -> None:
-        states = [f"S{i}" for i in range(diagram.MAX_STATE_NODES + 1)]
-        self.assertIsNone(diagram.svg_state_diagram(states, []))
 
-    def test_svg_produced_for_small_diagram(self) -> None:
-        svg = diagram.svg_state_diagram(self.STATES, self.TRANSITIONS)
+class MermaidCliSvgTests(unittest.TestCase):
+    """render_svg_via_mermaid_cli must never raise — mmdc is optional, and
+    every failure mode (not installed, no browser runtime, timeout, bad
+    input) has to fall back to `svg: None` so the caller keeps the Mermaid
+    source only."""
+
+    def setUp(self) -> None:
+        diagram._reset_mermaid_cli_probe_cache()
+
+    def test_returns_none_for_empty_source_without_touching_the_tool(self) -> None:
+        with patch("diagram.shutil.which") as which:
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli(""))
+            which.assert_not_called()
+
+    def test_returns_none_when_cli_not_on_path(self) -> None:
+        with patch("diagram.shutil.which", return_value=None):
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b"))
+
+    def test_returns_none_when_cli_invocation_fails(self) -> None:
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=subprocess.CalledProcessError(1, ["mmdc"])
+        ):
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b"))
+
+    def test_returns_none_on_timeout(self) -> None:
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=subprocess.TimeoutExpired(["mmdc"], 20)
+        ):
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b"))
+
+    def test_returns_svg_fragment_stripped_of_xml_prolog_on_success(self) -> None:
+        def fake_run(cmd, **kwargs):
+            out_path = Path(cmd[cmd.index("-o") + 1])
+            out_path.write_text(
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+                "<!DOCTYPE svg PUBLIC>\n"
+                '<svg xmlns="http://www.w3.org/2000/svg"><g>ok</g></svg>',
+                encoding="utf-8",
+            )
+
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=fake_run
+        ):
+            svg = diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b")
         self.assertIsNotNone(svg)
-        self.assertIn("<svg", svg)
+        self.assertTrue(svg.startswith("<svg"))
+        self.assertNotIn("<?xml", svg)
+        self.assertNotIn("<!DOCTYPE", svg)
+
+    def test_falls_back_to_npx_offline_when_mmdc_not_on_path(self) -> None:
+        # No global/local `mmdc` on PATH, but `npx` is — must invoke it with
+        # `--offline` so it only ever uses an already-installed local
+        # project dependency or npm cache, never a network fetch.
+        def which(name):
+            return {"npx": "/usr/bin/npx"}.get(name)
+
+        captured_cmd = {}
+
+        def fake_run(cmd, **kwargs):
+            captured_cmd["cmd"] = cmd
+            out_path = Path(cmd[cmd.index("-o") + 1])
+            out_path.write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>', encoding="utf-8")
+
+        with patch("diagram.shutil.which", side_effect=which), patch(
+            "diagram.subprocess.run", side_effect=fake_run
+        ):
+            svg = diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b")
+        self.assertIsNotNone(svg)
+        cmd = captured_cmd["cmd"]
+        self.assertEqual(cmd[0], "/usr/bin/npx")
+        self.assertIn("--offline", cmd)
+        self.assertIn("--package=@mermaid-js/mermaid-cli", cmd)
+
+    def test_returns_none_when_neither_mmdc_nor_npx_on_path(self) -> None:
+        with patch("diagram.shutil.which", return_value=None):
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b"))
+            self.assertFalse(diagram.mermaid_cli_available())
+
+    def test_second_diagram_in_same_run_skips_subprocess_after_first_failure(self) -> None:
+        # A report can carry several diagrams; once the first spawn fails
+        # (no browser runtime, etc.), every later diagram in the same
+        # process must return None immediately rather than paying for its
+        # own failed subprocess spawn again.
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=subprocess.CalledProcessError(1, ["mmdc"])
+        ) as run:
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b"))
+            self.assertEqual(run.call_count, 1)
+            self.assertIsNone(diagram.render_svg_via_mermaid_cli("stateDiagram-v2\n  [*] --> Idle"))
+            self.assertEqual(run.call_count, 1, "second diagram must not spawn a new subprocess")
+
+    def test_probe_cache_is_scoped_per_allow_network_value(self) -> None:
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=subprocess.CalledProcessError(1, ["mmdc"])
+        ) as run:
+            diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b", allow_network=False)
+            diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b", allow_network=True)
+        self.assertEqual(run.call_count, 2, "offline and allow_network failures are cached independently")
+
+    def test_probe_cache_does_not_short_circuit_after_a_success(self) -> None:
+        def fake_run(cmd, **kwargs):
+            out_path = Path(cmd[cmd.index("-o") + 1])
+            out_path.write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>', encoding="utf-8")
+
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=fake_run
+        ) as run:
+            diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b")
+            diagram.render_svg_via_mermaid_cli("stateDiagram-v2\n  [*] --> Idle")
+        self.assertEqual(run.call_count, 2, "a working tool still renders every diagram, not just the first")
+
+    def test_prefers_direct_mmdc_over_npx_when_both_available(self) -> None:
+        def which(name):
+            return {"mmdc": "/usr/bin/mmdc", "npx": "/usr/bin/npx"}.get(name)
+
+        with patch("diagram.shutil.which", side_effect=which):
+            self.assertEqual(diagram._mermaid_cli_command(), ["/usr/bin/mmdc"])
+
+    def test_allow_network_drops_offline_and_adds_yes(self) -> None:
+        # Only after a human has explicitly agreed (see change-report.md) —
+        # `--yes` avoids an interactive npx install prompt hanging a
+        # subprocess with no TTY attached.
+        def which(name):
+            return {"npx": "/usr/bin/npx"}.get(name)
+
+        with patch("diagram.shutil.which", side_effect=which):
+            cmd = diagram._mermaid_cli_command(allow_network=True)
+        self.assertNotIn("--offline", cmd)
+        self.assertIn("--yes", cmd)
+
+    def test_allow_network_does_not_change_direct_mmdc_invocation(self) -> None:
+        # A local/global mmdc binary never touches the network either way.
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"):
+            self.assertEqual(diagram._mermaid_cli_command(allow_network=True), ["/usr/bin/mmdc"])
+
+    def test_allow_network_uses_a_longer_default_timeout(self) -> None:
+        captured = {}
+
+        def fake_run(cmd, **kwargs):
+            captured["timeout"] = kwargs.get("timeout")
+            out_path = Path(cmd[cmd.index("-o") + 1])
+            out_path.write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>', encoding="utf-8")
+
+        with patch("diagram.shutil.which", return_value="/usr/bin/mmdc"), patch(
+            "diagram.subprocess.run", side_effect=fake_run
+        ):
+            diagram.render_svg_via_mermaid_cli("flowchart LR\n  a --> b", allow_network=True)
+        self.assertEqual(captured["timeout"], diagram.MERMAID_CLI_NETWORK_TIMEOUT)
+        self.assertGreater(diagram.MERMAID_CLI_NETWORK_TIMEOUT, diagram.MERMAID_CLI_TIMEOUT)
 
 
 class RenderDispatchTests(unittest.TestCase):
-    def test_render_dependency_graph(self) -> None:
-        result = diagram.render(
-            {
-                "kind": "dependency_graph",
-                "nodes": [{"id": "a", "label": "A"}],
-                "edges": [],
-                "forbidden_edges": [],
-            }
-        )
+    def test_render_dependency_graph_shape(self) -> None:
+        with patch("diagram.render_svg_via_mermaid_cli", return_value=None):
+            result = diagram.render(
+                {
+                    "kind": "dependency_graph",
+                    "nodes": [{"id": "a", "label": "A"}],
+                    "edges": [],
+                    "forbidden_edges": [],
+                }
+            )
         self.assertIn("mermaid", result)
         self.assertIn("svg", result)
+        self.assertIsNone(result["svg"])
+
+    def test_render_passes_mermaid_source_to_svg_renderer(self) -> None:
+        with patch("diagram.render_svg_via_mermaid_cli", return_value="<svg>stub</svg>") as renderer:
+            result = diagram.render({"kind": "state_diagram", "states": ["Idle"], "transitions": []})
+        renderer.assert_called_once_with(result["mermaid"], allow_network=False)
+        self.assertEqual(result["svg"], "<svg>stub</svg>")
+
+    def test_render_forwards_allow_network(self) -> None:
+        with patch("diagram.render_svg_via_mermaid_cli", return_value=None) as renderer:
+            result = diagram.render(
+                {"kind": "state_diagram", "states": ["Idle"], "transitions": []}, allow_network=True
+            )
+        renderer.assert_called_once_with(result["mermaid"], allow_network=True)
 
     def test_render_unknown_kind_raises(self) -> None:
         with self.assertRaises(SystemExit):
             diagram.render({"kind": "bogus"})
+
+
+class CliAllowNetworkFlagTests(unittest.TestCase):
+    def test_allow_network_flag_reaches_render(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            payload_path = Path(tmpdir) / "payload.json"
+            payload_path.write_text(
+                json.dumps({"kind": "state_diagram", "states": ["Idle"], "transitions": []}), encoding="utf-8"
+            )
+            with patch("diagram.render_svg_via_mermaid_cli", return_value=None) as renderer:
+                buf = io.StringIO()
+                with redirect_stdout(buf):
+                    diagram.main(["--in", str(payload_path), "--allow-network"])
+            self.assertTrue(renderer.call_args.kwargs.get("allow_network"))
 
 
 if __name__ == "__main__":

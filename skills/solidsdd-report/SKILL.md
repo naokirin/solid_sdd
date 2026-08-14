@@ -63,7 +63,7 @@ Turn existing machine-oriented artifacts into a single human-readable report for
    }
    ```
    Omit fields (or the whole file) for sections that are `"not_performed"` or where no natural-language summary is warranted.
-4. Run `scripts/solidsdd-report.sh render --project-root . --change-id ID --narrative PATH --format markdown|html|both` — writes `report.md`/`report.html` directly under `.solidsdd/changes/<change_id>/`. Do not hand-assemble the file content yourself; `render` embeds highlighted raw contracts, diagrams, and every mechanical section itself.
+4. Run `scripts/solidsdd-report.sh render --project-root . --change-id ID --narrative PATH --format markdown|html|both` — writes `report.md`/`report.html` directly under `.solidsdd/changes/<change_id>/`. Do not hand-assemble the file content yourself; `render` embeds highlighted raw contracts, diagrams, and every mechanical section itself. For `html`, diagram SVGs render only when the [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) is available offline (a `mmdc` binary on `PATH`, or `npx --offline` finding an already-installed copy) — otherwise those diagrams fall back to Mermaid source only (still a complete, correct report). If nicer inline diagrams matter here, ask the user whether to allow a one-time network install and, only if they agree, re-run with `--allow-network` (see [change-report.md](references/change-report.md) "HTML rendering") — never pass that flag without asking first.
 
 ## Output
 

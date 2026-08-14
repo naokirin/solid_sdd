@@ -1,34 +1,48 @@
-"""Deterministic diagram rendering for solidsdd-report.
+"""Diagram rendering for solidsdd-report.
 
 Turns the node/edge data collect.py already extracted from ArchitecturePlan /
 WorkPlan / ApplicationPlan (or, for Formal specs, data the caller supplies
 after reading the .tla/.als source) into:
 
-- Mermaid source text (flowchart LR / stateDiagram-v2) — always produced.
-- A hand-laid-out inline SVG — produced only while the node/edge count stays
-  small enough to lay out legibly (see change-report.md "Diagrams" /
-  "HTML rendering"); beyond that this returns svg: null and the caller keeps
-  the Mermaid source only, exactly as the spec already allows.
+- Mermaid source text (flowchart LR / stateDiagram-v2) — always produced,
+  and always correct: this is plain text templating, nothing to lay out.
+- An inline SVG — rendered via the optional Mermaid CLI (`mmdc`,
+  https://github.com/mermaid-js/mermaid-cli): a `mmdc` binary directly on
+  `PATH` when present, else `npx --offline` (uses an already-installed
+  local/cached copy only — never fetches over the network). `None` when
+  neither path can invoke the tool or the render fails, in which case the
+  caller keeps the Mermaid source only, exactly as change-report.md
+  already allows.
 
-This removes the need for an LLM to compute box/arrow coordinates by hand —
-the geometry here is a fixed, tested formula, not a judgment call.
+Earlier versions of this module hand-computed box/arrow/label coordinates
+directly. That repeatedly produced diagrams that were technically non-
+overlapping but still hard to read (arrows crossing through boxes, curve
+labels reading as attached to the wrong arrow, an opaque label backing that
+hid the arrow underneath it) — node placement, edge routing, and label
+placement without collisions is a genuinely hard layout problem that a
+mature, purpose-built renderer solves far more reliably than a few hundred
+lines of one-off geometry. Mermaid's own renderer (driven through `mmdc`) is
+that renderer here, and it draws from the exact same Mermaid source already
+used for the Markdown/no-SVG-fallback path, so the two representations of a
+given diagram can't drift apart.
 """
 from __future__ import annotations
 
 import html
 import json
 import re
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
 from typing import Any
 
 _ID_SAFE_RE = re.compile(r"[^A-Za-z0-9_]")
 
-MAX_ROW_NODES = 8  # dependency graph / state diagram: skip SVG above this
-MAX_TARGET_NODES = 8  # target mapping: skip SVG above this many total nodes
-MAX_STATE_NODES = 5  # state diagram: single-row/loop layout ceiling
-
 FORBIDDEN_COLOR = "#ff6b6b"
-ACCENT_COLOR = "var(--accent, #4dabf7)"
-TEXT_COLOR = "currentColor"
+
+MERMAID_CLI_BIN = "mmdc"
+MERMAID_CLI_TIMEOUT = 20.0
 
 
 def _mermaid_id(raw: str) -> str:
@@ -82,79 +96,6 @@ def mermaid_dependency_graph(
     return "\n".join(lines)
 
 
-def svg_dependency_graph(
-    nodes: list[dict[str, Any]],
-    edges: list[dict[str, Any]],
-    forbidden_edges: list[dict[str, Any]] | None = None,
-) -> str | None:
-    forbidden_edges = forbidden_edges or []
-    if len(nodes) < 1 or len(nodes) > MAX_ROW_NODES:
-        return None
-    box_w, box_h, gap, pad_top, pad_side = 140, 44, 60, 40, 20
-    n = len(nodes)
-    width = pad_side * 2 + n * box_w + max(0, n - 1) * gap
-    height = pad_top * 2 + box_h + 60  # room for a curved forbidden edge above
-    xs = {}
-    parts: list[str] = [
-        f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" '
-        f'aria-label="Module dependency diagram">'
-    ]
-    for i, node in enumerate(nodes):
-        x = pad_side + i * (box_w + gap)
-        y = pad_top + 30
-        xs[str(node["id"])] = (x, y)
-        parts.append(
-            f'<rect x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="8" '
-            f'fill="none" stroke="{ACCENT_COLOR}" stroke-width="1.5"/>'
-        )
-        parts.append(
-            f'<text x="{x + box_w / 2}" y="{y + box_h / 2 + 4}" text-anchor="middle" '
-            f'font-size="13" fill="{TEXT_COLOR}">{_esc(node["id"])}</text>'
-        )
-    parts.append(
-        '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" '
-        'markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-        f'<path d="M0,0 L10,5 L0,10 z" fill="{ACCENT_COLOR}"/></marker>'
-        '<marker id="arrow-forbidden" viewBox="0 0 10 10" refX="9" refY="5" '
-        'markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-        f'<path d="M0,0 L10,5 L0,10 z" fill="{FORBIDDEN_COLOR}"/></marker></defs>'
-    )
-    for e in edges:
-        a, b = xs.get(str(e["from"])), xs.get(str(e["to"]))
-        if not a or not b:
-            continue
-        ax, ay = a[0] + box_w / 2, a[1] + box_h / 2
-        bx, by = b[0] + box_w / 2, b[1] + box_h / 2
-        parts.append(
-            f'<line x1="{ax}" y1="{ay}" x2="{bx}" y2="{by}" stroke="{ACCENT_COLOR}" '
-            f'stroke-width="1.5" marker-end="url(#arrow)"/>'
-        )
-        if e.get("kind"):
-            mx, my = (ax + bx) / 2, (ay + by) / 2 - 6
-            parts.append(
-                f'<text x="{mx}" y="{my}" text-anchor="middle" font-size="11" '
-                f'fill="{TEXT_COLOR}">{_esc(e["kind"])}</text>'
-            )
-    for e in forbidden_edges:
-        a, b = xs.get(str(e["from"])), xs.get(str(e["to"]))
-        if not a or not b:
-            continue
-        ax, ay = a[0] + box_w / 2, a[1]
-        bx, by = b[0] + box_w / 2, b[1]
-        cx, cy = (ax + bx) / 2, min(ay, by) - 40
-        parts.append(
-            f'<path d="M{ax},{ay} Q{cx},{cy} {bx},{by}" fill="none" '
-            f'stroke="{FORBIDDEN_COLOR}" stroke-width="1.5" stroke-dasharray="4 2" '
-            f'marker-end="url(#arrow-forbidden)"/>'
-        )
-        parts.append(
-            f'<text x="{cx}" y="{cy - 6}" text-anchor="middle" font-size="11" '
-            f'fill="{FORBIDDEN_COLOR}">forbidden</text>'
-        )
-    parts.append("</svg>")
-    return "".join(parts)
-
-
 # ---------------------------------------------------------------------------
 # Target mapping (ApplicationPlan) — bipartite
 # ---------------------------------------------------------------------------
@@ -201,71 +142,6 @@ def mermaid_target_mapping(
     return "\n".join(lines)
 
 
-def svg_target_mapping(
-    left_nodes: list[str],
-    right_nodes: list[dict[str, Any]],
-    edges: list[dict[str, Any]],
-) -> str | None:
-    total = len(left_nodes) + len(right_nodes)
-    if total < 2 or total > MAX_TARGET_NODES:
-        return None
-    box_w, box_h, row_gap, col_gap, pad = 200, 40, 16, 220, 24
-    rows = max(len(left_nodes), len(right_nodes))
-    height = pad * 2 + rows * box_h + max(0, rows - 1) * row_gap
-    width = pad * 2 + box_w * 2 + col_gap
-    parts = [
-        f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" '
-        f'aria-label="Application target mapping diagram">'
-    ]
-    left_x = pad
-    right_x = pad + box_w + col_gap
-    left_pos: dict[str, tuple[float, float]] = {}
-    for i, lid in enumerate(left_nodes):
-        y = pad + i * (box_h + row_gap)
-        left_pos[str(lid)] = (left_x, y)
-        parts.append(
-            f'<rect x="{left_x}" y="{y}" width="{box_w}" height="{box_h}" rx="8" '
-            f'fill="none" stroke="{ACCENT_COLOR}" stroke-width="1.5"/>'
-        )
-        parts.append(
-            f'<text x="{left_x + box_w / 2}" y="{y + box_h / 2 + 4}" text-anchor="middle" '
-            f'font-size="13" fill="{TEXT_COLOR}">{_esc(lid)}</text>'
-        )
-    right_pos: dict[tuple, tuple[float, float]] = {}
-    for i, r in enumerate(right_nodes):
-        key = (r.get("kind"), r.get("location"))
-        y = pad + i * (box_h + row_gap)
-        right_pos[key] = (right_x, y)
-        label = f"{r.get('kind')}: {_short(r.get('location'), 22)}"
-        parts.append(
-            f'<rect x="{right_x}" y="{y}" width="{box_w}" height="{box_h}" rx="8" '
-            f'fill="none" stroke="{ACCENT_COLOR}" stroke-width="1.5"/>'
-        )
-        parts.append(
-            f'<text x="{right_x + box_w / 2}" y="{y + box_h / 2 + 4}" text-anchor="middle" '
-            f'font-size="12" fill="{TEXT_COLOR}">{_esc(label)}</text>'
-        )
-    parts.append(
-        '<defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" '
-        'markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-        f'<path d="M0,0 L10,5 L0,10 z" fill="{ACCENT_COLOR}"/></marker></defs>'
-    )
-    for e in edges:
-        a = left_pos.get(str(e["from"]))
-        to_key = tuple(e["to"]) if isinstance(e["to"], list) else e["to"]
-        b = right_pos.get(to_key)
-        if not a or not b:
-            continue
-        ax, ay = a[0] + box_w, a[1] + box_h / 2
-        bx, by = b[0], b[1] + box_h / 2
-        parts.append(
-            f'<line x1="{ax}" y1="{ay}" x2="{bx}" y2="{by}" stroke="{ACCENT_COLOR}" '
-            f'stroke-width="1.5" marker-end="url(#arrow2)"/>'
-        )
-    parts.append("</svg>")
-    return "".join(parts)
-
-
 # ---------------------------------------------------------------------------
 # State diagram (Formal: TLA+ / Alloy) — caller supplies the simplified
 # state/transition data (deriving it requires reading prose, an LLM job).
@@ -281,53 +157,126 @@ def mermaid_state_diagram(states: list[str], transitions: list[dict[str, Any]]) 
     return "\n".join(lines)
 
 
-def svg_state_diagram(states: list[str], transitions: list[dict[str, Any]]) -> str | None:
-    if not states or len(states) > MAX_STATE_NODES:
+# ---------------------------------------------------------------------------
+# SVG rendering via the optional Mermaid CLI
+# ---------------------------------------------------------------------------
+
+
+MERMAID_CLI_NETWORK_TIMEOUT = 180.0  # generous: first-run npx install + Chromium download
+
+
+def _mermaid_cli_command(*, allow_network: bool = False) -> list[str] | None:
+    """Locate a way to invoke the Mermaid CLI.
+
+    Prefers a `mmdc` binary directly on `PATH` (a global install, or an
+    already-activated local `node_modules/.bin`) — never touches the
+    network either way. Otherwise, when `npx` is on `PATH`:
+
+    - by default, uses `--offline`, which only resolves an already-
+      installed local project dependency or npm-cached copy of
+      `@mermaid-js/mermaid-cli`; npm refuses to reach the registry at all
+      in `--offline` mode, so this can never turn into a network fetch.
+    - with `allow_network=True` (an explicit, caller-opted-in escape
+      hatch — see change-report.md "HTML rendering"), drops `--offline`
+      and adds `--yes` so npx installs the package on demand instead of
+      prompting interactively (which would otherwise hang a
+      non-interactive subprocess waiting for input that never arrives).
+
+    Returns `None` when neither path can invoke the tool.
+    """
+    mmdc = shutil.which(MERMAID_CLI_BIN)
+    if mmdc:
+        return [mmdc]
+    npx = shutil.which("npx")
+    if not npx:
         return None
-    box_w, box_h, gap, pad = 120, 40, 70, 30
-    n = len(states)
-    width = pad * 2 + n * box_w + max(0, n - 1) * gap
-    height = pad * 2 + box_h + 60
-    pos: dict[str, tuple[float, float]] = {}
-    parts = [
-        f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" '
-        f'aria-label="Simplified state diagram">'
-    ]
-    for i, s in enumerate(states):
-        x = pad + i * (box_w + gap)
-        y = pad + 30
-        pos[s] = (x, y)
-        parts.append(
-            f'<rect x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="20" '
-            f'fill="none" stroke="{ACCENT_COLOR}" stroke-width="1.5"/>'
-        )
-        parts.append(
-            f'<text x="{x + box_w / 2}" y="{y + box_h / 2 + 4}" text-anchor="middle" '
-            f'font-size="13" fill="{TEXT_COLOR}">{_esc(s)}</text>'
-        )
-    parts.append(
-        '<defs><marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" '
-        'markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-        f'<path d="M0,0 L10,5 L0,10 z" fill="{ACCENT_COLOR}"/></marker></defs>'
-    )
-    for t in transitions:
-        a, b = pos.get(t["from"]), pos.get(t["to"])
-        if not a or not b:
-            continue
-        ax, ay = a[0] + box_w, a[1] + box_h / 2
-        bx, by = b[0], b[1] + box_h / 2
-        parts.append(
-            f'<line x1="{ax}" y1="{ay}" x2="{bx}" y2="{by}" stroke="{ACCENT_COLOR}" '
-            f'stroke-width="1.5" marker-end="url(#arrow3)"/>'
-        )
-        if t.get("label"):
-            mx, my = (ax + bx) / 2, (ay + by) / 2 - 8
-            parts.append(
-                f'<text x="{mx}" y="{my}" text-anchor="middle" font-size="11" '
-                f'fill="{TEXT_COLOR}">{_esc(t["label"])}</text>'
+    if allow_network:
+        return [npx, "--yes", "--package=@mermaid-js/mermaid-cli", "--", MERMAID_CLI_BIN]
+    return [npx, "--offline", "--package=@mermaid-js/mermaid-cli", "--", MERMAID_CLI_BIN]
+
+
+def mermaid_cli_available(*, allow_network: bool = False) -> bool:
+    return _mermaid_cli_command(allow_network=allow_network) is not None
+
+
+def _strip_to_svg_fragment(text: str) -> str:
+    """mmdc writes a standalone SVG file (XML prolog + DOCTYPE); keep only
+    the `<svg ...>...` fragment so it can be inlined into an HTML body."""
+    start = text.find("<svg")
+    return text[start:] if start != -1 else text
+
+
+# One report can carry several diagrams (ArchitecturePlan, WorkPlan,
+# ApplicationPlan, Formal), each calling render_svg_via_mermaid_cli. When
+# the CLI can't actually produce SVG output in this environment (no browser
+# runtime, tool missing), every one of those calls would otherwise pay for
+# its own failed subprocess spawn (real seconds each — resolving `npx`,
+# starting `mmdc`, trying and failing to launch a browser). `shutil.which`
+# lookups aren't the slow part; the spawn-and-fail is. So the *outcome* of
+# the first attempt per `allow_network` mode is memoized for the lifetime
+# of this process (one `render`/`diagram` CLI invocation = one report), and
+# every later diagram in the same run skips straight to `None` once that's
+# established — a content-specific Mermaid syntax error from our own
+# template functions is not a realistic failure mode, so "it failed once"
+# is a safe signal that it will fail again for the same environment reason.
+_svg_cli_probe_result: dict[bool, bool] = {}
+
+
+def _reset_mermaid_cli_probe_cache() -> None:
+    """Test hook: clear the per-process memoization from a clean slate."""
+    _svg_cli_probe_result.clear()
+
+
+def render_svg_via_mermaid_cli(
+    mermaid_source: str, *, timeout: float | None = None, allow_network: bool = False
+) -> str | None:
+    """Render Mermaid source to an inline SVG fragment via the Mermaid CLI.
+
+    Returns `None` — never raises — when the tool can't be invoked at all
+    (see `_mermaid_cli_command`), or the render fails for any reason (no
+    browser runtime available, timeout, malformed source). The caller keeps
+    the Mermaid source only in that case; this is a best-effort enhancement,
+    not a required step. See `_svg_cli_probe_result` above for why repeated
+    calls after the first failure short-circuit instead of re-spawning.
+
+    `allow_network=False` (default) never reaches the network — offline
+    runs (CI, `solidsdd-run`, or any caller that hasn't explicitly asked a
+    human) always get this. Pass `allow_network=True` only after a human
+    has actually agreed to a one-time install (see change-report.md);
+    that also raises the default timeout, since a first-run npx install
+    plus a Chromium/Puppeteer download can take much longer than a cached
+    render.
+    """
+    if not mermaid_source.strip():
+        return None
+    if _svg_cli_probe_result.get(allow_network) is False:
+        return None
+    command = _mermaid_cli_command(allow_network=allow_network)
+    if not command:
+        _svg_cli_probe_result[allow_network] = False
+        return None
+    if timeout is None:
+        timeout = MERMAID_CLI_NETWORK_TIMEOUT if allow_network else MERMAID_CLI_TIMEOUT
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = Path(tmpdir) / "diagram.mmd"
+            out_path = Path(tmpdir) / "diagram.svg"
+            in_path.write_text(mermaid_source, encoding="utf-8")
+            subprocess.run(
+                [*command, "-i", str(in_path), "-o", str(out_path), "-b", "transparent", "-t", "dark"],
+                capture_output=True,
+                timeout=timeout,
+                check=True,
             )
-    parts.append("</svg>")
-    return "".join(parts)
+            if not out_path.is_file():
+                _svg_cli_probe_result[allow_network] = False
+                return None
+            svg = _strip_to_svg_fragment(out_path.read_text(encoding="utf-8"))
+            _svg_cli_probe_result[allow_network] = True
+            return svg
+    except (subprocess.SubprocessError, OSError):
+        _svg_cli_probe_result[allow_network] = False
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -335,49 +284,49 @@ def svg_state_diagram(states: list[str], transitions: list[dict[str, Any]]) -> s
 # ---------------------------------------------------------------------------
 
 
-def render(payload: dict[str, Any]) -> dict[str, Any]:
+def render(payload: dict[str, Any], *, allow_network: bool = False) -> dict[str, Any]:
     kind = payload.get("kind")
     if kind == "dependency_graph":
         nodes = payload.get("nodes") or []
         edges = payload.get("edges") or []
         forbidden = payload.get("forbidden_edges") or []
-        return {
-            "mermaid": mermaid_dependency_graph(nodes, edges, forbidden),
-            "svg": svg_dependency_graph(nodes, edges, forbidden),
-        }
-    if kind == "target_mapping":
+        mermaid = mermaid_dependency_graph(nodes, edges, forbidden)
+    elif kind == "target_mapping":
         left = payload.get("left_nodes") or []
         right = payload.get("right_nodes") or []
         edges = payload.get("edges") or []
-        return {
-            "mermaid": mermaid_target_mapping(left, right, edges),
-            "svg": svg_target_mapping(left, right, edges),
-        }
-    if kind == "state_diagram":
+        mermaid = mermaid_target_mapping(left, right, edges)
+    elif kind == "state_diagram":
         states = payload.get("states") or []
         transitions = payload.get("transitions") or []
-        return {
-            "mermaid": mermaid_state_diagram(states, transitions),
-            "svg": svg_state_diagram(states, transitions),
-        }
-    raise SystemExit(f"unknown diagram kind: {kind!r} (expected dependency_graph|target_mapping|state_diagram)")
+        mermaid = mermaid_state_diagram(states, transitions)
+    else:
+        raise SystemExit(
+            f"unknown diagram kind: {kind!r} (expected dependency_graph|target_mapping|state_diagram)"
+        )
+    return {"mermaid": mermaid, "svg": render_svg_via_mermaid_cli(mermaid, allow_network=allow_network)}
 
 
 def main(argv: list[str] | None = None) -> int:
     import argparse
-    from pathlib import Path
 
-    parser = argparse.ArgumentParser(description="Render a report diagram (Mermaid + optional SVG)")
+    parser = argparse.ArgumentParser(description="Render a report diagram (Mermaid + optional SVG via mmdc)")
     parser.add_argument("--in", dest="in_path", help="JSON payload path (default: stdin)")
     parser.add_argument("--out", help="Write result JSON here instead of stdout")
     parser.add_argument("--pretty", action="store_true")
+    parser.add_argument(
+        "--allow-network",
+        action="store_true",
+        help="Let npx install @mermaid-js/mermaid-cli on demand if not already cached "
+        "(only pass this after a human has agreed to it — see change-report.md)",
+    )
     args = parser.parse_args(argv)
 
     import sys as _sys
 
     raw = Path(args.in_path).read_text(encoding="utf-8") if args.in_path else _sys.stdin.read()
     payload = json.loads(raw)
-    result = render(payload)
+    result = render(payload, allow_network=args.allow_network)
     indent = 2 if args.pretty else None
     text = json.dumps(result, indent=indent, ensure_ascii=False)
     if args.out:

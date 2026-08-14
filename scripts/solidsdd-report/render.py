@@ -467,10 +467,10 @@ def _html_raw_panel(path_rel: str, project_root: Path) -> str:
     )
 
 
-def _html_diagram(payload: dict[str, Any] | None) -> str:
+def _html_diagram(payload: dict[str, Any] | None, *, allow_network: bool = False) -> str:
     if not payload:
         return ""
-    rendered = diagrammod.render(payload)
+    rendered = diagrammod.render(payload, allow_network=allow_network)
     svg_part = rendered["svg"] or ""
     return (
         '<figure class="diagram">'
@@ -480,7 +480,9 @@ def _html_diagram(payload: dict[str, Any] | None) -> str:
     )
 
 
-def render_html(data: dict[str, Any], narrative: dict[str, Any], project_root: Path) -> str:
+def render_html(
+    data: dict[str, Any], narrative: dict[str, Any], project_root: Path, *, allow_network: bool = False
+) -> str:
     language = narrative.get("language") or data["language_hint"]["value"]
     labels = data["status_labels"]
     h = _headings(language)
@@ -550,7 +552,7 @@ def render_html(data: dict[str, Any], narrative: dict[str, Any], project_root: P
 
     body.append("<h3>WorkPlan</h3>")
     if sections["design"]["work_plan"]["state"] == "present":
-        wp_body = _html_diagram(_diagram_payload_for("work_plan", diagrams))
+        wp_body = _html_diagram(_diagram_payload_for("work_plan", diagrams), allow_network=allow_network)
         wp_body += _html_table(["id", "intent", "covers", "scenario", "status", "depends_on"], _workplan_rows(art.get("work_plan")))
         if art.get("work_plan_path"):
             wp_body += _html_raw_panel(art["work_plan_path"], project_root)
@@ -566,7 +568,7 @@ def render_html(data: dict[str, Any], narrative: dict[str, Any], project_root: P
         if arch.get("status") == "unchanged":
             arch_body += f'<p><code>status: unchanged</code> — no structural change. {_esc(arch.get("summary", ""))}</p>'
         else:
-            arch_body += _html_diagram(_diagram_payload_for("architecture", diagrams))
+            arch_body += _html_diagram(_diagram_payload_for("architecture", diagrams), allow_network=allow_network)
             if diagrams["architecture"].get("no_cycles"):
                 arch_body += "<p><em>No dependency cycles required among these modules.</em></p>"
             arch_body += "<h4>Modules</h4>" + _html_table(["id", "responsibility", "owns", "public"], _module_rows(arch))
@@ -588,7 +590,7 @@ def render_html(data: dict[str, Any], narrative: dict[str, Any], project_root: P
 
     body.append("<h3>ApplicationPlan</h3>")
     if sections["design"]["application_plan"]["state"] == "present":
-        ap_body = _html_diagram(_diagram_payload_for("application_plan", diagrams))
+        ap_body = _html_diagram(_diagram_payload_for("application_plan", diagrams), allow_network=allow_network)
         ap_body += _html_table(["kind", "location", "density", "status", "covers", "rationale"], _application_rows(art.get("application_plans") or []))
         for plan in art.get("application_plans") or []:
             ap_body += _html_raw_panel(plan["path"], project_root)
@@ -621,7 +623,7 @@ def render_html(data: dict[str, Any], narrative: dict[str, Any], project_root: P
         formal_body = f'<p>{_esc(narrative.get("formal_summary") or "No natural-language summary supplied.")}</p>'
         state_data = narrative.get("formal_state_diagram")
         if state_data:
-            formal_body += _html_diagram({"kind": "state_diagram", **state_data})
+            formal_body += _html_diagram({"kind": "state_diagram", **state_data}, allow_network=allow_network)
             formal_body += "<p><em>Simplified illustration; see source for full semantics.</em></p>"
         for p in art.get("formal_paths") or []:
             formal_body += _html_raw_panel(p, project_root)
@@ -666,6 +668,8 @@ def write_report(
     narrative: dict[str, Any],
     formats: set[str],
     collected: dict[str, Any] | None = None,
+    *,
+    allow_network: bool = False,
 ) -> dict[str, str]:
     data = collected or collectmod.collect(project_root, change_id)
     layout = collectmod.load_layout(project_root)
@@ -678,7 +682,9 @@ def write_report(
         written["markdown"] = str(md_path)
     if "html" in formats:
         html_path = change_dir / "report.html"
-        html_path.write_text(render_html(data, narrative, resolved_root), encoding="utf-8")
+        html_path.write_text(
+            render_html(data, narrative, resolved_root, allow_network=allow_network), encoding="utf-8"
+        )
         written["html"] = str(html_path)
     return written
 
@@ -692,6 +698,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--collected", help="Path to a prior `collect` JSON output (skip re-collecting)")
     parser.add_argument("--narrative", help="Path to narrative JSON (contract/DbC/Formal summaries, status overview)")
     parser.add_argument("--format", default="markdown", choices=["markdown", "html", "both"])
+    parser.add_argument(
+        "--allow-network",
+        action="store_true",
+        help="Let diagram SVG rendering install @mermaid-js/mermaid-cli via npx on demand "
+        "if not already cached (only pass this after a human has agreed to it — see "
+        "change-report.md 'HTML rendering'). No effect on markdown-only output.",
+    )
     args = parser.parse_args(argv)
 
     narrative: dict[str, Any] = {}
@@ -700,7 +713,9 @@ def main(argv: list[str] | None = None) -> int:
     collected = json.loads(Path(args.collected).read_text(encoding="utf-8")) if args.collected else None
     formats = {"markdown", "html"} if args.format == "both" else {args.format}
 
-    written = write_report(Path(args.project_root), args.change_id, narrative, formats, collected)
+    written = write_report(
+        Path(args.project_root), args.change_id, narrative, formats, collected, allow_network=args.allow_network
+    )
     print(json.dumps(written, ensure_ascii=False))
     return 0
 
