@@ -100,7 +100,7 @@ Do **not** raise `major` solely because a consuming example or production sample
 | `change_context` | `solidsdd-intake`, when `change-context-gate.json` **required** a human gate (reviewed alone so the gate can be checked before Brief runs) | intake | `solidsdd-run` |
 | `change_brief` | `solidsdd-brief`, only on the `change_context`-gate-required path (paired with a standalone `change_context` critique above) | brief | `solidsdd-run` |
 | `work_plan` | `solidsdd-decompose` | decompose | `solidsdd-run` |
-| `architecture_plan` | `solidsdd-architecture`, only when it wrote `status: changed`. Inputs: `.solidsdd/architecture/workspace.dsl`, `.solidsdd/architecture/invariants.yaml`, `.solidsdd/changes/<id>/architecture-reasoning.md`, generated `architecture-plan.json` | architecture | `solidsdd-run` |
+| `architecture_plan` | `solidsdd-architecture`, only when it wrote `status: changed`. Inputs: `.solidsdd/architecture/workspace.dsl`, `.solidsdd/architecture/invariants.yaml`, `.solidsdd/changes/<id>/architecture-reasoning.md`, generated `architecture-plan.json`, and `.solidsdd/changes/<id>/physical-design.md` when present (Level 3 only) | architecture | `solidsdd-run` |
 | `application_plan` | `solidsdd-judge` | judge | `solidsdd-loop` |
 | `api_contracts` | `solidsdd-apply-api` (if any api apply) | apply-api | `solidsdd-loop` |
 | `dbc_contracts` | `solidsdd-apply-dbc` (if any dbc apply) | apply-dbc | `solidsdd-loop` |
@@ -118,13 +118,15 @@ Evaluate a subject only when it is part of the requested review scope (e.g., a C
 
 Mechanical dependency/cycle/module-existence problems, and forbidden-dependency
 / no-cycles / ownership-conflict / boundary-leakage violations over
-`workspace.dsl` + `invariants.yaml`, are caught by `scripts/solidsdd-lint.sh`
-(Step 0, folding in `scripts/solidsdd-architecture/validate.py`) and surface as
+`workspace.dsl` + `invariants.yaml` — plus, when `physical-design.md` exists,
+its Logical Element references and `A -> B` Physical Dependency lines — are
+caught by `scripts/solidsdd-lint.sh` (Step 0, folding in
+`scripts/solidsdd-architecture/validate.py` and `physical.py`) and surface as
 `blocker`/`major` `consistency` findings automatically — do not re-derive those
 here. This table is for **adequacy**: is the structure this change proposes
 actually well-formed, per [architecture-axes.md](architecture-axes.md), and
-does the Architecture Model / Reasoning / generated projection actually agree
-with each other.
+does the Architecture Model / Reasoning / generated projection / Physical
+Design actually agree with each other.
 
 | Check | `major` examples | Not major |
 |-------|-------------------|-----------|
@@ -136,6 +138,8 @@ with each other.
 | Status shortcut misuse | `status: unchanged` despite WorkPlan `touches` indicating a new module, new public boundary, or a changed dependency direction | `status: unchanged` for a copy/config-only or internal-implementation-only change |
 | Reasoning missing/hollow | `status: changed` but `architecture-reasoning.md` is absent, or restates structure instead of explaining the boundary/ownership/dependency-direction choice | Reasoning is short but names the actual trade-off/decision |
 | Model not reflected | `architecture-plan.json` doesn't match elements/relationships actually tagged `change:<id>` in `workspace.dsl` (a sign `project.py` wasn't run, or the JSON was hand-edited afterward) | Generated JSON matches the tagged model |
+| Physical Design missing/hollow | [Architecture Depth](architecture-depth.md) is clearly Level 3 (WorkPlan `touches` implies a genuinely non-obvious realization — see [architecture-traceability.md](architecture-traceability.md) triggers) but `physical-design.md` is absent, or present but only restates the Logical structure without naming the physical/allocation decision | Level 3 with a `physical-design.md` that names the actual boundary-enforcement mechanism; or Level 3 with a trivial 1:1 mapping correctly left unwritten |
+| Physical boundary mismatch | `physical-design.md`'s stated enforcement mechanism (package visibility / interface / process boundary / …) doesn't actually match this project's stack/conventions (per Context), so it wouldn't enforce the Logical boundary in practice | Mechanism is plausible for the detected stack, even if not the only option |
 
 ### `knowledge_consistency` (major examples)
 
