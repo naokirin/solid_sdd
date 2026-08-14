@@ -32,11 +32,12 @@ Emit an `ApplicationPlan`.
 - [human-gates.md](references/human-gates.md)
 - [change-brief.md](references/change-brief.md) — when an active ChangeBrief exists
 - [change-context.md](references/change-context.md) — when Change Context exists (§5 tech selection)
+- `.solidsdd/changes/<change_id>/architecture-plan.json` — when present with `status: changed`; read-only context for the `architecture_public_boundary` signal ([judgment-axes.md](references/judgment-axes.md)) — never edit it or re-derive module boundaries
 - [working-language.md](references/working-language.md) — rationale string language
 
 ## Constraints
 
-- Produce the ApplicationPlan only (no OpenAPI / OCL / implementation / test edits)
+- Produce the ApplicationPlan only (no OpenAPI / OCL / implementation / test edits, no Architecture Model / ArchitecturePlan edits — read it for context only when it exists)
 - Judge from risk and boundary axes, not from how hard implementation would be
 - Never silently drop formal needs—use `defer` with rationale, or `apply` only under Phase 3 formal conditions in [judgment-axes.md](references/judgment-axes.md)
 - Populate `signals` on targets when known; set `human_gate` / `breaking` / `confidence` per Phase 2+ rules
@@ -44,7 +45,7 @@ Emit an `ApplicationPlan`.
 
 ## Steps
 
-1. Read change intent, active Change Context (`…/change-context.md`) and ChangeBrief (via `active-change.json`) when present, and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief; when unsure about stack/adapters, prefer Change Context §5 over inventing tech. Resolve working language from project rule or Context §6.
+1. Read change intent, active Change Context (`…/change-context.md`) and ChangeBrief (via `active-change.json`) when present, and current context (`solidsdd-context` output if available). When unsure whether a boundary is in scope, prefer the Brief; when unsure about stack/adapters, prefer Change Context §5 over inventing tech. If `.solidsdd/changes/<change_id>/architecture-plan.json` exists with `status: changed`, read it too (read-only) for the `architecture_public_boundary` signal. Resolve working language from project rule or Context §6.
 2. Apply axes in [judgment-axes.md](references/judgment-axes.md).
 3. Apply gate rules in [human-gates.md](references/human-gates.md).
 4. List targets with kind, location, density, rationale, adapter_hint, status (plus optional Phase 2 fields). When judging one WorkPlan slice, set optional `covers` to that item’s id(s) and optional plan-level `change_id`.
@@ -95,6 +96,14 @@ Otherwise `status: defer` with `adapter_hint: defer-formal`. Never omit formal n
 | `stable_core` | Mature, rarely changing core → density `standard` or `strict` |
 | `additive_change` | New optional fields/ops without removals or tightenings → usually **no** human gate; density often `standard` |
 | `low_confidence` | Ambiguous requirements or weak context → set `confidence: low` and `human_gate.required: true` |
+| `architecture_public_boundary` | When `.solidsdd/changes/<change_id>/architecture-plan.json` exists (`status: changed`) and a target's location falls under a module's declared `public[]` → target likely needs an external-facing contract (`api`), not just internal `dbc`; when it falls under a module's internal surface only (not in `public[]`) → `dbc` alone is often sufficient |
+
+`architecture_public_boundary` is **read-only context**, not a new judgment
+responsibility: `solidsdd-judge` reads `public[]`/`owns` from an existing
+ArchitecturePlan when present to sharpen kind/density selection above — it
+never edits the Architecture Model, re-derives module boundaries, or
+overrides `solidsdd-architecture`'s judgment. Absent an ArchitecturePlan
+(most changes), ignore this row entirely.
 
 ## Combining rules
 

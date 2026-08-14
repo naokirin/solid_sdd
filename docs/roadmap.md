@@ -131,6 +131,26 @@ Sourcing requirement.
 - [x] Documentation (this file, [architecture.md](architecture.md), [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md))
 - [ ] Per-language static import cross-check against the actual codebase (deliberately deferred — future per-language adapter, not required for the mechanical checks above)
 
+## Phase 6b: Structurizr DSL Architecture Model
+
+**Status: shipped.** Evolved Phase 6 from "structural judgment producing one
+change-level JSON delta" into "structural judgment that edits a persistent,
+whole-project Architecture Model, plus a separate record of *why*." See
+[architecture.md](architecture.md) "Architecture judgment" output model
+(three-layer: DSL / Reasoning / generated projection).
+
+- [x] `.solidsdd/architecture/workspace.dsl` (Structurizr DSL subset, no JVM required) as the structural Source of Truth, persistent across changes — [../reference-src/structurizr-dsl.md](../reference-src/structurizr-dsl.md)
+- [x] `.solidsdd/architecture/invariants.yaml` for `forbid_dependency`/`no_cycles` constraints and prose Architecture Invariants (rules *about* the model, not duplicated structure) — [../schemas/architecture-invariants.schema.json](../schemas/architecture-invariants.schema.json)
+- [x] `architecture-reasoning.md` per change-level structural decision (Logical Decomposition: responsibility / state / knowledge ownership / change locality; boundary and dependency-direction rationale; trade-offs) — [../reference-src/architecture-reasoning-template.md](../reference-src/architecture-reasoning-template.md)
+- [x] `architecture-depth.md` (Level 0–4) so most changes stay at Level 0 and never touch the model — [../reference-src/architecture-depth.md](../reference-src/architecture-depth.md)
+- [x] `architecture-plan.json` kept schema-unchanged as a **generated projection** (`scripts/solidsdd-architecture/project.py`, filtered by `change:<change_id>` tags) — never hand-authored, so `solidsdd-lint` / `solidsdd-critique` / `solidsdd-report` / eval fixtures 013–016 keep working unmodified
+- [x] Self-contained Python DSL parser/validator (`scripts/solidsdd-architecture/`) — syntax, referenced-element existence, forbidden-dependency / no-cycles / ownership-conflict / parent-child / internal-boundary-leakage checks, folded into `scripts/solidsdd-lint.sh`
+- [x] Optional, off-by-default `--with-structurizr-cli` integration with the real Structurizr CLI as a second check (`tools/structurizr/`, mirrors the `tools/tla/` optional-toolchain pattern) — never a hard dependency
+- [x] `solidsdd-next` / `run-state.schema.json` gained `architecture` / `critique_architecture` phases (previously the schema and `solidsdd-run-state`'s own phase list didn't accept the phase `solidsdd-run/SKILL.md` step 14b already instructed agents to set)
+- [x] `docs/execution-model.md` orchestration diagram / per-skill policy / parent obligations updated to include `solidsdd.architecture` (previously missing)
+- [x] Five worked examples: No Architecture Change, New Module, Boundary Split, Dependency Inversion, Concurrency (Architecture → BDD → TLA+) — [../examples/inventory-reservation](../examples/inventory-reservation), [../examples/architecture-dependency-inversion](../examples/architecture-dependency-inversion), [../examples/memory-formal](../examples/memory-formal)
+- [x] `solidsdd-judge` reads `architecture-plan.json` (when present, `status: changed`) as read-only context via the new `architecture_public_boundary` signal — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md); `ApplicationPlan`/`ArchitecturePlan` role separation stays intact (judge never edits the Architecture Model)
+
 ## Near-term next actions
 
 1. GitHub Release / tag workflow for `install-into-project.sh --repo/--ref` (optional packaging of install-manifest payload)

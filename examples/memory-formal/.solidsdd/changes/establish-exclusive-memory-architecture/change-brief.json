@@ -1,0 +1,37 @@
+{
+  "version": "1",
+  "change_id": "establish-exclusive-memory-architecture",
+  "summary": "Establish the Architecture Model (state ownership + boundary) that the existing ExclusiveMemory TLA+ concurrency sample formalizes.",
+  "goal": "Make explicit which module owns the shared register and enforces mutual exclusion, so the existing TLA+ model's properties are traceable to an architectural decision rather than only living in the .tla file.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Define memory_register (owns Mem) and client as separate modules, with a client -> memory_register dependency"
+    },
+    {
+      "id": "R2",
+      "text": "Record the state-ownership / mutual-exclusion Architecture Invariants that formal/ExclusiveMemory.tla's TypeOK/Inv formalize"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Any change to formal/ExclusiveMemory.tla or formal/ExclusiveMemory.cfg — this change only adds the Architecture layer above the existing, unchanged formal model"
+    },
+    {
+      "id": "X2",
+      "text": "Any implementation (this sample has no src/; it is a Phase 3 formal-only reference)"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ArchitecturePlan documents memory_register / client responsibilities, state ownership, and the client -> memory_register dependency, and passes solidsdd-lint / critique(architecture_plan) cleanly"
+    },
+    {
+      "id": "SC2",
+      "text": "architecture-reasoning.md explicitly connects Architecture (state ownership/boundary) to requirements/exclusive-memory.feature (BDD) and formal/ExclusiveMemory.tla (TLA+)"
+    }
+  ],
+  "confidence": "high"
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -80,6 +81,30 @@ class ProjectTests(unittest.TestCase):
         self.assertNotIn("modules", plan)
         self.assertNotIn("dependencies", plan)
         self.assertNotIn("constraints", plan)
+
+    def test_project_project_root_no_architecture_dir(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        (root / ".solidsdd").mkdir()
+        plan = project.project_project_root(root, "some-change")
+        self.assertEqual(plan["status"], "unchanged")
+        self.assertNotIn("modules", plan)
+
+    def test_project_project_root_workspace_without_invariants_file(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        arch_dir = root / ".solidsdd" / "architecture"
+        arch_dir.mkdir(parents=True)
+        (arch_dir / "workspace.dsl").write_text(
+            'workspace "W" { model { a = softwareSystem "A" { tags "change:demo" } } }',
+            encoding="utf-8",
+        )
+        plan = project.project_project_root(root, "demo")
+        self.assertEqual(plan["status"], "changed")
+        self.assertEqual(plan["modules"][0]["id"], "a")
+        self.assertEqual(plan["constraints"], [])
 
     def test_underscore_ids_become_hyphenated_module_ids(self) -> None:
         text = """

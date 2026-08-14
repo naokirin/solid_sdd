@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "status": "unchanged",
+  "change_id": "tweak-hold-log-wording",
+  "summary": "Internal log message wording only; no module, dependency, boundary, or ownership change. Non-structural bugfix/polish per architecture-axes.md's non-trigger table.",
+  "confidence": "high"
+}

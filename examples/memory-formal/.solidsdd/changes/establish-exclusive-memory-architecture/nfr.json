@@ -1,0 +1,54 @@
+{
+  "version": "1",
+  "change_id": "establish-exclusive-memory-architecture",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "The recorded state-ownership boundary must match what formal/ExclusiveMemory.tla actually checks (no drift between Architecture and the formal model).",
+      "rationale": "The whole point of this change is to make the formal model's assumptions traceable to an architectural decision.",
+      "measurement": "Manual review: architecture-reasoning.md's Architecture Invariants correspond to TypeOK/Inv in formal/ExclusiveMemory.tla.",
+      "threshold": "1:1 correspondence, reviewed at change time",
+      "verified_by": ["examples/memory-formal/.solidsdd/changes/establish-exclusive-memory-architecture/architecture-reasoning.md"]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No security-relevant surface in this formal-only sample."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Bounded model checking only; no performance requirement."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "No runtime deployment; design/formal artifact only."
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A",
+      "rationale": "Additive Architecture Model on top of an unchanged .tla/.cfg pair; nothing to break compatibility with."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "in_scope",
+      "requirement": "Adding a module to the model later must not require touching formal/ExclusiveMemory.tla unless the new module actually mutates Mem.",
+      "rationale": "Keeps the Architecture layer and the formal layer independently evolvable, per the Role separation table.",
+      "measurement": "Zero required edits to formal/ExclusiveMemory.tla when only Architecture-layer documentation changes.",
+      "threshold": "0 required .tla edits for architecture-only changes",
+      "verified_by": ["scripts/solidsdd-architecture.sh validate"]
+    }
+  ]
+}

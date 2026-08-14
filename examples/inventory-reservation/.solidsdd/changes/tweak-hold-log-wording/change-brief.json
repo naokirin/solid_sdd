@@ -1,0 +1,25 @@
+{
+  "version": "1",
+  "change_id": "tweak-hold-log-wording",
+  "summary": "Reword an internal hold-expiry log message for clarity. No behavior, API, or module boundary change.",
+  "goal": "Make the internal expiry log message state which SKU expired, to speed up local debugging.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Reword the internal hold-expiry log line to include the SKU"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Any change to HTTP responses, OpenAPI, OCL contracts, or module boundaries/dependencies"
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "ArchitecturePlan documents status: unchanged with a one-line summary, and passes solidsdd-lint cleanly"
+    }
+  ],
+  "confidence": "high"
+}

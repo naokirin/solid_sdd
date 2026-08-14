@@ -34,6 +34,19 @@ See [intent-inspired-improvements.md](intent-inspired-improvements.md). Prefer o
 | `run-next` output | new schema for `solidsdd-next` (not a change artifact version bump) |
 | KG `derives_from` edge | `to` may include `concept` (requirement → ubiquitous-language link) |
 
+## Shipped additive fields (v1, Structurizr DSL Architecture Model, 2026-08-14)
+
+`ArchitecturePlan` (`architecture-plan.schema.json`) is unchanged — it is now a
+generated projection rather than hand-authored, but its shape is identical, so
+existing consumers and eval fixtures 013–016 needed no changes. See
+[roadmap.md](roadmap.md) Phase 6b.
+
+| Artifact / surface | Additive |
+|--------------------|----------|
+| `run-state.json` `phase` | additive enum values `architecture`, `critique_architecture` (inserted between `critique_work_plan` and `waves`) |
+| `project-config.schema.json` `paths` | optional `architecture` key (default `.solidsdd/architecture`) |
+| `architecture-invariants.schema.json` | new schema for `.solidsdd/architecture/invariants.yaml` (`constraints[]`, `invariants[]`) — not a change-scoped artifact, persistent/whole-project like `.solidsdd/architecture/workspace.dsl` |
+
 ## Current notable breaks (v1 era)
 
 | Date | Artifact | Break |

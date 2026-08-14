@@ -100,7 +100,7 @@ If none found → Design — ApplicationPlan = **Not performed**.
 
 ### ArchitecturePlan discovery
 
-Look for `.solidsdd/changes/<change_id>/architecture-plan.json` (change-level, not per-item — unlike ApplicationPlan). If missing → Design — ArchitecturePlan = **Not performed** (`solidsdd-architecture`). If present with `status: unchanged`, render as **Present** with a one-line "no structural change" note (do not treat it as Not performed — the judgment ran, it just found nothing to record) plus its `summary` when given.
+Look for `.solidsdd/changes/<change_id>/architecture-plan.json` (change-level, not per-item — unlike ApplicationPlan; it is a **generated projection** of `.solidsdd/architecture/workspace.dsl` + `invariants.yaml`, not hand-authored). If missing → Design — ArchitecturePlan = **Not performed** (`solidsdd-architecture`). If present with `status: unchanged`, render as **Present** with a one-line "no structural change" note (do not treat it as Not performed — the judgment ran, it just found nothing to record) plus its `summary` when given. When `status: changed` and `.solidsdd/changes/<change_id>/architecture-reasoning.md` exists, link it alongside the ArchitecturePlan tables as the *why* behind the modules/dependencies/constraints shown (do not inline its full text — it is prose, not a table).
 
 ## Required document shape (Markdown)
 

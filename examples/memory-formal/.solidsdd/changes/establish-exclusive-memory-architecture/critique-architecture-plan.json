@@ -1,0 +1,7 @@
+{
+  "version": "1",
+  "subject": "architecture_plan",
+  "result": "pass",
+  "findings": [],
+  "summary": "Two modules with clear, non-overlapping responsibilities: MemoryRegister owns the shared state and its exclusive-ownership protocol, Client depends on that protocol without mutating state directly. The single client -> memory_register dependency has a stated reason and the direction is the only one that keeps ownership centrally enforceable. architecture-reasoning.md explicitly connects this Architecture layer to requirements/exclusive-memory.feature (BDD) and formal/ExclusiveMemory.tla (TLA+) without restating either — behavior stays in Gherkin, transition semantics stay in TLA+, matching the Role separation table. No responsibility, boundary, ownership, or checkability gaps."
+}

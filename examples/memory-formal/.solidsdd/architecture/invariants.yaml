@@ -1,0 +1,5 @@
+version: "1"
+constraints: []
+invariants:
+  - "MemoryRegister owns mem; only the current owner may mutate it."
+  - "At most one Client holds ownership at a time (mutual exclusion)."

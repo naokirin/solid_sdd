@@ -36,8 +36,20 @@ jobs:
       - name: solidsdd-lint (inventory-reservation new-module architecture example)
         run: scripts/solidsdd-lint.sh --project-root examples/inventory-reservation --change-id add-notification-module
 
+      - name: solidsdd-lint (inventory-reservation no-architecture-change example)
+        run: scripts/solidsdd-lint.sh --project-root examples/inventory-reservation --change-id tweak-hold-log-wording
+
       - name: solidsdd-architecture unit tests
         run: python3 -m unittest discover -s scripts/solidsdd-architecture
+
+      - name: solidsdd_lib unit tests
+        run: python3 -m unittest discover -s scripts/solidsdd_lib
+
+      - name: solidsdd-next unit tests
+        run: python3 -m unittest discover -s scripts/solidsdd-next
+
+      - name: solidsdd-run-state unit tests
+        run: python3 -m unittest discover -s scripts/solidsdd-run-state
 
       - name: solidsdd-architecture validate (architecture-dependency-inversion)
         run: scripts/solidsdd-architecture.sh validate --project-root examples/architecture-dependency-inversion
@@ -47,6 +59,9 @@ jobs:
 
       - name: solidsdd-lint (architecture-dependency-inversion, after)
         run: scripts/solidsdd-lint.sh --project-root examples/architecture-dependency-inversion --change-id invert-inventory-persistence-dependency
+
+      - name: solidsdd-lint (memory-formal architecture example)
+        run: scripts/solidsdd-lint.sh --project-root examples/memory-formal --change-id establish-exclusive-memory-architecture
 
       - name: Critique / lint regression fixtures
         run: python3 scripts/solidsdd-critique-eval.py

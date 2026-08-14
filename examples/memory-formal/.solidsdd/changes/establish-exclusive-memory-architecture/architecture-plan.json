@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "status": "changed",
+  "change_id": "establish-exclusive-memory-architecture",
+  "summary": "Projected from workspace.dsl + invariants.yaml for change 'establish-exclusive-memory-architecture': 2 module(s), 1 dependency edge(s), 0 constraint(s).",
+  "modules": [
+    {
+      "id": "client",
+      "responsibility": "Acquire ownership of the register, add once, then release."
+    },
+    {
+      "id": "memory-register",
+      "responsibility": "Own the shared memory register and its exclusive-ownership acquire/add/release protocol.",
+      "owns": [
+        "Mem"
+      ],
+      "public": [
+        "AcquireOwnership",
+        "AddAndRelease"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "client",
+      "to": "memory-register",
+      "reason": "Acquires ownership, mutates mem, releases.",
+      "kind": "runtime"
+    }
+  ],
+  "constraints": []
+}

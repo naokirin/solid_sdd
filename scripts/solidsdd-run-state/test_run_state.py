@@ -144,6 +144,18 @@ class RunStateCliTests(unittest.TestCase):
             0,
         )
 
+    def test_architecture_phases_accepted(self) -> None:
+        root, _, cdir = self._project(with_work_plan=False)
+        rs.main(["--project-root", str(root), "init"])
+        for phase in ("architecture", "critique_architecture"):
+            self.assertEqual(
+                rs.main(["--project-root", str(root), "set-phase", "--phase", phase]),
+                0,
+            )
+            data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+            self.assertEqual(data["phase"], phase)
+            rs.validate_run_state(data)
+
     def test_invalid_phase(self) -> None:
         root, _, _ = self._project(with_work_plan=False)
         rs.main(["--project-root", str(root), "init"])
