@@ -61,7 +61,19 @@ Only bother recording an explicit Logical → Physical mapping (in
 * migration in progress: old and new physical structure coexist for the same
   Logical element — list both rows with a short note on which is being
   phased out, rather than inventing a separate migration-tracking artifact
-* the mapping is itself an architecturally significant decision
+* the mapping is itself an architecturally significant decision — e.g. a
+  Logical element owns a Consistency/Concurrency Boundary (see
+  [architecture-reasoning-template.md](architecture-reasoning-template.md))
+  and its callers may run as separate processes/machines. A file-path
+  mapping (`claim_coordinator` → `src/job-queue/claim-coordinator.ts`) looks
+  trivial, but it hides an undecided process/service/database boundary: is
+  the boundary enforced by a shared database's atomic operation, a
+  distributed lock service, a single always-on coordinator process, or
+  something else? That allocation choice is architecturally significant
+  even though the *file* mapping is 1:1 — write `physical-design.md` and
+  record it under the Process/service boundary or Database boundary row of
+  [physical-design.md](physical-design.md)'s "Physical Design Decisions"
+  table, not just the Physical Realization table
 
 Otherwise (`Inventory` → `src/inventory/`), don't record it — it is
 self-evident from the code. This is the same density philosophy as the rest

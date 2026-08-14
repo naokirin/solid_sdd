@@ -32,6 +32,22 @@ traceability is required" for the concrete triggers (boundary divergence,
 significant mapping). Skip it when the mapping is a trivial 1:1 rename
 (`Inventory` → `src/inventory/`) — recording that adds no information.
 
+A trivial 1:1 *file-path* mapping is a different question from an undecided
+*process/service/database boundary* (see Physical Design Decisions below) —
+don't let the former stand in for the latter. Whenever this change's
+`architecture-reasoning.md` records a Consistency Boundary or Concurrency
+Boundary (a component that must coordinate across concurrent/distributed
+callers), check the Process/service boundary and Database boundary rows of
+the table below explicitly before concluding Physical Design isn't
+warranted: "X owns ClaimState" states ownership, but says nothing about
+whether callers run in one process or many, and if many, what actually
+enforces the boundary (a shared database's atomic operation? a distributed
+lock service? a single always-on coordinator process?). That allocation
+choice is the "architecturally significant mapping" trigger, even when
+every Logical element still maps to exactly one source file — see the
+worked example in
+[architecture-traceability.md](architecture-traceability.md).
+
 ## Physical Design Decisions
 
 Consider, only to the depth this change actually needs:

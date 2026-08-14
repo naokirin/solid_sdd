@@ -61,7 +61,11 @@ consistency requirement.)
 Which boundary coordinates concurrent access, if any? States *where*, not
 the transition semantics (that is TLA+/Alloy — see Role separation in
 [architecture-axes.md](architecture-axes.md)). Omit when this change has no
-concurrency concern.
+concurrency concern. If enforcing this boundary requires a specific
+process/service/database allocation (e.g. callers may run as separate
+processes or machines) and that allocation isn't decided yet, say so here
+and flag it for [Physical Design](physical-design.md) — don't leave it
+implicit just because every Logical element still maps to one source file.
 
 ## Boundary Decisions
 
