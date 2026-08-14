@@ -151,6 +151,25 @@ whole-project Architecture Model, plus a separate record of *why*." See
 - [x] Five worked examples: No Architecture Change, New Module, Boundary Split, Dependency Inversion, Concurrency (Architecture → BDD → TLA+) — [../examples/inventory-reservation](../examples/inventory-reservation), [../examples/architecture-dependency-inversion](../examples/architecture-dependency-inversion), [../examples/memory-formal](../examples/memory-formal)
 - [x] `solidsdd-judge` reads `architecture-plan.json` (when present, `status: changed`) as read-only context via the new `architecture_public_boundary` signal — [../reference-src/judgment-axes.md](../reference-src/judgment-axes.md); `ApplicationPlan`/`ArchitecturePlan` role separation stays intact (judge never edits the Architecture Model)
 
+## Phase 6c: Architecture Reasoning / Physical Design / Traceability
+
+**Status: shipped.** Sharpened the design flow inside `solidsdd-architecture`
+from "Logical structure judgment" into an explicit
+`Requirement → Decision Drivers → Logical Architecture → Physical Design →
+Implementation` sequence, still gated by [architecture-depth.md](../reference-src/architecture-depth.md)
+so most changes stay at Level 0–1. No new persistent Source of Truth: the
+Structurizr Model remains authoritative; everything below is change-local
+reasoning or a generated/derived check.
+
+- [x] Decision Drivers step (Requirement → Decision Drivers → Design Alternatives → Architecture Decision) plus Consistency/Concurrency Boundary as explicit Logical Decomposition axes — [../reference-src/architecture-axes.md](../reference-src/architecture-axes.md), [../reference-src/architecture-reasoning-template.md](../reference-src/architecture-reasoning-template.md)
+- [x] Physical Design as a separate, optional Level-3-only artifact (`physical-design.md`: module/package/directory/class/process/service/database/adapter boundary, Physical Dependency) — [../reference-src/physical-design.md](../reference-src/physical-design.md)
+- [x] Architecture Traceability guidance: when an explicit Logical → Physical mapping is worth recording vs. self-evident, migration-coexistence handling, explicit "don't embed filesystem metadata in `workspace.dsl`" rule — [../reference-src/architecture-traceability.md](../reference-src/architecture-traceability.md)
+- [x] Mechanical cross-check of `physical-design.md` against the Architecture Model (`scripts/solidsdd-architecture/physical.py`: unknown Logical Element references, `A -> B` Physical Dependency lines vs. `forbid_dependency` / declared Logical direction), folded into `solidsdd-lint.sh` and `solidsdd-architecture.sh validate --change-id` — reuses the existing `forbid_dependency` constraint type, no schema change
+- [x] `solidsdd-critique`'s `architecture_plan` Architecture Review reads `physical-design.md` when present and checks it for adequacy (missing/hollow at Level 3, boundary-mechanism mismatch) — [../reference-src/adversarial-critique.md](../reference-src/adversarial-critique.md)
+- [x] `solidsdd-run` step 14b documents `physical-design.md` as a possible Architecture output and makes explicit that the whole step (Logical through Physical Design) completes before any implementation wave starts
+- [x] 11 new unit tests (`scripts/solidsdd-architecture/test_physical.py`); full existing suite, `sync-skill-references.sh --check`, `check-skill-frontmatter.sh`, and both existing Architecture examples stay green throughout
+- [ ] No dedicated Module Skill exists in solid_sdd; Physical Design responsibility stays inside `solidsdd-architecture` (Level 3) rather than being split out prematurely — see "Relation to solid_sdd Skills" in [physical-design.md](../reference-src/physical-design.md)
+
 ## Near-term next actions
 
 1. GitHub Release / tag workflow for `install-into-project.sh --repo/--ref` (optional packaging of install-manifest payload)
