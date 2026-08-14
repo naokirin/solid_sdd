@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Change report: invert-inventory-persistence-dependency</title>
+<style>
+:root {
+  --bg: #070b14;
+  --bg-panel: #0f1626;
+  --bg-panel-2: #131c30;
+  --border: #22304a;
+  --text: #ffffff;
+  --text-dim: #c7d0e0;
+  --accent: #7fb8ff;
+  --accent-2: #8fd6c4;
+  --badge-present-bg: #123a2c;
+  --badge-present-fg: #8fd6c4;
+  --badge-missing-bg: #3a1f22;
+  --badge-missing-fg: #ff9d9d;
+  --sev-blocker: #ff8a8a;
+  --sev-major: #ffc07a;
+  --sev-minor: #9fd6ff;
+  --tok-key: #7fd0ff;
+  --tok-string: #f2a97e;
+  --tok-number: #b7e08a;
+  --tok-bool: #d2a8ff;
+  --tok-null: #9aa7bd;
+  --tok-punct: #7f8db3;
+  --tok-comment: #6b7690;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  line-height: 1.7;
+  margin: 0;
+  padding: 2rem 1rem 6rem;
+}
+.container { max-width: 980px; margin: 0 auto; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; }
+h2 { font-size: 1.25rem; margin-top: 2.4rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { font-size: 1.05rem; margin-top: 1.6rem; color: var(--accent-2); }
+h4 { font-size: 0.95rem; margin-top: 1.2rem; color: var(--text-dim); }
+p { color: var(--text-dim); }
+p.stub { font-style: italic; }
+.meta { color: var(--text-dim); font-size: 0.92rem; }
+.meta ul { list-style: none; padding-left: 0; }
+.meta li { padding: 0.15rem 0; }
+table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.4rem; font-size: 0.92rem; overflow-x: auto; display: block; }
+table thead, table tbody { display: table; width: 100%; table-layout: fixed; }
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; word-break: break-word; }
+th { color: var(--accent); font-weight: 600; }
+tr.nfr-in-scope td { background: rgba(143, 214, 196, 0.06); }
+code { background: var(--bg-panel-2); padding: 0.08rem 0.35rem; border-radius: 4px; font-size: 0.88em; color: #ffe9b3; }
+a { color: var(--accent); }
+.links { font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-present { background: var(--badge-present-bg); color: var(--badge-present-fg); }
+.badge-missing { background: var(--badge-missing-bg); color: var(--badge-missing-fg); }
+.note { font-size: 0.8rem; color: var(--text-dim); font-weight: normal; }
+.sev { font-weight: 700; text-transform: uppercase; font-size: 0.75rem; padding: 0.05rem 0.4rem; border-radius: 4px; }
+.sev-blocker { color: var(--sev-blocker); background: rgba(255,138,138,0.12); }
+.sev-major { color: var(--sev-major); background: rgba(255,192,122,0.12); }
+.sev-minor { color: var(--sev-minor); background: rgba(159,214,255,0.12); }
+.tabs { margin: 0.8rem 0 1.6rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg-panel); }
+.tab-buttons { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-panel-2); }
+.tab-btn { flex: none; background: transparent; border: none; color: var(--text-dim); padding: 0.55rem 1.1rem; cursor: pointer; font-size: 0.88rem; border-right: 1px solid var(--border); }
+.tab-btn.active { color: var(--text); background: var(--bg-panel); font-weight: 600; }
+.tab-panel { padding: 1rem 1.1rem; }
+pre.raw { background: var(--bg-panel-2); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; margin: 0; }
+pre.raw code { background: none; padding: 0; color: var(--text-dim); }
+.tok-key { color: var(--tok-key); }
+.tok-string { color: var(--tok-string); }
+.tok-number { color: var(--tok-number); }
+.tok-bool { color: var(--tok-bool); }
+.tok-null { color: var(--tok-null); }
+.tok-punct { color: var(--tok-punct); }
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+footer { margin-top: 3rem; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+figure.diagram { margin: 0.8rem 0 1.6rem; }
+figure.diagram svg { display: block; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; }
+figure.diagram details { margin-top: 0.6rem; }
+figure.diagram summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Change report: invert-inventory-persistence-dependency</h1>
+<div class="meta">
+<ul>
+<li><strong>言語</strong>: 日本語（依頼文で明示的に指定）</li>
+<li><strong>change 状態</strong>: <code>active</code>（設計のみ。このサンプルに <code>src/</code> はありません）</li>
+<li><strong>生成元</strong>: <code>solidsdd-report</code>（ビューのみ。SoT ではない）</li>
+</ul>
+</div>
+
+<h2>Status overview</h2>
+
+<table>
+  <thead><tr><th>章</th><th>状態</th><th>主なソース / 不足時のスキル</th></tr></thead>
+  <tbody>
+    <tr><td>1. 要求と課題</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-intake</code>（<code>change-context.md</code> 未作成）</td></tr>
+    <tr><td>2. 機能要件</td><td><span class="badge badge-present">実施済</span> 部分</td><td><code>change-brief.json</code>（Feature/Scenario 連携は未実施 — <code>solidsdd-decompose</code>）</td></tr>
+    <tr><td>3. 非機能要件</td><td><span class="badge badge-present">実施済</span></td><td><code>nfr.json</code></td></tr>
+    <tr><td>4. 技術選定</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-intake</code>（<code>change-context.md</code> §5 未作成）</td></tr>
+    <tr><td>5. 設計 — WorkPlan</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-decompose</code></td></tr>
+    <tr><td>5. 設計 — ArchitecturePlan</td><td><span class="badge badge-present">実施済</span></td><td><code>architecture-plan.json</code>（<code>status: changed</code>）+ <code>architecture-reasoning.md</code></td></tr>
+    <tr><td>5. 設計 — ApplicationPlan</td><td><span class="badge badge-missing">未実施</span></td><td><code>solidsdd-judge</code></td></tr>
+    <tr><td>5. 設計 — API 契約</td><td><span class="badge badge-missing">未実施</span></td><td>本サンプルに <code>openapi/openapi.yaml</code> も <code>graphql/schema.graphql</code> もありません</td></tr>
+    <tr><td>5. 設計 — DbC (OCL)</td><td><span class="badge badge-missing">未実施</span></td><td>本サンプルに <code>contracts/**/*.ocl</code> はありません</td></tr>
+    <tr><td>5. 設計 — Formal</td><td><span class="badge badge-missing">未実施</span></td><td>本サンプルに <code>formal/**</code> はありません</td></tr>
+    <tr><td>6. 判断とトレードオフ</td><td><span class="badge badge-present">実施済</span> 部分</td><td><code>architecture-reasoning.md</code> + critique</td></tr>
+    <tr><td>7. 未解決事項</td><td><span class="badge badge-present">実施済</span></td><td>Brief に <code>open_questions</code> なし；Context 未作成</td></tr>
+  </tbody>
+</table>
+
+<h2>1. 要求と課題</h2>
+<p class="stub"><code>change-context.md</code> が未作成のため、本章は未実施です（<code>solidsdd-intake</code> が生成する章）。</p>
+
+<h2>2. 機能要件</h2>
+<h3>ゴール</h3>
+<p>Inventory の永続化技術を、ドメインモジュールを変更せずに交換（またはテストでモック化）できるようにする。具体的な実装ではなく抽象に依存させることでこれを実現する。</p>
+<h3>スコープ内 (<code>in_scope</code>)</h3>
+<ul>
+  <li><strong>R1</strong> — <code>inventory_repository_port</code> を導入する。直接的な <code>inventory -&gt; postgres_store</code> 依存を取り除き、代わりに <code>inventory -&gt; port</code> と <code>postgres_store -&gt; port</code> を追加する</li>
+  <li><strong>R2</strong> — <code>postgres_store</code> が <code>inventory</code> に直接依存できないようにし、port にのみ依存できる <code>forbid_dependency</code> 制約を追加する</li>
+</ul>
+<h3>スコープ外 (<code>out_of_scope</code>)</h3>
+<ul>
+  <li><strong>X1</strong> — <code>src/</code> での実装。本サンプル全体が構造設計の成果物であり、実行可能なプロジェクトではない</li>
+  <li><strong>X2</strong> — 2つ目の永続化アダプタの導入。反転を示すには実装（<code>PostgresInventoryStore</code>）1つで十分</li>
+</ul>
+<h3>成功基準</h3>
+<ul>
+  <li><strong>SC1</strong> — ArchitecturePlan が <code>inventory_repository_port</code>、<code>inventory -&gt; port</code> / <code>postgres_store -&gt; port</code> の依存関係、<code>postgres_store -&gt; inventory</code> の <code>forbid_dependency</code> 制約を記録し、<code>solidsdd-lint</code> / <code>critique(architecture_plan)</code> を通過すること</li>
+</ul>
+<h3>受入シナリオ（Gherkin）</h3>
+<p class="stub">この design-only サンプルでは <code>solidsdd-decompose</code> が未実施のため、本 change に紐づく Feature / Scenario はありません。</p>
+
+<h2>3. 非機能要件</h2>
+<table>
+  <thead><tr><th>ID</th><th>品質</th><th>状態</th><th>要件</th><th>根拠</th><th>閾値 / 検証</th></tr></thead>
+  <tbody>
+    <tr><td>NFR1</td><td>reliability</td><td>out_of_scope</td><td>N/A</td><td>設計のみの変更であり、実行時の振る舞いは導入されない。</td><td>—</td></tr>
+    <tr><td>NFR2</td><td>security</td><td>out_of_scope</td><td>N/A</td><td>設計のみの変更であり、実行時の振る舞いは導入されない。</td><td>—</td></tr>
+    <tr><td>NFR3</td><td>performance</td><td>out_of_scope</td><td>N/A</td><td>設計のみの変更であり、実行時の振る舞いは導入されない。</td><td>—</td></tr>
+    <tr><td>NFR4</td><td>operability</td><td>out_of_scope</td><td>N/A</td><td>設計のみの変更であり、実行時の振る舞いは導入されない。</td><td>—</td></tr>
+    <tr><td>NFR5</td><td>compatibility</td><td>out_of_scope</td><td>N/A</td><td>設計のみの変更であり、実行時の振る舞いは導入されない。</td><td>—</td></tr>
+    <tr class="nfr-in-scope"><td>NFR6</td><td>maintainability</td><td>in_scope</td><td>Inventory は具体的な永続化技術に依存してはならない。PostgresInventoryStore は Inventory に直接依存してはならない。</td><td>これがこの反転の目的そのものである：永続化の交換やモック化が Inventory ドメインモジュールの変更を必要としないこと。</td><td><code>postgres_store -&gt; inventory</code> の <code>forbid_dependency</code> 違反ゼロ / <code>scripts/solidsdd-lint.sh</code>（Architecture Model 検証）</td></tr>
+  </tbody>
+</table>
+
+<h2>4. 技術選定</h2>
+<p class="stub"><code>change-context.md</code> §5 が未作成のため、本章は未実施です（<code>solidsdd-intake</code>）。</p>
+
+<h2>5. 設計</h2>
+<h3>WorkPlan — <span class="badge badge-missing">未実施</span></h3>
+<p class="stub">本 change には <code>work-plan.json</code> がありません（<code>solidsdd-decompose</code> 未実施）。構造設計（ArchitecturePlan）は WorkPlan 分解前の設計段階で止まっています。</p>
+
+<h3>ArchitecturePlan — <span class="badge badge-present">実施済</span></h3>
+<div class="tabs" data-tabs>
+  <div class="tab-buttons">
+    <button type="button" class="tab-btn active" data-tab="arch-summary">Summary</button>
+    <button type="button" class="tab-btn" data-tab="arch-raw">Raw</button>
+  </div>
+  <div class="tab-panel" data-panel="arch-summary">
+<p><strong>status:</strong> <code>changed</code></p>
+<p>本 change は、このサンプルの先行 change <code>establish-inventory-persistence</code> が確立した依存関係を反転させます：</p>
+<pre class="raw"><code>Before:  Inventory -&gt; PostgresInventoryStore
+After:   Inventory -&gt; InventoryRepositoryPort &lt;- PostgresInventoryStore</code></pre>
+<figure class="diagram">
+<svg viewBox="0 0 680 220" width="100%" role="img" aria-label="モジュール依存関係図">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7fb8ff"/>
+    </marker>
+    <marker id="arrow-forbid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ff6b6b"/>
+    </marker>
+  </defs>
+  <rect x="15" y="130" width="190" height="56" rx="8" fill="#131c30" stroke="#7fb8ff" stroke-width="1.5"/>
+  <text x="110" y="153" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">inventory</text>
+  <text x="110" y="171" text-anchor="middle" fill="#c7d0e0" font-size="10">available stock を所有</text>
+
+  <rect x="245" y="130" width="190" height="56" rx="8" fill="#131c30" stroke="#7fb8ff" stroke-width="1.5"/>
+  <text x="340" y="153" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="600">inventory-repository-port</text>
+  <text x="340" y="171" text-anchor="middle" fill="#c7d0e0" font-size="10">永続化ポート</text>
+
+  <rect x="475" y="130" width="190" height="56" rx="8" fill="#131c30" stroke="#7fb8ff" stroke-width="1.5"/>
+  <text x="570" y="153" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">postgres-store</text>
+  <text x="570" y="171" text-anchor="middle" fill="#c7d0e0" font-size="10">PostgreSQL 永続化</text>
+
+  <line x1="205" y1="158" x2="242" y2="158" stroke="#7fb8ff" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="223" y="148" text-anchor="middle" fill="#c7d0e0" font-size="10">runtime</text>
+
+  <line x1="475" y1="158" x2="438" y2="158" stroke="#7fb8ff" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="457" y="148" text-anchor="middle" fill="#c7d0e0" font-size="10">data</text>
+
+  <path d="M 570 130 C 570 35, 110 35, 110 130" stroke="#ff6b6b" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arrow-forbid)"/>
+  <text x="340" y="30" text-anchor="middle" fill="#ff6b6b" font-size="11">forbidden</text>
+</svg>
+<details>
+<summary>図のソース（Mermaid）</summary>
+<pre class="raw"><code>flowchart LR
+  inventory[&quot;inventory&lt;br/&gt;own available stock&quot;]
+  inventory_repository_port[&quot;inventory-repository-port&lt;br/&gt;persistence port&quot;]
+  postgres_store[&quot;postgres-store&lt;br/&gt;PostgreSQL persistence&quot;]
+  inventory --&gt;|runtime| inventory_repository_port
+  postgres_store --&gt;|data| inventory_repository_port
+  postgres_store -.-&gt;|forbidden| inventory
+  linkStyle 2 stroke:#ff6b6b,stroke-dasharray: 4 2</code></pre>
+</details>
+</figure>
+<h4>モジュール</h4>
+<table><thead><tr><th>id</th><th>責務</th><th>owns</th><th>public</th></tr></thead><tbody>
+<tr><td><code>inventory</code></td><td>SKU ごとの在庫を所有し、在庫の読み取り・増減操作を公開する</td><td>Stock</td><td>InventoryService</td></tr>
+<tr><td><code>inventory-repository-port</code></td><td>Inventory が依存し、インフラ側のアダプタが実装する永続化の抽象</td><td>—</td><td>—</td></tr>
+<tr><td><code>postgres-store</code></td><td>在庫レコードの具体的な PostgreSQL 永続化</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h4>依存関係</h4>
+<table><thead><tr><th>from</th><th>to</th><th>理由</th><th>kind</th></tr></thead><tbody>
+<tr><td><code>inventory</code></td><td><code>inventory-repository-port</code></td><td>永続化ポート経由で在庫を読み書きする</td><td>runtime</td></tr>
+<tr><td><code>postgres-store</code></td><td><code>inventory-repository-port</code></td><td>PostgreSQL で永続化ポートを実装する</td><td>data</td></tr>
+</tbody></table>
+<h4>構造上の制約</h4>
+<table><thead><tr><th>type</th><th>from</th><th>to</th><th>理由</th></tr></thead><tbody>
+<tr><td><code>forbid_dependency</code></td><td><code>postgres-store</code></td><td><code>inventory</code></td><td>インフラは永続化ポートのみに依存し、Inventory ドメインモジュールに直接依存してはならない。これにより、ドメイン側が知ることなく永続化実装を交換できる。</td></tr>
+</tbody></table>
+<h4>理由</h4>
+<p><a href="architecture-reasoning.md">architecture-reasoning.md</a> より：port は <code>inventory</code> にネストさせず、独立したトップレベルの <code>softwareSystem</code>（<code>inventory</code> の兄弟要素）としてモデル化しています。Structurizr は親要素とその子要素の間の relationship を禁止しているためです。これは本例の作成中に実際の Structurizr CLI で確認し、<code>scripts/solidsdd-architecture/validate.py</code> でも同様に検証しています。</p>
+<h4>Critique (<code>architecture_plan</code>) — <span class="badge badge-present">pass</span></h4>
+<p>指摘なし。依存方向が明確な理由とともに実際に反転している。取り除かれた <code>inventory -&gt; postgres_store</code> エッジは（新しい <code>forbid_dependency</code> 制約により）暗黙に復活しない。port は親子関係を正しく回避している。</p>
+<p class="links"><a href="architecture-plan.json">architecture-plan.json</a> ·
+<a href="critique-architecture-plan.json">critique-architecture-plan.json</a></p>
+</div>
+  <div class="tab-panel" data-panel="arch-raw" hidden><pre class="raw"><code><span class="tok-punct">{</span>
+  <span class="tok-key">&quot;version&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;1&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;status&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;changed&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;change_id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;invert-inventory-persistence-dependency&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;summary&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Projected from workspace.dsl + invariants.yaml for change &#x27;invert-inventory-persistence-dependency&#x27;: 3 module(s), 2 dependency edge(s), 1 constraint(s).&quot;</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;modules&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;responsibility&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Own available stock per SKU; expose stock read/adjust operations.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;owns&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-string">&quot;Stock&quot;</span><span class="tok-punct">]</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;public&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-string">&quot;InventoryService&quot;</span><span class="tok-punct">]</span>
+    <span class="tok-punct">}</span><span class="tok-punct">,</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory-repository-port&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;responsibility&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Persistence abstraction that Inventory depends on and infrastructure adapters implement.&quot;</span>
+    <span class="tok-punct">}</span><span class="tok-punct">,</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;id&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;postgres-store&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;responsibility&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Concrete PostgreSQL persistence for inventory rows.&quot;</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;dependencies&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;from&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;to&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory-repository-port&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;reason&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Reads and writes stock through the persistence port.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;kind&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;runtime&quot;</span>
+    <span class="tok-punct">}</span><span class="tok-punct">,</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;from&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;postgres-store&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;to&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory-repository-port&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;reason&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Implements the persistence port with PostgreSQL.&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;kind&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;data&quot;</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span><span class="tok-punct">,</span>
+  <span class="tok-key">&quot;constraints&quot;</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">&quot;type&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;forbid_dependency&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;from&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;postgres-store&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;to&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;inventory&quot;</span><span class="tok-punct">,</span>
+      <span class="tok-key">&quot;reason&quot;</span><span class="tok-punct">:</span> <span class="tok-string">&quot;Infrastructure must depend only on the persistence port, not directly on the Inventory domain module, so persistence implementations can be swapped without the domain knowing about them.&quot;</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span>
+</code></pre></div>
+</div>
+
+<h3>ApplicationPlan — <span class="badge badge-missing">未実施</span></h3>
+<p class="stub"><code>.solidsdd/changes/invert-inventory-persistence-dependency/</code> 配下に ApplicationPlan JSON は見つかりません（<code>solidsdd-judge</code> 未実施）。本 change は構造設計のみです。</p>
+
+<h3>API 契約 — <span class="badge badge-missing">未実施</span></h3>
+<p class="stub">本サンプルに <code>openapi/openapi.yaml</code> も <code>graphql/schema.graphql</code> もありません。</p>
+
+<h3>DbC (OCL) — <span class="badge badge-missing">未実施</span></h3>
+<p class="stub">本サンプルに <code>contracts/**/*.ocl</code> はありません。</p>
+
+<h3>Formal — <span class="badge badge-missing">未実施</span></h3>
+<p class="stub">本サンプルに <code>formal/**</code> はありません。技術選定自体が未実施（Context 未作成）のため、形式手法の適用判断も行っていません。</p>
+
+<h2>6. 判断とトレードオフ</h2>
+<ul>
+  <li><code>inventory_repository_port</code> を（ネストした <code>container</code> ではなく）兄弟の <code>softwareSystem</code> として導入。<code>inventory</code> と <code>postgres_store</code> の両方からの relationship の対象になれるようにし、Structurizr の親子関係ルール違反を回避する</li>
+  <li><code>forbid_dependency: postgres_store -&gt; inventory</code> を追加し、本 change で取り除いた直接結合が後から静かに復活しないようにする</li>
+  <li>port 1つ・ホップ1つ分のコストを許容する（この最小サンプルでは永続化技術は1つのみ）— このトレードオフは、永続化の交換やテスト容易性が実際に重要になる場合にのみ価値がある</li>
+  <li>検討して却下した代替案：直接依存を維持したまま実際の Postgres インスタンスに対するテストのみを追加する案 — 結合のコストを取り除くのではなく隠すだけになるため却下した</li>
+</ul>
+
+<h2>7. 未解決事項</h2>
+<ul>
+  <li>ChangeBrief の <code>open_questions</code>: （空）</li>
+  <li><code>change-context.md</code> が未作成のため、Context §7 由来の未解決事項は該当なし</li>
+</ul>
+
+<h2>8. Source artifacts</h2>
+<ul>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/status.json</code></li>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/change-brief.json</code></li>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/nfr.json</code></li>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/architecture-plan.json</code></li>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/architecture-reasoning.md</code></li>
+  <li><code>.solidsdd/changes/invert-inventory-persistence-dependency/critique-architecture-plan.json</code></li>
+  <li><code>.solidsdd/architecture/workspace.dsl</code>（永続的な Architecture Model のうち本 change のスライス）</li>
+  <li><code>.solidsdd/architecture/invariants.yaml</code></li>
+  <li><code>.solidsdd/changes/establish-inventory-persistence/</code>（先行 change。本 change が反転させる「Before」の状態）</li>
+  <li>change-context.md: （なし → 未実施）</li>
+  <li>work-plan.json: （なし → 未実施）</li>
+  <li>ApplicationPlan: （なし → 未実施）</li>
+  <li>OpenAPI / GraphQL / OCL / Formal: （本サンプルには無し → 未実施）</li>
+</ul>
+
+<footer>生成元: solidsdd-report（ビューのみ。SoT ではない）。オフラインで安全: 外部 CDN 不使用、色は生成時に埋め込み。</footer>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  var wrap = btn.closest('.tabs');
+  wrap.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var target = btn.getAttribute('data-tab');
+  wrap.querySelectorAll('.tab-panel').forEach(function (p) {
+    p.hidden = p.getAttribute('data-panel') !== target;
+  });
+});
+</script>
+</body>
+</html>
