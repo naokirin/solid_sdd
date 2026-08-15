@@ -36,6 +36,7 @@ Resolve via the active pointer. Override layout paths via `.solidsdd/config.yaml
 - `change_id` — meaningful kebab-case id; must match the directory name under `changes/`
 - `goal` — outcome for this change
 - `in_scope` / `out_of_scope` / `success_criteria` — arrays of **`{ "id", "text" }`** objects (not bare strings). Prefer ids `R1…` (in scope), `X1…` (out of scope), `SC1…` (success). Ids must be unique across the Brief. `out_of_scope` must not be empty hand-waving; name concrete non-goals
+- Avoid a "(for now, only X)" / "(当面はXのみ)" parenthetical inside an `out_of_scope` entry — it reads as two different claims at once (X itself is also excluded vs. X is the assumed in-scope default and only alternatives to X are excluded) and downstream skills (decompose, Gherkin, contracts) cannot tell which was meant, so X ends up promised nowhere and delivered nowhere. If X is a real guaranteed default behavior, give it its own `in_scope` / `success_criteria` id so it gets a Gherkin Scenario and a contract. If it is not actually guaranteed, exclude the broader policy without naming an implied default at all (e.g. "job scheduling/priority policy (processing order across jobs is unspecified/not guaranteed)" rather than "(for now, FIFO only)")
 - Prefer short `text` values over essays
 - JSON **keys** stay English; string **values** (`text`, `goal`, …) use the project **working language** ([working-language.md](working-language.md))
 
