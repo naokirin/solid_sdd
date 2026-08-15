@@ -44,14 +44,24 @@ Override via `.solidsdd/config.yaml` (`paths.requirements` / `paths.requirements
 
 ## Failure-path & cross-cutting-property checklist (required)
 
-Structural, project-agnostic — applies to any domain, not just this project's. Before finalizing an operation-shaped Scenario, check each row against the operation and add the matching Scenario now if it applies; do not defer discovery to a later contract layer (OCL `pre`, API error response, formal spec) — a contract/formal model naming a failure or safety property with no matching Gherkin Scenario is backwards (see [adversarial-critique.md](adversarial-critique.md) "Failure-path / concurrency-scenario traceability gap").
+**The rule, not a fixed list**: for every operation-shaped Scenario, partition its inputs, current state, calling actor, and any stated cross-call guarantee into classes that would produce a **distinguishable, product-visible outcome** — one the caller/observer would have to handle or notice differently. Write **one Scenario per distinguishable class**; classes that fold into identical handling stay in one Scenario (optionally an `Examples` table per convention 3) rather than being split. Do this **at decompose time**, from Brief/domain reasoning alone — do not defer class discovery to a later contract layer (OCL `pre`, API error response, formal spec); a contract/formal model naming an outcome with no matching Gherkin Scenario is backwards (see [adversarial-critique.md](adversarial-critique.md) "Failure-path / concurrency-scenario traceability gap").
 
-| The operation or requirement… | …needs this Scenario too |
+Common instances of this rule — **not exhaustive**; reason from the operation itself, don't just pattern-match this table:
+
+| The operation or requirement… | …commonly has this distinguishable class too |
 |---|---|
-| References an existing entity by id/key | A not-found failure |
-| Transitions an entity to a new state | An already-in-target-state / invalid-transition failure |
-| Has a stated capacity or uniqueness constraint | A constraint-violation failure |
-| Has a `success_criteria` stating an invariant across multiple simultaneous actors ("exactly one wins", "never both succeed") | A **concurrent-attempt** Scenario dramatizing two actors acting at once — **in addition to**, not instead of, any sequential already-in-state Scenario above (a sequential check alone doesn't exercise the interleaving the property is actually about) |
+| Looks up or selects an existing entity by some criterion (id, key, filter, query — not only "by id") | A no-match ("not found") class |
+| Transitions state, or behaves differently depending on current state | One Scenario per behaviorally-distinct state, not only the target transition |
+| Has required, typed, or bounded input | An invalid / out-of-range input class |
+| Has a stated capacity or uniqueness constraint | A constraint-violation class |
+| States an invariant across simultaneous actors ("exactly one wins", "never both succeed") | A **concurrent-attempt** class, in addition to — not instead of — any single-caller state class above |
+| Distinguishes callers by identity/permission **and the product has decided a distinct outcome for it** | An unauthorized-actor class (if authorization is not yet decided, that is an open Change Context / `authz_boundary` question, not something to invent here) |
+| States a repeat-safety / idempotency guarantee | A repeated-call class |
+
+**Usually not a Gherkin class** — these belong in `nfr.json` / Change Context instead, unless they change an observable functional outcome (e.g. a size threshold that triggers pagination *is* a class):
+- Pure scale / volume / latency thresholds with no distinct functional outcome
+- Infra or external-dependency failure with no product-committed behavioral contract yet
+- Which exception type or log line an implementation uses (OCL / API / formal's job, not Gherkin's)
 
 ## Example (preferred shape)
 
