@@ -36,11 +36,22 @@ Override via `.solidsdd/config.yaml` (`paths.requirements` / `paths.requirements
 1. Prefer Scenarios that state a **general property** (e.g. addition returns the sum; zero divisor fails with a named domain error) over one-off examples (`2+3=5`) as the only acceptance text.
 2. One **Feature** groups related behavior; each property-level **Scenario** (or independently checkable **Scenario Outline**) is one WorkPlan item when independently verifiable.
 3. Optional `Examples` / illustration steps may pin a representative case; they must not replace the property statement in `Then`.
-4. Name failure paths explicitly (zero divisor → named domain error). Find them systematically, not only when a failure is an obvious domain axiom like division by zero — for **any** operation under decomposition, check: does it reference an existing entity by id/key (→ add a not-found Scenario)? Does it transition an entity to a new state (→ add an already-in-target-state / invalid-transition Scenario)? Does it have a stated capacity/uniqueness constraint (→ add a violation Scenario)? Does a `success_criteria` / requirement state an invariant across **multiple simultaneous actors** ("never both succeed", "exactly one wins", "at most one X at a time") (→ add an explicit **concurrent-attempt** Scenario that dramatizes two actors acting at the same time, in addition to — not instead of — any sequential already-in-state Scenario; a sequential check alone does not exercise the interleaving the property is actually about). Do this **at decompose time**, from the Brief/domain reasoning alone — do not leave failure-path or concurrency-scenario discovery to a later contract layer (an OCL `pre`, an API error response, a formal spec). A contract or formal model that names a failure mode or safety property with no matching Gherkin Scenario is backwards: it invented a requirement the acceptance layer never stated (see [adversarial-critique.md](adversarial-critique.md) "Failure-path traceability gap").
+4. Name failure paths and cross-cutting properties explicitly, systematically — not only when one is an obvious domain axiom (zero divisor → named domain error). Do this **at decompose time**, from Brief/domain reasoning alone; do not leave it for a later contract layer to invent (see checklist below).
 5. Cover ChangeBrief `in_scope` / `success_criteria` **ids**: tag each Scenario with `@R1` / `@SC1` (etc.) matching the owning WorkPlan item’s `covers`. Do not pull in `out_of_scope` (`@X*`).
 6. On later changes, **add or update** Scenarios for the new Brief only; treat destructive rewrites of existing Scenarios as breaking and surface them in Brief / critique.
 7. Exploratory UX may stay thin: still prefer a minimal property Scenario over prose; judge may later choose `natural_only` / density `thin`.
 8. Language: Feature/Scenario titles and step prose follow the project **working language** ([working-language.md](working-language.md), usually from the project rule); keep keywords (`Feature`, `Scenario`, `Given`, `When`, `Then`) in English.
+
+## Failure-path & cross-cutting-property checklist (required)
+
+Structural, project-agnostic — applies to any domain, not just this project's. Before finalizing an operation-shaped Scenario, check each row against the operation and add the matching Scenario now if it applies; do not defer discovery to a later contract layer (OCL `pre`, API error response, formal spec) — a contract/formal model naming a failure or safety property with no matching Gherkin Scenario is backwards (see [adversarial-critique.md](adversarial-critique.md) "Failure-path / concurrency-scenario traceability gap").
+
+| The operation or requirement… | …needs this Scenario too |
+|---|---|
+| References an existing entity by id/key | A not-found failure |
+| Transitions an entity to a new state | An already-in-target-state / invalid-transition failure |
+| Has a stated capacity or uniqueness constraint | A constraint-violation failure |
+| Has a `success_criteria` stating an invariant across multiple simultaneous actors ("exactly one wins", "never both succeed") | A **concurrent-attempt** Scenario dramatizing two actors acting at once — **in addition to**, not instead of, any sequential already-in-state Scenario above (a sequential check alone doesn't exercise the interleaving the property is actually about) |
 
 ## Example (preferred shape)
 
@@ -62,43 +73,6 @@ Feature: Arithmetic calculator operations
 ```
 
 Avoid making the only Scenario for addition be `When adds 2 and 3 / Then result is 5` without stating the general property.
-
-## Example (failure-path and concurrency-scenario identification for reference/state-transition operations)
-
-An operation that looks up an entity by id, moves it to a new state, and whose `success_criteria` claims an invariant across simultaneous actors has (at least) **four** properties, not one — the success path, one Scenario per structural failure check from convention 4, and one Scenario dramatizing simultaneity:
-
-```gherkin
-Feature: Exclusive job claiming
-
-  @R2
-  Scenario: Claiming an unclaimed job transitions it to claimed
-    Given an unclaimed job exists
-    When a worker claims that job
-    Then the job transitions to claimed by that worker
-
-  @R2 @SC1
-  Scenario: Two workers claiming the same job concurrently — exactly one succeeds
-    Given an unclaimed job exists
-    And two workers attempt to claim that same job at the same time
-    When both claim requests are processed concurrently
-    Then exactly one worker's claim succeeds
-    And the other worker receives an "already claimed" result
-
-  @R2
-  Scenario: Claiming an already-claimed job fails with a named domain error
-    Given a job has already been claimed by another worker
-    When a worker attempts to claim that same job
-    Then the claim fails with a named "already claimed" error
-    And the existing claim is unchanged
-
-  @R2
-  Scenario: Claiming a nonexistent job fails with a named not-found error
-    Given no job with the given id exists
-    When a worker attempts to claim that job id
-    Then the claim fails with a named not-found error
-```
-
-Writing only the first Scenario and letting a later OCL `pre` / formal spec invent the other three is the anti-pattern convention 4 forbids — all three were derivable at decompose time, before any contract or formal model existed: the not-found and already-claimed failures from "claim references an existing job by id and transitions it to a terminal-ish state"; the concurrent Scenario from the `success_criteria`'s "exactly one wins" phrasing. Note the concurrent Scenario and the sequential already-claimed Scenario are **not** substitutes for each other — the sequential one checks the state-machine rule, the concurrent one is what later motivates a `concurrency_safety` / `formal` judgment (see [judgment-axes.md](judgment-axes.md)); dropping either leaves a real gap.
 
 ## Critique expectations
 
