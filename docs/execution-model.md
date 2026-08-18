@@ -186,6 +186,8 @@ Cold-start re-reads of full Brief / OpenAPI / OCL dominate wall-clock. The **par
 
 **Do not** put full contract bodies or entire test files in the pack.
 
+**Escalation carry-forward:** a Thin (L1) execution profile's optional Context/Impact note (see [triage.md](../reference-src/triage.md) Escalation) is written directly at this same `context-pack-framing.md` path from the start, not a separate ad hoc file — it already *is* a change-level context pack, just written before any Task runs instead of before Intake/Brief. If Thin escalates to Standard/Full, the parent **appends** the L1 attempt's outcome (touched files, a short diff summary, the `verification-report.json` path/result) to that same file before handing it to `solidsdd-intake`/`solidsdd-brief` — no conversion step, no second file. The WorkPlan item(s) that supersede the escalated attempt should have their own `items/<item_id>/context-pack.md` cite that record under **Precedent to adapt**, so Plan Slice does not re-derive from scratch what the L1 attempt already discovered.
+
 ## Prompt template for subagents
 
 ```text

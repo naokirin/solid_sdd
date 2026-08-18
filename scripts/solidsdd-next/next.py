@@ -2,13 +2,15 @@
 """Deterministic next-action for solidsdd-run (read-only; no run-state writes).
 
 Commands:
-  next     — emit RunNext JSON for the active or --change-id change
-  validate — check --declared ACTION against the legal set for current state
+  next          — emit RunNext JSON for the active or --change-id change
+  validate      — check --declared ACTION against the legal set for current state
+  parse-profile — extract an explicit --profile / profile: token from raw text
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,6 +33,62 @@ from solidsdd_lib.paths import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
+
+REQUESTED_PROFILES = ("auto", "direct", "thin", "standard", "full")
+
+# `--profile thin`, `--profile=thin`, `profile: thin`, `profile:thin` (case-insensitive).
+_PROFILE_TOKEN_RE = re.compile(
+    r"--profile[=\s]+(auto|direct|thin|standard|full)\b"
+    r"|\bprofile\s*:\s*(auto|direct|thin|standard|full)\b",
+    re.IGNORECASE,
+)
+# Same shapes, but capturing whatever word follows even if it's not a valid
+# profile — lets us warn on a near-miss (e.g. `--profile fast`) instead of
+# silently treating it as "no explicit profile requested".
+_PROFILE_ATTEMPT_RE = re.compile(
+    r"--profile[=\s]+(\S+)|\bprofile\s*:\s*(\S+)", re.IGNORECASE
+)
+
+
+def parse_explicit_profile(text: str) -> dict[str, Any]:
+    """Extract an explicit Execution Profile token from raw instruction text.
+
+    Mechanical helper for the Triage step in skills/solidsdd-run/SKILL.md —
+    prefer this over ad hoc prose parsing so `--profile thin` is recognized
+    the same way regardless of who reads the instruction. Never writes
+    anything and never itself applies the safety-override floor (that's
+    Triage's job, using this only as the `requested_profile` input) — see
+    reference-src/triage.md.
+    """
+    text = text or ""
+    match = _PROFILE_TOKEN_RE.search(text)
+    if match:
+        value = (match.group(1) or match.group(2)).lower()
+        return {
+            "version": "1",
+            "requested_profile": value,
+            "explicit": True,
+            "matched_text": match.group(0).strip(),
+        }
+    attempt = _PROFILE_ATTEMPT_RE.search(text)
+    if attempt:
+        raw = attempt.group(1) or attempt.group(2)
+        return {
+            "version": "1",
+            "requested_profile": "auto",
+            "explicit": False,
+            "matched_text": None,
+            "warning": (
+                f"found a profile-like token {raw!r} that is not one of "
+                f"{REQUESTED_PROFILES}; ignoring and defaulting to auto"
+            ),
+        }
+    return {
+        "version": "1",
+        "requested_profile": "auto",
+        "explicit": False,
+        "matched_text": None,
+    }
 
 
 def load_json(path: Path) -> Any:
@@ -781,12 +839,12 @@ def validate_hint(hint_obj: dict[str, Any]) -> None:
     Draft202012Validator(schema).validate(hint_obj)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="solid_sdd deterministic next / validate")
     parser.add_argument(
         "command",
-        choices=["next", "validate"],
-        help="next = emit action; validate = check --declared",
+        choices=["next", "validate", "parse-profile"],
+        help="next = emit action; validate = check --declared; parse-profile = extract --profile token from --text",
     )
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
     parser.add_argument("--change-id", default=None)
@@ -795,8 +853,21 @@ def main() -> int:
         default=None,
         help="Action the parent intends to run (validate command)",
     )
+    parser.add_argument(
+        "--text",
+        default=None,
+        help="Raw instruction text to scan for an explicit profile token (parse-profile command)",
+    )
     parser.add_argument("--pretty", action="store_true")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+
+    if args.command == "parse-profile":
+        if args.text is None:
+            print("parse-profile requires --text", file=sys.stderr)
+            return 2
+        result = parse_explicit_profile(args.text)
+        print(json.dumps(result, indent=2 if args.pretty else None, ensure_ascii=False))
+        return 0
 
     project = args.project_root.resolve()
     layout = load_layout(project)

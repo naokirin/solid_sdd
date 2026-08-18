@@ -1,16 +1,34 @@
 # solidsdd-next
 
 Deterministic **next-action** hints for `solidsdd-run` / resume (Intent-inspired I4).  
-**Read-only:** never writes `run-state.json`. Depth B: `next` + `validate --declared`.
+**Read-only:** never writes `run-state.json`. Depth B: `next` + `validate --declared` + `parse-profile`.
 
 ## Usage
 
 ```bash
 scripts/solidsdd-next.sh next --project-root /path/to/project [--change-id ID] [--pretty]
 scripts/solidsdd-next.sh validate --project-root /path/to/project --declared critique_change_brief [--change-id ID]
+scripts/solidsdd-next.sh parse-profile --text "--profile thin: fix the typo" [--pretty]
 ```
 
 Requires Python 3 + `jsonschema`.
+
+## `parse-profile`
+
+Extracts an explicit Execution Profile token from raw instruction text, for Triage (see [triage.md](../../reference-src/triage.md)) — mechanical instead of ad hoc prose parsing, needs no `--project-root` / `--change-id`. Recognizes `--profile <value>`, `--profile=<value>`, and `profile: <value>` (case-insensitive; `auto`/`direct`/`thin`/`standard`/`full`).
+
+```bash
+$ scripts/solidsdd-next.sh parse-profile --text "--profile thin: fix the typo"
+{"version": "1", "requested_profile": "thin", "explicit": true, "matched_text": "--profile thin"}
+
+$ scripts/solidsdd-next.sh parse-profile --text "no explicit profile here"
+{"version": "1", "requested_profile": "auto", "explicit": false, "matched_text": null}
+
+$ scripts/solidsdd-next.sh parse-profile --text "--profile fast please"
+{"version": "1", "requested_profile": "auto", "explicit": false, "matched_text": null, "warning": "found a profile-like token 'fast' that is not one of ('auto', 'direct', 'thin', 'standard', 'full'); ignoring and defaulting to auto"}
+```
+
+`requested_profile` here is only the **input** to Triage's `effective = max(requested, required_minimum)` computation — `parse-profile` never applies the safety-override floor itself, and never writes anything.
 
 ## Output
 

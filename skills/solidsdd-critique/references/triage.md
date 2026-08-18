@@ -89,9 +89,13 @@ take the stricter one.
 ## Explicit profile + safety override
 
 The user may ask for a profile conversationally (`--profile <x>` or
-`profile: <x>` in the request text; unspecified → `auto`). Triage always
-computes `required_minimum_profile` from the table above **independent of**
-what was requested, then:
+`profile: <x>` in the request text; unspecified → `auto`). Extract this
+token with `scripts/solidsdd-next.sh parse-profile --text "<instruction>"`
+(prefer it over ad hoc prose parsing — mechanical and consistent regardless
+of who reads the instruction; see
+[solidsdd-next.md](../scripts/solidsdd-next/README.md)) to get
+`requested_profile`. Triage always computes `required_minimum_profile` from
+the table above **independent of** what was requested, then:
 
 ```text
 effective_profile = max(requested_profile, required_minimum_profile)
@@ -127,16 +131,21 @@ purposes but the change directory keeps both for audit (e.g.
 [human-gates.md](human-gates.md)).
 
 **Carry forward, do not redo:** whatever the lower profile already produced
-stays useful input for the higher one — pass an L1 run's context/impact note
-into `solidsdd-intake` / `solidsdd-brief` as prior framing instead of
-re-deriving it from nothing; treat any code already implemented under L0/L1
-as the starting point for the relevant WorkPlan item's slice (its `solidsdd-loop`
+stays useful input for the higher one. An L1 run's optional Context/Impact
+note already lives at the canonical `context-pack-framing.md` path (same
+shape used for outer Intake/Brief Tasks — see [execution-model.md](../docs/execution-model.md)
+"Context pack"), not a separate file; append the L1 attempt's outcome
+(touched files, diff summary, verification result) to it and pass it into
+`solidsdd-intake` / `solidsdd-brief` as prior framing instead of re-deriving
+framing from nothing. Treat any code already implemented under L0/L1 as the
+starting point for the relevant WorkPlan item's slice (its `solidsdd-loop`
 still runs Plan/Verify in full — Implement Slice may find little left to
-change, which is fine, not a shortcut). Do re-run whatever guarantee the
-higher profile requires and the lower one didn't provide (ChangeBrief,
-WorkPlan, Architecture Judgment, the checkpoint critiques the Sequence at
-that profile requires) — escalation upgrades assurance, it does not
-retroactively grant it.
+change, which is fine, not a shortcut; that item's own `items/<item_id>/context-pack.md`
+should cite the escalation record as **Precedent to adapt**). Do re-run
+whatever guarantee the higher profile requires and the lower one didn't
+provide (ChangeBrief, WorkPlan, Architecture Judgment, the checkpoint
+critiques the Sequence at that profile requires) — escalation upgrades
+assurance, it does not retroactively grant it.
 
 `run-state.json` upgrades from the L0 shape (none) or L1 shape (`triage` →
 `thin_implementation` → `thin_verification`) to the full phase set by

@@ -387,6 +387,46 @@ class NextTests(unittest.TestCase):
         h = nxt.compute_next(cid, cdir)
         self.assertEqual(h["action"], "knowledge_consult")
 
+    def test_parse_profile_dash_flag(self) -> None:
+        r = nxt.parse_explicit_profile("please run --profile thin: fix the typo")
+        self.assertEqual(r["requested_profile"], "thin")
+        self.assertTrue(r["explicit"])
+        self.assertEqual(r["matched_text"], "--profile thin")
+
+    def test_parse_profile_colon_form(self) -> None:
+        r = nxt.parse_explicit_profile("profile: full - handle auth change")
+        self.assertEqual(r["requested_profile"], "full")
+        self.assertTrue(r["explicit"])
+
+    def test_parse_profile_equals_and_case_insensitive(self) -> None:
+        r = nxt.parse_explicit_profile("--profile=STANDARD add the field")
+        self.assertEqual(r["requested_profile"], "standard")
+        self.assertTrue(r["explicit"])
+
+    def test_parse_profile_no_token_defaults_auto(self) -> None:
+        r = nxt.parse_explicit_profile("no explicit profile mentioned here")
+        self.assertEqual(r["requested_profile"], "auto")
+        self.assertFalse(r["explicit"])
+        self.assertNotIn("warning", r)
+
+    def test_parse_profile_invalid_value_warns_and_defaults_auto(self) -> None:
+        r = nxt.parse_explicit_profile("--profile fast please")
+        self.assertEqual(r["requested_profile"], "auto")
+        self.assertFalse(r["explicit"])
+        self.assertIn("fast", r["warning"])
+
+    def test_parse_profile_empty_text(self) -> None:
+        r = nxt.parse_explicit_profile("")
+        self.assertEqual(r["requested_profile"], "auto")
+        self.assertFalse(r["explicit"])
+
+    def test_parse_profile_cli_command(self) -> None:
+        argv = ["parse-profile", "--text", "--profile direct: bump a comment"]
+        # main() prints JSON and returns 0; capture via monkeypatching stdout is
+        # unnecessary here — just assert the exit code and that the underlying
+        # function (already tested above) is what backs the command.
+        self.assertEqual(nxt.main(argv), 0)
+
     def test_critique_architecture_enters_waves_with_ready_items(self) -> None:
         cid, cdir = self._change(
             {
