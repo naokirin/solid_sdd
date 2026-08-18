@@ -18,7 +18,11 @@ As with Kiro-like SDD tools, **manual step-by-step execution** and **AI automati
 └──────────────────┬──────────────────────┘
                    │ constraints & context
 ┌──────────────────▼──────────────────────┐
-│ Outer = solidsdd.run (req → Context → Brief → WP) │
+│ Outer = solidsdd.run                     │
+│   Triage → Execution Profile             │
+│   [direct]  inline implement + verify    │
+│   [thin]    implement Task → verify Task │
+│   [standard/full, below]                 │
 │   intake + critique(change_context)      │
 │   [optional human gate before brief]     │
 │   brief + critique(change_brief)         │
@@ -60,12 +64,14 @@ Execution policy: [execution-model.md](execution-model.md). Run cost / greenfiel
    Do not run judgment, apply, derive-tests, implement, and verify in one continuous agent context (avoids bias, self-grading, and watered-down contracts).
 7. **Producers do not grade their own phase artifacts**  
    When invoked by a checkpoint or failure, `solidsdd.critique` adversarially evaluates phase artifacts (including weak contracts) in a separate Task.
+8. **Apply only the assurance a change needs — and let it escalate**  
+   `solidsdd.run` triages every change into an Execution Profile (direct / thin / standard / full — see [triage.md](../reference-src/triage.md)) before spending orchestration effort; the profile can only move up mid-run, never down, when risk is discovered. This is not "SDD, lightened" — `standard`/`full` keep every existing guarantee; `direct`/`thin` exist for changes that never needed them.
 
 ## Core skills (MVP)
 
 | Skill | Responsibility | Execution policy | Main I/O |
 |-------|----------------|------------------|----------|
-| `solidsdd.run` | Outer orchestration (consult → [grill?] → intake → brief → decompose → **parallel** loops → verify → harvest) | orchestrator only | Loop log / final state |
+| `solidsdd.run` | Outer orchestration: Triage (Execution Profile) → [direct \| thin \| consult → [grill?] → intake → brief → decompose → **parallel** loops → verify → harvest] | orchestrator only | Loop log / final state / `triage-result.json` |
 | `solidsdd.loop` | Slice orchestration (one change intent) | orchestrator only | Loop log / final state |
 | `solidsdd.context` | Discover stack and existing contracts | orchestrator | Context summary |
 | `solidsdd.knowledge` | Consult / harvest durable `knowledge/` (CLI: `solidsdd-kg`) | **subagent required** (from run) | `knowledge-consult.md` / `knowledge-harvest.json` |
@@ -286,7 +292,7 @@ Adapter responsibilities:
 - Default application density (thin for exploratory areas; strict for money / authz boundaries, etc.)
 - Whether merge/done without verification is forbidden
 - Handling of API breaking changes (warn / block / require approval)
-- Orchestrator max loop count and escalation on failure
+- Orchestrator max loop count and escalation on failure — now concretely the Execution Profile Escalation rules in [triage.md](../reference-src/triage.md) (verification failure, contract mismatch, discovered architecture/API impact, etc. force a re-triage that only moves up)
 - Human-gate conditions (first adoption, breaking changes, low judgment confidence, etc.)
 
 ## Manual vs automatic execution

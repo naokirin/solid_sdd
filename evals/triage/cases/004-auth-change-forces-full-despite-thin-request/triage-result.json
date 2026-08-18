@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "change_id": "add-delete-permission-check",
+  "requested_profile": "thin",
+  "effective_profile": "full",
+  "required_minimum_profile": "full",
+  "change_type": "system",
+  "risk": "high",
+  "complexity": "medium",
+  "contract_impact": false,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "authorization / permission boundary change is an explicit high-risk category",
+    "requested profile thin overridden to full per the safety floor"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

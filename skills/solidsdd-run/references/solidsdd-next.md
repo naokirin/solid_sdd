@@ -44,3 +44,11 @@ cd examples/inventory-reservation
 ```
 
 If `phase` is `brief` without a passing critique file, `next` returns `critique_change_brief`. Declaring `waves` fails `validate`. Parent resumes by following `action` / `skill` without inventing phase order from chat.
+
+## Execution Profile awareness
+
+`next` reads `triage-result.json` and `run-state.execution_profile.effective` (see [triage.md](../../reference-src/triage.md)) and tailors its recommendation:
+
+- `direct` (no `run-state.json` yet): `action: direct_implementation`, `legal_actions: [direct_implementation, done]` — never recommends `intake`/`brief`/`decompose`/`architecture`/`waves`.
+- `thin`: `action: thin_implementation` (skill `solidsdd-implement`) → once implemented, `action: thin_verification` (skill `solidsdd-verify`) → on pass, `action: done`; on fail, `action: critique_verification_report` (never silently retries at `thin` — that's an escalation trigger).
+- `standard` / `full`: unchanged behavior — the full phase-based recommendations below apply once Triage's `triage` phase is passed.

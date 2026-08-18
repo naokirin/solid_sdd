@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solid-sdd.dev/schemas/triage-result.schema.json",
+  "title": "TriageResult",
+  "description": "Output of solidsdd.run's Triage step: classifies a change and selects an Execution Profile (direct/thin/standard/full). Persisted at .solidsdd/changes/<change_id>/triage-result.json for every change, including direct (L0), which otherwise writes no run-state.json. See reference-src/triage.md for the decision rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "change_id",
+    "requested_profile",
+    "effective_profile",
+    "required_minimum_profile",
+    "change_type",
+    "risk",
+    "complexity",
+    "contract_impact",
+    "architecture_impact",
+    "uncertain",
+    "reasons",
+    "decided_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 48
+    },
+    "requested_profile": {
+      "type": "string",
+      "enum": ["auto", "direct", "thin", "standard", "full"],
+      "description": "What the user asked for (conversational --profile <x> / profile: <x> token), or auto when unspecified."
+    },
+    "effective_profile": {
+      "type": "string",
+      "enum": ["direct", "thin", "standard", "full"],
+      "description": "max(requested_profile, required_minimum_profile) — never lower than the safety floor."
+    },
+    "required_minimum_profile": {
+      "type": "string",
+      "enum": ["direct", "thin", "standard", "full"],
+      "description": "Safety floor computed from change_type / risk / complexity / contract_impact / architecture_impact / uncertain, independent of what was requested."
+    },
+    "change_type": {
+      "type": "string",
+      "enum": ["local", "contract", "system"]
+    },
+    "risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "contract_impact": {
+      "type": "boolean",
+      "description": "Change touches an existing/new OpenAPI, GraphQL schema, OCL/DbC, formal spec, or the Architecture Model."
+    },
+    "architecture_impact": {
+      "type": "boolean",
+      "description": "Change touches structure, module boundaries, or dependency direction (mirrors solidsdd-architecture's own Level-0 trigger check)."
+    },
+    "uncertain": {
+      "type": "boolean",
+      "description": "Triage could not confidently classify the change. When true, required_minimum_profile must not be direct or thin (uncertainty is a risk factor, not a reason to default low)."
+    },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Short human-readable reasons behind the profile decision, e.g. \"Existing behavior remains local\", \"No public contract change\"."
+    },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "trigger", "reason", "at"],
+      "description": "Present only when this TriageResult supersedes an earlier lower-profile decision for the same change_id.",
+      "properties": {
+        "from": {
+          "type": "string",
+          "enum": ["direct", "thin", "standard", "full"]
+        },
+        "to": {
+          "type": "string",
+          "enum": ["direct", "thin", "standard", "full"]
+        },
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "verification_failure",
+            "unexpected_test_failure",
+            "contract_mismatch",
+            "unexpected_dependency",
+            "architecture_impact_discovered",
+            "public_api_impact_discovered",
+            "data_integrity_risk_discovered",
+            "scope_exceeds_assessment",
+            "agent_uncertain",
+            "other"
+          ]
+        },
+        "reason": { "type": "string" },
+        "at": {
+          "type": "string",
+          "description": "ISO-8601 timestamp."
+        }
+      }
+    },
+    "decided_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp."
+    }
+  }
+}

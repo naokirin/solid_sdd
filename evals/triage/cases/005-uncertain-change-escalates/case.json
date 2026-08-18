@@ -1,0 +1,5 @@
+{
+  "id": "005-uncertain-change-escalates",
+  "description": "Triage unable to confidently classify scope must not default to direct/thin",
+  "scenario": "Requirement text is ambiguous about whether an existing internal helper is also called from a public entry point."
+}

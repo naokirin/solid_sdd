@@ -4,6 +4,19 @@ solid_sdd trades wall-clock agent time for **isolation and checkability**. Small
 
 For the broader structural improvement plan to reduce Task counts and transition to Slice/Checkpoint-based orchestration, see [cost-reduction-plan.md](cost-reduction-plan.md).
 
+## Execution Profile cost model
+
+Before any of the below applies, `solidsdd-run` triages the change into an Execution Profile — see [triage.md](../reference-src/triage.md). The Canonical Consolidated Model and its cost skips (B1–B5) below describe the `standard`/`full` path only; `direct`/`thin` are a **different, cheaper scale**, not a further skip inside that same path:
+
+| Profile | Outer Task-class steps | Per-change cost shape |
+|---|---|---|
+| `direct` (L0) | **0** | Inline edit + project test/lint/typecheck; no Task, no `run-state.json` |
+| `thin` (L1) | **2** (normal path) | Task `solidsdd-implement` → Task `solidsdd-verify`; critique only on failure |
+| `standard` (L2) | **4–6** (see below) | Full Canonical Consolidated Model |
+| `full` (L3) | **4–6**, with fewer optional steps skipped | Same model as `standard`; cross-change/knowledge-consistency critique and formal-deferral justification become required rather than recommended |
+
+**Do not confuse this with cost-skip B1–B5 below.** B1–B5 are mechanical, narrowly-scoped exceptions *inside* the `standard`/`full` pipeline (skip one Task inside a slice, or skip a duplicate integration verify). Execution Profile is a policy-level, phase-scale decision made once at Triage, before the pipeline starts. A `direct`/`thin` change never reaches B1–B5 because it never reaches the pipeline they apply to.
+
 ## Cost model (order of magnitude)
 
 ### Canonical Consolidated Model (Current Standard)

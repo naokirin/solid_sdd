@@ -244,6 +244,149 @@ class NextTests(unittest.TestCase):
         h = nxt.compute_next(cid, cdir)
         self.assertEqual(h["action"], "human_gate")
 
+    def test_direct_profile_recommends_direct_implementation_no_run_state(self) -> None:
+        cid, cdir = self._change(
+            {
+                "triage-result.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "requested_profile": "auto",
+                    "effective_profile": "direct",
+                    "required_minimum_profile": "direct",
+                    "change_type": "local",
+                    "risk": "low",
+                    "complexity": "low",
+                    "contract_impact": False,
+                    "architecture_impact": False,
+                    "uncertain": False,
+                    "reasons": ["typo fix; no contract/architecture impact"],
+                    "decided_at": "2026-08-18T00:00:00Z",
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "direct_implementation")
+        legal = set(h["legal_actions"])
+        for heavy in ("intake", "brief", "decompose", "architecture", "waves"):
+            self.assertNotIn(heavy, legal)
+
+    def test_thin_profile_recommends_thin_implementation_no_run_state(self) -> None:
+        cid, cdir = self._change(
+            {
+                "triage-result.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "requested_profile": "auto",
+                    "effective_profile": "thin",
+                    "required_minimum_profile": "thin",
+                    "change_type": "local",
+                    "risk": "low",
+                    "complexity": "low",
+                    "contract_impact": False,
+                    "architecture_impact": False,
+                    "uncertain": False,
+                    "reasons": ["small additive change"],
+                    "decided_at": "2026-08-18T00:00:00Z",
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "thin_implementation")
+        self.assertEqual(h["skill"], "solidsdd-implement")
+        legal = set(h["legal_actions"])
+        for heavy in ("intake", "brief", "decompose", "architecture", "waves"):
+            self.assertNotIn(heavy, legal)
+
+    def test_thin_implementation_phase_recommends_thin_verification(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "thin_implementation",
+                    "run_retry": {"remaining": 3, "max": 3},
+                    "execution_profile": {
+                        "requested": "auto",
+                        "effective": "thin",
+                        "required_minimum": "thin",
+                    },
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "thin_verification")
+        self.assertEqual(h["skill"], "solidsdd-verify")
+
+    def test_thin_verification_pass_recommends_done(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "thin_verification",
+                    "run_retry": {"remaining": 3, "max": 3},
+                    "execution_profile": {
+                        "requested": "auto",
+                        "effective": "thin",
+                        "required_minimum": "thin",
+                    },
+                },
+                "verification-report.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "result": "pass",
+                    "checks": [],
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "done")
+
+    def test_thin_verification_fail_recommends_critique_not_downgrade(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "thin_verification",
+                    "run_retry": {"remaining": 3, "max": 3},
+                    "execution_profile": {
+                        "requested": "auto",
+                        "effective": "thin",
+                        "required_minimum": "thin",
+                    },
+                },
+                "verification-report.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "result": "fail",
+                    "checks": [],
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "critique_verification_report")
+        self.assertEqual(h["subject"], "verification_report")
+
+    def test_standard_profile_triage_phase_falls_through_to_knowledge_consult(self) -> None:
+        cid, cdir = self._change(
+            {
+                "run-state.json": {
+                    "version": "1",
+                    "change_id": "sample-change",
+                    "phase": "triage",
+                    "run_retry": {"remaining": 3, "max": 3},
+                    "execution_profile": {
+                        "requested": "auto",
+                        "effective": "standard",
+                        "required_minimum": "standard",
+                    },
+                },
+            }
+        )
+        h = nxt.compute_next(cid, cdir)
+        self.assertEqual(h["action"], "knowledge_consult")
+
     def test_critique_architecture_enters_waves_with_ready_items(self) -> None:
         cid, cdir = self._change(
             {

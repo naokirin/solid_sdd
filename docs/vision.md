@@ -93,6 +93,8 @@ Initial axes the system uses instead of ad-hoc human judgment.
 
 The principle is not “formalize everything,” but **set application density from risk and change frequency**.
 
+This table is about **density within a change already running the standard/full pipeline** — how thin or strict a given API/DbC/formal target should be once `solidsdd-loop` reaches it. It is a different, narrower decision from the **Execution Profile** Triage selects before any of that pipeline runs at all (direct/thin/standard/full — see [execution-model.md](execution-model.md) and [run-cost.md](run-cost.md)): profile decides *whether* Intake/Brief/WorkPlan/Architecture/Loop run this change through in full; density decides, once they do, *how heavy* each target's contract should be. A `direct`/`thin` change never reaches the density table at all.
+
 ## Non-goals (for now)
 
 - Optimizing only as a plugin for a specific IDE or SDD product

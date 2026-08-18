@@ -7,14 +7,15 @@ is enum / id / short note only. Validates against schemas/run-state.schema.json
 after each write.
 
 Commands:
-  init                 create run-state.json with defaults (fail if exists unless --force)
-  set-phase            set phase (schema enum)
-  set-wave             set wave_index
-  note --append TEXT   append isolation_notes (deduped)
-  sync-items           populate/refresh items from work-plan.json
-  set-item             update one item status / loop_phase; optional --sync-work-plan
-  set-host-toolchain   snapshot .solidsdd/host-toolchain.json into run-state
-  mark-change-done     status.json done + phase done
+  init                    create run-state.json with defaults (fail if exists unless --force)
+  set-phase               set phase (schema enum)
+  set-wave                set wave_index
+  note --append TEXT      append isolation_notes (deduped)
+  sync-items              populate/refresh items from work-plan.json
+  set-item                update one item status / loop_phase; optional --sync-work-plan
+  set-host-toolchain      snapshot .solidsdd/host-toolchain.json into run-state
+  set-execution-profile   set/update the Triage-derived execution_profile object
+  mark-change-done        status.json done + phase done
 """
 from __future__ import annotations
 
@@ -50,6 +51,7 @@ NOTE_MAX = 512
 
 PHASES = [
     "context",
+    "triage",
     "grill",
     "knowledge_consult",
     "intake",
@@ -65,9 +67,16 @@ PHASES = [
     "critique_integration",
     "knowledge_harvest",
     "critique_knowledge_harvest",
+    "thin_implementation",
+    "thin_verification",
     "done",
     "stopped",
 ]
+
+REQUESTED_PROFILES = ["auto", "direct", "thin", "standard", "full"]
+PROFILES = ["direct", "thin", "standard", "full"]
+CHANGE_TYPES = ["local", "contract", "system"]
+LEVELS = ["low", "medium", "high"]
 
 ITEM_STATUSES = ["pending", "ready", "running", "done", "blocked"]
 
@@ -132,11 +141,11 @@ def default_retry() -> dict[str, Any]:
     return {"remaining": 3, "max": 3, "last_suggested_skills": []}
 
 
-def default_run_state(change_id: str) -> dict[str, Any]:
+def default_run_state(change_id: str, phase: str = "intake") -> dict[str, Any]:
     return {
         "version": "1",
         "change_id": change_id,
-        "phase": "intake",
+        "phase": phase,
         "wave_index": 0,
         "run_retry": default_retry(),
         "items": {},
@@ -163,12 +172,14 @@ def write_run_state(change_dir: Path, data: dict[str, Any], changed: list[str]) 
     emit(True, path, changed)
 
 
-def cmd_init(project: Path, change_id: str | None, force: bool) -> None:
+def cmd_init(project: Path, change_id: str | None, force: bool, phase: str) -> None:
+    if phase not in PHASES:
+        raise SystemExit(f"invalid phase {phase!r}; want one of {PHASES}")
     cid, change_dir = resolve_change_dir(project, change_id)
     path = run_state_path(change_dir)
     if path.is_file() and not force:
         raise SystemExit(f"run-state.json already exists: {path} (use --force to overwrite)")
-    data = default_run_state(cid)
+    data = default_run_state(cid, phase)
     validate_run_state(data)
     dump_json(path, data)
     emit(True, path, ["created"] if not force else ["overwritten"])
@@ -354,6 +365,74 @@ def cmd_set_host_toolchain(project: Path, change_id: str | None) -> None:
     write_run_state(change_dir, data, ["host_toolchain"])
 
 
+def cmd_set_execution_profile(
+    project: Path,
+    change_id: str | None,
+    requested: str,
+    effective: str,
+    required_minimum: str,
+    change_type: str | None,
+    risk: str | None,
+    complexity: str | None,
+    contract_impact: bool | None,
+    architecture_impact: bool | None,
+    uncertain: bool | None,
+    reasons: list[str],
+    escalated_from: str | None,
+    escalation_reason: str | None,
+) -> None:
+    if requested not in REQUESTED_PROFILES:
+        raise SystemExit(f"invalid --requested {requested!r}; want one of {REQUESTED_PROFILES}")
+    if effective not in PROFILES:
+        raise SystemExit(f"invalid --effective {effective!r}; want one of {PROFILES}")
+    if required_minimum not in PROFILES:
+        raise SystemExit(
+            f"invalid --required-minimum {required_minimum!r}; want one of {PROFILES}"
+        )
+    rank = {p: i for i, p in enumerate(PROFILES)}
+    if rank[effective] < rank[required_minimum]:
+        raise SystemExit(
+            f"--effective {effective!r} is below --required-minimum {required_minimum!r}; "
+            "effective must never be lower than the safety floor"
+        )
+    if change_type is not None and change_type not in CHANGE_TYPES:
+        raise SystemExit(f"invalid --change-type {change_type!r}; want one of {CHANGE_TYPES}")
+    if risk is not None and risk not in LEVELS:
+        raise SystemExit(f"invalid --risk {risk!r}; want one of {LEVELS}")
+    if complexity is not None and complexity not in LEVELS:
+        raise SystemExit(f"invalid --complexity {complexity!r}; want one of {LEVELS}")
+    if escalated_from is not None and escalated_from not in PROFILES:
+        raise SystemExit(f"invalid --escalated-from {escalated_from!r}; want one of {PROFILES}")
+
+    _, change_dir = resolve_change_dir(project, change_id)
+    data = require_run_state(change_dir)
+    profile: dict[str, Any] = {
+        "requested": requested,
+        "effective": effective,
+        "required_minimum": required_minimum,
+    }
+    if change_type is not None:
+        profile["change_type"] = change_type
+    if risk is not None:
+        profile["risk"] = risk
+    if complexity is not None:
+        profile["complexity"] = complexity
+    if contract_impact is not None:
+        profile["contract_impact"] = contract_impact
+    if architecture_impact is not None:
+        profile["architecture_impact"] = architecture_impact
+    if uncertain is not None:
+        profile["uncertain"] = uncertain
+    if reasons:
+        profile["reasons"] = reasons
+    if escalated_from is not None:
+        profile["escalated_from"] = escalated_from
+    if escalation_reason is not None:
+        profile["escalation_reason"] = escalation_reason
+    data["execution_profile"] = profile
+    write_run_state(change_dir, data, ["execution_profile"])
+
+
 def cmd_record_metrics(
     project: Path,
     change_id: str | None,
@@ -432,6 +511,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="overwrite existing run-state.json",
     )
+    init_p.add_argument(
+        "--phase",
+        choices=PHASES,
+        default="intake",
+        help="initial phase (default: intake; thin execution uses triage)",
+    )
 
     sp = sub.add_parser("set-phase", help="set run-state phase")
     sp.add_argument("--phase", required=True, choices=PHASES)
@@ -458,6 +543,32 @@ def build_parser() -> argparse.ArgumentParser:
         "set-host-toolchain",
         help="copy readiness from .solidsdd/host-toolchain.json",
     )
+
+    ep = sub.add_parser(
+        "set-execution-profile",
+        help="set/update the Triage-derived execution_profile object",
+    )
+    ep.add_argument("--requested", required=True, choices=REQUESTED_PROFILES)
+    ep.add_argument("--effective", required=True, choices=PROFILES)
+    ep.add_argument("--required-minimum", required=True, dest="required_minimum", choices=PROFILES)
+    ep.add_argument("--change-type", dest="change_type", choices=CHANGE_TYPES, default=None)
+    ep.add_argument("--risk", choices=LEVELS, default=None)
+    ep.add_argument("--complexity", choices=LEVELS, default=None)
+    ep.add_argument("--contract-impact", dest="contract_impact", action="store_true", default=None)
+    ep.add_argument(
+        "--architecture-impact", dest="architecture_impact", action="store_true", default=None
+    )
+    ep.add_argument("--uncertain", dest="uncertain", action="store_true", default=None)
+    ep.add_argument(
+        "--reason",
+        dest="reasons",
+        action="append",
+        default=[],
+        help="short reason; repeatable",
+    )
+    ep.add_argument("--escalated-from", dest="escalated_from", choices=PROFILES, default=None)
+    ep.add_argument("--escalation-reason", dest="escalation_reason", default=None)
+
     rm_p = sub.add_parser("record-metrics", help="record or increment run metrics")
     rm_p.add_argument("--inc-task-launches", type=int, default=0, help="increment task launch count")
     rm_p.add_argument("--inc-critiques", type=int, default=0, help="increment critique count")
@@ -476,7 +587,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     project = args.project_root.resolve()
     if args.command == "init":
-        cmd_init(project, args.change_id, args.force)
+        cmd_init(project, args.change_id, args.force, args.phase)
     elif args.command == "set-phase":
         cmd_set_phase(project, args.change_id, args.phase)
     elif args.command == "set-wave":
@@ -496,6 +607,23 @@ def main(argv: list[str] | None = None) -> int:
         )
     elif args.command == "set-host-toolchain":
         cmd_set_host_toolchain(project, args.change_id)
+    elif args.command == "set-execution-profile":
+        cmd_set_execution_profile(
+            project,
+            args.change_id,
+            args.requested,
+            args.effective,
+            args.required_minimum,
+            args.change_type,
+            args.risk,
+            args.complexity,
+            args.contract_impact,
+            args.architecture_impact,
+            args.uncertain,
+            args.reasons,
+            args.escalated_from,
+            args.escalation_reason,
+        )
     elif args.command == "record-metrics":
         cmd_record_metrics(
             project,

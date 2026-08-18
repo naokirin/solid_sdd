@@ -1,0 +1,5 @@
+{
+  "id": "001-typo-fix-direct",
+  "description": "Local, no-risk wording fix should classify as direct (L0)",
+  "scenario": "Fix a typo in a README heading. No behavior, contract, or structure change."
+}

@@ -1,0 +1,5 @@
+{
+  "id": "004-auth-change-forces-full-despite-thin-request",
+  "description": "Explicit --profile thin on an authorization change must still be forced to full (safety override)",
+  "scenario": "User asks: '--profile thin: add a new permission check before deleting a resource.'"
+}

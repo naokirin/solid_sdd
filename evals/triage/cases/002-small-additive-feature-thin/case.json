@@ -1,0 +1,5 @@
+{
+  "id": "002-small-additive-feature-thin",
+  "description": "Small additive UI feature, local impact confirmed, should classify as thin (L1)",
+  "scenario": "Add a small optional sort toggle to an existing list view. No API/DB/architecture change."
+}

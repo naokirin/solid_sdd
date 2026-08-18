@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "change_id": "broken-safety-override",
+  "requested_profile": "thin",
+  "effective_profile": "thin",
+  "required_minimum_profile": "full",
+  "change_type": "system",
+  "risk": "high",
+  "complexity": "medium",
+  "contract_impact": false,
+  "architecture_impact": true,
+  "uncertain": false,
+  "reasons": [
+    "Deliberately broken fixture: effective_profile was not raised to required_minimum_profile"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

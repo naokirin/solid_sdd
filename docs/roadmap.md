@@ -170,6 +170,29 @@ reasoning or a generated/derived check.
 - [x] 11 new unit tests (`scripts/solidsdd-architecture/test_physical.py`); full existing suite, `sync-skill-references.sh --check`, `check-skill-frontmatter.sh`, and both existing Architecture examples stay green throughout
 - [ ] No dedicated Module Skill exists in solid_sdd; Physical Design responsibility stays inside `solidsdd-architecture` (Level 3) rather than being split out prematurely — see "Relation to solid_sdd Skills" in [physical-design.md](../reference-src/physical-design.md)
 
+## Phase 7: Execution Profile / Triage
+
+**Status: shipped.** Not every change needs Full SDD. `solidsdd-run` now triages
+each change into an **Execution Profile** — `direct` (L0) / `thin` (L1) /
+`standard` (L2) / `full` (L3) — before spending any orchestration effort, so
+trivial and simple changes skip Intake/Brief/WorkPlan/Architecture/Critique
+entirely instead of paying for the full pipeline on every change. `standard`
+and `full` remain exactly today's pipeline, unchanged; a profile can only
+escalate upward mid-run, never down. See [triage.md](../reference-src/triage.md),
+[execution-model.md](execution-model.md) "Triage and Execution Profile", and
+[run-cost.md](run-cost.md) "Execution Profile cost model".
+
+- [x] `TriageResult` schema (`change_type` / `risk` / `complexity` / `contract_impact` / `architecture_impact` / `uncertain` / `reasons`, `requested`/`effective`/`required_minimum` profile, optional `escalation`) — [../schemas/triage-result.schema.json](../schemas/triage-result.schema.json)
+- [x] `run-state.schema.json` gained `triage` / `thin_implementation` / `thin_verification` phases and an `execution_profile` object carried forward for resume/escalation
+- [x] Triage decision rules (Change Type, complexity signals, risk categories mirroring [human-gates.md](../reference-src/human-gates.md), contract/architecture impact check, priority table, explicit-profile safety override `effective = max(requested, required_minimum)`, escalation triggers) — [../reference-src/triage.md](../reference-src/triage.md)
+- [x] `solidsdd-run/SKILL.md`: Triage/resume dispatch step, **Direct (L0)** and **Thin (L1)** execution sections (no Intake/Brief/WorkPlan/Architecture/Critique on a clean pass), **Standard/Full (L2/L3)** section reusing the existing Sequence unchanged (with `full`-only tightenings on the cross-change/knowledge-consistency critiques and formal deferral), and an **Escalation** section carrying forward already-produced work instead of redoing it
+- [x] `solidsdd-critique`: new `subject: triage`, used only for failure-driven/uncertain re-checks of a Triage call — never a producer-driven checkpoint
+- [x] `scripts/solidsdd-run-state/run_state.py`: `init --phase` and `set-execution-profile` (schema-validated; refuses `--effective` below `--required-minimum`)
+- [x] `scripts/solidsdd-next/next.py`: profile-aware `next` — `direct`/`thin` never recommend `intake`/`brief`/`decompose`/`architecture`/`waves`; `standard`/`full` unchanged
+- [x] `rules/solidsdd.mdc`: routes multi-criterion changes through Triage; broadened the non-negotiable gate rule to explicitly cover every profile
+- [x] Unit tests for the new `run_state.py` / `next.py` behavior (mechanical, no LLM) — the concrete evidence that L0/L1 never recommend the heavy phases
+- [x] `evals/triage/` fixture cases (shape + safety-override invariant + hand-verified priority-table checks, mirroring `evals/critique/`'s scope limits) — [../evals/triage](../evals/triage), `scripts/solidsdd-triage-eval.py`
+
 ## Near-term next actions
 
 1. GitHub Release / tag workflow for `install-into-project.sh --repo/--ref` (optional packaging of install-manifest payload)

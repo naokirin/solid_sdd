@@ -15,12 +15,20 @@ Critique is not automatically launched after every phase. `Plan Review` is the n
 
 When a user manually names a single skill, the conversation agent may run it (the user is the parent).
 
-## Two-layer orchestration
+## Triage and Execution Profile
+
+Before any of the below runs, `solidsdd.run` triages the change and picks an **Execution Profile** — `direct` (L0), `thin` (L1), `standard` (L2), or `full` (L3). Triage is parent-only (no Task) and must stay light — it is a judgment step, not a Full-SDD-equivalent process. `standard`/`full` run exactly the pipeline below, unchanged; `direct` implements inline with no orchestration; `thin` runs a minimal implement→verify Task pair. See [triage.md](../reference-src/triage.md) and [run-cost.md](run-cost.md#execution-profile-cost-model) for the decision rules and cost shape, and `skills/solidsdd-run/SKILL.md` for the exact dispatch. A profile only escalates upward mid-run, never down.
 
 ```text
 User or solidsdd.run (outer parent)
   │
   ├─ solidsdd.context                 … parent OK
+  ├─ Triage                           … parent OK, no Task — picks direct/thin/standard/full
+  │
+  ├─ [direct]  inline implement + project verify, no further Tasks
+  ├─ [thin]    Task: solidsdd.implement → Task: solidsdd.verify (critique only on failure)
+  │
+  ├─ [standard / full, below]
   ├─ Task: solidsdd.intake            ← Change Context (MD) + gate JSON
   ├─ [only if change-context-gate human_gate.required]
   │     ├─ Task: solidsdd.critique    ← subject: change_context
@@ -49,7 +57,7 @@ User or solidsdd.run (outer parent)
        └─ Task: solidsdd.critique     ← verification_report
 ```
 
-- **`solidsdd.run`**: Intake → Brief → decompose → architecture judgment → **wave-scoped slices** → integration verify → mark change `done`. Do not reimplement loop phases in the parent.
+- **`solidsdd.run`**: Triage (Execution Profile) → [direct | thin | Intake → Brief → decompose → architecture judgment → **wave-scoped slices** → integration verify → mark change `done`]. Do not reimplement loop phases in the parent. The bracketed pipeline is `standard`/`full` only.
 - **`solidsdd.loop`**: Dedicated to **one slice** (one verifiable acceptance criterion / one change intent). Need not know WorkPlan; may receive ChangeBrief / Change Context excerpts for scope and tech.
 - Even a single-item WorkPlan: run still invokes loop **once**, then integration verify.
 - **Parallelism**: Launch `solidsdd.loop` for all `ready` items in a wave by default. Serialize only contested groups when there is clear path contention on the same artifacts.
@@ -87,8 +95,9 @@ The **Consolidated Slice Model** is the canonical execution model for `solidsdd-
 | Skill | Execution policy | Reason |
 |-------|------------------|--------|
 | `solidsdd.run` | **orchestrator only** | Outer parent; do not delegate to a subagent |
-| `solidsdd.loop` | **orchestrator only** | Slice parent; do not delegate to a subagent |
+| `solidsdd.loop` | **orchestrator only** | Slice parent; do not delegate to a subagent (`standard`/`full` only — see Triage) |
 | `solidsdd.context` | orchestrator | For later planning; light exploration may stay on the parent |
+| Triage | orchestrator, no Task | Must stay light — a judgment step over the request text and repo state, not a producer artifact; see [triage.md](../reference-src/triage.md) |
 | `solidsdd.intake` | **subagent required** | Isolate demand / NFR / tech framing from scope slicing |
 | `solidsdd.brief` | **subagent required** | Isolate change scope (in/out) from slicing and implementation |
 | `solidsdd.decompose` | **subagent required** | Isolate work decomposition from contract judgment and implementation |

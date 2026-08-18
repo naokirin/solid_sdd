@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "change_id": "helper-scope-unclear",
+  "requested_profile": "auto",
+  "effective_profile": "standard",
+  "required_minimum_profile": "standard",
+  "change_type": "contract",
+  "risk": "medium",
+  "complexity": "medium",
+  "contract_impact": true,
+  "architecture_impact": false,
+  "uncertain": true,
+  "reasons": [
+    "Cannot confidently determine whether this helper is reachable from a public entry point",
+    "Uncertainty treated as a risk factor; not defaulted to direct or thin"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

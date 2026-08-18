@@ -1,0 +1,5 @@
+{
+  "id": "003-public-api-change-standard",
+  "description": "Additive but public OpenAPI response field change should classify at least standard (L2)",
+  "scenario": "Add a new field to an existing, published API response schema."
+}

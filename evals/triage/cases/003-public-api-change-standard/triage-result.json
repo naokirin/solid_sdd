@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "change_id": "add-order-total-field",
+  "requested_profile": "auto",
+  "effective_profile": "standard",
+  "required_minimum_profile": "standard",
+  "change_type": "contract",
+  "risk": "medium",
+  "complexity": "low",
+  "contract_impact": true,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "Change touches an already-published OpenAPI response schema",
+    "Additive and backward-compatible, but still a public contract change"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

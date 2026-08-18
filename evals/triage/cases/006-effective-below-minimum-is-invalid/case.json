@@ -1,0 +1,5 @@
+{
+  "id": "006-effective-below-minimum-is-invalid",
+  "description": "A candidate TriageResult with effective_profile below required_minimum_profile must be flagged as an invariant violation, even though it is schema-valid on its own",
+  "scenario": "Negative case: simulates a bug where the safety override was not applied."
+}

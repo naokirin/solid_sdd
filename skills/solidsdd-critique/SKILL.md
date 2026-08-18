@@ -1,10 +1,10 @@
 ---
 name: solidsdd-critique
 description: >-
-  Adversarial, read-only critique of a prior solid_sdd phase artifact (change
-  context, change brief, work plan, application plan, contracts, derived tests,
-  formal specs, verification, knowledge harvest, knowledge consistency, or
-  cross-change consistency).
+  Adversarial, read-only critique of a prior solid_sdd phase artifact (triage,
+  change context, change brief, work plan, application plan, contracts, derived
+  tests, formal specs, verification, knowledge harvest, knowledge consistency,
+  or cross-change consistency).
   When called from solidsdd-loop or solidsdd-run, must run as an explicit Task
   subagent. Runs deterministic solidsdd-lint first, then LLM adequacy review.
   Emits CritiqueReport; does not edit artifacts. Calibrated so only
@@ -26,6 +26,7 @@ Emit a `CritiqueReport` that adversarially evaluates another phase’s result. R
 ## References
 
 - [critique-report.schema.json](references/critique-report.schema.json)
+- [triage.md](references/triage.md) — when `subject` is `triage` (rare — see below)
 - [adversarial-critique.md](references/adversarial-critique.md) — **severity calibration + lint-first (required)**
 - [run-cost.md](references/run-cost.md) — WorkPlan greenfield / `touches` smells stay minor unless checkability is lost
 - [working-language.md](references/working-language.md) — finding detail language
@@ -52,6 +53,10 @@ When reviewing a ChangeBrief, resolve path via `.solidsdd/active-change.json` �
 - Do not soft-pedal true checkability holes as `minor`
 - On fail, set `loop_action` and `suggested_next_skills` per [loop-retry.md](references/loop-retry.md)
 - Finding `detail` strings use the **working language** ([working-language.md](references/working-language.md)); keys/enums stay English
+
+## `subject: triage`
+
+Unlike every other subject, `triage` is **never** a checkpoint — `solidsdd-run`'s Triage step (see [triage.md](references/triage.md)) does not get a producer-driven critique on a clean pass. Only call this subject when Triage's own call is in question: a Thin (L1) execution hit an escalation trigger and the parent wants a second opinion on whether the new `effective_profile` (or a further escalation) is right, before continuing. Evaluate against the priority decision table and the explicit-profile safety override in [triage.md](references/triage.md) — the only things that can fail here are `effective_profile` being below `required_minimum_profile`, or `reasons` not supporting the classification.
 
 ## Inputs (from parent Task prompt)
 

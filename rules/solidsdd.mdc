@@ -9,13 +9,13 @@ This project uses solid_sdd for machine-checkable Spec-Driven Development.
 
 ## Where to start
 
-- Multi-criterion change (spans several acceptance criteria) → **`solidsdd-run`**
-- Single known slice (one clear acceptance criterion) → **`solidsdd-loop`**
+- Multi-criterion change (spans several acceptance criteria) → **`solidsdd-run`** — it triages first and picks direct/thin/standard/full; not every change gets the full flow
+- Single known slice already scoped at standard/full (one clear acceptance criterion) → **`solidsdd-loop`**
 - Framing is ambiguous before either → **`solidsdd-grill`** (optional, conditional)
 - A human-readable snapshot of a change → **`solidsdd-report`** (manual only, not part of `solidsdd-run`)
 
-Read the skill you are about to invoke for procedure; do not infer procedure from this file, and do not thin or rewrite its artifacts (Change Context, ChangeBrief, WorkPlan, ApplicationPlan, CritiqueReport, VerificationReport, knowledge-harvest.json) in the parent.
+Read the skill you are about to invoke for procedure; do not infer procedure from this file, and do not thin or rewrite its artifacts (Change Context, ChangeBrief, WorkPlan, ApplicationPlan, CritiqueReport, VerificationReport, knowledge-harvest.json, TriageResult) in the parent.
 
 ## Non-negotiable
 
-Never mark a change `done`, or a slice complete, while a required check, critique, or human gate is unresolved.
+Never mark a change `done`, or a slice complete, while a required check, critique, or human gate is unresolved — at **every** Execution Profile, including direct (L0) and thin (L1). A low profile lightens orchestration, never the requirement that what did run actually passed.

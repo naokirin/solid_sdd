@@ -203,6 +203,16 @@ def hint(
     return out
 
 
+def effective_profile(rs: dict[str, Any], triage: dict[str, Any] | None) -> str | None:
+    """Read Triage's effective_profile, preferring the persisted run-state copy."""
+    prof = rs.get("execution_profile")
+    if isinstance(prof, dict) and prof.get("effective"):
+        return prof["effective"]
+    if isinstance(triage, dict):
+        return triage.get("effective_profile")
+    return None
+
+
 def compute_next(
     change_id: str, change_dir: Path, layout: Layout | None = None
 ) -> dict[str, Any]:
@@ -210,6 +220,7 @@ def compute_next(
     phase = rs.get("phase")
     work = load_optional(change_dir, "work-plan.json")
     status = load_optional(change_dir, "status.json") or {}
+    triage = load_optional(change_dir, "triage-result.json")
 
     if status.get("status") == "done" or phase == "done":
         return hint(
@@ -217,6 +228,104 @@ def compute_next(
             phase=phase or "done",
             action="done",
             reason="change status or phase is done",
+        )
+
+    if triage is not None and not phase:
+        profile = effective_profile(rs, triage)
+        if profile == "direct":
+            return hint(
+                change_id=change_id,
+                phase=None,
+                action="direct_implementation",
+                reason=(
+                    "Triage selected direct (L0): implement inline and run project "
+                    "verification; no orchestration phases apply — see triage-result.json"
+                ),
+                inputs=["triage-result.json"],
+                legal=["direct_implementation", "done"],
+            )
+        if profile == "thin":
+            return hint(
+                change_id=change_id,
+                phase="triage",
+                action="thin_implementation",
+                skill="solidsdd-implement",
+                reason=(
+                    "Triage selected thin (L1): implement then verify; "
+                    "brief/decompose/architecture do not apply"
+                ),
+                inputs=["triage-result.json"],
+                legal=["thin_implementation"],
+            )
+        # standard/full: fall through to the phase-based logic below, unchanged.
+
+    if phase == "triage":
+        profile = effective_profile(rs, triage)
+        if profile == "thin":
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="thin_implementation",
+                skill="solidsdd-implement",
+                reason="thin (L1): run implementation",
+                legal=["thin_implementation"],
+            )
+        if profile == "direct":
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="direct_implementation",
+                reason="direct (L0) should not have a run-state.json; implement inline",
+                legal=["direct_implementation"],
+            )
+        return hint(
+            change_id=change_id,
+            phase=phase,
+            action="knowledge_consult",
+            skill="solidsdd-knowledge",
+            reason="triage complete; profile standard/full — advance outer framing",
+            legal=["knowledge_consult", "grill", "intake"],
+        )
+
+    if phase == "thin_implementation":
+        if not exists(change_dir, "verification-report.json"):
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="thin_verification",
+                skill="solidsdd-verify",
+                reason="thin (L1): run verification after implementation",
+                legal=["thin_verification"],
+            )
+        phase = "thin_verification"
+
+    if phase == "thin_verification":
+        report = load_optional(change_dir, "verification-report.json")
+        if report is None:
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="thin_verification",
+                skill="solidsdd-verify",
+                reason="thin (L1): verification-report.json missing",
+                legal=["thin_verification"],
+            )
+        if report.get("result") == "pass":
+            return hint(
+                change_id=change_id,
+                phase=phase,
+                action="done",
+                reason="thin (L1) verification passed",
+                legal=["done"],
+            )
+        return hint(
+            change_id=change_id,
+            phase=phase,
+            action="critique_verification_report",
+            skill="solidsdd-critique",
+            subject="verification_report",
+            reason="thin (L1) verification failed; critique then re-triage/escalate",
+            legal=["critique_verification_report", "re_triage"],
         )
 
     opens = blocking_clarifications(change_dir)
@@ -261,8 +370,8 @@ def compute_next(
                 phase=None,
                 action="context",
                 skill="solidsdd-context",
-                reason="no run-state; start with solidsdd-context",
-                legal=["context", "knowledge_consult", "grill", "intake"],
+                reason="no run-state; start with solidsdd-context, then triage",
+                legal=["context", "triage", "knowledge_consult", "grill", "intake"],
             )
         # Context exists without phase → critique or brief path
         phase = "intake"

@@ -262,6 +262,9 @@ sync_one schemas/run-state.schema.json skills/solidsdd-loop/references/run-state
 sync_one schemas/run-state.schema.json skills/solidsdd-run/references/run-state.schema.json
 sync_one scripts/solidsdd-next/README.md skills/solidsdd-run/references/solidsdd-next.md
 sync_one schemas/run-next.schema.json skills/solidsdd-run/references/run-next.schema.json
+sync_one reference-src/triage.md skills/solidsdd-run/references/triage.md
+sync_one reference-src/triage.md skills/solidsdd-critique/references/triage.md
+sync_one schemas/triage-result.schema.json skills/solidsdd-run/references/triage-result.schema.json
 sync_one reference-src/change-lifecycle.md skills/solidsdd-brief/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-run/references/change-lifecycle.md
 sync_one reference-src/change-lifecycle.md skills/solidsdd-decompose/references/change-lifecycle.md

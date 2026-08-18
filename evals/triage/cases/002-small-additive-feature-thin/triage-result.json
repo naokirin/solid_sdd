@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "change_id": "add-list-sort-toggle",
+  "requested_profile": "auto",
+  "effective_profile": "thin",
+  "required_minimum_profile": "thin",
+  "change_type": "local",
+  "risk": "low",
+  "complexity": "low",
+  "contract_impact": false,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "Small additive UI feature confined to one existing view",
+    "No public contract or architecture impact"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

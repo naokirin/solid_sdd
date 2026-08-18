@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "change_id": "fix-readme-typo",
+  "requested_profile": "auto",
+  "effective_profile": "direct",
+  "required_minimum_profile": "direct",
+  "change_type": "local",
+  "risk": "low",
+  "complexity": "low",
+  "contract_impact": false,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "Wording-only change to a Markdown file",
+    "No contract, API, DB, or architecture impact"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}

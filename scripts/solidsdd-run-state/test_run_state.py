@@ -256,6 +256,114 @@ class RunStateCliTests(unittest.TestCase):
         self.assertEqual(data["metrics"]["critique_count"], 3)
         rs.validate_run_state(data)
 
+    def test_init_with_triage_phase(self) -> None:
+        root, _, cdir = self._project(with_work_plan=False)
+        self.assertEqual(
+            rs.main(["--project-root", str(root), "init", "--phase", "triage"]),
+            0,
+        )
+        data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["phase"], "triage")
+        rs.validate_run_state(data)
+
+    def test_set_execution_profile(self) -> None:
+        root, _, cdir = self._project(with_work_plan=False)
+        rs.main(["--project-root", str(root), "init", "--phase", "triage"])
+        self.assertEqual(
+            rs.main(
+                [
+                    "--project-root",
+                    str(root),
+                    "set-execution-profile",
+                    "--requested",
+                    "auto",
+                    "--effective",
+                    "thin",
+                    "--required-minimum",
+                    "thin",
+                    "--change-type",
+                    "local",
+                    "--risk",
+                    "low",
+                    "--complexity",
+                    "low",
+                    "--reason",
+                    "Existing behavior remains local",
+                    "--reason",
+                    "No public contract change",
+                ]
+            ),
+            0,
+        )
+        data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+        profile = data["execution_profile"]
+        self.assertEqual(profile["requested"], "auto")
+        self.assertEqual(profile["effective"], "thin")
+        self.assertEqual(profile["required_minimum"], "thin")
+        self.assertEqual(profile["change_type"], "local")
+        self.assertEqual(len(profile["reasons"]), 2)
+        rs.validate_run_state(data)
+
+    def test_set_execution_profile_rejects_effective_below_minimum(self) -> None:
+        root, _, _ = self._project(with_work_plan=False)
+        rs.main(["--project-root", str(root), "init", "--phase", "triage"])
+        with self.assertRaises(SystemExit):
+            rs.main(
+                [
+                    "--project-root",
+                    str(root),
+                    "set-execution-profile",
+                    "--requested",
+                    "thin",
+                    "--effective",
+                    "thin",
+                    "--required-minimum",
+                    "full",
+                ]
+            )
+
+    def test_set_execution_profile_records_escalation(self) -> None:
+        root, _, cdir = self._project(with_work_plan=False)
+        rs.main(["--project-root", str(root), "init", "--phase", "triage"])
+        rs.main(
+            [
+                "--project-root",
+                str(root),
+                "set-execution-profile",
+                "--requested",
+                "auto",
+                "--effective",
+                "thin",
+                "--required-minimum",
+                "thin",
+            ]
+        )
+        self.assertEqual(
+            rs.main(
+                [
+                    "--project-root",
+                    str(root),
+                    "set-execution-profile",
+                    "--requested",
+                    "auto",
+                    "--effective",
+                    "standard",
+                    "--required-minimum",
+                    "standard",
+                    "--escalated-from",
+                    "thin",
+                    "--escalation-reason",
+                    "contract_mismatch discovered during thin verify",
+                ]
+            ),
+            0,
+        )
+        data = json.loads((cdir / "run-state.json").read_text(encoding="utf-8"))
+        profile = data["execution_profile"]
+        self.assertEqual(profile["effective"], "standard")
+        self.assertEqual(profile["escalated_from"], "thin")
+        rs.validate_run_state(data)
+
     def test_changes_path_override(self) -> None:
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)

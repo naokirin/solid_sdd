@@ -21,6 +21,7 @@
       "type": "string",
       "enum": [
         "context",
+        "triage",
         "grill",
         "knowledge_consult",
         "intake",
@@ -36,10 +37,56 @@
         "critique_integration",
         "knowledge_harvest",
         "critique_knowledge_harvest",
+        "thin_implementation",
+        "thin_verification",
         "done",
         "stopped"
       ],
-      "description": "Highest-level solidsdd-run phase last completed or currently in progress. grill is optional (conditional interview before intake)."
+      "description": "Highest-level solidsdd-run phase last completed or currently in progress. grill is optional (conditional interview before intake). triage runs for every change (direct/L0 does not persist run-state at all — see triage-result.schema.json). thin_implementation / thin_verification are the L1 (thin) execution path; grill through critique_knowledge_harvest are the L2/L3 (standard/full) path."
+    },
+    "execution_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "effective", "required_minimum"],
+      "description": "Triage decision carried forward for resume / escalation. Mirrors triage-result.schema.json; see reference-src/triage.md. Absent only for the direct (L0) path, which never persists run-state.",
+      "properties": {
+        "requested": {
+          "type": "string",
+          "enum": ["auto", "direct", "thin", "standard", "full"]
+        },
+        "effective": {
+          "type": "string",
+          "enum": ["direct", "thin", "standard", "full"]
+        },
+        "required_minimum": {
+          "type": "string",
+          "enum": ["direct", "thin", "standard", "full"]
+        },
+        "change_type": {
+          "type": "string",
+          "enum": ["local", "contract", "system"]
+        },
+        "risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "contract_impact": { "type": "boolean" },
+        "architecture_impact": { "type": "boolean" },
+        "uncertain": { "type": "boolean" },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "escalated_from": {
+          "type": "string",
+          "enum": ["direct", "thin", "standard", "full"]
+        },
+        "escalation_reason": { "type": "string" }
+      }
     },
     "wave_index": {
       "type": "integer",

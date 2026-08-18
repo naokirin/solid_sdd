@@ -14,6 +14,7 @@
     "subject": {
       "type": "string",
       "enum": [
+        "triage",
         "specification",
         "change_context",
         "change_brief",
@@ -30,7 +31,7 @@
         "knowledge_harvest",
         "knowledge_consistency"
       ],
-      "description": "Which prior-phase artifact was critiqued."
+      "description": "Which prior-phase artifact was critiqued. triage is used only for failure-driven / uncertain re-checks of a Triage decision — never a producer-driven checkpoint."
     },
     "result": {
       "type": "string",
