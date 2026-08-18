@@ -60,7 +60,13 @@ export async function requestListener(req: IncomingMessage, res: ServerResponse)
       const body = (await readJson(req)) as Record<string, unknown>;
       const { op, a, b } = body;
 
-      if (!isOperation(op) || typeof a !== "number" || typeof b !== "number") {
+      if (
+        !isOperation(op) ||
+        typeof a !== "number" ||
+        typeof b !== "number" ||
+        !Number.isFinite(a) ||
+        !Number.isFinite(b)
+      ) {
         sendJson(res, 400, { error: "invalid request: require op, a, b" });
         return;
       }
@@ -86,7 +92,7 @@ export async function requestListener(req: IncomingMessage, res: ServerResponse)
 
     if (req.method === "POST" && req.url === "/memory/add") {
       const body = (await readJson(req)) as Record<string, unknown>;
-      if (typeof body?.value !== "number") {
+      if (typeof body?.value !== "number" || !Number.isFinite(body.value)) {
         sendJson(res, 400, { error: "invalid request: require value" });
         return;
       }
@@ -97,7 +103,7 @@ export async function requestListener(req: IncomingMessage, res: ServerResponse)
 
     if (req.method === "POST" && req.url === "/memory/subtract") {
       const body = (await readJson(req)) as Record<string, unknown>;
-      if (typeof body?.value !== "number") {
+      if (typeof body?.value !== "number" || !Number.isFinite(body.value)) {
         sendJson(res, 400, { error: "invalid request: require value" });
         return;
       }

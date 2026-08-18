@@ -1,0 +1,25 @@
+{
+  "version": "1",
+  "change_id": "reject-non-finite-numeric-input",
+  "result": "pass",
+  "checks": [
+    {
+      "name": "Redocly lint: openapi/openapi.yaml (--extends=spec)",
+      "kind": "openapi",
+      "result": "pass",
+      "detail": "npx --yes @redocly/cli@latest lint openapi/openapi.yaml --extends=spec -> exit 0. Output: 'openapi/openapi.yaml: validated in 11ms — Your API description is valid.' Unaffected by this change (thin-context.md confirms openapi/openapi.yaml was not touched); run for completeness since an API SoT is present."
+    },
+    {
+      "name": "npm test (vitest run)",
+      "kind": "ocl_tests",
+      "result": "pass",
+      "detail": "npm test in examples/arithmetic-api -> 3 test files, 21 tests, all passed (tests/contracts/memory.test.ts: 6, tests/contracts/calculator.test.ts: 11, tests/http/server.test.ts: 4). No new/updated automated test exists for this change (expected: thin/L1 profile per triage-result.json/thin-context.md, small existing-logic fix confined to src/server.ts request validation, no contract/openapi/OCL touched); this run establishes no regression in the pre-existing suite."
+    },
+    {
+      "name": "Manual verification: reject non-finite numeric input at /calculate, /memory/add, /memory/subtract",
+      "kind": "other",
+      "result": "pass",
+      "detail": "Started requestListener from src/server.ts via createServer(...).listen(0) on an ephemeral port (pattern from tests/http/server.test.ts) and drove it with real HTTP requests via a throwaway tsx script (not committed to the repo). Results: (1) POST /calculate {op:add,a:1e400,b:1} -> 400 {\"error\":\"invalid request: require op, a, b\"} (previously 200 {\"result\":null} before the fix). (2) POST /memory/add {value:1e400} -> 400 {\"error\":\"invalid request: require value\"} (previously 200 {\"memory\":null}). (3) POST /calculate {op:add,a:2,b:3} (normal, unaffected request) -> 200 {\"result\":5}, confirming the fix did not break the ordinary path. (4) Additionally checked POST /memory/subtract {value:1e400} -> 400 {\"error\":\"invalid request: require value\"}, covering the third handler the implementer changed. All four responses matched the expected shape and status exactly."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
 {
   "version": "1",
-  "change_id": "add-avg-operation"
+  "change_id": "reject-non-finite-numeric-input"
 }

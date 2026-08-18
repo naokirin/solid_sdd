@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "change_id": "reject-non-finite-numeric-input",
+  "requested_profile": "auto",
+  "effective_profile": "thin",
+  "required_minimum_profile": "thin",
+  "change_type": "local",
+  "risk": "low",
+  "complexity": "low",
+  "contract_impact": false,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "Existing validation rule addition: request bodies with a/b/value = Infinity currently pass the typeof===\"number\" check (JSON.parse('1e400') yields Infinity, a legal JSON number literal), then JSON.stringify silently turns an Infinity result into null in the 200 response instead of a 400 error",
+    "Fix is confined to the HTTP request-validation layer in src/server.ts; no new endpoint, no new response field, no change to openapi/openapi.yaml or contracts/*.ocl (the existing 400 'Invalid request/precondition violation' response shape already documents this error path)",
+    "Small existing-logic change (one additional finiteness check, applied uniformly at the three request handlers that parse numeric input) — worth a light implement+verify isolation pass rather than zero orchestration, since it changes accepted-vs-rejected request behavior across three endpoints"
+  ],
+  "decided_at": "2026-08-18T00:10:00Z"
+}

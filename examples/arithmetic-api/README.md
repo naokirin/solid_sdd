@@ -1,13 +1,13 @@
 # arithmetic-api (evaluation sample)
 
-A small TypeScript API for arithmetic (+ mod) and calculator memory (MC / MR / M+ / M-). Used to evaluate solid_sdd’s OpenAPI + OCL→contract-test path.
+A small TypeScript API for arithmetic (+ mod, pow, avg) and calculator memory (MC / MR / M+ / M-). Used to evaluate solid_sdd’s OpenAPI + OCL→contract-test path.
 
 ## Scenario
 
 ### Calculate
 
 - `POST /calculate` with `{ "op", "a", "b" }` returns the result
-- `op`: `add` | `sub` | `mul` | `div` | `mod`
+- `op`: `add` | `sub` | `mul` | `div` | `mod` | `pow` | `avg`
 - `div` / `mod` with `b === 0` → 400
 
 ### Memory

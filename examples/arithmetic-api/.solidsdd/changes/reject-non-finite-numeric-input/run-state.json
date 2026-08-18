@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "change_id": "reject-non-finite-numeric-input",
+  "phase": "done",
+  "wave_index": 0,
+  "run_retry": {
+    "remaining": 3,
+    "max": 3,
+    "last_suggested_skills": []
+  },
+  "items": {},
+  "isolation_notes": [],
+  "updated_at": "2026-08-18T13:55:19Z",
+  "execution_profile": {
+    "requested": "auto",
+    "effective": "thin",
+    "required_minimum": "thin",
+    "change_type": "local",
+    "risk": "low",
+    "complexity": "low",
+    "reasons": [
+      "Existing validation rule addition confined to server.ts request layer",
+      "No contract/openapi/OCL file touched"
+    ]
+  }
+}

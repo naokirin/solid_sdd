@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "change_id": "fix-readme-operation-list",
+  "requested_profile": "auto",
+  "effective_profile": "direct",
+  "required_minimum_profile": "direct",
+  "change_type": "local",
+  "risk": "low",
+  "complexity": "low",
+  "contract_impact": false,
+  "architecture_impact": false,
+  "uncertain": false,
+  "reasons": [
+    "README.md's documented /calculate op list (add|sub|mul|div|mod) is stale: src/calculator.ts and openapi/openapi.yaml already support pow and avg (added by prior changes add-power-operation, add-avg-operation)",
+    "Wording-only fix to a Markdown file; does not touch openapi/, contracts/, requirements/, or src/",
+    "No behavior, contract, or structure change; existing pow/avg implementation and their OCL contracts are untouched"
+  ],
+  "decided_at": "2026-08-18T00:00:00Z"
+}
