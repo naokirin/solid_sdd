@@ -1,0 +1,61 @@
+{
+  "version": "1",
+  "change_id": "reject-non-finite-numeric-input",
+  "items": [
+    {
+      "id": "NFR1",
+      "quality": "reliability",
+      "status": "in_scope",
+      "requirement": "Non-finite numeric inputs (Infinity, -Infinity) supplied in request bodies are rejected with a 400 error rather than silently producing a null result in a 200 response.",
+      "rationale": "JSON.parse('1e400') yields Infinity, a valid JSON number literal; without an explicit finiteness check the handler would compute a non-finite result and JSON.stringify would silently serialize it as null, giving a misleading 200 response.",
+      "threshold": "Any request to /calculate, /memory/add, or /memory/subtract containing a non-finite numeric operand always returns HTTP 400 with the documented error shape.",
+      "measurement": "Manual verification via real HTTP requests to each affected endpoint with Infinity-valued inputs.",
+      "verified_by": [
+        "src/server.ts",
+        "openapi/openapi.yaml"
+      ]
+    },
+    {
+      "id": "NFR2",
+      "quality": "security",
+      "status": "out_of_scope",
+      "requirement": "N/A — authentication and authorization are out of scope for this change.",
+      "rationale": "Auth explicitly excluded from sample scope."
+    },
+    {
+      "id": "NFR3",
+      "quality": "performance",
+      "status": "out_of_scope",
+      "requirement": "N/A — no special latency or throughput targets.",
+      "rationale": "Sample / evaluation workload only; the added Number.isFinite() check has negligible cost."
+    },
+    {
+      "id": "NFR4",
+      "quality": "operability",
+      "status": "in_scope",
+      "requirement": "The fix must not regress any of the 21 pre-existing automated tests.",
+      "rationale": "The change is confined to the HTTP request-validation layer and must not alter behavior for valid finite-input requests.",
+      "threshold": "All 21 pre-existing Vitest tests pass after the change.",
+      "measurement": "npm test in examples/arithmetic-api — 3 test files, 21 tests.",
+      "verified_by": [
+        "tests/contracts/calculator.test.ts",
+        "tests/contracts/memory.test.ts",
+        "tests/http/server.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5",
+      "quality": "compatibility",
+      "status": "out_of_scope",
+      "requirement": "N/A — openapi/openapi.yaml is not modified; the existing 400 response path already documents this error channel.",
+      "rationale": "Thin-profile change; contract surface is unchanged."
+    },
+    {
+      "id": "NFR6",
+      "quality": "maintainability",
+      "status": "out_of_scope",
+      "requirement": "N/A — no OCL or contract file is modified; the fix is an implementation-layer validation addition only.",
+      "rationale": "Thin-profile change confined to src/server.ts; no Design-by-Contract source-of-truth files are touched."
+    }
+  ]
+}

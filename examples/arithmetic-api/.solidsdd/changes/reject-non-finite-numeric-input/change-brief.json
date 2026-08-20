@@ -1,0 +1,81 @@
+{
+  "version": "1",
+  "change_id": "reject-non-finite-numeric-input",
+  "summary": "Add Number.isFinite() validation alongside existing typeof checks in the /calculate, /memory/add, and /memory/subtract request handlers so that non-finite numeric inputs (Infinity, -Infinity, NaN) are rejected with a 400 error instead of silently producing a null result in a 200 response.",
+  "goal": "Requests containing non-finite numeric values (e.g. 1e400 parsed as Infinity) are rejected at the HTTP request-validation layer with the existing 400 'Invalid request' error shape, matching the already-documented 400 response path in the OpenAPI spec.",
+  "background": "JSON.parse('{\"a\":1e400}') yields a === Infinity because 1e400 is a valid JSON number literal whose magnitude collapses to Infinity per the ECMAScript Number grammar. typeof Infinity === \"number\", so the existing typeof check accepts it. The handler then computes a non-finite result and JSON.stringify silently turns Infinity into null in the HTTP 200 response body instead of routing to the existing 400 'Invalid request' path. This is a correctness gap in the existing input-validation layer.",
+  "in_scope": [
+    {
+      "id": "R1",
+      "text": "Add Number.isFinite() guard alongside each existing typeof !== \"number\" check in the /calculate handler in src/server.ts"
+    },
+    {
+      "id": "R2",
+      "text": "Add Number.isFinite() guard alongside each existing typeof !== \"number\" check in the /memory/add handler in src/server.ts"
+    },
+    {
+      "id": "R3",
+      "text": "Add Number.isFinite() guard alongside each existing typeof !== \"number\" check in the /memory/subtract handler in src/server.ts"
+    },
+    {
+      "id": "R4",
+      "text": "Reuse the existing 400 error-response shapes: { \"error\": \"invalid request: require op, a, b\" } and { \"error\": \"invalid request: require value\" } — no new error shape"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "X1",
+      "text": "Changes to openapi/openapi.yaml or contracts/*.ocl — the existing 400 response path is already documented"
+    },
+    {
+      "id": "X2",
+      "text": "New automated tests — this is a thin/L1 profile fix; the existing test suite establishes no regression"
+    },
+    {
+      "id": "X3",
+      "text": "New endpoints, new response fields, or any other product feature additions"
+    },
+    {
+      "id": "X4",
+      "text": "Handling of NaN produced internally (as opposed to NaN supplied in the request body)"
+    }
+  ],
+  "assumptions": [
+    "Only src/server.ts is touched; no contract, OpenAPI, or OCL files require modification",
+    "The existing 400 error-response shapes are sufficient to communicate the rejection of non-finite input",
+    "The three handlers identified (calculate, memory/add, memory/subtract) are the only HTTP request handlers that parse numeric input from the request body"
+  ],
+  "constraints": [
+    "Do not introduce new error shapes or new response fields",
+    "Do not modify openapi/openapi.yaml or any contracts/*.ocl file",
+    "The fix must not break the existing test suite (3 test files, 21 tests)"
+  ],
+  "success_criteria": [
+    {
+      "id": "SC1",
+      "text": "POST /calculate with a non-finite numeric operand (e.g. {op:add,a:1e400,b:1}) returns HTTP 400 with {\"error\":\"invalid request: require op, a, b\"}"
+    },
+    {
+      "id": "SC2",
+      "text": "POST /memory/add with a non-finite numeric value (e.g. {value:1e400}) returns HTTP 400 with {\"error\":\"invalid request: require value\"}"
+    },
+    {
+      "id": "SC3",
+      "text": "POST /memory/subtract with a non-finite numeric value (e.g. {value:1e400}) returns HTTP 400 with {\"error\":\"invalid request: require value\"}"
+    },
+    {
+      "id": "SC4",
+      "text": "Normal finite-input requests (e.g. POST /calculate {op:add,a:2,b:3}) continue to return HTTP 200 with the correct result"
+    },
+    {
+      "id": "SC5",
+      "text": "All 21 pre-existing automated tests continue to pass"
+    }
+  ],
+  "open_questions": [],
+  "confidence": "high",
+  "human_gate": {
+    "required": false,
+    "reason": "Fix is a small, well-understood validation addition confined to the HTTP request layer. No contract surface, no new error shape, no ambiguity."
+  }
+}
